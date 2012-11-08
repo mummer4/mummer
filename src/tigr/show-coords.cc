@@ -788,7 +788,7 @@ void printBtab
      (vector<AlignStats> Stats)
 {
   time_t currtime;
-  char * type;
+  const char * type;
   char date[MAX_LINE];
   long int len;
   vector<AlignStats>::iterator Sip;

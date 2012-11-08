@@ -64,9 +64,9 @@ static int  Find
 static void  Parse_Command_Line
     (int argc, char * argv []);
 static void  Process_Matches
-    (Match_t * A, int N, char * label);
+    (Match_t * A, int N, const char * label);
 static int  Process_Cluster
-    (Match_t * A, int N, char * label);
+    (Match_t * A, int N, const char * label);
 static void  Union
     (int a, int b);
 static void  Usage
@@ -438,7 +438,7 @@ static void  Parse_Command_Line
 
 
 static int  Process_Cluster
-    (Match_t * A, int N, char * label)
+    (Match_t * A, int N, const char * label)
 
 //  Process the cluster of matches in  A [0 .. (N - 1)]  and output them
 //  after a line containing  label .  Return the number of clusters
@@ -552,7 +552,7 @@ static int  Process_Cluster
 
 
 static void  Process_Matches
-    (Match_t * A, int N, char * label)
+    (Match_t * A, int N, const char * label)
 
 //  Process matches  A [1 .. N]  and output them after
 //  a line containing  label .

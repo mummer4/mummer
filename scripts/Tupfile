@@ -1,0 +1,18 @@
+include_rules
+
+!replace = |> ^ REPL  %f^ $(SED) -e 's?__CSH_PATH?$(CSH)?g' \
+    -e 's?__BIN_DIR?$(BIN_DIR)?g' \
+    -e 's?__SCRIPT_DIR?$(SCRIPT_DIR)?g' \
+    -e 's?__PERL_PATH?$(PERL)?g' \
+    -e 's?__AUX_BIN_DIR?$(AUX_BIN_DIR)?g' \
+    %f > %o |>
+
+: exact-tandems.csh |> !replace |> exact-tandems
+: mapview.pl |> !replace |> mapview
+: mummerplot.pl Foundation.pm |> !replace |> mummerplot
+: dnadiff.pl Foundation.pm |> !replace |> dnadiff
+: nucmer.pl Foundation.pm |> !replace |> nucmer
+: promer.pl Foundation.pm |> !replace |> promer
+: run-mummer1.csh |> !replace |> run-mummer1
+: run-mummer3.csh |> !replace |> run-mummer3
+: nucmer2xfig.pl |> !replace |> nucmer2xfig

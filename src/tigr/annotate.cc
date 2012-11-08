@@ -44,7 +44,8 @@ int main  (int argc, char * argv [])
    char  Name [MAX_NAME_LEN], Tag [MAX_NAME_LEN];
    char  Olap_String [FIELD_LEN], Gap_String1 [FIELD_LEN], Gap_String2 [FIELD_LEN];
    int  Tag_Len;
-   long int  Input_Size, Len1, Len2, Line_Len;
+   long int  Input_Size, Len2, Line_Len;
+   //   long int Len1;
    long int  Start1, Start2, Len, Olap, Gap1, Gap2;
    long int  i;
 
@@ -87,7 +88,7 @@ int main  (int argc, char * argv [])
            Read_String (Data_File, Data1, Input_Size, Name, FALSE);
            fclose (Data_File);
 
-           Len1 = strlen (Data1 + 1);
+           //           Len1 = strlen (Data1 + 1);
 
            Tag_Len = strlen (Tag);
            for  (i = 0;  i < Tag_Len;  i ++)
@@ -151,7 +152,7 @@ public:
   {
     nRows_m = nRows;
     nCols_m = nCols;
-    if ( nRows*nCols > d_m.size() )
+    if ( (unsigned long)nRows * (unsigned long)nCols > d_m.size() )
       {
         try {
           d_m.resize(nRows*nCols);

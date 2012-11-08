@@ -1,0 +1,15 @@
+include_rules
+
+LIBBASEDIR=../libbasedir
+LIBSTREEDIR=../streesrc
+INCLUDEDIR=-I$(LIBBASEDIR) -I$(LIBSTREEDIR)
+
+CFLAGS+=$(INCLUDEDIR)
+MUM3OBJECTS=maxmat3.o maxmatopt.o maxmatinp.o\
+            findmumcand.o findmaxmat.o procmaxmat.o
+LIBBASE=$(LIBBASEDIR)/libbase.a
+LIBSTREE=$(LIBSTREEDIR)/libstree.a
+
+
+: foreach *.c | $(LIBSTREEDIR)/streeproto.h $(LIBBASEDIR)/protodef.h |> !cc |>
+: $(MUM3OBJECTS) $(LIBBASE) $(LIBSTREE) |> !ld |> mummer

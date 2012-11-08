@@ -1580,7 +1580,8 @@ void validateData
   char * A [7] = {NULL, NULL, NULL, NULL, NULL, NULL, NULL};
   char * B [7] = {NULL, NULL, NULL, NULL, NULL, NULL, NULL};
   
-  long int Alen [7], Blen [7];         // the length of the amino acid sequences
+  //  long int Alen [7];
+  //  long int Blen [7];         // the length of the amino acid sequences
   vector<Cluster>::iterator Cp;
   vector<Match>::iterator Mp;
   vector<Alignment>::iterator Ap;
@@ -1597,16 +1598,20 @@ void validateData
 	  A [Cp->frameA] = (char *) Safe_malloc
 	    ( sizeof(char) * ( (Af->len / 3) + 2) );
 	  A [Cp->frameA] [0] = '\0';
-	  Alen [Cp->frameA] = Translate_DNA ( Af->seq, A [Cp->frameA],
-						  Cp->frameA );
+	  // Alen [Cp->frameA] = Translate_DNA ( Af->seq, A [Cp->frameA],
+	  //       				  Cp->frameA );
+	  Translate_DNA ( Af->seq, A [Cp->frameA],
+                          Cp->frameA );
         }
       if ( B [Cp->frameB] == NULL )
         {
 	  B [Cp->frameB] = (char *) Safe_malloc
 	    ( sizeof(char) * ( (Bf->len / 3) + 2) );
 	  B [Cp->frameB] [0] = '\0';
-	  Blen [Cp->frameB] = Translate_DNA ( Bf->seq, B [Cp->frameB],
-						  Cp->frameB );
+	  Translate_DNA ( Bf->seq, B [Cp->frameB],
+                          Cp->frameB );
+	  // Blen [Cp->frameB] = Translate_DNA ( Bf->seq, B [Cp->frameB],
+	  //       				  Cp->frameB );
         }
 
       for ( Mp = Cp->matches.begin( ); Mp < Cp->matches.end( ); Mp ++ )

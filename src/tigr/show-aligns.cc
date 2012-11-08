@@ -338,7 +338,8 @@ void printAlignments
 
   int Sign;
   long int Delta;
-  long int Total, Errors, Remain;
+  long int Total, Remain;
+  // long int Errors;
   long int Pos;
 
   long int sR, eR, sQ, eQ;
@@ -434,7 +435,7 @@ void printAlignments
       Apos = sR;
       Bpos = sQ;
 
-      Errors = 0;
+      //      Errors = 0;
       Total = 0;
       Remain = eR - sR + 1;
 

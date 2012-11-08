@@ -106,7 +106,7 @@ int  Error_Bound [MAX_FRAG_LEN + 1];
     //  This array [i]  is the maximum number of errors allowed
     //  in a match between sequences of length  i , which is
     //  i * MAXERROR_RATE .
-char  * Error_File_Name = DEFAULT_ERROR_FILE_NAME;
+const char  * Error_File_Name = DEFAULT_ERROR_FILE_NAME;
     // Name of file to write gaps listing with # errors in each gap
 int  Fill_Ct = 0;
     // Number of non-acgt bases in ref sequence
@@ -132,7 +132,7 @@ char  * Query = NULL;
     // The query sequence
 long int  Query_Len;
     // The length of the query sequence
-char  * Query_Suffix = "Query";
+const char  * Query_Suffix = "Query";
     // Suffix for query tag
 char  * Ref = NULL;
     // The reference sequence
@@ -142,7 +142,7 @@ long int  Ref_Len;
     // The length of the reference sequence
 long int  Ref_Size;
     // The size of the reference sequence buffer
-char  * Ref_Suffix = "Ref";
+const char  * Ref_Suffix = "Ref";
     // Suffix for reference tag
 int  Show_Differences = FALSE;
     // If  TRUE  then show differences in all alignments

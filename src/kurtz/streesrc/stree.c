@@ -17,17 +17,17 @@
 #include "spacedef.h"
 #include "megabytes.h"
 
-/*@unused@*/ static void progresswithdot(/*@unused@*/ Uint nextstep,
-                                         /*@unused@*/ void *info)
-{
-  (void) putc('.',stderr);
-  (void) fflush(stderr);
-}
+/* /\*@unused@*\/ static void progresswithdot(/\*@unused@*\/ Uint nextstep, */
+/*                                          /\*@unused@*\/ void *info) */
+/* { */
+/*   (void) putc('.',stderr); */
+/*   (void) fflush(stderr); */
+/* } */
 
-/*@unused@*/ static void finalprogress(/*@unused@*/ void *info)
-{
-  (void) putc('\n',stderr);
-}
+/* /\*@unused@*\/ static void finalprogress(/\*@unused@*\/ void *info) */
+/* { */
+/*   (void) putc('\n',stderr); */
+/* } */
 
 /*EE
   The following function constructs the suffix tree.

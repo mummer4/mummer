@@ -37,5 +37,7 @@ void freestree(Suffixtree *stree);
 #endif
 
 ENDOFINCLUDE
-skproto.x $*
+
+cproto -I ../libbasedir "$@"
+
 echo "#endif"

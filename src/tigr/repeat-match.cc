@@ -847,7 +847,7 @@ void  List_Matches
         {
          if  (Data [i - 1] == Data [j - 1]
                   || Data [i + n] == Data [j + n]
-                  || i > String_Separator && j > String_Separator)
+                  || (i > String_Separator && j > String_Separator))
              continue;
          Reversed = FALSE;
          if  (j > String_Separator)
@@ -1266,14 +1266,15 @@ void  Set_Subtree_Size
 //  string-depth in the suffix tree.
 
   {
-   int  Start, Depth;
+   int Depth;
+   //   int Start;
 
    if  (Root == NIL)
        return;
 
    if  (Is_Leaf)
        {
-        Start = Leaf_Array [Root] . Lo - Parent_Depth;
+         //        Start = Leaf_Array [Root] . Lo - Parent_Depth;
         if  (Leaf_Array [Root] . Is_Duplicate)
             Node_Array [Parent] . Subtree_Size ++;
           else

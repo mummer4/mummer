@@ -53,7 +53,8 @@ static void setdepthtab(ArrayUint *depthtab,Uint depth)
 
 void makedepthtabstree(ArrayUint *depthtab,Suffixtree *stree)
 {
-  Uint depth, headposition, *btptr, *largeptr, distance;
+  Uint depth, *btptr, *largeptr, distance;
+  //  Uint headposition;
 
   btptr = stree->branchtab; 
   while(btptr < stree->nextfreebranch)
@@ -61,7 +62,7 @@ void makedepthtabstree(ArrayUint *depthtab,Suffixtree *stree)
     if(ISLARGE(*btptr))
     {
       depth = GETDEPTH(btptr);
-      headposition = GETHEADPOS(btptr);
+      /* headposition = GETHEADPOS(btptr); */
       setdepthtab(depthtab,depth);
       btptr += LARGEINTS;
     } else
@@ -69,7 +70,7 @@ void makedepthtabstree(ArrayUint *depthtab,Suffixtree *stree)
       distance = GETDISTANCE(btptr);
       GETCHAINEND(largeptr,btptr,distance);
       depth = GETDEPTH(largeptr);
-      headposition = GETHEADPOS(largeptr);
+      /* headposition = GETHEADPOS(largeptr); */
       while(distance > 0)
       {
         setdepthtab(depthtab,depth + distance);

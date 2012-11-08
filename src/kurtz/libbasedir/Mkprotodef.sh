@@ -19,6 +19,12 @@ cat << ENDOFINCLUDE
 #include "optdesc.h"
 #include "multidef.h"
 #include "mumcand.h"
+
 ENDOFINCLUDE
-skproto.x $*
-echo "#endif"
+
+cproto "$@"
+
+cat <<EOF 
+
+#endif /* PROTODEF_H */
+EOF

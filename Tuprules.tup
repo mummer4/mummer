@@ -1,0 +1,30 @@
+!cc   = |> ^ CC    %f^ $(CC) $(T_CPPFLAGS) $(CPPFLAGS) $(T_CFLAGS) $(CFLAGS_%B) $(CFLAGS) -c -o %o %f |> %B.o
+!cxx  = |> ^ CXX   %f^ $(CXX) $(T_CPPFLAGS) $(CPPFLAGS) $(T_CXXFLAGS) $(CXXFLAGS_%B) $(CXXFLAGS) -c -o %o %f |> %B.o
+!ld   = |> ^ LD    %o^ $(CC) $(T_LDFLAGS) $(LDFLAGS) $(LDFLAGS_%B) $(LOADLIBES) $(LDLIBS) %f -o %o |>
+!lxxd = |> ^ LXX   %o^ $(CXX) $(T_LDFLAGS) $(LDFLAGS) $(LDFLAGS_%B) $(LOADLIBES) $(LDLIBS) %f -o %o |>
+!ar   = |> ^ AR    %o^ $(AR) sruv $(T_ARFLAGS) $(ARFLAGS) %o %f |>
+
+# : foreach *.c |> !cc |>
+# : foreach *.cc |> !cxx |>
+# : foreach *.cpp |> !cxx |>
+
+CC  = gcc
+CXX = g++
+AR  = ar
+
+T_CPPFLAGS = -Wall @(CPPFLAGS)
+T_CFLAGS = @(CFLAGS)
+T_CXXFLAGS = @(CXXFLAGS)
+T_LDFLAGS = @(LDFLAGS)
+T_ARFLAGS = @(ARFLAGS)
+
+ifdef BIN_DIR
+BIN_DIR = @(BIN_DIR)
+else
+BIN_DIR = .
+endif
+AUX_BIN_DIR = $(BIN_DIR)
+
+CSH = /bin/csh
+PERL = /usr/bin/perl
+SED = /bin/sed
