@@ -1,0 +1,74 @@
+findmaxmat.o: findmaxmat.c ../streesrc/streedef.h \
+ ../libbasedir/types.h ../streesrc/streemac.h ../streesrc/symboldef.h \
+ ../libbasedir/errordef.h ../streesrc/streetyp.h \
+ ../libbasedir/arraydef.h ../libbasedir/spacedef.h \
+ ../streesrc/streeproto.h ../libbasedir/debugdef.h maxmatdef.h \
+ ../libbasedir/chardef.h ../libbasedir/multidef.h
+findmumcand.o: findmumcand.c ../streesrc/streedef.h \
+ ../libbasedir/types.h ../streesrc/streemac.h ../streesrc/symboldef.h \
+ ../libbasedir/errordef.h ../streesrc/streetyp.h \
+ ../libbasedir/arraydef.h ../libbasedir/spacedef.h \
+ ../streesrc/streeproto.h ../libbasedir/debugdef.h maxmatdef.h \
+ ../libbasedir/chardef.h ../libbasedir/multidef.h
+maxmat3.o: maxmat3.c ../libbasedir/types.h ../libbasedir/debugdef.h \
+ ../libbasedir/errordef.h ../libbasedir/protodef.h \
+ ../libbasedir/optdesc.h ../libbasedir/multidef.h \
+ ../libbasedir/arraydef.h ../libbasedir/spacedef.h \
+ ../libbasedir/mumcand.h ../libbasedir/megabytes.h maxmatdef.h \
+ ../libbasedir/chardef.h
+maxmatinp.o: maxmatinp.c ../libbasedir/chardef.h \
+ ../libbasedir/spacedef.h ../libbasedir/types.h \
+ ../libbasedir/errordef.h ../libbasedir/protodef.h \
+ ../libbasedir/optdesc.h ../libbasedir/multidef.h \
+ ../libbasedir/arraydef.h ../libbasedir/mumcand.h \
+ ../libbasedir/debugdef.h maxmatdef.h
+maxmatopt.o: maxmatopt.c ../libbasedir/types.h ../libbasedir/optdesc.h \
+ ../libbasedir/errordef.h ../libbasedir/debugdef.h \
+ ../libbasedir/protodef.h ../libbasedir/multidef.h \
+ ../libbasedir/arraydef.h ../libbasedir/spacedef.h \
+ ../libbasedir/mumcand.h maxmatdef.h ../libbasedir/chardef.h
+procmaxmat.o: procmaxmat.c ../libbasedir/types.h \
+ ../libbasedir/debugdef.h ../libbasedir/errordef.h \
+ ../libbasedir/protodef.h ../libbasedir/optdesc.h \
+ ../libbasedir/multidef.h ../libbasedir/arraydef.h \
+ ../libbasedir/spacedef.h ../libbasedir/mumcand.h \
+ ../streesrc/streedef.h ../streesrc/streemac.h ../streesrc/symboldef.h \
+ ../streesrc/streetyp.h ../streesrc/streeproto.h maxmatdef.h \
+ ../libbasedir/chardef.h
+findmaxmat.dbg.o: findmaxmat.c ../streesrc/streedef.h \
+ ../libbasedir/types.h ../streesrc/streemac.h ../streesrc/symboldef.h \
+ ../libbasedir/errordef.h ../streesrc/streetyp.h \
+ ../libbasedir/arraydef.h ../libbasedir/spacedef.h \
+ ../streesrc/streeproto.h ../libbasedir/debugdef.h maxmatdef.h \
+ ../libbasedir/chardef.h ../libbasedir/multidef.h
+findmumcand.dbg.o: findmumcand.c ../streesrc/streedef.h \
+ ../libbasedir/types.h ../streesrc/streemac.h ../streesrc/symboldef.h \
+ ../libbasedir/errordef.h ../streesrc/streetyp.h \
+ ../libbasedir/arraydef.h ../libbasedir/spacedef.h \
+ ../streesrc/streeproto.h ../libbasedir/debugdef.h maxmatdef.h \
+ ../libbasedir/chardef.h ../libbasedir/multidef.h
+maxmat3.dbg.o: maxmat3.c ../libbasedir/types.h ../libbasedir/debugdef.h \
+ ../libbasedir/errordef.h ../libbasedir/protodef.h \
+ ../libbasedir/optdesc.h ../libbasedir/multidef.h \
+ ../libbasedir/arraydef.h ../libbasedir/spacedef.h \
+ ../libbasedir/mumcand.h ../libbasedir/megabytes.h maxmatdef.h \
+ ../libbasedir/chardef.h
+maxmatinp.dbg.o: maxmatinp.c ../libbasedir/chardef.h \
+ ../libbasedir/spacedef.h ../libbasedir/types.h \
+ ../libbasedir/errordef.h ../libbasedir/protodef.h \
+ ../libbasedir/optdesc.h ../libbasedir/multidef.h \
+ ../libbasedir/arraydef.h ../libbasedir/mumcand.h \
+ ../libbasedir/debugdef.h maxmatdef.h
+maxmatopt.dbg.o: maxmatopt.c ../libbasedir/types.h ../libbasedir/optdesc.h \
+ ../libbasedir/errordef.h ../libbasedir/debugdef.h \
+ ../libbasedir/protodef.h ../libbasedir/multidef.h \
+ ../libbasedir/arraydef.h ../libbasedir/spacedef.h \
+ ../libbasedir/mumcand.h maxmatdef.h ../libbasedir/chardef.h
+procmaxmat.dbg.o: procmaxmat.c ../libbasedir/types.h \
+ ../libbasedir/debugdef.h ../libbasedir/errordef.h \
+ ../libbasedir/protodef.h ../libbasedir/optdesc.h \
+ ../libbasedir/multidef.h ../libbasedir/arraydef.h \
+ ../libbasedir/spacedef.h ../libbasedir/mumcand.h \
+ ../streesrc/streedef.h ../streesrc/streemac.h ../streesrc/symboldef.h \
+ ../streesrc/streetyp.h ../streesrc/streeproto.h maxmatdef.h \
+ ../libbasedir/chardef.h

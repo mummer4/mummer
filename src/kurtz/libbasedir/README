@@ -1,0 +1,14 @@
+
+This directory contains basic functions which are useful for other
+software. That is why I have put it in a seperate directory.
+
+cleanMUMcand.c: cleaning tables of MUM candidates
+clock.c: timing the program
+debug.c: throwing debugging messages
+distri.c: incrementally computing distributions of integers
+mapfile.c: memory mapping files
+multiseq.c: handling multiple sequences
+procopt.c: parsing options
+safescpy.c: a safe string copy
+seterror.c: handling error messages 
+space.c: space allocation and keeping track of it

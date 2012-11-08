@@ -1,0 +1,26 @@
+cleanMUMcand.o: cleanMUMcand.c types.h mumcand.h arraydef.h
+clock.o: clock.c types.h
+debug.o: debug.c types.h fopen.h debugdef.h errordef.h megabytes.h
+mapfile.o: mapfile.c types.h errordef.h megabytes.h debugdef.h
+multiseq.o: multiseq.c types.h debugdef.h spacedef.h errordef.h \
+ minmax.h protodef.h optdesc.h multidef.h arraydef.h mumcand.h \
+ chardef.h
+procopt.o: procopt.c optdesc.h types.h errordef.h debugdef.h \
+ protodef.h multidef.h arraydef.h mumcand.h spacedef.h
+safescpy.o: safescpy.c debugdef.h types.h errordef.h protodef.h \
+ optdesc.h multidef.h arraydef.h mumcand.h
+seterror.o: seterror.c types.h
+space.o: space.c types.h errordef.h megabytes.h debugdef.h
+cleanMUMcand.dbg.o: cleanMUMcand.c types.h mumcand.h arraydef.h
+clock.dbg.o: clock.c types.h
+debug.dbg.o: debug.c types.h fopen.h debugdef.h errordef.h megabytes.h
+mapfile.dbg.o: mapfile.c types.h errordef.h megabytes.h debugdef.h
+multiseq.dbg.o: multiseq.c types.h debugdef.h spacedef.h errordef.h \
+ minmax.h protodef.h optdesc.h multidef.h arraydef.h mumcand.h \
+ chardef.h
+procopt.dbg.o: procopt.c optdesc.h types.h errordef.h debugdef.h \
+ protodef.h multidef.h arraydef.h mumcand.h spacedef.h
+safescpy.dbg.o: safescpy.c debugdef.h types.h errordef.h protodef.h \
+ optdesc.h multidef.h arraydef.h mumcand.h
+seterror.dbg.o: seterror.c types.h
+space.dbg.o: space.c types.h errordef.h megabytes.h debugdef.h

@@ -1,0 +1,200 @@
+access.dbg.o:access.c
+	$(CC) $(CFLAGS) -DDEBUG -c access.c -o $@
+
+addleafcount.dbg.o:addleafcount.c
+	$(CC) $(CFLAGS) -DDEBUG -c addleafcount.c -o $@
+
+construct.dbg.o:construct.c
+	$(CC) $(CFLAGS) -DDEBUG -c construct.c -o $@
+
+depthtab.dbg.o:depthtab.c
+	$(CC) $(CFLAGS) -DDEBUG -c depthtab.c -o $@
+
+dfs.dbg.o:dfs.c
+	$(CC) $(CFLAGS) -DDEBUG -c dfs.c -o $@
+
+ex2leav.dbg.o:ex2leav.c
+	$(CC) $(CFLAGS) -DDEBUG -c ex2leav.c -o $@
+
+iterator.dbg.o:iterator.c
+	$(CC) $(CFLAGS) -DDEBUG -c iterator.c -o $@
+
+linkloc.dbg.o:linkloc.c
+	$(CC) $(CFLAGS) -DDEBUG -c linkloc.c -o $@
+
+loc.dbg.o:loc.c
+	$(CC) $(CFLAGS) -DDEBUG -c loc.c -o $@
+
+overmax.dbg.o:overmax.c
+	$(CC) $(CFLAGS) -DDEBUG -c overmax.c -o $@
+
+oversucc.dbg.o:oversucc.c
+	$(CC) $(CFLAGS) -DDEBUG -c oversucc.c -o $@
+
+scanpref.dbg.o:scanpref.c
+	$(CC) $(CFLAGS) -DDEBUG -c scanpref.c -o $@
+
+stree.dbg.o:stree.c
+	$(CC) $(CFLAGS) -DDEBUG -c stree.c -o $@
+
+streedbg.dbg.o:streedbg.c
+	$(CC) $(CFLAGS) -DDEBUG -c streedbg.c -o $@
+
+streefiledoc.dbg.o:streefiledoc.c
+	$(CC) $(CFLAGS) -DDEBUG -c streefiledoc.c -o $@
+
+access.prepro:access.c
+	$(CC) -E -g3 $(CFLAGS) -DDEBUG -c access.c -o $@
+
+addleafcount.prepro:addleafcount.c
+	$(CC) -E -g3 $(CFLAGS) -DDEBUG -c addleafcount.c -o $@
+
+construct.prepro:construct.c
+	$(CC) -E -g3 $(CFLAGS) -DDEBUG -c construct.c -o $@
+
+depthtab.prepro:depthtab.c
+	$(CC) -E -g3 $(CFLAGS) -DDEBUG -c depthtab.c -o $@
+
+dfs.prepro:dfs.c
+	$(CC) -E -g3 $(CFLAGS) -DDEBUG -c dfs.c -o $@
+
+ex2leav.prepro:ex2leav.c
+	$(CC) -E -g3 $(CFLAGS) -DDEBUG -c ex2leav.c -o $@
+
+iterator.prepro:iterator.c
+	$(CC) -E -g3 $(CFLAGS) -DDEBUG -c iterator.c -o $@
+
+linkloc.prepro:linkloc.c
+	$(CC) -E -g3 $(CFLAGS) -DDEBUG -c linkloc.c -o $@
+
+loc.prepro:loc.c
+	$(CC) -E -g3 $(CFLAGS) -DDEBUG -c loc.c -o $@
+
+overmax.prepro:overmax.c
+	$(CC) -E -g3 $(CFLAGS) -DDEBUG -c overmax.c -o $@
+
+oversucc.prepro:oversucc.c
+	$(CC) -E -g3 $(CFLAGS) -DDEBUG -c oversucc.c -o $@
+
+scanpref.prepro:scanpref.c
+	$(CC) -E -g3 $(CFLAGS) -DDEBUG -c scanpref.c -o $@
+
+stree.prepro:stree.c
+	$(CC) -E -g3 $(CFLAGS) -DDEBUG -c stree.c -o $@
+
+streedbg.prepro:streedbg.c
+	$(CC) -E -g3 $(CFLAGS) -DDEBUG -c streedbg.c -o $@
+
+streefiledoc.prepro:streefiledoc.c
+	$(CC) -E -g3 $(CFLAGS) -DDEBUG -c streefiledoc.c -o $@
+
+access.pr:access.c
+	skproto.x access.c > $@
+
+addleafcount.pr:addleafcount.c
+	skproto.x addleafcount.c > $@
+
+construct.pr:construct.c
+	skproto.x construct.c > $@
+
+depthtab.pr:depthtab.c
+	skproto.x depthtab.c > $@
+
+dfs.pr:dfs.c
+	skproto.x dfs.c > $@
+
+ex2leav.pr:ex2leav.c
+	skproto.x ex2leav.c > $@
+
+iterator.pr:iterator.c
+	skproto.x iterator.c > $@
+
+linkloc.pr:linkloc.c
+	skproto.x linkloc.c > $@
+
+loc.pr:loc.c
+	skproto.x loc.c > $@
+
+overmax.pr:overmax.c
+	skproto.x overmax.c > $@
+
+oversucc.pr:oversucc.c
+	skproto.x oversucc.c > $@
+
+scanpref.pr:scanpref.c
+	skproto.x scanpref.c > $@
+
+stree.pr:stree.c
+	skproto.x stree.c > $@
+
+streedbg.pr:streedbg.c
+	skproto.x streedbg.c > $@
+
+streefiledoc.pr:streefiledoc.c
+	skproto.x streefiledoc.c > $@
+
+access.splint:access.c
+	splint ${SPLINTFLAGS} access.c
+	touch access.splint
+
+addleafcount.splint:addleafcount.c
+	splint ${SPLINTFLAGS} addleafcount.c
+	touch addleafcount.splint
+
+construct.splint:construct.c
+	splint ${SPLINTFLAGS} construct.c
+	touch construct.splint
+
+depthtab.splint:depthtab.c
+	splint ${SPLINTFLAGS} depthtab.c
+	touch depthtab.splint
+
+dfs.splint:dfs.c
+	splint ${SPLINTFLAGS} dfs.c
+	touch dfs.splint
+
+ex2leav.splint:ex2leav.c
+	splint ${SPLINTFLAGS} ex2leav.c
+	touch ex2leav.splint
+
+iterator.splint:iterator.c
+	splint ${SPLINTFLAGS} iterator.c
+	touch iterator.splint
+
+linkloc.splint:linkloc.c
+	splint ${SPLINTFLAGS} linkloc.c
+	touch linkloc.splint
+
+loc.splint:loc.c
+	splint ${SPLINTFLAGS} loc.c
+	touch loc.splint
+
+overmax.splint:overmax.c
+	splint ${SPLINTFLAGS} overmax.c
+	touch overmax.splint
+
+oversucc.splint:oversucc.c
+	splint ${SPLINTFLAGS} oversucc.c
+	touch oversucc.splint
+
+scanpref.splint:scanpref.c
+	splint ${SPLINTFLAGS} scanpref.c
+	touch scanpref.splint
+
+stree.splint:stree.c
+	splint ${SPLINTFLAGS} stree.c
+	touch stree.splint
+
+streedbg.splint:streedbg.c
+	splint ${SPLINTFLAGS} streedbg.c
+	touch streedbg.splint
+
+streefiledoc.splint:streefiledoc.c
+	splint ${SPLINTFLAGS} streefiledoc.c
+	touch streefiledoc.splint
+
+splintall:${SPLINTALL}
+
+splintclean:
+	rm -f *.splint
+

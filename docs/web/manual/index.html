@@ -1,0 +1,3079 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>The MUMmer 3 manual</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<style type="text/css">
+<!--
+body {
+	background-color: #FFFFFF;
+}
+h2 {
+	background-color: #BBBBFF;
+	font-style: italic;
+}
+h3 {
+	background-color: #CDCDEE;
+}
+h4 {
+	background-color: #EFEFEF;
+}
+code {
+	color: #CC0000;
+}
+td {
+	vertical-align: top;
+}
+.centered {
+	text-align: center;
+}
+.right {
+	text-align: right;
+}
+-->
+</style>
+</head>
+<body>
+<p><img alt="MUMmer 3 manual logo" src="manual_logo.gif" border="0"></p>
+<hr>
+<h2>Table of Contents</h2>
+<ol>
+  <li><a href="#introduction">Introduction</a> 
+    <ol>
+      <li><a href="#description">Description</a></li>
+      <li><a href="#compare">Comparative genomics</a> 
+        <ol>
+          <li><a href="#AvailableCompare">Available sequence</a></li>
+          <li><a href="#HumanCompare">Human vs. Human</a></li>
+        </ol>
+      </li>
+      <li><a href="#osi">OSI open source</a></li>
+    </ol>
+  </li>
+  <li><a href="#installation">Installation</a> 
+    <ol>
+      <li><a href="#requirements">System requirements</a></li>
+      <li><a href="#obtaining">Obtaining MUMmer</a></li>
+      <li><a href="#compilation">Compilation and installation</a></li>
+    </ol>
+  </li>
+  <li><a href="#running">Running MUMmer</a></li>
+  <li><a href="#usecases">Use cases and walk-throughs</a> 
+    <ol>
+      <li><a href="#aligningfinished">Aligning two finished sequences</a> 
+        <ol>
+          <li><a href="#1vs1mummer1">Highly similar sequences without rearrangements</a></li>
+          <li><a href="#1vs1mummer3">Highly similar sequences with rearrangements</a></li>
+          <li><a href="#1vs1nucmer">Fairly similar sequences</a></li>
+          <li><a href="#1vs1promer">Fairly dissimilar sequences</a></li>
+        </ol>
+      </li>
+      <li><a href="#aligningdraft">Aligning two draft sequences</a></li>
+      <li><a href="#mappingdraft">Mapping a draft sequence to a finished sequence</a></li>
+      <li><a href="#snpdetection">SNP detection</a></li>
+      <li><a href="#identifyingrepeats">Identifying repeats</a></li>
+    </ol>
+  </li>
+  <li><a href="#program">Program descriptions</a> 
+    <ol>
+      <li><a href="#maximal">Maximal exact matching</a> 
+        <ol>
+          <li><a href="#mummer">mummer</a></li>
+          <li><a href="#repeat">repeat-match</a></li>
+          <li><a href="#exact">exact-tandems</a></li>
+        </ol>
+      </li>
+      <li><a href="#clustering">Clustering</a> 
+        <ol>
+          <li><a href="#gaps">gaps</a></li>
+          <li><a href="#mgaps">mgaps</a></li>
+        </ol>
+      </li>
+      <li><a href="#alignment">Alignment generators</a> 
+        <ol>
+          <li><a href="#nucmer">NUCmer</a></li>
+          <li><a href="#promer">PROmer</a></li>
+          <li><a href="#mummer1">run-mummer1</a></li>
+          <li><a href="#mummer3">run-mummer3</a></li>
+        </ol>
+      </li>
+      <li><a href="#utilities">Utilities</a> 
+        <ol>
+          <li><a href="#filter">delta-filter</a></li>
+          <li><a href="#mapview">mapview</a></li>
+          <li><a href="#mummerplot">mummerplot</a></li>
+          <li><a href="#aligns">show-aligns</a></li>
+          <li><a href="#coords">show-coords</a></li>
+          <li><a href="#snps">show-snps</a></li>
+          <li><a href="#tiling">show-tiling</a></li>
+        </ol>
+      </li>
+    </ol>
+  </li>
+  <li><a href="#problems">Known problems</a></li>
+  <li><a href="#acknowledgements">Acknowledgements</a></li>
+  <li><a href="#contact">Contact information</a></li>
+</ol>
+<hr width="100%">
+<h2><a name="introduction"></a>1. Introduction</h2>
+<p>MUMmer is an open source software package for the rapid alignment of very large 
+  DNA and amino acid sequences. The latest version, release 3.0, includes a new 
+  suffix tree algorithm that has further improved the efficiency of the package 
+  and has been integral to making MUMmer an open source product. If you are familiar 
+  with the previous versions of MUMmer, you will find the new version is very 
+  similar because most of the changes have been to the implementation and not 
+  the interface, however this document assumes no previous experience with MUMmer, 
+  so past users may find it desirable to skip or skim through some of the sections.</p>
+<h3><a name="description"></a>1.1. Description</h3>
+<p>MUMmer is a modular and versatile package that relies on a suffix tree data 
+  structure for efficient pattern matching. Suffix trees are suited for large 
+  data sets because they can be constructed and searched in linear time and space. 
+  This allows <code>mummer</code> to find all 20 base pair maximal exact matches 
+  between two ~5 million base pair bacterial genomes in 20 seconds, using 90 MB 
+  of RAM, on a typical 1.7 GHz Linux desktop computer. Using a seed and extend 
+  strategy, other parts of the MUMmer pipeline use these exact matches as alignment 
+  anchors to generate pair-wise alignments similar to BLAST output. Also included 
+  are some <a href="#utilities">utilities</a> to handle the alignment output and 
+  a primitive plotting tool (<code>mummerplot</code>) that allows the user to 
+  convert MUMmer output to <code><a href="http://www.gnuplot.info" target="_blank">gnuplot</a></code> 
+  files for <a href="#dotplot">dot and percent identity plots</a>. Another graphical 
+  utility called MapView is included with the MUMmer distribution and displays 
+  sequence alignments to a annotated reference sequence for exon refinement and 
+  investigation.</p>
+<p>This modular design has an important side effect, it allows for the easy reuse 
+  of MUMmer modules in other software. For instance, one can imagine primer design, 
+  repeat masking and even comparative annotation tools based on the efficient 
+  matching algorithm MUMmer provides. Another advantage of MUMmer is its speed. 
+  Its low runtime and memory requirements allow it to be used on most any computer. 
+  MUMmer's efficiency also makes it ideal for aligning huge sequences such as 
+  completed and draft eukarotic genomes. MUMmer has been successfully used to 
+  align the mouse and human genomes, showing it can handle most any input available. 
+  In addition, its ability to handle multiple sequences facilitate many vs. many 
+  searches, and make the comparison of unfinished draft sequence quite simple. 
+  However, because of it's many abilities, inexperienced users may find it difficult 
+  to determine the best methods for their application, so please refer to the 
+  <a href="#running">Running MUMmer</a> and <a href="#usecases">Use cases</a> 
+  sections for brief descriptions, use case examples, and tips on making the most 
+  of the MUMmer package, or if you want to understand more about a specific utility, 
+  refer to <a href="#program">Program descriptions</a> section for more detailed 
+  information and output formats.</p>
+<h3><a name="compare"></a>1.2. Comparative genomics</h3>
+<h4><a name="AvailableCompare"></a>1.2.1. Available sequence</h4>
+<p>The MUMmer package provides efficient means for comparing an entire genome 
+  against another. However, until 1999 there were no two genomes of sufficient 
+  similarity to compare. With the publication of the second strain of <em>Helicobacter 
+  pylori</em> in 1999, following the publication of the first strain in 1997, 
+  the scientific world had its first chance to look at two complete bacterial 
+  genomes whose DNA sequences were highly similar. The number of pairs of closely-related 
+  genomes has exploded in recent years, facilitating many comparative studies. 
+  For instance, the published databases include the following genomes for which 
+  multiple strains and/or multiple species have been sequenced:</p>
+<div class="centered"> 
+  <table width="60%" border="0">
+    <tr> 
+      <td nowrap> <h5>multiple strains of...</h5>
+        <ul>
+          <li><em>Agrobacterium tumefaciens</em></li>
+          <li><em>Bacillus anthracis</em></li>
+          <li><em>Brucella melitensis</em></li>
+          <li><em>Buchnera aphidicola</em></li>
+          <li><em>Chlamydophila pneumoniae</em></li>
+          <li><em>Escherichia coli</em></li>
+          <li><em>Helicobacter pylori</em></li>
+          <li><em>Mycobacterium tuberculosis</em></li>
+          <li><em>Neisseria meningitidis</em></li>
+          <li><em>Staphylococcus aureus</em></li>
+          <li><em>Streptococcus pyogenes</em></li>
+          <li><em>Streptococcus pneumoniae</em></li>
+          <li><em>Yersinia pestis</em></li>
+        </ul></td>
+      <td nowrap> <h5>multiple species of...</h5>
+        <ul>
+          <li><em>Bacillus</em></li>
+          <li><em>Chlamydia</em></li>
+          <li><em>Clostridium</em></li>
+          <li><em>Corynebacterium</em></li>
+          <li><em>Lactobacillus</em></li>
+          <li><em>Listeria</em></li>
+          <li><em>Methanosarcina</em></li>
+          <li><em>Mycobacterium</em></li>
+          <li><em>Mycoplasma</em></li>
+          <li><em>Plasmodium</em></li>
+          <li><em>Pseudomonas</em></li>
+          <li><em>Pyrococcus</em></li>
+          <li><em>Rickettsia</em></li>
+          <li><em>Saccharomyces</em></li>
+          <li><em>Staphylococcus</em></li>
+          <li><em>Streptococcus</em></li>
+          <li><em>Thermoplasma</em></li>
+          <li><em>Vibrio</em></li>
+          <li><em>Xanthomonas</em></li>
+          <li><em>Xylella</em></li>
+        </ul></td>
+    </tr>
+  </table>
+</div>
+<p>Most of these genomes can be obtained from the NCBI ftp site: <a href="ftp://ftp.ncbi.nlm.nih.gov/genomes/">ftp://ftp.ncbi.nlm.nih.gov/genomes/</a></p>
+<h4><a name="HumanCompare">1.2.2. Human vs. Human</a></h4>
+<p>With the capability to align the entire human genome to itself, there is no 
+  genome too large for MUMmer. The following table gives run times and space requirements 
+  for a cross comparison of all human chromosomes. The 1st column indicates the 
+  chromosome number, with &quot;Un&quot; referring to unmapped contigs. Column 
+  2 shows chromosome length and column 4 shows the length of the total genomic 
+  DNA searched against the chromosome in column 1. Column 3 shows the time to 
+  construct the suffix tree, and column 5 the time to stream the query sequence 
+  through it. Column 6 shows the maximum amount of computer memory occupied by 
+  the program and data, and column 7 shows memory usage for the suffix tree in 
+  bytes per base pair. Each human chromosome was used as a reference, and the 
+  rest of the genome was used as a query and streamed against it. To avoid duplication, 
+  we only included chromosomes in the query if they had not already been compared; 
+  thus we first used chromosome 1 as a reference, and streamed the other 23 chromosomes 
+  against it. Then we used chromosome 2 as a reference, and streamed chromosomes 
+  3&#8211;22, X, and Y against that, and so on.</p>
+<div class="centered"> 
+  <table border="0" cellpadding="1" cellspacing="3">
+    <tr align="right"> 
+      <td bgcolor="#EFEFEF"><strong><font size="2">Chr </font></strong></td>
+      <td bgcolor="#EFEFEF"><strong><font size="2">Ref length<br>
+        (Mbp)</font></strong></td>
+      <td bgcolor="#EFEFEF"><strong><font size="2">Suffix time<br>
+        (min)</font></strong></td>
+      <td bgcolor="#EFEFEF"><strong><font size="2">Qry length<br>
+        (Mbp)</font></strong></td>
+      <td bgcolor="#EFEFEF"><strong><font size="2">Query time<br>
+        (min)</font></strong></td>
+      <td bgcolor="#EFEFEF"><strong><font size="2">Total space</font><font size="2"><br>
+        (Mb)</font></strong></td>
+      <td bgcolor="#EFEFEF"><strong><font size="2">Suffix space<br>
+        (bytes/bp)</font></strong></td>
+    </tr>
+    <tr align="right"> 
+      <td bgcolor="#E6E6FA"><font size="2">1 </font></td>
+      <td bgcolor="#E6E6FA"><font size="2">221.8</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">24.6</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">2617.1</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">679.5</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">3702</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">15.43</font></td>
+    </tr>
+    <tr align="right"> 
+      <td bgcolor="#E6E6FA"><font size="2">2</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">237.6</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">27.4</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">2379.5</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">625.8</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">3908</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">15.43</font></td>
+    </tr>
+    <tr align="right"> 
+      <td bgcolor="#E6E6FA"><font size="2">3</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">194.8</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">21.2</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">2184.7</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">565.0</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">3232</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">15.43</font></td>
+    </tr>
+    <tr align="right"> 
+      <td bgcolor="#E6E6FA"><font size="2">4</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">188.4</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">22.4</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">1996.3</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">518.0</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">3121</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">15.43</font></td>
+    </tr>
+    <tr align="right"> 
+      <td bgcolor="#E6E6FA"><font size="2">5</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">177.7</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">18.6</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">1818.6</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">461.4</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">2952</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">15.43</font></td>
+    </tr>
+    <tr align="right"> 
+      <td bgcolor="#E6E6FA"><font size="2">6</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">175.8</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">17.9</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">1642.8</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">407.6</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">2900</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">15.43</font></td>
+    </tr>
+    <tr align="right"> 
+      <td bgcolor="#E6E6FA"><font size="2">7</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">153.8</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">15.7</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">1489.0</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">360.1</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">2550</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">15.43</font></td>
+    </tr>
+    <tr align="right"> 
+      <td bgcolor="#E6E6FA"><font size="2">8</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">142.8</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">14.4</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">1346.2</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">322.3</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">2378</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">15.43</font></td>
+    </tr>
+    <tr align="right"> 
+      <td bgcolor="#E6E6FA"><font size="2">9</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">117.0</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">10.7</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">1229.2</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">303.7</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">1974</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">15.43</font></td>
+    </tr>
+    <tr align="right"> 
+      <td bgcolor="#E6E6FA"><font size="2">10</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">131.1</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">13.2</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">1098.1</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">263.3</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">2195</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">15.43</font></td>
+    </tr>
+    <tr align="right"> 
+      <td bgcolor="#E6E6FA"><font size="2">11</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">133.2</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">13.1</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">964.9</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">225.6</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">2228</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">15.43</font></td>
+    </tr>
+    <tr align="right"> 
+      <td bgcolor="#E6E6FA"><font size="2">12</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">129.4</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">12.5</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">835.5</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">195.9</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">2168</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">15.43</font></td>
+    </tr>
+    <tr align="right"> 
+      <td bgcolor="#E6E6FA"><font size="2">13</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">95.2</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">8.6</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">740.3</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">163.6</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">1633</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">15.44</font></td>
+    </tr>
+    <tr align="right"> 
+      <td bgcolor="#E6E6FA"><font size="2">14</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">88.2</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">7.5</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">652.1</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">141.0</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">1523</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">15.44</font></td>
+    </tr>
+    <tr align="right"> 
+      <td bgcolor="#E6E6FA"><font size="2">15</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">83.6</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">6.8</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">568.5</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">122.1</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">1451</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">15.44</font></td>
+    </tr>
+    <tr align="right"> 
+      <td bgcolor="#E6E6FA"><font size="2">16</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">80.9</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">6.4</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">487.6</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">106.3</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">1409</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">15.44</font></td>
+    </tr>
+    <tr align="right"> 
+      <td bgcolor="#E6E6FA"><font size="2">17</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">80.7</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">6.6</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">406.9</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">91.8</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">1406</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">15.44</font></td>
+    </tr>
+    <tr align="right"> 
+      <td bgcolor="#E6E6FA"><font size="2">18</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">74.6</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">6.3</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">332.3</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">78.8</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">1311</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">15.44</font></td>
+    </tr>
+    <tr align="right"> 
+      <td bgcolor="#E6E6FA"><font size="2">19</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">56.4</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">3.7</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">275.8</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">56.1</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">1026</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">15.45</font></td>
+    </tr>
+    <tr align="right"> 
+      <td bgcolor="#E6E6FA"><font size="2">20</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">59.4</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">4.6</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">216.4</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">45.8</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">1073</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">15.45</font></td>
+    </tr>
+    <tr align="right"> 
+      <td bgcolor="#E6E6FA"><font size="2">21</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">33.9</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">2.1</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">182.5</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">33.7</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">673</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">15.48</font></td>
+    </tr>
+    <tr align="right"> 
+      <td bgcolor="#E6E6FA"><font size="2">22</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">33.8</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">2.0</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">148.6</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">26.4</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">672</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">15.48</font></td>
+    </tr>
+    <tr align="right"> 
+      <td bgcolor="#E6E6FA"><font size="2">Un</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">1.4</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">0.03</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">147.3</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">10.0</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">164</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">16.96</font></td>
+    </tr>
+    <tr align="right"> 
+      <td bgcolor="#E6E6FA"><font size="2">X</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">147.3</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">14.6</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">&nbsp;</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">4.8</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">2327</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">15.57</font></td>
+    </tr>
+  </table>
+</div>
+<p>The Human Chromosomes can be obtained from the NCBI ftp site: <a href="ftp://ftp.ncbi.nih.gov/genomes/H_sapiens/">ftp://ftp.ncbi.nih.gov/genomes/H_sapiens/</a></p>
+<h3><a name="osi"></a>1.3. OSI open source</h3>
+<table width="100%" border="0">
+  <tr> 
+    <td><p>The key difference between version 3.0 and previous versions of MUMmer, 
+        is its qualification as an open source project. Previous versions of MUMmer 
+        were always free for non-profit, but now MUMmer is free for all organizations, 
+        both for- and non-profit. Please refer to the <code>LICENSE</code> file 
+        included in the package for a description of the <a href="http://www.opensource.org/licenses/artistic-license.php" target="_blank">Artistic 
+        License</a>, the same <a href="http://www.opensource.org/docs/definition.php" target="_blank">OSI 
+        certified open source</a> license used by Perl and countless other packages. 
+        We encourage you to contact us (though you are not required to) if you 
+        wish to contribute to our ongoing improvement and development of the software, 
+        and simple suggestions on how to improve MUMmer are always welcome. Enjoy 
+        the freedom of open source!</p>
+      <p>To receive software update notices, please join the <a href="http://lists.sourceforge.net/lists/listinfo/mummer-users">MUMmer 
+        mailing list</a>. This list will only be used to announce major version 
+        releases and help us keep track of MUMmer users.</p></td>
+    <td><a href="http://www.opensource.org" target="_blank"><img alt="OSI logo" src="osi.gif" border="0"></a></td>
+  </tr>
+</table>
+<hr width="100%">
+<h2><a name="installation"></a>2. Installation</h2>
+<p>MUMmer comes as a source distribution only, and needs to be compiled before 
+  use. This sections describes the steps and requirements necessary to compile 
+  the package. Installation problems are usually caused by incompatible versions 
+  of one or more OS utilities, so if installation fails please check that you 
+  have the needed system requirements before alerting us of your problem. The 
+  <code>INSTALL</code> file included in the source distribution also contains 
+  much of the same information provided in this section.</p>
+<h3><a name="requirements"></a>2.1. System Requirements</h3>
+<p>MUMmer is mostly written in C and C++. With some technical expertise it could 
+  be ported to any system with a C++ compiler, but our distribution was specifically 
+  designed to be compiled with the GNU GCC compiler and has been successfully 
+  tested on the following three platforms:</p>
+<ul>
+  <li><code>Redhat Linux 6.2 and 7.3 (Pentium 4)</code></li>
+  <li><code>Compaq Tru64 UNIX 5.1 (alpha)</code></li>
+  <li><code>SunOS UNIX 5.8 (sparc)</code></li>
+  <li><code>Mac OS X 10.2.8 (PowerPC G4)</code></li>
+</ul>
+<p> MUMmer also requires some third party software to run successfully. In the 
+  absence of one or more of the below utilities, certain MUMmer programs may fail 
+  to run correctly. Listed in parenthesis are the versions used to test the MUMmer 
+  package. These versions, or subsequent versions should assure the proper execution 
+  of the various MUMmer programs. These utilities must be accessible via the system 
+  path:</p>
+<ul>
+  <li><code>make&nbsp;(GNU make 3.79.1)</code></li>
+  <li><code>perl&nbsp;(PERL 5.6.0)</code></li>
+  <li><code>sh&nbsp;&nbsp;&nbsp;(GNU sh 1.14.7)</code></li>
+  <li><code>csh&nbsp;&nbsp;(tcsh 6.10.00)</code></li>
+  <li><code>g++&nbsp;&nbsp;(GNU gcc 2.95.3)</code></li>
+  <li><code>sed&nbsp;&nbsp;(GNU sed 3.02)</code></li>
+  <li><code>awk&nbsp;&nbsp;(GNU awk 3.0.4)</code></li>
+  <li><code>ar&nbsp;&nbsp;&nbsp;(GNU ar 2.9.5)</code></li>
+</ul>
+<p>For running the MUMmer display programs, these additional system utilities 
+  are required:</p>
+<ul>
+  <li><code>fig2dev&nbsp;(fig2dev 3.2.3)</code></li>
+  <li><code>gnuplot&nbsp;(gnuplot 4.0)</code></li>
+  <li><code>xfig&nbsp;&nbsp;&nbsp;&nbsp;(xfig 3.2)</code></li>
+</ul>
+<p>Sufficient memory and disk space are also necessary, but required sizes vary 
+  considerably with input size, so please be aware of your disk and memory usage, 
+  as insufficient capacities will result in incorrect or missing output. In general, 
+  512 MB of RAM and 1 GB of disk space is sufficient for most mid-sized comparisons. 
+  For Mac OSX, the Mac development kit must be downloaded and installed. This 
+  kit will include <code>gcc</code>, <code>ar</code>, and <code>make</code> which 
+  are necessary for building MUMmer. MUMmer is not supported for any Mac operating 
+  system other than OSX.</p>
+<h3><a name="obtaining"></a>2.2. Obtaining MUMmer</h3>
+<p>The current MUMmer release can be <a href="http://sourceforge.net/project/showfiles.php?group_id=133157">downloaded</a> 
+  from our <a href="http://sourceforge.net/projects/mummer">SourceForge.net project 
+  page</a>.</p>
+<h3><a name="compilation"></a>2.3. Compilation and installation</h3>
+<p>For explanation purposes, let's suppose you just downloaded the <code>MUMmer3.0.tar.gz</code> 
+  distribution from the SourceForge site. The first step would be to move this 
+  file to the desired installation directory and type:</p>
+<p><code>tar -xvzf MUMmer3.0.tar.gz</code></p>
+<p> to extract the MUMmer source into a <code>MUMmer3.0</code> subdirectory. Switch 
+  to this newly created subdirectory and execute:</p>
+<p><code>make check</code></p>
+<p>to assure the makefile can identify the necessary utilities. If no error messages 
+  appear, the diagnostics were successful and you may continue. However, if error 
+  messages are displayed, the listed programs are not accessible via your system 
+  path. Install the utilities if necessary, add them to your system <code>PATH</code> 
+  variable, and continue with the MUMmer installation by typing:</p>
+<p><code>make install</code></p>
+<p>This will attempt to compile the MUMmer scripts and executables. If the <code>make</code> 
+  command issues no errors, the compilation was successful and you are ready to 
+  begin using MUMmer. If the command fails, it is likely that <code>make</code> 
+  was confused by the existence of more than one copy of the same utility, such 
+  as two versions of <code>gcc</code>. When this happens, it is important to arrange 
+  you system <code>PATH</code> variable so that the more recent versions are listed 
+  first, or to hard code the location of your utility location in the makefile. 
+  The same advice goes for your <code>LD_LIBRARY_PATH</code> variable if your system 
+  is having a difficult time locating the appropriate C or C++ libraries at runtime.</p>
+<p>It is important to note that the <code>make</code> command dynamically builds 
+  the MUMmer scripts to reference the install directory, therefore if the install 
+  directory is moved after the <code>make</code> command is issued the MUMmer 
+  scripts will fail. If you need certain MUMmer executables in a directory other 
+  than the install directory, it is recommend to leave the install directory untouched 
+  and link the needed executables to the desired destination. An alternative would 
+  be to move the install directory and reissue the <code>make</code> command at 
+  the new location.</p>
+<hr width="100%">
+<h2><a name="running"></a>3. Running MUMmer</h2>
+<p>The five most commonly used programs in the MUMmer package are <code>mummer</code>, 
+  <code>nucmer</code>, <code>promer</code>, <code>run-mummer1 </code>and <code>run-mummer3</code>, 
+  so this section covers the basics of executing these tools and what each of 
+  them specializes in. To better understand how to view the outputs of these programs, 
+  please refer to the <a href="#usecases">use cases</a> section or the <a href="../examples">MUMmer 
+  examples</a> webpage for a brief walk-through of each major module with full 
+  input data and expected outputs. For further information, please refer to the 
+  <a href="#program">Program descriptions</a> section for a detailed explanation 
+  of each program and its output.</p>
+<h5>mummer</h5>
+<p><code>mummer</code> efficiently locates <em>maximal unique matches</em> between 
+  two sequences using a suffix tree data structure. This makes <code>mummer</code> 
+  most suited for generating lists of exact matches that can be displayed as a 
+  <a href="#dotplot">dot plot</a>, or used as anchors in generating pair-wise 
+  alignments.</p>
+<p><code>mummer [options] &lt;reference file&gt; &lt;query file1&gt; . . . [query 
+  file32]</code></p>
+<p>There must be exactly one reference file and at least one query file. Both 
+  the reference and query files should be in multi-FastA format and may contain 
+  any set of upper and lowercase characters, thus DNA and protein sequences are 
+  both allowed and matching is case insensitive. The maximum number of query files 
+  is 32, but there is no limit on how many sequences each reference or query file 
+  may contain. Output is to <code>stdout</code>. Refer to the <a href="#mummer">mummer</a> 
+  section for a list of options and output descriptions.</p>
+<h5>NUCmer</h5>
+<p> NUCmer is a Perl script pipeline for the alignment of multiple <em>closely 
+  related</em> nucleotide sequences. It begins by finding maximal exact matches 
+  of a given length, it then clusters these matches to form larger inexact alignment 
+  regions, and finally, it extends alignments outward from each of the matches 
+  to join the clusters into a single high scoring pair-wise alignment. This makes 
+  NUCmer most suited for locating and displaying highly conserved regions of DNA 
+  sequence. To increase NUCmer's accuracy, it may be desirable to mask the input 
+  sequences to avoid the alignment of uninteresting sequence, or to change the 
+  uniqueness constraints (see the <a href="#nucmer">NUCmer</a> section) to reduce 
+  the number of repeat induced alignments.</p>
+<p><code>nucmer [options] &lt;reference file&gt; &lt;query file&gt;</code></p>
+<p>Both the reference and query files should be in multi-FastA format and may 
+  contain any set of upper and lowercase characters, however <em>only</em> the 
+  DNA characters <em>a</em>, <em>c</em>, <em>t</em> and <em>g</em> will be aligned 
+  (case insensitive). There is no limit on how many sequences the reference or 
+  query files may contain. Output is written to the file <code>out.delta</code> 
+  This is an ASCII file, but not formatted for human 
+  consumption, so it is necessary to run a utility program to parse the output. 
+  The two primary utility programs for viewing the contents of a <code>.delta</code> 
+  file are <code>show-aligns</code>, and <code>show-coords</code>. <code>show-aligns</code> 
+  displays all of the pair-wise alignments between two sequences, while <code>show-coords</code> 
+  displays a summary of the coordinates, percent identity, etc. of the alignment 
+  regions. Refer to the <a href="#nucmer">NUCmer</a> section for a list of options 
+  and output descriptions.</p>
+<h5>PROmer</h5>
+<p>PROmer is a Perl script pipeline for the alignment of multiple <em>somewhat 
+  divergent</em> nucleotide sequences. It works exactly like NUCmer, but with 
+  a small twist. Before any of the exact matching takes place, the input sequences 
+  are translated in all six amino acid reading frames. This allows PROmer to identify 
+  regions of conserved protein sequences that may not be conserved on the DNA 
+  level and thus gives it a higher sensitivity than NUCmer. Note however, this 
+  increase in sensitivity will result in huge amounts of output for highly similar 
+  sequences, therefore it is recommended that PROmer only be used when the input 
+  sequences are too divergent to produce a reasonable amount of NUCmer output. 
+  As with NUCmer, it is recommended to mask the input sequences to avoid the alignment 
+  of uninteresting sequence, or to change the uniqueness constraints (see the 
+  <a href="#promer">PROmer</a> section) to reduce the number of repeat induced 
+  alignments.</p>
+<p><code>promer [options] &lt;reference file&gt; &lt;query file&gt;</code></p>
+<p>Both the reference and query files should be in multi-FastA format and may 
+  contain any set of upper and lowercase characters, however <em>only</em> valid 
+  DNA characters will result in correctly translated sequence, all other characters 
+  will be translated into masking characters and therefore will not be matched 
+  by the BLOSUM scoring matrix. There is no limit on how many sequences the reference 
+  or query files may contain. Output is written to the same files as NUCmer and 
+  can also be viewed with the same utility programs (see above). Refer to the 
+  <a href="#promer">PROmer</a> section for a list of options and output descriptions.</p>
+<h5>run-mummer1 and run-mummer3</h5>
+<p><code>run-mummer1</code> and <code>run-mummer3</code> are cshell script pipelines 
+  for the general alignment of two sequences. They follow the same three steps 
+  of NUCmer and PROmer, in that they match, cluster and extend, however they handle 
+  any input sequence, not just nucleotide. This non-discrimination can be useful, 
+  however the program interface is not very user friendly and the output can be 
+  difficult to parse. In their favor, the <code>run-mummer*</code> programs are 
+  good at aligning very similar DNA sequences and identifying their differences, 
+  this makes them well suited for SNP and error detection. <code>run-mummer1</code> 
+  is recommended for one vs. one comparisons with no rearrangements, while <code>run-mummer3</code> 
+  is recommended for one vs. many comparisons that may involved rearrangements. 
+  Sequence masking is only recommended if a different character is used to mask 
+  the reference and query sequences so that they are not aligned.</p>
+<p><code>run-mummer1 &lt;reference file&gt; &lt;query file&gt; &lt;prefix&gt; 
+  [-r]</code></p>
+<p><em>or</em></p>
+<p><code>run-mummer3 &lt;reference file&gt; &lt;query file&gt; &lt;prefix&gt;</code></p>
+<p>The reference and query files should both be in FastA format and may contain 
+  any set of upper and lowercase characters. The reference file <em>may only contain 
+  a single sequence</em>, and <code>run-mummer1</code> only allows a single query 
+  sequence, but <code>run-mummer3</code> has no limit on the number of query sequences 
+  . The <code>-r</code> option for <code>run-mummer1</code> reverses the query 
+  sequence, while <code>run-mummer3</code> automatically finds both forward and 
+  reverse matches. Output is written to the files <code>&lt;prefix&gt;.out</code>, 
+  <code>&lt;prefix&gt;.gaps</code>, <code>&lt;prefix&gt;.errorsgaps</code> and 
+  <code>&lt;prefix&gt;.align</code>. There are no utilities included to parse 
+  these files, so they must be viewed as raw text files. Refer to the <a href="#mummer1">run-mummer1</a> 
+  and <a href="#mummer3">run-mummer3</a> sections for info on changing the program 
+  parameters and output descriptions.</p>
+<hr>
+<h2><a name="usecases" id="usecases"></a>4. Use cases and walk-throughs</h2>
+<p>Because of its breadth, MUMmer can be overwhelming at first, and sometimes 
+  the hardest part of using MUMmer is deciding which alignment program to run 
+  for a particular application. This section attempts to overview some of the 
+  basic MUMmer use cases and propose the best MUMmer alignment routine for each 
+  case. This section only gives a set of command line calls to generate alignments 
+  for each use case. For further information, please refer to the <a href="#program">Program 
+  descriptions</a> section for a detailed explanation of each program and its 
+  output, and the <a href="../examples">MUMmer examples</a> webpage for a brief 
+  walk-through of each major module with full input data and expected outputs.</p>
+<h3><a name="aligningfinished"></a>4.1. Aligning two finished sequences</h3>
+<p>The most basic use case is the alignment of two contiguous sequences. For all 
+  of the one vs. one use cases the <code>mummer</code> program alone, when coupled 
+  with <code>mummerplot</code>, may be all that is necessary to visualize a global 
+  alignment of the two sequences. This process alone can be very helpful in determining 
+  the large scale differences between the two sequences. For a single reference 
+  sequence <code>ref.fasta</code> and a single query sequence <code>qry.fasta</code> 
+  in FastA format, type:</p>
+<p><code>mummer -mum -b -c ref.fasta qry.fasta &gt; ref_qry.mums</code></p>
+<p><code>mummerplot --postscript --prefix=ref_qry ref_qry.mums</code></p>
+<p><code>gnuplot ref_qry.gp</code></p>
+<p>Then view or print the postscript plot <code>ref_qry.ps</code> in whatever 
+  manner you wish.</p>
+<h4><a name="1vs1mummer1" id="1vs1mummer1"></a>4.1.1. Highly similar sequences 
+  without rearrangements</h4>
+<p>When comparing two near identical sequences, the object of the alignment is 
+  usually SNP and small indel identification. The original MUMmer1.0 pipeline 
+  still proves to be a handy tool for this type of analysis, although <code>run-mummer3</code> 
+  with <code>combineMUMs -D</code> can prove to be even handier. Its LIS clustering 
+  algorithm and reliance on unique matches give it some reliability advantages 
+  over the newer pipelines. For a single reference sequence <code>ref.fasta</code> 
+  and a single query sequence <code>qry.fasta</code> in FastA format, type:</p>
+<p><code>run-mummer1 ref.fasta qry.fasta ref_qry</code></p>
+<p><em>or for sequences that match on the reverse strand</em></p>
+<p><code>run-mummer1 ref.fasta qry.fasta ref_qry -r</code></p>
+<p>SNP detection and one-to-one global alignment can also be performed by <code>nucmer</code> 
+  as described in the <a href="#snpdetection">SNP detection</a> walkthrough. The 
+  NUCmer pipeline provides a more user-friendly method for SNP detection while 
+  sacrificing a small degree of sensitivity.</p>
+<h4><a name="1vs1mummer3"></a>4.1.2. Highly similar sequences with rearrangements</h4>
+<p>Often two sequences are highly similar, but large chunks of the sequence are 
+  rearranged, inverted and inserted. In order to align these and produce an output 
+  that is similar to the MUMmer1.0 pipeline, use <code>run-mummer3</code>. It 
+  uses a clustering method that allows for these types of large scale mutations, 
+  but retains many of the other features of <code>run-mummer1</code>. To hunt 
+  for SNPs more accurately, you can edit the script and add the <code>-D</code> 
+  option to the <code>combineMUMs</code> command line, thus producing a concise 
+  file of only the difference positions between the two sequences. For a single 
+  reference sequence <code>ref.fasta</code> and a single query sequence <code>qry.fasta</code> 
+  in FastA format, type:</p>
+<p><code>run-mummer3 ref.fasta qry.fasta ref_qry</code></p>
+<p>SNP detection and one-to-one local alignment can also be performed by <code>nucmer</code> 
+  as described in the <a href="#snpdetection">SNP detection</a> walkthrough. The 
+  NUCmer pipeline provides a more user-friendly method for SNP detection while 
+  sacrificing a small degree of sensitivity.</p>
+<h4><a name="1vs1nucmer"></a>4.1.3. Fairly similar sequences</h4>
+<p>While <code>run-mummer1</code> and <code>run-mummer3</code> focus more on what 
+  is different between two sequences, <code>nucmer</code> focuses on what is the 
+  same. It has very few restrictions on what it will align, so rearrangements, 
+  inversions and repeats will all be identified by <code>nucmer</code>. For a 
+  single reference sequence <code>ref.fasta</code> and a single query sequence 
+  <code>qry.fasta</code> in FastA format, type:</p>
+<p><code>nucmer --maxgap=500 --mincluster=100 --prefix=ref_qry ref.fasta qry.fasta</code></p>
+<p><code>show-coords -r ref_qry.delta &gt; ref_qry.coords</code></p>
+<p><code>show-aligns ref_qry.delta refname qryname &gt; ref_qry.aligns</code></p>
+<p>Where <code>refname</code> and <code>qryname</code> are the FastA IDs of the 
+  two sequences. The output of NUCmer can often be voluminous and is best visualized 
+  with <code>mummerplot</code>. In addition, its output can be filtered in a varity 
+  of ways with the <code>delta-filter</code> program. For example, to select and 
+  display a one-to-one local mapping of reference to query sequences, use:</p>
+<p><code>delta-filter -q -r ref_qry.delta &gt; ref_qry.filter</code></p>
+<p><code>mummerplot ref_qry.filter -R ref.fasta -Q qry.fasta</code></p>
+<p>This will first filter the delta file, selecting only those alignments which 
+  comprise the one-to-one mapping between reference and query, and then display 
+  a dotplot of the selected alignments. Note that NUCmer allows for multiple reference 
+  and query sequences, so the above methods will also work for such and input. 
+  See the <a href="#filter">delta-filter</a> and <a href="#mummerplot">mummerplot</a> 
+  sections for more details.</p>
+<h4><a name="1vs1promer"></a>4.1.4. Fairly dissimilar sequences</h4>
+<p>Sometimes two sequences exhibit poor similarity on the DNA level, but their 
+  protein sequences are conserved. In this case, <code>promer</code> will be the 
+  most useful MUMmer tool, since it translates the DNA input sequences into amino 
+  acids before proceeding with the alignment. For a single DNA reference sequence 
+  <code>ref.fasta</code> and a single DNA query sequence <code>qry.fasta</code> 
+  in FastA format, type:</p>
+<p><code>promer --prefix=ref_qry ref.fasta qry.fasta</code></p>
+<p><code>show-coords -r ref_qry.delta &gt; ref_qry.coords</code></p>
+<p><code>show-aligns -r ref_qry.delta refname qryname &gt; ref_qry.aligns</code></p>
+<p>Where <code>refname</code> and <code>qryname</code> are the FastA IDs of the 
+  two sequences. Note that the <code>-k</code> option can be added to <code>show-coords</code> 
+  to reduce the amount of output by only displaying the best frame in situations 
+  where the same hit is represented in multiple, overlapping frames. The output 
+  of PROmer can often be voluminous and is best visualized with <code>mummerplot</code>. 
+  In addition, its output can be filtered in a varity of ways with the <code>delta-filter</code> 
+  program. For example, to select and display a one-to-one local mapping of reference 
+  to query sequences, use:</p>
+<p><code>delta-filter -q -r ref_qry.delta &gt; ref_qry.filter</code></p>
+<p><code>mummerplot ref_qry.filter -R ref.fasta -Q qry.fasta</code></p>
+<p>This will first filter the delta file, selecting only those alignments which 
+  comprise the one-to-one mapping between reference and query, and then display 
+  a dotplot of the selected alignments. Note that PROmer allows for multiple reference 
+  and query sequences, so the above methods will also work for such an input. 
+  See the <a href="#filter">delta-filter</a> and <a href="#mummerplot">mummerplot</a> 
+  sections for more details. </p>
+<h3><a name="aligningdraft"></a>4.2. Aligning two draft sequences</h3>
+<p>Many times it is necessary to align two genomes that have not yet been completed, 
+  or two genomes with multiple chromosomes. This can make things a little more 
+  complicated, since a separate alignment would have to be generated for each 
+  possible pairing of the sequences. However, both NUCmer and PROmer automate 
+  this process and accept multi-FastA inputs, thus simplifying the process of 
+  aligning two sets of contigs, scaffolds or chromosomes. Since NUCmer and PROmer 
+  have an almost identical user interface, this use case will only be explained 
+  using <code>nucmer</code>. If the two inputs are too divergent for <code>nucmer</code> 
+  to align, simply use <code>promer</code> instead. For two sets of contigs, <code>ref.fasta</code> 
+  and <code>qry.fasta</code>, type:</p>
+<p><code>nucmer --prefix=ref_qry ref.fasta qry.fasta</code></p>
+<p><code>show-coords -rcl ref_qry.delta &gt; ref_qry.coords</code></p>
+<p><code>show-aligns ref_qry.delta refname qryname &gt; ref_qry.aligns</code></p>
+<p>Where <code>refname</code> and <code>qryname</code> are the FastA IDs of two 
+  contigs. The <code>show-aligns</code> step will have to be repeated for every 
+  combination of contigs that the user wishes to analyze. Because the output of 
+  the all-vs-all comparison described above can be immense, it is often essential 
+  to filter the resulting alignment data with the <code>delta-filter</code> program. 
+  To map each reference to a position in the query, use <code>delta-filter -r</code>. 
+  To map each query to a position in the reference, use <code>delta-filter -q</code>. 
+  To determine a one-to-one mapping of each reference and query, combine the options 
+  and use<code> delta-filter -r -q</code>. Also, the <code>mummerplot</code> utility 
+  provides a very handy visualization method for viewing contig mappings, type:</p>
+<p><code>mummerplot ref_qry.delta -R ref.fasta -Q qry.fasta --filter --layout</code></p>
+<p>This will generate a plot displaying the one-to-one mapping between the two 
+  contig sets. When plotted to an X11 terminal, the plot is zoom-able and browse-able 
+  via the mouse and keyboard commands provided by gnuplot 4.0. See the <a href="#filter">delta-filter</a> 
+  and <a href="#mummerplot">mummerplot</a> sections for more details.</p>
+<h3><a name="mappingdraft"></a>4.3. Mapping a draft sequence to a finished sequence</h3>
+<p>There are many benefits of mapping a draft sequence to the finished sequence 
+  of a related organism. Determining the location and orientation of each query 
+  contig as it maps to the finished reference sequence can significantly speed 
+  up the closure process of the draft sequence, and by examining the areas of 
+  conservation, the annotation of the draft sequence can be improved and refined. 
+  Since NUCmer and PROmer have an almost identical user interface, this use case 
+  will only be explained using <code>nucmer</code>. If the two inputs are to divergent 
+  for <code>nucmer</code>, simply use <code>promer</code> instead. For a finished 
+  reference chromosome(s) <code>ref.fasta</code> and a set of near identical contigs 
+  <code>qry.fasta</code>, type:</p>
+<p><code>nucmer --prefix=ref_qry ref.fasta qry.fasta</code></p>
+<p><code>show-coords -rcl ref_qry.delta &gt; ref_qry.coords</code></p>
+<p><code>show-aligns ref_qry.delta refname qryname &gt; ref_qry.aligns</code></p>
+<p><code>show-tiling ref_qry.delta &gt; ref_qry.tiling</code></p>
+<p>Where <code>refname</code> and <code>qryname</code> are the FastA IDs of two 
+  sequences. The <code> show-aligns</code> step will have to be repeated for every 
+  combination of sequences that the user wishes to analyze. If mapping the draft 
+  sequences to each of their repeat locations is not required, the <code>delta-filter</code> 
+  program can quickly select the optimal placement of each draft sequence to the 
+  reference using the following:</p>
+<p><code>delta-filter -q ref_qry.delta &gt; ref_qry.filter</code></p>
+<p>The newly created delta file <code>ref_qry.filter</code> can then be substituted 
+  for the original in the above procedures in order to generate slimmed down versions 
+  of the output.</p>
+<h3><a name="snpdetection" id="snpdetection"></a>4.4. SNP detection</h3>
+<p>Joining a couple of the MUMmer components together can form a quite reliable 
+  SNP detection pipeline. MUMmer can perform all steps of this pipeline from aligning 
+  the sequences, to selecting the one-to-one mapping, and finally calling the 
+  SNP positions. The user can then process these SNP positions to assign quality 
+  scores based on the underlying traces and surrounding context. Such methods 
+  have been successfully applied to various SNP studies for organisms including 
+  <em>Bacillus anthracis</em> and <em>Yersinia pestis</em>. Of important note, 
+  a SNP pipeline built with <code>nucmer</code> allows for the identification 
+  of SNPs between two genomes with many rearrangements. The <em>Yersinia pestis</em> 
+  strains, for example, demonstrate significant genome &quot;shuffling&quot;, 
+  and make SNP detection difficult with global alignment programs such as <code>run-mummer1</code>. 
+  However, a pipeline built with <code>nucmer</code> (like shown below) is capable 
+  of finding all of the SNPs between two genomes, regardless of their structural 
+  similarity.</p>
+<p>To find a reliable set of SNPs between to highly similar multi-FastA sequence 
+  sets <code>ref.fasta</code> and <code>qry.fasta</code>, type:</p>
+<p><code>nucmer --prefix=ref_qry ref.fasta qry.fasta</code></p>
+<p><code>show-snps -Clr ref_qry.delta &gt; ref_qry.snps</code></p>
+<p>The <code>-C</code> option in <code>show-snps</code> assures that only SNPs 
+  found in uniquely aligned sequence will be reported, thus excluding SNPs contained 
+  in repeats. An alternative method which first attempts to determine the &quot;correct&quot; 
+  repeat copy is:</p>
+<p><code>nucmer --prefix=ref_qry ref.fasta qry.fasta</code></p>
+<p><code>delta-filter -r -q ref_qry.delta &gt; ref_qry.filter</code></p>
+<p><code>show-snps -Clr ref_qry.filter &gt; ref_qry.snps</code></p>
+<p>Now, conflicting repeat copies will first be eliminated with <code>delta-filter</code> 
+  and the SNPs will be re-called in hopes of finding some that were previously 
+  masked by another repeat copy.</p>
+<h3><a name="identifyingrepeats" id="identifyingrepeats"></a>4.5. Identifying 
+  repeats</h3>
+<p>Although MUMmer was not specifically designed to identify repeats, it does 
+  has a few methods of identifying exact and exact tandem repeats. In addition 
+  to these methods, the <code>nucmer</code> alignment script can be used to align a 
+  sequence (or set of sequences) to itself. By ignoring all of the hits that have 
+  the same coordinates in both inputs, one can generate a list of inexact repeats. 
+  When using this method of repeat detection, be sure to set the <code>--maxmatch</code>
+  and <code>--nosimplify</code> options to ensure the correct results.
+</em></p>
+<p>To find large inexact repeats in a set of sequences <code>seq.fasta</code>, 
+  type the following and ignore all hits with the same start
+  coordinate in each copy of the sequence:</p>
+<p><code>nucmer --maxmatch --nosimplify --prefix=seq_seq seq.fasta 
+  seq.fasta</code></p>
+<p><code>show-coords -r seq_seq.delta &gt; seq_seq.coords</code></p>
+<p>To find exact repeats of length 50 or greater in a single sequence <code>seq.fasta</code>, 
+  type:</p>
+<p><code>repeat-match -n 50 seq.fasta &gt; seq.repeats</code></p>
+<p>To find exact tandem repeats of length 50 or greater in a single sequence <code>seq.fasta</code>, 
+  type:</p>
+<p><code>exact-tandems seq.fasta 50 &gt; seq.tandems</code></p>
+<hr>
+<h2><a name="program"></a>5. Program descriptions</h2>
+<p>The most commonly used MUMmer pipelines (<code>nucmer</code>, <code>promer</code>, 
+  <code>run-mummer1</code> and <code>run-mummer3</code>) are comprised of three 
+  main sections. The first section identifies a certain subset of maximal exact 
+  matches between the two inputs, the second section clusters these matches into 
+  groups that will likely make good alignment anchors, and the third and final 
+  section extends alignments between these clustered matches to produce the final 
+  gapped alignment. These three sections also outline the primary types of programs 
+  included in the MUMmer package - the <a href="#maximal">Maximal exact matching</a> 
+  section describes the programs that compute different types maximal exact matches, 
+  the <a href="#clustering">Clustering</a> section describes the two different 
+  types of clustering algorithms, and <a href="#alignment">Alignment</a> generators 
+  describes the scripts that combine matching, clustering and extending in order 
+  to produce high scoring pair-wise alignments. Finally, the <a href="#utilities">Utilities</a> 
+  section reviews a few of the tools that have been developed for interpreting 
+  and displaying the output of the MUMmer alignment routines.</p>
+<p>It is noteworthy to point out the simplicity of improving the current MUMmer 
+  pipeline. For instance, if a different and/or better clustering algorithm was 
+  needed for a certain application, a program could be written in any language 
+  and inserted into the pipeline. So long as the program was able to read the 
+  appropriate input and produce output that mimics the existing module, it could 
+  be swapped for the existing module with a single edit to the calling script. 
+  NUCmer for example is a Perl script that invokes various MUMmer routines. If 
+  you were to develop a new clustering algorithm called <code>mygaps</code> you 
+  could edit the line in NUCmer that defines the location of <code>mgaps</code> 
+  to instead define the location of <code>mygaps</code>. It's that easy, as long 
+  as <code>mygaps</code> had the same input and output <code>mgaps</code> the 
+  transition would be seamless.</p>
+<h3><a name="maximal"></a>5.1. Maximal exact matching</h3>
+<p>The heart of the MUMmer package is its suffix tree based maximal matching routines. 
+  These can be used for repeat detection within a single sequence as is done by 
+  <code>repeat-match</code> and <code>exact-tandems</code>, or can be used for 
+  the alignment of two or more sequences as is done by <code>mummer</code>. Most 
+  every other program in the MUMmer packages builds off of the output of the <code>mummer</code> 
+  maximal exact matcher, so it is of great importance to first understand the 
+  workings of this program.</p>
+<h4><a name="mummer"></a>5.1.1. mummer</h4>
+<p><code>mummer</code> is a suffix tree algorithm designed to find maximal exact 
+  matches of some minimum length between two input sequences. MUMmer's namesake 
+  program originally stood for <u>M</u>aximal <u> U</u>nique <u>M</u>atch<u>er</u>, 
+  however in subsequent versions the meaning of <em>unique</em> has been skewed. 
+  The original version (1.0) required all maximal matches to be unique in both 
+  the reference and the query sequence (MUMs); the second version (2.0) required 
+  uniqueness only in the reference sequence (MUM-candidates); and the current 
+  version (3.0) can ignore uniqueness completely, however it defaults to finding 
+  MUM-candidates and can be switched on the command line. To restate, by default 
+  <code>mummer</code> will only find maximal matches that are unique in the entire 
+  set of reference sequences. The match lists produced by <code>mummer</code> 
+  can be used alone to generate alignment <a href="#dotplot">dot plots</a>, or 
+  can be passed on to the clustering algorithms for the identification of longer 
+  non-exact regions of conservation. These match lists have great versatility 
+  because they contain huge amounts of information and can be passed forward to 
+  other interpretation programs for clustering, analysis, searching, etc.</p>
+<p><code>mummer</code> achieves its high performance by using a very efficient 
+  data structure known as a suffix tree. This data structure can be both constructed 
+  and searched in linear time, making it ideal for large scale pattern matching. 
+  To save memory, only the reference sequence(s) is used to construct the suffix 
+  tree and the query sequences are then streamed through the data structure while 
+  all of the maximal exact matches are extracted and displayed to the user. Because 
+  only the reference sequence is loaded into memory, the space requirement for 
+  any particular <code>mummer</code> run is only dependent on the size of the 
+  reference sequence. Therefore, if you have a reasonably sized sequence set that 
+  you want to match against an enormous set of sequences, it is wise to make the 
+  smaller file the reference to assure the process will not exhaust your computer's 
+  memory resources. The query files are loaded into memory one at a time, so for 
+  an enormous query that will require a significant amount of memory just to load 
+  the character string, it is helpful to partition the query into multiple smaller 
+  files using the syntax described below.</p>
+<h5>Command line syntax</h5>
+<p><code>mummer [options] &lt;reference file&gt; &lt;query file1&gt; . . . [query 
+  file32]</code></p>
+<p>There must be exactly one reference file and at least one query file. Both 
+  the reference and query files should be in multi-FastA format and may contain 
+  any set of upper and lowercase characters, thus DNA and protein sequences are 
+  both allowed and matching is case insensitive. The maximum number of query files 
+  is 32, but there is no limit on how many sequences each reference or query file 
+  may contain.</p>
+<h5>Program options</h5>
+<table width="100%" border="0" cellpadding="10">
+  <tr> 
+    <td nowrap><code>-mum</code></td>
+    <td><code>Compute MUMs, i.e. matches that are unique in both the reference 
+      and query</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-mumreference</code></td>
+    <td><code>Compute MUM-candidates, i.e. matches that are unique in the reference 
+      but not necessarily in the query</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-maxmatch</code></td>
+    <td><code>Compute all maximal matches regardless of their uniqueness</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-n</code></td>
+    <td><code>Only match the characters <em>a</em>, <em>c</em>, <em>g</em>, or 
+      <em>t</em> (case insensitive)</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-l int</code></td>
+    <td><code>Minimum match length (default 20)</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-b</code></td>
+    <td><code>Compute both forward and reverse complement matches</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-r</code></td>
+    <td><code>Only compute reverse complement matches</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-s</code></td>
+    <td><code>Show the matching substring in the output</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-c</code></td>
+    <td><code>Report the query position of a reverse complement match relative 
+      to the forward strand of the query sequence</code> </td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-F</code></td>
+    <td><code>Force 4 column output format that prepends every match line with 
+      the reference sequence identifier</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-L</code></td>
+    <td><code>Show the length of the query sequence on the header line</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-help</code></td>
+    <td><code>Show the possible options and exit</code></td>
+  </tr>
+</table>
+<p>Option grouping is not allowed, therefore each option should be separated by 
+  a space. The options <code>-mum</code>, <code>-mumreference</code>, and <code>-maxmatch</code> 
+  cannot be combined, and if neither is used, then the program will default to 
+  <code>-mumreference</code>. For a string to be unique in the reference, it must 
+  occur only once in the concatenation of <em>all</em> the reference superstrings, 
+  but for string to be unique in the query it need only be unique in its own superstring. 
+  Setting either the <code>-mum</code> or <code>-mumreference</code> option can 
+  significantly cut down on the number of repeat induced matches as opposed to 
+  <code>-maxmatch</code>, and is recommended for most all applications. Also, 
+  setting the <code>-l </code>option any lower than around 15 can significantly 
+  increase the number of spurious matches and therefore balloon the runtime. When 
+  dealing with masked DNA sequence, use the <code>-n</code> option to avoid matching 
+  the masking characters. Options <code>-b</code> and <code>-r</code> exclude 
+  each other, and if neither is used then only forward matches will be reported. 
+  All reverse complementing will affect only the query sequences. Option <code>-c</code> 
+  can only be used in combination with <code>-b</code> or <code>-r</code>, as 
+  it would have no relevance without these options. The <code>-F</code> option 
+  is useful for forcing <code>mummer</code> to output a consistent format regardless 
+  of the number of input sequences.</p>
+<p>For those familiar with the previous versions of MUMmer, the <code>-mum</code> 
+  option mimics the functionality of MUMmer1.0; the <code>-mumreference</code> 
+  option mimics the functionality of MUMmer2.0; and the <code>-maxmatch</code> 
+  option mimics the functionality of the <code>max-match</code> program included 
+  with MUMmer2.0. The default behavior of the current version is <code>-mumreference</code> 
+  because it is a good balance between finding all matches and only unique matches.</p>
+<h5><a name="mummeroutput"></a>Output format</h5>
+<p>Output formatting varies depending on the command line parameters used. Program 
+  diagnostic information is always output to <code>stderr</code> while the match 
+  lists are output to <code>stdout</code>. This allows for the match output to 
+  be redirected into a file, which is quite useful since the output is generally 
+  quite large. The standard output format that results from running <code>mummer</code> 
+  on a single reference sequence with the <code>-b</code> option is as follows:</p>
+<pre><code>
+&gt; ID1
+ 4655667         1        31
+ 4655699        33       319
+ 4656019       353       520
+ 4656540       874        20
+&gt; ID1 Reverse
+  741743        22       872
+&gt; ID2
+ 4655520         1       498
+ 4656019       500       274
+ 4656317       798        39
+ 4656376       855        29
+&gt; ID2 Reverse
+&gt; ID3
+&gt; ID3 Reverse
+ 4655178        27       840
+ 4656019       868       171
+(output continues ...)</code></pre>
+<p>For each query sequence, the corresponding ID tag is reported on each line 
+  beginning with a <code>'&gt;'</code> symbol, even if there are no matches corresponding 
+  to this sequence. Reverse complemented matches follow a query header that has 
+  the keyword <code>Reverse</code> following the sequence tag, thus creating two 
+  headers for each query sequence and alternating forward and reverse match lists. 
+  For each match, the three columns list the position in the reference sequence, 
+  the position in the query sequence, and the length of the match respectively. 
+  Reverse complemented query positions are reported relative to the <em>reverse</em> 
+  of the query sequence unless the <code>-c</code> option was used. As was stated 
+  above the <code>-L</code> option adds the sequence lengths to the header line 
+  and the <code>-s</code> option adds the match strings to the output, if these 
+  options were used the format would be as follows:</p>
+<pre><code>
+> ID1  Len = 893
+ 4655667         1        31
+ctgacgacaaccatgcaccacctgtcactct
+ 4655699        33       319
+ctcccgaaggagaagccctatctctagggttgtcagaggatgtcaagacctgg . . .
+ 4656019       353       520
+gttcctccatatctctacgcatttcaccgctacacatggaattccactttcct . . .
+ 4656540       874        20
+tttcgaaccatgcggttcaa
+> ID1 Reverse  Len = 893
+  741743        22       872
+tgaaaggcggcttcggctgtcacttatggatggacccgcgtcgcattagctag . . .
+> ID2  Len = 884
+ 4655520         1       498
+tcataaggggcatgatgatttgacgtcatccccaccttcctccggtttgtcac . . .
+ 4656019       500       274
+gttcctccatatctctacgcatttcaccgctacacatggaattccactttcct . . .
+ 4656317       798        39
+aagccttcatcactcacgcggcgttgctccgtcagactt
+ 4656376       855        29
+cctactgctgcctcccgtaggagtctggg
+> ID2 Reverse  Len = 884
+> ID3  Len = 1039
+> ID3 Reverse  Len = 1039
+ 4655178        27       840
+atcaattctccatagaaaggaggtgatccagccgcaccttccgatacggctac . . .
+ 4656019       868       171
+gttcctccatatctctacgcatttcaccgctacacatggaattccactttcct . . .
+(output continues ...)</code></pre>
+<p>Where the length of each query is noted after the <code>Len</code> keyword 
+  and the match string is listed on the line after its match coordinates. Note 
+  that the ellipsis marks are not part of the actual output, but added to fit 
+  the output into the webpage. Finally, when dealing with multiple reference sequences 
+  (or the <code>-F</code> option), it is necessary to output the ID of the reference 
+  sequence. This is placed at the beginning of each match line, creating an four 
+  column output format as follows:</p>
+<pre><code>
+> ID1
+  220594       479         1       728
+> ID1 Reverse
+  220716      3527         1        20
+  220716      3548        22       840
+> ID2
+> ID2 Reverse
+  219093        13       401       484
+  220716      3682         2        29
+  220716      3731        49        39
+  220716      3794       112       693
+> ID3
+  219093        13       188       721
+  220716      3897         2       590
+  220716      4488       593       423
+> ID3 Reverse
+  220594         1        38       509
+(output continues ...)
+</code></pre>
+<h4><a name="repeat"></a>5.1.2. repeat-match</h4>
+<p><code>repeat-match</code> is a suffix tree algorithm designed to find maximal 
+  exact repeats within a single input sequence. It uses a similar algorithm to 
+  <code>mummer</code>, but altered slightly to find maximal exact matches within 
+  a single sequence.</p>
+<h5>Command line syntax</h5>
+<p><code>repeat-match [options] &lt;sequence file&gt;</code></p>
+<p>The sequence file should contain only one sequence in FastA format, however 
+  if multiple sequences exist the first one will be used. The sequence may contain 
+  any set of upper and lowercase characters, thus DNA and protein sequences are 
+  both allowed and matching is case insensitive.</p>
+<h5>Program options</h5>
+<table width="100%" border="0" cellpadding="10">
+  <tr> 
+    <td nowrap><code>-f</code></td>
+    <td><code>Use the forward strand only</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-n int</code></td>
+    <td><code>Minimum match length (default 20)</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-t</code></td>
+    <td><code>Only output tandem repeats</code></td>
+  </tr>
+</table>
+<p>The program will report both forward and reverse complement repeats by default 
+  unless the <code>-f</code> option is used. While the <code>-t</code> option 
+  identifies tandem repeats, the <code>exact-tandems</code> script is a wrapper 
+  for <code>repeat-match</code> and does a more graceful job of reporting the 
+  tandem repeats.</p>
+<h5>Output format</h5>
+<p>Output formatting varies depending on the command line parameters. Program 
+  diagnostic information is always output to <code>stderr</code> while the match 
+  lists are output to <code>stdout</code>. This allows for the match output to 
+  be redirected into a file, which is quite useful since the output can be quite 
+  large. The standard output format that results from running <code>repeat-match 
+  </code>with default parameters is as follows:</p>
+<pre><code>
+Long Exact Matches:
+   Start1     Start2    Length
+  4919485    4919506r       22
+  4997298    4997319r       22
+  4919485    4997298        22
+  3461866    3751066        53
+   537897    4650529r       76
+(output continues ...)
+</code></pre>
+<p>The three columns are the first position of the repeat, the second position 
+  of the repeat, and the length of the repeat respectively. Reverse complement 
+  repeat positions are denoted by an <code>'r'</code> following the Start2 position, 
+  and are relative to the forward strand of the sequence.</p>
+<h4><a name="exact"></a>5.1.3. exact-tandems</h4>
+<p><code>exact-tandems</code> is a wrapper cshell script for the <code>repeat-match</code> 
+  program. It provides a list of exact tandem repeats within a single input sequence.</p>
+<h5>Command line syntax</h5>
+<p><code>exact-tandems &lt;sequence file&gt; &lt;min length&gt;</code></p>
+<p>As with <code>repeat-match</code> the sequence file should contain only one 
+  sequence in FastA format, however if multiple sequences exist the first one 
+  will be used. The sequence may contain any set of upper and lowercase characters, 
+  thus DNA and protein sequence are both allowed and matching is case insensitive. 
+  The minimum match length parameter should be a positive integer, this value 
+  will be passed to the <code>repeat-match</code> program via the <code>-n </code>option.</p>
+<h5>Output format</h5>
+<p>Program diagnostic information is always output to <code>stderr</code> while 
+  the match lists are output to <code>stdout</code>. This allows for the match 
+  output to be redirected into a file, which is quite useful since the output 
+  can be quite large. The output format of <code>exact-tandems</code> is as follows:</p>
+<pre><code>
+Finding matches
+Tandem repeats
+   Start   Extent  UnitLen     Copies
+  416173      150       45        3.3
+  554810      102       42        2.4
+  554943      109       42        2.6
+  880346      191       63        3.0
+  880370       62       21        3.0
+(output continues ...)
+</code></pre>
+<p>The four columns are the first position of the tandem, the extent of the repeat 
+  region, the length of each tandem repeat unit, and the number of repeat units 
+  respectively.</p>
+<h3><a name="clustering"></a>5.2. Clustering</h3>
+<p>MUMmer's clustering algorithms attempt to order small individual matches into 
+  larger match clusters in order to make the output of <code>mummer</code> more 
+  intelligible. A <a href="#dotplot">dot plot</a> makes it easy to spot alignment 
+  regions from a match list, however when examining the data without graphic aids, 
+  it is very difficult to draw any reasonable conclusions from the simple flat 
+  file list of matches. Clustering the matches together into larger groups of 
+  neighboring matches makes this process much easier by ordering the data and 
+  removing spurious matches.</p>
+<h4><a name="gaps"></a>5.2.1. gaps</h4>
+<p><code>gaps</code> is the primary clustering algorithm for <code>run-mummer1</code>, 
+  and although classified as a &quot;clustering&quot; step, <code>gaps</code> 
+  is more of a sorting routine. It implements the LIS (longest increasing subset) 
+  algorithm to extract the longest consistent set of matches between two sequences, 
+  and generates a single cluster that represents the best &quot;straight-line&quot; 
+  arrangement of matches between the sequences. By straight-line, we mean no rearrangements 
+  or inversions, just a simple path of agreeing matches between the two sequences. 
+  This limits the usability of this program to the alignment of genomes that are 
+  very similar and with no large scale mutations. To further illustrate the purpose 
+  of this program, consider the following set of MUMs (illustrated as line connecting 
+  two rectangles) between two sequences:</p>
+<div class="centered"> <img alt="gaps example" src="gaps.gif"> </div>
+<p>The rectangles connected by lines are maximal exact matches between two sequences, 
+  however only the red rectangles would be included in the LIS because they form 
+  the longest increasing subset of matches, i.e. the longest subset of matches 
+  that are consistently ordered in both genomes. Note that the empty rectangles 
+  will be discarded, even though they probably represent a major rearrangement 
+  between the two sequences. Because of this limitation <code>gaps</code> is best 
+  suited for the comparison of near identical sequences with the goal of finding 
+  minor mutations like SNPs and small indels.</p>
+<h5>Command line syntax</h5>
+<p><code>mummer [params] | tail +2 | gaps &lt;reference file&gt; [-r]</code></p>
+<p><em>or</em></p>
+<p><code>gaps &lt;reference file&gt; [-r] &lt; &lt;match list&gt;</code></p>
+<p>Because <code>gaps</code> receives its input from <code>stdin</code>, the input 
+  can either be piped directly from filtered <code>mummer</code> output, or redirected 
+  as input from a file. The strange syntax is a result of a legacy issue described 
+  in the <a href="#problems">Known problems</a> section, and requires the header 
+  be stripped from the <code>mummer</code> output. In addition, <code>gaps</code> 
+  is only designed to handle a single reference and a single query sequence, thus 
+  the preceding <code>mummer</code> run must also follow this constraint. The 
+  <code>-r</code> is optional and designates the incoming matches as reverse complement 
+  matches which must reference the reverse complement of the sequence, therefore 
+  forcing <code>mummer</code> to be run <em>without</em> the <code>-c</code> option. 
+  Please refer to the <code>run-mummer1</code> script for an example of how to 
+  use this program in an alignment pipeline. A rewrite of this algorithm to handle 
+  multiple reference and/or query sequences may eventually appear, but is not 
+  currently in development.</p>
+<h5><a name="gapsoutput"></a>Output format</h5>
+<p>The <code>stdout</code> output of <code>gaps</code> shares much in common with 
+  the standard three column match output, with the addition of three extra columns:</p>
+<pre><code>
+> /home/aphillip/data/GHP.1con  Consistent matches
+     183       17     22    none      -      -
+     238       72    108    none     33     33
+     347      181     92    none      1      1
+     458      292     50    none     19     19
+     705      539     44    none      1      1
+     750      584     38    none      1      1
+     807      641     23     -16      0      4
+(output continues ...)
+> Wrap around
+  334398   329917     47    none      -    225
+  334446   329965     62    none      1      1
+  334539   330058     20    none     31     31
+  334560   330079     92    none      1      1
+  334653   330172     77    none      1      1
+  334740   330259     41    none     10     10
+(output continues ...)
+> /home/aphillip/data/GHP.1con  Other matches
+ 1317231     4891     21    none      -      -
+ 1317275     4927     21    none      -      -
+ 1317804     5399     25    none    508    451
+  947580     5436     36    none      -      -
+   23406     5518     34    none      -      -
+  333079     6592     32    none      -      -
+(output continues ...)
+</code></pre>
+<p>Where the first line is the location of the reference file, and the first three 
+  columns are the same as the three column match format described in the <a href="#mummer">mummer</a> 
+  section. The final three columns are the overlap between this match and the 
+  previous match, the gap between the start of this match and the end of the previous 
+  match in the reference, and the gap between the start of this match and the 
+  end of the previous match in the query respectively. A couple suggestions on 
+  how to visually scan through this output: a gap size == 1 means a single mismatch 
+  between the two sequences, e.g. a SNP, an overlap like seen in the last line 
+  of the <code>Consistent matches</code> indicates the existence of a tandem repeat, 
+  and a <code>'-'</code> character means that the gap size could not be calculated. 
+  The <code>Wrap around</code> list is for circular genomes where the consistent 
+  set of matches wraps around the origin of the reference, and the <code>Other 
+  matches</code> list shows the matches that were not included in the LIS (like 
+  the white boxes in the above image). Finally, if the <code>-r</code> was passed 
+  on the command line the <code>Consistent matches</code> and <code>Other matches</code> 
+  headers would contain the <code>reverse</code> keyword after the reference file.</p>
+<h4><a name="mgaps"></a>5.2.2. mgaps</h4>
+<p><code>mgaps</code> was introduced into the MUMmer pipeline in an effort to 
+  better handle large-scale rearrangements and duplications. Unlike <code>gaps</code>, 
+  <code>mgaps</code> is a full clustering algorithm that is capable of generating 
+  multiple groups of consistently ordered matches. Clustering is controlled by 
+  a set of command-line parameters that adjust the minimum cluster size, maximum 
+  gap between matches, etc. Only matches that were included in clusters will appear 
+  in the output, so by adjusting the command-line parameters it is possible to 
+  filter out many of the spurious matches, thus leaving only the larger areas 
+  of conservation between the input sequences. The major advantage of mgaps is 
+  its ability to identify these &quot;islands&quot; of conservation. This frees 
+  the user from the single LIS restraints of the <code>gaps</code> program and 
+  allows for the identification of large-scale rearrangements, duplications, gene 
+  families and so on. To further illustrate the purpose of this program, consider 
+  once again the following set of MUMs (illustrated as line connecting two rectangles) 
+  between two sequences:</p>
+<div class="centered"> <img alt="mgaps example" src="mgaps.gif"> </div>
+<p>Just like before the rectangles connected by lines are maximal exact matches 
+  between two sequences, with each distinct cluster having its own unique color. 
+  In the previous demonstration using this MUM set, <code>gaps</code> failed to 
+  identify the blue cluster because it was not consistent with the LIS. However, 
+  by using <code>mgaps</code>, all regions of conservation have now been identified. 
+  The only fallback being the increased complexity of the output, where you once 
+  had only one cluster for the whole comparison, you now have four. Because of 
+  this, it can sometimes be difficult separating the repetitive clusters from 
+  &quot;correct&quot; clusters, making <code>mgaps</code> more suited for global 
+  alignments instead of localized error detection.</p>
+<h5>Command line syntax</h5>
+<p><code>mummer [params] | mgaps [options]</code></p>
+<p><em>or</em></p>
+<p><code>mgaps &lt; &lt;match list&gt;</code></p>
+<p>Because <code>gaps</code> receives its input from <code>stdin</code>, the input 
+  can either be piped directly from raw <code>mummer</code> output, or redirected 
+  as input from a <code>mummer</code> output file. <code>mgaps</code> is only 
+  designed to handle a single reference and one or more query sequences, thus 
+  the preceding <code>mummer</code> run must also follow this constraint. Please 
+  refer to the <code>run-mummer3</code> script for an example of how to use this 
+  program in an alignment pipeline. Note that in order to cluster reverse complement 
+  matches, the reverse complement matches must reference the reverse complement 
+  strand of the query sequence, therefore forcing <code>mummer</code> to be run 
+  <em>without</em> the <code>-c</code> option. A rewrite of this algorithm to 
+  handle multiple reference sequences and a better coordinate system (forward 
+  coordinates for reverse complement matches) is doubtful but may eventually appear.</p>
+<h5>Program options</h5>
+<table width="100%" border="0" cellpadding="10">
+  <tr> 
+    <td nowrap><code>-C</code></td>
+    <td><code>Check that input header labels alternately have the &quot;Reverse&quot; 
+      keyword </code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-d int</code></td>
+    <td><code>Maximum fixed diagonal difference (default 5)</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-e</code></td>
+    <td><code>Use extent of cluster (end - start) rather than the sum of the match 
+      lengths to determine cluster length</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-f float</code></td>
+    <td><code>Maximum fraction of separation for diagonal difference (default 
+      0.05) </code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-l int</code></td>
+    <td><code>Minimum cluster length (default 200)</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-s int</code></td>
+    <td><code>Maximum separation between adjacent matches in a cluster (default 
+      1000) </code></td>
+  </tr>
+</table>
+<p>The <code>-d</code> option can be interpreted as the number of insertions allowed 
+  between two matches in the same cluster, while the <code>-f</code> option is 
+  a fraction equal to (diagonal difference / match separation) where a higher 
+  value will increase the indel tolerance. Minimum cluster length is the sum of 
+  the contained matches unless the <code>-e</code> option is used. The best way 
+  to get a feel for what each parameter controls is to cluster the same data set 
+  numerous times with different values and observe the resulting differences. 
+  It can also be helpful to set these parameters to the size of the element you 
+  wish to capture, i.e. set the minimum cluster size to say the smallest exon 
+  you expect and set the max gap to the smallest intron you expect to obtain clusters 
+  that could represent single exons (depending of course of the similarity of 
+  the two sequences).</p>
+<h5><a name="mgapsoutput"></a>Output format</h5>
+<p>The <code>stdout</code> output of <code>mgaps</code> shares much in common 
+  with the output of <code>mummer</code> and <code>gaps</code>, with a slightly 
+  different header formatting than <code>gaps</code> to allow for multiple query 
+  sequences and multiple clusters. The output of <code>mgaps</code> run on both 
+  forward and reverse complement matches is as follows:</p>
+<pre><code>
+> ID41
+> ID41 Reverse
+ 5177399        1    232    none      -      -
+ 5177632      234   6794    none      1      1
+ 5184433     7035     24    none      7      7
+ 5184468     7069     23    none     11     10
+> ID42
+   10181       43   1521    none      -      -
+> ID42 Reverse
+ 4654536       17     36    none      -      -
+ 4654578       57    298    none      6      4
+ 4654877      356    226    none      1      1
+#
+ 4655139      845     28    none      -      -
+ 4655178      884    694    none     11     11
+ 4655873     1579     20    none      1      1
+#
+ 4850044       17   1492    none      -      -
+ 4851537     1510    711    none      1      1
+ 4852249     2222     42    none      1      1
+(output continues ...)
+</code></pre>
+Headers containing the ID for each query sequence are listed after the <code>'&gt;'</code> 
+characters, and a following <code>Reverse</code> keyword identifies the reverse 
+matches for that query sequence. Individual clusters for each sequence are separated 
+by a <code>'#'</code> character, and the six columns are exactly the same as the 
+<code>gaps</code> output (see the <a href="#gaps">gaps</a> section for more details). 
+<h3><a name="alignment"></a>5.3. Alignment generators</h3>
+<p>The alignment scripts described in this section build upon the data generated 
+  by the previous two sections, maximal exact matching and clustering. Each of 
+  these scripts independently runs the matching and clustering steps, and then 
+  generates pair-wise alignments for each of the clusters. This translates to 
+  a basic seed and extend method of alignment. The individual matches within each 
+  cluster are used as alignment anchors and only the mismatching sequence between 
+  the matches is processed by the Smith-Waterman dynamic programming routine. 
+  This reduces both the time and memory necessary to align large sequences, while 
+  still producing accurate alignments.</p>
+<h4><a name="nucmer"></a>5.3.1. NUCmer</h4>
+<p>NUCmer (<u>NUC</u>leotide MUM<u>mer</u>) is the most user-friendly alignment 
+  script for standard DNA sequence alignment. It is a robust pipeline that allows 
+  for multiple reference and multiple query sequences to be aligned in a many 
+  vs. many fashion. For instance, a very common use for <code>nucmer</code> is 
+  to determine the position and orientation of a set of sequence contigs in relation 
+  to a finished sequence, however it can be just as effective in comparing two 
+  finished sequences to one another. Like all of the other alignment scripts, 
+  it is a three step process - maximal exact matching, match clustering, and alignment 
+  extension. It begins by using <code>mummer</code> to find all of the maximal 
+  unique matches of a given length between the two input sequences. Following 
+  the matching phase, individual matches are clustered into closely grouped sets 
+  with <code>mgaps</code>. Finally, the non-exact sequence between matches is 
+  aligned via a modified Smith-Waterman algorithm, and the clusters themselves 
+  are extended outwards in order to increase the overall coverage of the alignments. 
+  <code>nucmer</code> uses the <code>mgaps</code> clustering routine which allows 
+  for rearrangements, duplications and inversions; as a consequence, <code>nucmer</code> 
+  is best suited for large-scale global alignments, as is shown in the following 
+  plot:</p>
+<div class="centered"> <img src="nucex.gif" alt="nucmer dot plot"> </div>
+<p>This dot plot represents a <code>nucmer</code> alignment of two different strains 
+  of <em>Helicobacter pylori</em> (26695 on the x-axis and J99 on the y-axis). 
+  Forward matches are shown in red, while reverse matches are shown in green. 
+  This alignment, which took only 12 seconds to compute, clearly shows a major 
+  inversion event centered around the origin of replication, and demonstrates 
+  NUCmer's ability to handle large scale rearrangements between sequences of high 
+  nucleotide similarity.</p>
+<h5>Command line syntax</h5>
+<p><code>nucmer [options] &lt;reference file&gt; &lt;query file&gt;</code></p>
+<p>The reference and query files should both be in multi-FastA format and have 
+  no limit on the number of sequences they man contain. However, because <code>nucmer</code> 
+  uses <code>mummer</code> for its maximal exact matching, the memory usage will 
+  be dependent on the size of the reference file, so it may be advisable to make 
+  the smaller of the input files the reference to assure the program does not 
+  exhaust your computer's memory resources. In addition, masking the uninteresting 
+  regions of the input with any character other than <em>a</em>, <em>c</em>, <em>g</em>, 
+  or <em>t</em> will both speed up <code>nucmer</code> by reducing the number 
+  of possible matches and also cut down on the number of alignments induced by 
+  repetitive sequence.</p>
+<h5><a name="nucmeroptions"></a>Program options</h5>
+<table width="100%" border="0" cellpadding="10">
+  <tr> 
+    <td nowrap><code>--mum</code></td>
+    <td><code>Use anchor matches that are unique in both the reference and query</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>--mumreference</code></td>
+    <td><code>Use anchor matches that are unique in the reference but not necessarily 
+      unique in the query (default behavior)</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>--maxmatch</code></td>
+    <td><code>Use all anchor matches regardless of their uniqueness</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-b int<br>
+      --breaklen </code></td>
+    <td><code>Distance an alignment extension will attempt to extend poor scoring 
+      regions before giving up (default 200)</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-c int<br>
+      --mincluster </code></td>
+    <td><code>Minimum cluster length (default 65)</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>--[no]delta</code></td>
+    <td><code>Toggle the creation of the delta file. Setting --nodelta prevents 
+      the alignment extension step and only outputs the match clusters (default 
+      --delta)</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>--depend</code></td>
+    <td><code>Print the dependency information and exit</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-d float<br>
+      --diagfactor</code></td>
+    <td><code>Maximum diagonal difference factor for clustering, i.e. diagonal 
+      difference / match separation (default 0.12)</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>--[no]extend</code></td>
+    <td><code>Toggle the outward extension of alignments from their anchoring 
+      clusters. Setting --noextend will prevent alignment extensions but still 
+      align the DNA between clustered matches and create the .delta file (default 
+      --extend)</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-f<br>
+      --forward</code></td>
+    <td><code>Align only the forward strands of each sequence</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-g int<br>
+      --maxgap </code></td>
+    <td><code>Maximum gap between two adjacent matches in a cluster (default 90)</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-h<br>
+      --help </code></td>
+    <td><code>Print the help information and exit</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-l int<br>
+      --minmatch </code></td>
+    <td><code>Minimum length of an maximal exact match (default 20)</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-o<br>
+      --coords </code></td>
+    <td><code>Automatically generate the &lt;prefix&gt;.coords file using the 
+      'show-coords' program with the -r option</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>--[no]optimize</code></td>
+    <td><code>Toggle alignment score optimization. Setting --nooptimize will prevent 
+      alignment score optimization and result in sometimes longer, but lower scoring 
+      alignments (default --optimize)</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-p string<br>
+      --prefix </code></td>
+    <td><code>Set the output file prefix (default out)</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-r<br>
+      --reverse</code></td>
+    <td><code>Align only the reverse strand of the query sequence to the forward 
+      strand of the reference</code></td>
+  </tr>
+  <tr>
+    <td nowrap><code>--[no]simplify</code></td>
+    <td><code>Simplify alignments by removing shadowed clusters. Turn this option off
+      if aligning a sequence to itself to look for repeats (default --simplify)</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-V<br>
+      --version</code></td>
+    <td><code>Print the version information and exit</code></td>
+  </tr>
+</table>
+<p>All values are measured in DNA bases unless otherwise noted. Using either the 
+  <code>-mum</code> or <code>-mumreference</code> options (along with masking 
+  the input sequences) can help reduce the number of repeat induced alignments, 
+  and is suggested for most applications. If no uniqueness options are set, the 
+  program will default to <code>-mumreference</code>. Decreasing the values of 
+  the <code>-mincluster</code> and <code>--minmatch </code>options will increase 
+  the sensitivity of the alignment but may produce less reliable alignments. In 
+  addition, significantly raising the value of the <code>--maxgap</code> value 
+  (say to 1000) can be crucial in producing alignments for more divergent genomes. 
+  Setting <code>--noextend</code> speeds up the process by preventing alignment 
+  extensions outward from each cluster, while <code>--nodelta</code> takes this 
+  a step further and doesn't even align the sequence between the matches in a 
+  cluster, however both of these reduce the amount of information contained in 
+  the output. See <code>mgaps</code> description for hints on setting the clustering 
+  parameters <code>--mincluster</code>, <code>--diagdiff</code> and <code>--maxgap</code>. 
+  The <code>--coords</code> option exists only for NUCmer1.0 compatibility; instead, 
+  it is recommended to run <code>show-coords</code> afterwards with more specific 
+  options. The <code>--nooptimize</code> option will force alignments within <code>--breaklen</code> 
+  bases of the sequence end to extend all the way to the sequence end, regardless 
+  of the resulting alignment score. The <code>--prefix</code> string should be 
+  unique in the output directory to prevent overwriting pre-existing data. Finally, 
+  by default <code>nucmer</code> matches the forward and reverse strands of the 
+  query sequences to the forward strand of the reference sequence unless the <code>--forward</code> 
+  or <code>--reverse</code> options were used, and all output coordinates always 
+  reference the forward strand of their respective sequence. Only use
+  the <code>--nosimplify</code> option when aligning a sequence to
+  itself in order to find inexact repeats.</p>
+<h5><a name="nucmeroutput" id="nucmeroutput"></a>Output format</h5>
+<p>Because <code>nucmer</code> and <code>promer</code> produce the same output 
+  files, this section will serve to explain the <code>&lt;prefix&gt;.delta</code> 
+  format for both programs. The delta file contains an encoded representation 
+  of all the alignments generated in the &quot;extend&quot; phase of the pipeline, 
+  and is a unique format for concise, machine representation 
+  of the pair-wise alignments. Several tools described in the <a href="#utilities">Utilities</a> 
+  section were designed to interpret these files and extract useful, human-readable 
+  information from them, however the full format description the 
+  delta file is described below to aid developers.</p>
+<h5>The &quot;delta&quot; file format</h5>
+<p>The &quot;delta&quot; file is an encoded representation of the all-vs-all alignment 
+  between the input sequences to either the NUCmer or PROmer pipeline. It is the 
+  primary output of these alignment scripts and there are various utilities described 
+  in <a href="#utilities">section 5.4.</a> that are designed to take the delta 
+  file as input, and output some human-readable information to the user. Also, 
+  the <a href="#filter">delta-filter </a>utility is designed to manipulate these 
+  files and select desired alignments. The primary function of the delta file 
+  is to catalog the coordinates of each alignment and note the distance between 
+  insertions and deletions contained in these alignments. By only storing the 
+  location of each indel as an offset, disk space is efficiently utilized, and 
+  a potentially enormous alignment can be stored in a relatively small space. 
+  The first line lists the two original input files separated by a space, while the second 
+  line specifies the alignment data type, either <code>&quot;NUCMER&quot;</code> 
+  or <code>&quot;PROMER&quot;</code>. Every grouping of alignments have a unique 
+  header specifying the two aligning sequences. Only sequences with shared alignments 
+  will have a header; therefore, there can be no empty 
+  headers (i.e. those that have no alignments following them). An example header 
+  might look like</p>
+<pre><code>
+>tagA1 tagB1 500 20000000
+</code></pre>
+Following this sequence header is the alignment data. Each alignment following 
+also has a header that describes the coordinates of the alignment and some error 
+information. These coordinates are inclusive and reference the forward strand 
+of the DNA sequence, regardless of the alignment type (DNA or amino acid). Thus, 
+if the start coordinate is greater than the end coordinate, the alignment is on 
+the reverse strand. The four coordinates are the start and end in the reference 
+and the start and end in the query respectively. The three digits following the 
+location coordinates are the number of errors (non-identities + indels), similarity 
+errors (non-positive match scores), and stop codons (does not apply to DNA alignments, 
+will be <code>&quot;0&quot;</code>). An example header might look like: 
+<pre><code>
+2631 3401 2464 3234 15 15 2
+</code></pre>
+<p>Notice that the start coordinate points to the first base in the first codon, 
+  and the end coordinate points to the last base in the last codon. Therefore 
+  making <code>(end - start + 1) % 3 = 0</code>. This makes determining the frame 
+  of the amino acid alignment a simple matter of determining the reading frame 
+  of the start coordinate for the reference and query. Obviously, these calculations 
+  are not necessary when dealing with vanilla DNA alignments.</p>
+<p>Each of these alignment headers is followed by a string of signed digits, one 
+  per line, with the final line before the next header equaling 0 (zero). Each 
+  digit represents the distance to the next insertion in the reference (positive 
+  int) or deletion in the reference (negative int), as measured in DNA bases OR 
+  amino acids depending on the alignment data type. For example, with the <code>PROMER</code> 
+  data type, the delta sequence <code>(1, -3, 4, 0)</code> would represent an 
+  insertion at positions 1 and 7 in the translated reference sequence and an insertion 
+  at position 3 in the translated query sequence. Or with letters:</p>
+<pre><code>
+A = ABCDACBDCAC$
+B = BCCDACDCAC$
+Delta = (1, -3, 4, 0)
+A = ABC.DACBDCAC$
+B = .BCCDAC.DCAC$
+</code></pre>
+<p>Using this delta information, it is possible to re-generate the alignments 
+  calculated by <code>nucmer</code> or <code>promer</code> as is done in the <code>show-coords</code> 
+  program. This allows various utilities to be crafted to process and analyze 
+  the alignment data using a universal format. This also means the delta only 
+  needs to be created once, yet it can be analyzed numerous times without ever 
+  having to rerun the costly alignment algorithm. Below is an example of what 
+  a delta file might look like:</p>
+<pre><code>
+/home/username/reference.fasta /home/username/query.fasta
+PROMER
+>tagA1 tagB1 3000000 2000000
+1667803 1667078 1641506 1640769 14 7 2
+-145
+-3
+-1
+-40
+0
+1667804 1667079 1641507 1640770 10 5 3
+-146
+-1
+-1
+-34
+0
+>tagA2 tagB4 4000 3000
+2631 3401 2464 3234 4 0 0
+0
+2608 3402 2456 3235 10 5 0
+7
+1
+1
+1
+1
+0
+(output continues ...)
+</code></pre>
+<h4><a name="promer"></a>5.3.2. PROmer</h4>
+<p>PROmer (<u>PRO</u>tein MUM<u>mer</u>) is a close relative to the NUCmer script. 
+  It follows the exact same steps as NUCmer and even uses most of the same programs 
+  in its pipeline, with one exception - all matching and alignment routines are 
+  performed on the six frame amino acid translation of the DNA input sequence. 
+  This provides <code>promer</code> with a much higher sensitivity than <code>nucmer</code> 
+  because protein sequences tends to diverge much slower than their underlying 
+  DNA sequence. Therefore, on the same input sequences, <code>promer</code> may 
+  find many conserved regions that <code>nucmer</code> will not, simply because 
+  the DNA sequence is not as highly conserved as the amino acid translation.</p>
+<p>All of this is performed behind the scenes, as the input is still the raw DNA 
+  sequence and output coordinates are still reported in reference to the DNA, 
+  so the two programs (<code>nucmer</code> and <code>promer</code>) exhibit little 
+  difference in their interfaces and usability. Because of its greatly increased 
+  sensitivity, it is usually best to use <code>promer</code> on those sequences 
+  that cannot be adequately compared by <code>nucmer</code>, because if run on 
+  very similar sequences the <code>promer</code> output can be quite voluminous. 
+  This is because <code>promer</code> makes no effort to distinguish between proteins 
+  and junk amino acid translations, therefore a single highly conserved gene may 
+  have up to <em>six</em> alignments in <code>promer</code> output, one for each 
+  of the six amino acid reading frames, when only the correct reading frame would 
+  be sufficient. This makes <code>promer</code> ideally suited for highly divergent 
+  sequences that show little DNA sequence conservation, as is shown in the following 
+  two plots:</p>
+<div class="centered"> 
+  <table width="100%" border="0">
+    <tr> 
+      <td align="center"><img src="nuc_proex.gif" alt="nucmer dot plot" name="nuc_proex" id="nuc_proex"></td>
+      <td align="center"><img src="pro_proex.gif" alt="promer dot plot" name="pro_proex" id="pro_proex"></td>
+    </tr>
+  </table>
+</div>
+<p>These dot plots represent two comparisons of <em>Streptococcus pyogenes</em> 
+  (x-axis) and <em>Streptococcus mutans</em> (y-axis), with forward matches colored 
+  red and reverse matches colored green. The graph generated with <code>nucmer</code> 
+  output is on the left, while the graph generated with <code>promer</code> output 
+  is on the right (both run with default parameters). It is clearly visible that 
+  <code>promer</code> has aligned the two genomes with a much greater sensitivity, 
+  thus demonstrating the effectiveness of comparing two divergent genomes on the 
+  amino acid level.</p>
+<h5>Command line syntax</h5>
+<p><code>promer [options] &lt;reference file&gt; &lt;query file&gt;</code></p>
+<p>The reference and query files should both be in multi-FastA format and have 
+  no limit on the number of sequences they man contain. However, because <code>promer</code> 
+  uses <code>mummer</code> for its maximal exact matching, the memory usage will 
+  be dependent on the size of the reference file, so it may be advisable to make 
+  the smaller of the input files the reference to assure the program does not 
+  exhaust your computer's memory resources. In addition, masking the uninteresting 
+  regions of the input with <em>n</em> or <em>x</em> will both speed up <code>promer</code> 
+  by reducing the number of possible matches and also cut down on the number of 
+  alignments induced by repetitive sequence.</p>
+<h5>Program options</h5>
+<table width="100%" border="0" cellpadding="10">
+  <tr> 
+    <td nowrap><code>--mum</code></td>
+    <td><code>Use anchor matches that are unique in both the reference and query</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>--mumreference</code></td>
+    <td><code>Use anchor matches that are unique in the reference but not necessarily 
+      unique in the query (default behavior)</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>--maxmatch</code></td>
+    <td><code>Use all anchor matches regardless of their uniqueness</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-b int<br>
+      --breaklen </code></td>
+    <td><code>Distance an alignment extension will attempt to extend poor scoring 
+      regions before giving up (default 60)</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-c int<br>
+      --mincluster </code></td>
+    <td><code>Minimum cluster length (default 20)</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>--[no]delta</code></td>
+    <td><code>Toggle the creation of the delta file. Setting --nodelta prevents 
+      the alignment extension step and only outputs the match clusters (default 
+      --delta)</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>--depend</code></td>
+    <td><code>Print the dependency information and exit</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-d float<br>
+      --diagfactor</code></td>
+    <td><code>Maximum diagonal difference factor for clustering, i.e. diagonal 
+      difference / match separation (default 0.11)</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>--[no]extend</code></td>
+    <td><code>Toggle the outward extension of alignments from their anchoring 
+      clusters. Setting --noextend will prevent alignment extensions but still 
+      align the DNA between clustered matches and create the .delta file (default 
+      --extend)</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-g int<br>
+      --maxgap </code></td>
+    <td><code>Maximum gap between two adjacent matches in a cluster (default 30)</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-h<br>
+      --help </code></td>
+    <td><code>Print the help information and exit</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-l int<br>
+      --minmatch </code></td>
+    <td><code>Minimum length of an maximal exact match (default 6)</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-m int<br>
+      --masklen </code></td>
+    <td><code>Maximum stop codon bookend masking length (default 8)</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-o<br>
+      --coords </code></td>
+    <td><code>Automatically generate the &lt;prefix&gt;.coords file using the 
+      'show-coords' program with the -r option</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>--[no]optimize</code></td>
+    <td><code>Toggle alignment score optimization. Setting --nooptimize will prevent 
+      alignment score optimization and result in sometimes longer, but lower scoring 
+      alignments (default --optimize)</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-p string<br>
+      --prefix </code></td>
+    <td><code>Set the output file prefix (default out)</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-V<br>
+      --version </code></td>
+    <td><code>Print the version information and exit</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-x type<br>
+      --matrix </code></td>
+    <td><code>The alignment matrix type, 1 [BLOSUM 45], 2 [BLOSUM 62] or 3 [BLOSUM 
+      80] (default 2)</code></td>
+  </tr>
+</table>
+<p>All values are measured in amino acids unless otherwise noted. Refer to the 
+  <a href="#nucmeroptions">NUCmer Program options</a> section for more information 
+  regarding their shared options. The <code>--masklen</code> value determines 
+  the number of amino acids between stop codons that will be automatically masked 
+  by <code>promer</code>, e.g. if an amino acid sequence were <code>...AAA*AAAA*AAA...</code> 
+  and the <code>--masklen</code> value were greater than or equal to 4, the sequence 
+  would be masked to read <code>...AAA*XXXX*AAA...</code> for the duration of 
+  the script. The <code>--matrix</code> option sets the BLOSUM matrix for scoring 
+  mismatches in the amino acid sequence, where options <code>1</code> assumes 
+  greater diversity between the two sequences and <code>3</code> assumes greater 
+  similarity between the two sequences.</p>
+<h5>Output format</h5>
+<p>Output files follow the same format as described in the <a href="#nucmeroutput">NUCmer 
+  Output format</a> section.</p>
+<h4><a name="mummer1"></a>5.3.3. run-mummer1</h4>
+<p><code>run-mummer1</code> is a legacy script from the original MUMmer1.0 release. 
+  It has been updated to utilize the new suffix tree code of version 3.0, however 
+  all other programs called from this script are identical to the original MUMmer 
+  release back in 1999. Even though it is an outdated program, it still has some 
+  advantages over the newer alignment scripts (<code>nucmer</code>, <code>promer</code>, 
+  <code>run-mummer3</code>). Like all of the alignment scripts, <code>run-mummer1</code> 
+  is a three step process - matching, clustering and extension. However, unlike 
+  the newer alignment scripts, <code>run-mummer1</code> uses the <code>gaps</code> 
+  program for its clustering step. The <code>gaps</code> program does not allow 
+  for rearrangements like <code>mgaps</code>, instead if finds the single longest 
+  increasing subset of matches across the full length of both sequences. This 
+  makes it well suited for SNP and small indel identification between small (&lt; 
+  10 Mbp), very similar sequences with few to no rearrangements.</p>
+<h5>Command line syntax</h5>
+<p><code>run-mummer1 &lt;reference file&gt; &lt;query file&gt; &lt;prefix&gt; 
+  [-r]</code></p>
+<p>The reference and query files must both be in FastA format and contain <em>only</em> 
+  one sequence. Memory usage will be dependent on the size of the reference sequence, 
+  so it may be advisable to make the smaller of the input files the reference 
+  to assure the program does not exhaust your computer's memory resources. <code>run-mummer1</code> 
+  uses a simplified scoring function that does not recognize masking characters, 
+  so it is not recommended to perform any masking on the input sequences. The 
+  <code>&lt;prefix&gt;</code> value will be prefixed to the names of the resulting 
+  output files. The <code>-r</code> is optional and tells the script to reverse 
+  complement the query input sequence, thus all output coordinates will reference 
+  the reverse complement of the query. If the <code>-r</code> option is omitted, 
+  all matching will be limited to the forward strand of each sequence; if it is 
+  included, all matching will be limited to the forward strand of the reference 
+  and the reverse strand of the query.</p>
+<h5>Program options</h5>
+<p>There are no available command line options for <code>run-mummer1</code>. Instead, 
+  the user must directly edit the <code>csh</code> script to alter the command 
+  line values passed to the individual pipeline programs. The only available tweak 
+  is changing the minimum match length value for <code>mummer</code>, set with 
+  the <code>-l</code> option within the script. Decreasing this value may increase 
+  the sensitivity of the script, but may drastically increase the resulting runtime.</p>
+<h5>Output format</h5>
+<p>There are four output files generated with each call of <code>run-mummer1</code>, 
+  and each of these files is prefixed with the <code>&lt;prefix&gt;</code> value 
+  set on the command line. Each of these files will be referred to by its file 
+  extension (out, gaps, errorsgaps, align), and are described below.</p>
+<h5>The &quot;out&quot; file format</h5>
+<p>The standard output of the <code>mummer</code> program with it's header information 
+  stripped, see the <a href="#mummeroutput">mummer output</a> section for more 
+  information. Just a simple three column list, noting the position and length 
+  of every maximal exact match. Note that for reverse complement matches (produced 
+  with the <code>-r</code> option), the query start positions will reference the 
+  reverse complement of the query input sequence.</p>
+<h5>The &quot;gaps&quot; file format</h5>
+<p>The standard output of the <code>gaps</code> program, see the <a href="#gapsoutput">gaps 
+  output</a> section for more information.</p>
+<h5>The &quot;errorsgaps&quot; file format</h5>
+<p>An annotated version of the gaps format, with an extra column listing the number 
+  of errors counted in each gap. This is perhaps the most useful output file produced 
+  by <code>run-mummer1</code> as it is easy to parse and identify SNPs, which 
+  appear as a <code>'1'</code> in the final column. A <code>'-'</code> character 
+  in the final column means the alignment was too large to compute. Example slice 
+  from an errorsgaps file:</p>
+<pre><code>
+  403382   356512     77    none      1      1       -
+  403466   356595     56    none      7      6       4
+  403542   356670     81    none     20     19       2
+  403626   356756     75    none      3      5       4
+</code></pre>
+<h5>The &quot;align&quot; file format</h5>
+<p>The align file is difficult to parse, but contains some useful visual information. 
+  It intersperses the gaps output file with the actual pair-wise alignment of 
+  each gap. Each alignment follows the listing of the two involved matches and 
+  uses a <code>'^'</code> character to identify the non-identities. If an alignment 
+  was too large to process in memory a tag reading <code>&quot;*** Too long ***&quot;</code> 
+  will be listed in its place. Example align file:</p>
+<pre><code>
+> /home/aphillip/data/mgen.seq reverse Consistent matches
+  170273   729167    158    none      8      8
+  170433   729327     34    none      2      2
+    Errors = 2
+T:  gaaggtctttttgattgtaaag
+S:  gaaggtctttaagattgtaaag
+              ^^          
+  170501   729395    155    none     34     34
+    Errors = 4
+T:  aagaatgactctagcaggcaatggctggagtttgactgtaccactttgaataag
+S:  aagaatgactttagcaggtaatggctagagtttgactgtaccattttgaataag
+              ^       ^       ^                ^          
+  170659   729553    187    none      3      3
+    Errors = 2
+T:  tggaaactatcagtctagagtgt
+S:  tggaaactattaatctagagtgt
+              ^ ^          
+  170856   729750    281    none     10     10
+    Errors = 2
+T:  tagctgtcggagcgatcccttcggtagtga
+S:  tagctgtcggggcgatcccctcggtagtga
+              ^        ^          
+(output continues ...)
+</code></pre>
+<p>Each alignment region is padded with 10bp of the exact match surrounding it 
+  on either side.</p>
+<h4><a name="mummer3"></a>5.3.4. run-mummer3</h4>
+<p><code>run-mummer3</code> is the simplest pipeline of the latest MUMmer3.0 programs. 
+  It runs the same matching and clustering algorithm as <code>nucmer</code> and 
+  <code>promer</code>, however it uses a different extension technique and does 
+  not perform the important pre- and post-processing steps of NUC/PROmer. Because 
+  of its simplistic form, <code>run-mummer3</code> can only handle a single reference 
+  sequence, but like <code>run-mummer1</code> its error-focused output makes it 
+  a handy tool for detecting SNPs and other small errors. The only major difference 
+  between <code>run-mummer3</code> and <code>run-mummer1</code> is the new version's 
+  ability to handle multiple query sequences and its tolerance of large rearrangements. 
+  This makes <code>run-mummer3</code> well suited for error detection between 
+  highly similar sequences that may have large rearrangements, inversions etc. 
+  Edit the script by adding the <code>-D</code> option to the <code>combineMUMs</code> 
+  command line to output a format designed for SNP identification. Still, <code>run-mummer3</code> 
+  provides few advantages of the more user friendly <code>nucmer</code> program, 
+  and should be avoided where possible.</p>
+<h5>Command line syntax</h5>
+<p><code>run-mummer3 &lt;reference file&gt; &lt;query file&gt; &lt;prefix&gt;</code></p>
+<p>The reference and query files should both be FastA format. The reference file 
+  may <em>only</em> have a single sequence, but there is no limit on the number 
+  of sequences the query file may contain. It is <em>very</em> important that 
+  the reference file only contain one sequence, because the script will give you 
+  no indication something went wrong and there will just be empty output files. 
+  <code>run-mummer3</code> uses a simplified scoring function that does not recognize 
+  masking characters, so it is not recommended to perform any masking on the input 
+  sequences. The <code>&lt;prefix&gt;</code> value will be prefixed to the names 
+  of the resulting output files. Both forward and reverse complement matches will 
+  be found by default; to change this behavior or change any parameters, requires 
+  requires hand editing the script.</p>
+<h5>Program options</h5>
+<p>There are no available command line options for <code>run-mummer3</code>. Instead, 
+  the user must directly edit the <code>csh</code> script to alter the command 
+  line values passed to the individual pipeline programs. Altering these parameters 
+  is suggested for most applications, as the default values may not always produce 
+  the best output. Parameter values may be added or changed for <code>mummer</code>, 
+  <code>mgaps</code> and <code>combineMUMs</code>. Run these programs with the 
+  <code>-help</code> option for a list of available options, or refer to this 
+  manual for more information on <code>mummer</code> or <code>mgaps</code>. Note 
+  that the <code>-c</code> option cannot be used for <code>mummer</code> in this 
+  script, or <code>mgaps</code> will fail to cluster the reverse complement matches.</p>
+<h5>Output format</h5>
+<p>Like <code>run-mummer1</code>, <code>run-mummer3</code> produces four output 
+  files prefixed with the value set on the command line. Each of these files will 
+  be referred to by its file extension (out, gaps, errorsgaps, align), and are 
+  described below.</p>
+<h5>The &quot;out&quot; file format</h5>
+<p>Pure, unadulterated <code>mummer</code> output. See the <a href="#mummeroutput">mummer 
+  output</a> section for more information. Just a simple three column list, noting 
+  the position and length of every maximal exact match. Note that for reverse 
+  complement matches, the query start positions will reference the reverse complement 
+  of the query input sequence.</p>
+<h5>The &quot;gaps&quot; file format</h5>
+<p>The standard output of the <code>mgaps</code> program, see the <a href="#mgapsoutput">mgaps 
+  output</a> section for more information.</p>
+<h5>The &quot;errorsgaps&quot; file format</h5>
+<p>An annotated version of the gaps format, with an extra column listing the number 
+  of errors counted in each gap. This is perhaps the most useful output file produced 
+  by <code>run-mummer1</code> as it is easy to parse and identify SNPs, which 
+  appear as a <code>'1'</code> in the final column. A <code>'-'</code> character 
+  in the final column means the alignment was too large to compute. Example slice 
+  from an errorsgaps file:</p>
+<pre><code>
+  403382   356512     77    none      1      1       -
+  403466   356595     56    none      7      6       4
+  403542   356670     81    none     20     19       2
+  403626   356756     75    none      3      5       4</code></pre>
+<h5>The &quot;align&quot; file format</h5>
+<p>The align file is difficult to parse, but contains some useful visual information. 
+  It intersperses the <code>mgaps</code> output file with the actual pair-wise 
+  alignment of each gap. Each alignment follows the listing of the two involved 
+  matches and uses a <code>'^'</code> character to identify the non-identities 
+  and a <code>'='</code> character to identify the MUM portion. The gap alignment 
+  is also padded with 10bp of the exact match surrounding it on either side. Example 
+  align file:</p>
+<pre><code>
+(... output continues)
+&gt; ID21
+ 3944620       24    983    none      -      -
+ 3945604     1008     22    none      1      1
+     Errors = 1
+A: agactctttctttggttgatt
+B: agactctttccttggttgatt
+   ==========^==========
+ 3945655     1059     26    none     29     29
+     Errors = 3
+A: cttgcgattgtctttgcatttgtctttgtttctttttcttcatgctgct
+B: cttgcgattggctttgcatttggctttgtttctttttcctcatgctgct
+   ==========^           ^               ^==========
+ 3945684     1088     29    none      3      3
+     Errors = 2
+A: ttacttttttctc-cattatagta
+B: ttactttttt-tctcattatagta
+   ==========^  ^==========
+Region:    3944620 .. 3945743           24 .. 1146             8 / 1124        0.71%
+&gt; ID21 Reverse
+&gt; ID22
+&gt; ID22 Reverse
+ 5183942        8     31    none      -      -
+ 5183980       47   4221    none      7      8
+     Errors = 3
+A: cccagaaaac-accacctccggccagta
+B: cccagaaaaccaccactcccggccagta
+   ==========^     ^^==========
+ 5188202     4269    314    none      1      1
+     Errors = 1
+A: tgcaccagaacgtaataatcc
+B: tgcaccagaaagtaataatcc
+   ==========^==========
+Region:    5183942 .. 5188515         4578 .. 4                4 / 4575        0.09%
+(output continues ...)
+</code></pre>
+<p>After each cluster, the align file prints a line beginning with the <code>Region</code> 
+  keyword that shows the start and stop of the alignment in the reference and 
+  the start and stop of the alignment in the query respectively. The query coordinates 
+  in the region line will reference the forward strand of the query, while the 
+  lines taken from the gaps file will still reference the reverse strand of the 
+  query. The region line also shows and error ratio and the error percentage.</p>
+<h3><a name="utilities"></a>5.4. Utilities</h3>
+<p>MUMmer includes a few utility programs intended to parse the delta encoded 
+  alignment files and output their contents to the user. The majority of these 
+  programs will only operate on the delta file output of NUCmer or PROmer, however 
+  the generalized visualization tool, <code>mummerplot</code>, will function on 
+  a variety of input.</p>
+<h4><a name="filter" id="filter"></a>5.4.1. delta-filter</h4>
+<p><code>delta-filter</code> is a utility program for the manipulation of the 
+  delta encoded alignment files output by the NUCmer and PROmer pipelines. It 
+  takes a delta file as input and filters the information based on the various 
+  command line switches, outputting only the desired alignments to stdout. Options 
+  to filter by alignment length, identity, uniqueness and consistency are provided. 
+  Certain combinations of these options can greatly reduce the number of unwanted 
+  alignments in the delta file, thus making the output of programs such as <code>show-coords</code> 
+  more comprehendible.</p>
+<h5>Command line syntax</h5>
+<p><code>delta-filter [options] &lt;delta file&gt; &gt; &lt;filtered delta file&gt;</code></p>
+<p>The <code>&lt;delta file&gt;</code> may represent either NUCmer of PROmer data. 
+  The <code>&lt;filtered delta file&gt;</code> will be the filtered down version 
+  of the input. Output will be to stdout. <code>delta-filter</code> run with no 
+  options is the identity function.</p>
+<h5>Program options</h5>
+<table width="100%" border="0" cellpadding="10">
+  <tr> 
+    <td nowrap><code>-g</code></td>
+    <td><code>Global alignment using length*identity weighted LIS (longest increasing 
+      subset). For every reference-query pair, leave only the alignments which 
+      form the longest mutually consistent set</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-h</code></td>
+    <td><code>Print the help information and exit</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-i float</code></td>
+    <td><code>Set the minimum alignment identity [0, 100], (default 0)</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-l int</code></td>
+    <td><code>Set the minimum alignment length (default 0)</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-q</code></td>
+    <td><code>Query alignment using length*identity weighted LIS. For each query, 
+      leave only the alignments which form the longest consistent set for the 
+      query</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-r</code></td>
+    <td><code>Reference alignment using length*identity weighted LIS. For each 
+      reference, leave only the alignments which form the longest consistent set 
+      for the reference.</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-u float</code></td>
+    <td><code>Set the minimum alignment uniqueness, i.e. percent of the alignment 
+      matching to unique reference AND query sequence [0, 100], (default 0)</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-o float</code></td>
+    <td><code>Set the maximum alignment overlap for -r and -q options as a percent 
+      of the alignment length [0, 100], (default 75)</code></td>
+  </tr>
+</table>
+<p>The <code>-g</code> option simulates the behavior of MUMmer1 by performing 
+  a similar algorithm to determine the longest mutually consistent set of matches, 
+  while the <code>-r</code> and <code>-q</code> option only require the match 
+  set to be consistent with respect to either the reference or query respectively. 
+  The difference being, the <code>-g</code> option does not allow for inversions, 
+  translocations, etc. while the <code>-r</code> and <code>-q</code> options do. 
+  However, none of these options (<code>-g -r -q</code>) allow for the inclusion 
+  of multiple repeat copies. Use <code>-g</code> when aligning two sequences which 
+  are globally consistent, use <code>-r</code> for determining the best mapping 
+  of a reference to a query (one-to-many), use <code>-q</code> for determining 
+  the best mapping of a query to a reference (many-to-one), and use <code>-r</code> 
+  and <code>-q</code> in conjunction for a one-to-one mapping of reference to 
+  query. The <code>-u</code> option is handy for keeping only those alignments 
+  which are anchored in unique sequence. The <code>-o</code> option sets the alignment 
+  overlap tolerance for the <code>-r</code> and <code>-q</code> options, i.e. 
+  the amount two adjacent alignments included by <code>-r</code> or <code>-q</code> 
+  are allowed to overlap.</p>
+<h5>Output format</h5>
+<p>Output format is the same as the input format. See the <a href="#nucmeroutput">NUCmer 
+  Output format</a> section for more details.</p>
+<h4><a name="mapview" id="mapview"></a>5.4.2. mapview</h4>
+<p><code>mapview</code> is a utility script for displaying sequence alignments 
+  as provided by NUCmer or PROmer. It takes the output from <code>show-coords</code> 
+  or <code>mgaps</code> and converts it to a FIG, PDF or PS image file. By default, 
+  it produces FIG files which can be viewed with the common system utility <code>xfig</code> 
+  or converted to PDF or PS with the <code>fig2dev</code> utility (neither programs 
+  are included with MUMmer). <code>mapview</code> is useful for mapping multiple 
+  query contigs (e.g. from a draft sequencing project) against an annotated reference 
+  sequence. Exons and other features can also be plotted with the NUCmer or PROmer 
+  alignments, aiding in exon refinement and analysis. Individual MUMmer hits are 
+  plotted according to their percent identity, making regions of high or low similarity 
+  easily distinguishable.</p>
+<h5>Command line syntax</h5>
+<p><code>mapview [options] &lt;coords file&gt; [UTR coords] [CDS coords]</code></p>
+<p>The <code>&lt;coords file&gt;</code> must be produced with the <code>show-coords</code> 
+  program run with the <code>-r </code><code>-l</code> options (see <a href="#coords">show-coords</a> 
+  section), or the <code>mgaps</code> program. This coords file may represent 
+  either NUCmer or PROmer data, and it is recommended that it be generated with 
+  the <code>-k</code> option (or run on a <a href="#filter">filtered delta file</a>) 
+  to reduce redundancy in the PROmer output, however this option does not always 
+  select the proper reading frame. The optional UTR and CDS coordinate files which 
+  refer to the reference sequence, should be in <a href="http://www.sanger.ac.uk/Software/formats/GFF/">GFF 
+  format</a>. These contain the coordinates of coding sequences and untranslated 
+  regions for genes on the reference genome and will be displayed graphically 
+  if provided.</p>
+<h5>Program options</h5>
+<table width="100%" border="0" cellpadding="10">
+  <tr> 
+    <td nowrap><code>-d int<br>
+      --maxdist</code></td>
+    <td><code>Set the maximum distance, in base-pairs, between graphically linked 
+      matches (default 50000)</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-f string<br>
+      --format</code></td>
+    <td><code>Set the output file format to 'fig', 'pdf' or 'ps' (default 'fig')</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-h<br>
+      --help </code></td>
+    <td><code>Print help information and exit</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-m float<br>
+      --mag </code></td>
+    <td><code>Set the magnification at which the figure is rendered, this option 
+      will be used when generating PDF or PS files (default 1.0)</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-n int<br>
+      --num</code></td>
+    <td><code>Set the number of output files used to partition the output, this 
+      is to avoid generating files that are too large to display (default 10)</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-p string<br>
+      --prefix </code></td>
+    <td><code>Set the output file prefix (default PROMER_graph or NUCMER_graph)</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-v<br>
+      --verbose </code></td>
+    <td><code>Verbose logging of the processed files</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-V<br>
+      --version </code></td>
+    <td><code>Display the version information and exit</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-x1 int</code></td>
+    <td><code>Set the lower coordinate bound of the display window</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-x2 int</code></td>
+    <td><code>Set the upper coordinate bound of the display window</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-g|ref</code></td>
+    <td><p><code>If the input file is provided by 'mgaps', set the reference sequence 
+        ID (as it appears in the first column of the UTR/CDS coords file)</code></p>
+      </td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-I</code></td>
+    <td><code>Display the name of the query sequences</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-Ir</code></td>
+    <td><code>Display the name of the reference genes</code></td>
+  </tr>
+</table>
+<p>All matches from the same contig are linked by drawing lines between each successive 
+  pair of matches, if the matches occur too far apart, then this can get a little 
+  messy. The <code>-d</code> option can help clean up the plots by limiting the 
+  distance a link can span. The <code>-n</code> value can be increased or decreased 
+  if the resulting FIG files are either too big or too small respectively.</p>
+<h5>Output format</h5>
+<p>The <code>mapview</code> script produces FIG output files (or PDF or PS if 
+  requested) that graphically represent the alignment described in the input coords 
+  file. An example of the resulting figures can be seen below.</p>
+<div class="centered"> <img src="mapplot.gif" alt="mapview plot example" name="mapplot" id="mapplot"> 
+</div>
+<p>The above MapView FIG shows a 220 kbp slice of <em>D. melanogaster</em> chromosome 
+  2L and its alignment to <em>D. pseudoobscura</em>. The alignment, generated 
+  by PROmer, shows all regions of conserved amino acid sequence. The blue rectangle 
+  spanning the figure represents the reference (<em>D. melanogaster</em>), with 
+  annotated genes shown above it and the PROmer alignments shown below it. Alternative 
+  splice variants of the same gene are stacked vertically. Exons are shown as 
+  boxes, with intervening introns connecting them. The 5' and 3' UTRs are colored 
+  pink and blue to indicate the gene's direction of translation. PROmer matches 
+  are shown twice, once just below the reference genome, where all matches are 
+  collapsed into red boxes, and in a larger display showing the separate matches 
+  within each contig, where the contigs are colored differently to indicate contig 
+  boundaries. The vertical position of the matches indicates their percent identity, 
+  ranging from 50% at the bottom of the display to 100% just below the red rectangles. 
+  Percent identity is of the amino acid translations used by PROmer. Matches from 
+  the same query sequence are connected by lines of the same color.</p>
+<h4><a name="mummerplot"></a>5.4.3. mummerplot</h4>
+<p><code>mummerplot</code> is a script utility that takes output from <code>mummer</code>, 
+  <code>nucmer</code>, <code>promer</code> or <code>show-tiling</code>, and converts 
+  it to a format suitable for plotting with <code>gnuplot</code>. The primary 
+  plot type is an alignment dotplot where a sequence is laid out on each axis 
+  and a point is plotted at every position where the two sequences show similarity. 
+  As an extension to this plot style, <code>mummerplot</code> is also able to 
+  offset multiple 1-vs-1 dotplots to form a multiplot where multiple sequences 
+  can be laid out on each axis. This plot style is especially handy for browsing 
+  an alignment of two contig sets. Identity plots are also possible by coloring 
+  each data point with a color gradient representing identity, or by collapsing 
+  the y-axis data onto a single line and then vertically offsetting the data points 
+  by their identities. In addition to producing the plot data, <code>mummerplot</code> 
+  also generates a <code>gnuplot</code> script that will be evaluated in order 
+  to generate the graph. Since <code>mummerplot</code> simply generates <code>gnuplot</code> 
+  input, <code>gnuplot</code> must also be installed and accessible from the system 
+  path. Information about the free <code>gnuplot</code> software is currently 
+  available at <a href="http://www.gnuplot.info" target="_blank">www.gnuplot.info</a>.</p>
+<h5>Command line syntax</h5>
+<p><code>mummerplot [options] &lt;match file&gt;</code></p>
+<p>The <code>&lt;match file&gt;</code> can either be a three column match list 
+  from <code>mummer</code> (either 3 or 4 column format), the delta file from 
+  <code>nucmer</code> or <code>promer</code>, or the default output from <code>show-tiling</code>. 
+  <code>mummerplot</code> will automatically detect the type of input file it 
+  is given, regardless of its file extension, or it will fail if the input file 
+  is of an unrecognized type. If the X11 terminal is selected for output (default 
+  behavior), an X11 window will be spawned and the plot will be drawn to the screen. 
+  If a terminal other than X11 is selected, an extra file will be output containing 
+  the plot graphic. The leftover <code>&lt;prefix&gt;.gp</code> script contains 
+  the commands necessary for generating the plot, and may be edited afterwards 
+  and rerun with gnuplot to change line thickness, labels, colors, etc.</p>
+<h5>Program options</h5>
+<table width="100%" border="0" cellpadding="10">
+  <tr> 
+    <td nowrap><code>-b int<br>
+      --breaklen</code></td>
+    <td><code>Highlight alignments with a breakpoint further than the given distance 
+      from the nearest sequence end</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>--[no]color</code></td>
+    <td><code>Color plot lines with a percent similarity gradient or turn off 
+      all color (default color by match direction)</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-c<br>
+      --coverage </code></td>
+    <td><code>Generate a reference coverage plot, also known as a percent identity 
+      plot (default behavior for show-tiling input)</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>--depend</code></td>
+    <td><code>Print dependency information and exit</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-f<br>
+      --filter</code></td>
+    <td><code>Only display alignments which represent the &quot;best&quot; one-to-one 
+      mapping of reference and query subsequences (requires delta formatted input)</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-h<br>
+      --help </code></td>
+    <td><code>Print help information and exit</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-l<br>
+      --layout</code></td>
+    <td><code>Layout a multiplot by ordering and orienting sequences such that 
+      the largest hits cluster near the main diagonal (requires delta formatted 
+      input) </code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-p string<br>
+      --prefix</code></td>
+    <td><code>Set the output file prefix (default 'out')</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>--rv</code></td>
+    <td><code>Reverse video, swap the foreground and background colors for x11 
+      plots (requires x11 terminal)</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-r string<br>
+      --IdR </code></td>
+    <td><code>Select a specific reference sequence for the x-axis</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-q string<br>
+      --IdQ</code></td>
+    <td><code>Select a specific query sequence for the y-axis</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-R string<br>
+      --Rfile</code></td>
+    <td><code>Generate a multiplot by using the order and length information contained 
+      in this file, either a FastA file of the desired reference sequences or 
+      a tab-delimited list of sequence IDs, lengths and orientations [ +-]</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-Q string<br>
+      --Qfile</code></td>
+    <td><code>Generate a multiplot by using the order and length information contained 
+      in this file, either a FastA file of the desired query sequences or a tab-delimited 
+      list of sequence IDs, lengths and orientations [ +-]</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><p><code>-s string<br>
+        --size</code></p></td>
+    <td><code>Set the output size to small, medium or large<br>
+      --small --medium --large (default 'small')</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><p><code>-S<br>
+        --SNP</code></p></td>
+    <td><code>Highlight SNP locations in the alignment</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><p><code>-t string<br>
+        --terminal</code></p></td>
+    <td><code>Set the output terminal to x11, postscript or png<br>
+      --x11 --postscript --png</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><p><code>-x range<br>
+        --xrange </code></p></td>
+    <td><code>Set the x-range for the plot in the form &quot;[min,max]&quot;</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><p><code>-y range<br>
+        --yrange </code></p></td>
+    <td><code>Set the y-range for the plot in the form &quot;[min,max]&quot;</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-V<br>
+      --version </code></td>
+    <td><code>Display version information and exit</code></td>
+  </tr>
+</table>
+<p>The <code>--breaklen</code> option is only useful for highlighting discrepancies 
+  between two near identical sequence sets. The <code>--color</code> option looks 
+  best when plotted to a postscript terminal and looks worst when plotted to a 
+  png terminal. If the alignment is very sparse, many of the alignments will &quot;disappear&quot; 
+  because they are too small to be rendered. If this happens, try editing the 
+  gnuplot script to plot with &quot;linespoints&quot; instead of &quot;lines&quot;. 
+  The <code>--coverage</code> option is sometimes the only sensible way to plot 
+  one vs. many comparisons if &quot;many&quot; is very large, and it is also a 
+  useful plot for finding gaps in the reference (e.g. physical gaps in a contig 
+  set). The <code>--filter</code> option will throw away sometimes valuable repeat 
+  information, but is nonetheless very helpful in cleaning up an otherwise noisy 
+  plot. The <code>--layout</code> feature is only meant to be used for multiplots 
+  where the two sequence sets are near identical, and even when this is true, 
+  the layout algorithm isn't perfect. The <code>-R -Q</code> options are necessary 
+  for any multiplot, otherwise the script won't know how long the sequences are. 
+  The sequences will be laid out in the order found in these files and every sequence 
+  in <code>--Rfile</code> and <code>--Qfile</code> will be plotted even if no 
+  alignments exist. The <code>--SNP</code> or <code>--breaklen</code> options 
+  will change the plot colors so that green is normal and red is highlighted.</p>
+<h5>Output format</h5>
+<p>The <code>mummerplot</code> script outputs three files, <code>&lt;prefix&gt;.gp 
+  &lt;prefix&gt;.fplot &lt;prefix&gt;.rplot</code>, when run with standard parameters. 
+  The first of which is the gnuplot script. This script contains the commands 
+  necessary to generate the plot, and refers to the two data files which contain 
+  the forward and reverse matches respectively. If the <code>--filter</code> or 
+  <code>--layout</code> option are specified, an additional <code>&lt;prefix&gt;.filter</code> 
+  file will be generated containing the filtered delta information. If the <code>--breaklen</code> 
+  or <code>--SNP</code> are included, an additional data file <code>&lt;prefix&gt;.hplot</code> 
+  will be created containing the highlight information. Finally, if a terminal 
+  other than X11 is specified, the plot graphic will saved to the file <code>&lt;prefix&gt;.ps</code> 
+  or <code>&lt;prefix&gt;.png</code> if the terminal is postscript of PNG respectively. 
+  Line thickness, color, and many other options can be added or removed from the 
+  plot by hand editing the gnuplot script. Examples of the two types of plots 
+  are displayed below, the dot plot first, followed by the coverage plot, and 
+  finnaly a couple multiplots.</p>
+<div class="centered"> <img src="dotplot.gif" alt="dot plot example" name="dotplot" id="dotplot"> 
+</div>
+<p>For a dot plot, the reference sequence is laid across the x-axis, while the 
+  query sequence is on the y-axis. Wherever the two sequences agree, a colored 
+  line or dot is plotted. The forward matches are displayed in red, while the 
+  reverse matches are displayed in green. If the two sequences were perfectly 
+  identical, a single red line would go from the bottom left to the top right. 
+  However, two sequences rarely exhibit this behavior, and in the above plot, 
+  multiple gaps and inversions can be identified between these two strains of 
+  <em>Helicobacter pylori</em>. This plot was generated from <code>nucmer</code> 
+  output, however running <code>mummerplot</code> on a simple match list from 
+  <code>mummer</code> would produce similar results, but with more &quot;noise&quot;. 
+  In the newer versions, <code>mummerplot </code>plots points at the beginning 
+  and end of each line to avoid pixel resolution issues and also uses different 
+  plotting colors. Therefore, the output may look slightly different than displayed 
+  on these pages.</p>
+<div class="centered"> <img src="covplot.gif" alt="coverage plot example" name="covplot" id="covplot"> 
+</div>
+<p>When there are many query sequences mapping to a single reference sequence, 
+  it is often helpful to use a coverage or percent identity plot. This type of 
+  plot lays out each of the alignment regions (or for <code>show-tiling</code>, 
+  the full contigs) according to their percent similarity and mapping location 
+  to the reference. For easier visualization of gaps, all of the alignments are 
+  also re-plotted at 10% similarity to normalize the y coordinates and produce 
+  a secondary 1D plot. Note that since <code>mummer</code> produces nothing but 
+  exact matches, only the normalized 1D plot will appear in the figure.</p>
+<table width="100%" border="0">
+  <tr> 
+    <td align="center"><img src="multiplota.gif" alt="multiplot raw" name="multiplota" width="350" height="245" id="multiplota"></td>
+    <td align="center"><img src="multiplotb.gif" alt="multiplot layout" name="multiplotb" width="350" height="245" id="multiplotb"></td>
+  </tr>
+</table>
+<p>A multiplot is a plot for multiple reference and query sequences where each 
+  reference/query pair is given its own grid box and their dotplot is drawn within 
+  the constraints of that box. Thus, every grid line represents the end of one 
+  sequence and the beginning of the next. This allows us to draw every dotplot 
+  for the two sequence sets at once, as displayed by the two contig sets in the 
+  above left image. With a little shuffling of the order and orientation of the 
+  sequences, a more pleasing layout can be obtained as show in the above right 
+  image. This is the same contig set as on the left, however the contigs have 
+  been reordered and oriented so that the major alignments cluster around the 
+  main diagonal of the plot. This allows for easier browsing of the plot by centralizing 
+  the important information, and also highlights contigs that have disagreeing 
+  sequences by breaking the diagonal. Currently a greedy approach is used to perform 
+  the layout, and while good at bringing alignments to the diagonal, it does not 
+  always produce the optimal ordering. Therefore, a break in the diagonal does 
+  not always signal a disagreement between the two sequence sets (see the <code>mummerplot 
+  --breaklen</code> option for an easy way to highlight assembly discrepancies).</p>
+<p>
+A quick reference guide for interpretting the dot plot is available <a href="AlignmentTypes.pdf">here</a>.
+
+</p>
+<h4><a name="aligns"></a>5.4.4. show-aligns</h4>
+<p><code>show-aligns</code> parses the delta encoded alignment output of NUCmer 
+  and PROmer, and displays the pair-wise alignments from the two sequences specified 
+  on the command line. It is handy for identifying the exact location of errors 
+  and looking for SNPs between two sequences.</p>
+<h5>Command line syntax</h5>
+<p><code>show-aligns [options] &lt;delta file&gt; &lt;IdR&gt; &lt;IdQ&gt;</code></p>
+<p>The <code>&lt;delta file&gt;</code> is the delta output file of either <code>nucmer</code> 
+  or <code>promer</code>. <code>&lt;IdR&gt;</code> is the FastA header tag of 
+  the desired reference sequence, and <code>&lt;IdQ&gt;</code> is the FastA header 
+  tag of the desired query sequence. All alignments between these two sequences 
+  will be displayed. Output will be to stdout.</p>
+<h5>Program options</h5>
+<table width="100%" border="0" cellpadding="10">
+  <tr> 
+    <td nowrap><code>-h</code></td>
+    <td><code>Print help information and exit</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-q</code></td>
+    <td><code>Sort alignments by the query start coordinate</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-r</code></td>
+    <td><code>Sort alignments by the reference start coordinate</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-w int</code></td>
+    <td><code>Set the screen width of the output (default 60)</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-x int</code></td>
+    <td><code>The alignment matrix type, 1 [BLOSUM 45], 2 [BLOSUM 62] or 3 [BLOSUM 
+      80] (default 2)</code></td>
+  </tr>
+</table>
+<p>The <code>-x</code> option applies to amino acid alignments (<code>promer</code> 
+  output) and will only affect the error notations, not the alignment.</p>
+<h5>Output format</h5>
+<p>Output is to <code>stdout</code> and is slightly different depending on the 
+  type of alignment, i.e. nucleotide or amino acid. Each alignment is preceded 
+  with a header containing the <code>BEGIN</code> keyword, the frame/direction 
+  information and the start and end in the reference and query respectively. Each 
+  individual line of the alignment is prefixed with the position of the first 
+  base on that line, these positions reference the forward strand of the DNA sequence 
+  regardless of alignment type. Errors in nucleotide alignments are marked with 
+  a <code>'^'</code> character below the two mismatching sequence bases. Errors 
+  in protein alignments are noted with a whitespace in between the two mismatching 
+  acids, while similarities (positive alignment scores) are marked with a <code>'+'</code> 
+  and identities are noted with a copy of the matching acid. Each alignment is 
+  followed by a footer containing the <code>END</code> keyword, the frame/direction 
+  information and the start and end in the reference and query respectively. Perhaps 
+  the best way to explain this format is by example, so snippets of the two types 
+  of alignments are given below.</p>
+<h5>Nucleotide alignment output</h5>
+<pre><code>
+/home/aphillip/data/GHP.1con /home/aphillip/data/GHPJ9.1con
+
+============================================================
+-- Alignments between Helicobacter_pylori_26695 and Helicobacter_pylori_strain_J99
+
+
+-- BEGIN alignment [ +1 4262 - 4316 | +1 4469 - 4522 ]
+
+
+4262       gatttgaacttccgtttccaccgtgaaagggtggtatccttggccacta
+4469       gatttgaacccctgtaaccaccgtgaaagggtggtatcc.taaccacta
+                    ^^ ^  ^^                      ^ ^^      
+
+4311       gatgaa
+4517       gatgaa
+                 
+
+
+--   END alignment [ +1 4262 - 4316 | +1 4469 - 4522 ]
+-- BEGIN alignment [ +1 5198 - 22885 | +1 5389 - 23089 ]
+(output continues ...)
+</code></pre>
+<h5>Amino acid alignment output</h5>
+<pre><code>
+/home/aphillip/data/mgen.seq /home/aphillip/data/ecoliO157.seq
+
+============================================================
+-- Alignments between mgen.seq and Escherichia_coli_O157:H7
+
+
+-- BEGIN alignment [ +1 31690 - 31995 | +3 3336375 - 3336680 ]
+
+
+31690      VSFSFYLVPNKRSPASPRPGIMYLLSFNFSSIAARNIST*GCIFSTLLI
+           + F  Y VP   SPASPRPGIMY  SF+  SI A   ST GC FS+  I
+3336375    IIFILYFVPKILSPASPRPGIMYPCSFSP*SIDAVYSSTSGCAFSSAAI
+
+31837      PSGAATIAITLILIGLSSLIDLIAVNNVVPVASIGSRIITCESEMFSGI
+           PSGAAT   TL+L+  +     +      PVASIGS I    S M    
+3336522    PSGAATSTRTLMLLQPAFFSRSMVAITEPPVASIGSTISAIRSSMLETS
+
+31984      FL*Y
+           F  Y
+3336669    FWKY
+
+
+--   END alignment [ +1 31690 - 31995 | +3 3336375 - 3336680 ]
+-- BEGIN alignment [ +2 50819 - 51220 | -1 3263900 - 3263499 ]
+(output continues ...)
+</code></pre>
+<h4><a name="coords"></a>5.4.5. show-coords</h4>
+<p><code>show-coords</code> parses the delta alignment output of NUCmer and PROmer, 
+  and displays summary information such as position, percent identity and so on, 
+  of each alignment. It is the most commonly used tool for analyzing the delta 
+  files.</p>
+<h5>Command line syntax</h5>
+<p><code>show-coords [options] &lt;delta file&gt;</code></p>
+<p>The <code>&lt;delta file&gt;</code> is the delta output file of either <code>nucmer</code> 
+  or <code>promer</code>.</p>
+<h5>Program options</h5>
+<table width="100%" border="0" cellpadding="10">
+  <tr> 
+    <td nowrap><code>-b</code></td>
+    <td><code>Brief output that only displays the non-redundant locations of aligning 
+      regions</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-B</code></td>
+    <td><code>Switch output to btab format</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-c</code></td>
+    <td><code>Include percent coverage columns in the output</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-d</code></td>
+    <td><code>Include the alignment direction/reading frame in the output (default 
+      for promer)</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-g</code></td>
+    <td><code>Only display alignments included in the Longest Ascending Subset, 
+      i.e. the global alignment. Recommened to be used in conjunction with the 
+      -r or -q options. Does not support circular sequences</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-h</code></td>
+    <td><code>Print help information and exit</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-H</code></td>
+    <td><code>Omit the output header</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-I float</code></td>
+    <td><code>Set minimum percent identity to display</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-k</code></td>
+    <td><code>*PROMER ONLY* Knockout (do not display) alignments that overlap 
+      another alignment in a better reading frame</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-l</code></td>
+    <td><code>Include sequence length columns in the output</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-L int</code></td>
+    <td><code>Set minimum alignment length to display</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-o</code></td>
+    <td><code>Annotate maximal alignments between two sequences, i.e. overlaps 
+      between reference and query sequences</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-q</code></td>
+    <td><code>Sort output lines by query</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-r</code></td>
+    <td><code>Sort output lines by reference</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-T</code></td>
+    <td><code>Switch output to tab-delimited format</code></td>
+  </tr>
+</table>
+<p>The <code>-b</code> option alters the output table to only display the location 
+  of the aligning regions, not their identity, direction, frame, etc. Also, for 
+  protein data, the <code>-b</code> option will collapse all overlapping frames, 
+  and list a single encompassing region. <code>-B</code> switches the output format 
+  to &quot;btab&quot; (Blast tablature) which is a tab-delimited table with a 
+  different layout than the standard <code>show-coords</code> format. The coverage 
+  information added with the <code>-c</code> option is equal to the length of 
+  the alignment divided by the length of the sequence. The <code>-k</code> option 
+  will select the &quot;best&quot; reading frame by choosing the alignment that 
+  is longest, or has the highest percent identity and is within 75% of the length 
+  of the longest alignment; only alignments that overlap each other by greater 
+  than 50% of their length will be considered for knockout. The <code>-T</code> 
+  option is different than the <code>-B</code> option because it retain the normal 
+  ordering of output columns. The output of the <code>-d</code> option for NUCmer 
+  data will appear under the <code>[FRM]</code> column, just like the reading 
+  frame info from PROmer data. The <code>-o</code> annotations will appear in 
+  the final column of the output. The descriptions reference the reference sequence, 
+  <em>e.g.</em> <code>[END]</code> means the overlap is on the end of the reference 
+  sequence and <code>[CONTAINED]</code> means the reference sequence is contained 
+  by the query sequence.</p>
+<p>The <code>-c</code> and <code>-l</code> options are useful when comparing two 
+  sets of assembly contigs, in that these options help determine if an alignment 
+  spans an entire contig, or is just a partial hit to a different sequence. The 
+  <code>-b</code> option is useful when the user wishes to identify syntenic regions 
+  between two genomes, but is not particularly interested in the actual alignment 
+  similarity or appearance. This option also disregards match orientation, so 
+  should not be used if this information is needed. The <code>-g</code> option 
+  comes in handy when comparing sequences that share a linear alignment relationship, 
+  that is there are no rearrangements. Large nsertions, deletions and gaps can 
+  then be identified by the break between two adjacent alignments in the output. 
+  If there are more than one global alignment that share the same score, then 
+  one of them is picked at random to display. This is useful when mapping repetitive 
+  reads to a finished sequence.</p>
+<h5>Output format</h5>
+<p>Output is to <code>stdout</code> and is slightly different depending on the 
+  type of alignment, i.e. nucleotide or amino acid. Some of the described columns, 
+  such as percent similarity, will not appear for nucleotide comparisons. When 
+  run without the <code>-H</code> or <code>-B</code> options, <code>show-coords</code> 
+  prints a header tag for each column; the descriptions of each tag follows. <code>[S1]</code> 
+  start of the alignment region in the reference sequence<code> [E1]</code> end 
+  of the alignment region in the reference sequence <code>[S2]</code> start of 
+  the alignment region in the query sequence <code>[E2]</code> end of the alignment 
+  region in the query sequence <code>[LEN 1]</code> length of the alignment region 
+  in the reference sequence <code>[LEN 2]</code> length of the alignment region 
+  in the query sequence <code>[% IDY]</code> percent identity of the alignment 
+  <code>[% SIM]</code> percent similarity of the alignment (as determined by the 
+  BLOSUM scoring matrix) <code>[% STP]</code> percent of stop codons in the alignment 
+  <code>[LEN R]</code> length of the reference sequence <code>[LEN Q]</code> length 
+  of the query sequence <code>[COV R]</code> percent alignment coverage in the 
+  reference sequence <code>[COV Q]</code> percent alignment coverage in the query 
+  sequence <code>[FRM]</code> reading frame for the reference and query sequence 
+  alignments respectively <code>[TAGS]</code> the reference and query FastA IDs 
+  respectively. All output coordinates and lengths are relative to the forward 
+  strand of the reference DNA sequence.</p>
+<p>When run with the <code>-B</code> option, output format will consist of 21 
+  tab-delimited columns. These are as follows: <code>[1]</code> query sequence 
+  ID <code>[2]</code> date of alignment <code>[3]</code> length of query sequence 
+  <code>[4]</code> alignment type <code>[5]</code> reference file <code>[6]</code> 
+  reference sequence ID <code>[7]</code> start of alignment in the query <code>[8]</code> 
+  end of alignment in the query <code>[9]</code> start of alignment in the reference 
+  <code>[10]</code> end of alignment in the reference <code>[11]</code> percent 
+  identity <code>[12]</code> percent similarity <code>[13]</code> length of alignment 
+  in the query <code>[14]</code> 0 for compatibility <code>[15]</code> 0 for compatibility 
+  <code>[16]</code> NULL for compatibility <code>[17]</code> 0 for compatibility 
+  <code>[18]</code> strand of the query <code>[19]</code> length of the reference 
+  sequence <code>[20]</code> 0 for compatibility <code>[21]</code> and 0 for compatibility.</p>
+<h4><a name="snps" id="snps"></a>5.4.6. show-snps</h4>
+<p><code>show-snps</code> is a utility program for reporting polymorphisms contained 
+  in a delta encoded alignment file output by NUCmer or PROmer. It catalogs all 
+  of the single nucleotide polymorphisms (SNPs) and insertions/deletions within 
+  the delta file alignments. Polymorphisms are reported one per line, in a delimited 
+  fashion similar to <code>show-coords</code>. Pairing this program with the appropriate 
+  MUMmer tools can create an easy to use SNP pipeline for the rapid identification 
+  of putative SNPs between any two sequence sets, as demonstrated in <a href="#snpdetection">SNP 
+  detection section</a>. </p>
+<h5>Command line syntax</h5>
+<p><code>show-snps [options] &lt;delta file&gt;</code></p>
+<p>The <code>&lt;delta file&gt;</code> is the delta output of either <code>nucmer</code> 
+  or <code>promer</code>. Output will be to stdout.</p>
+<h5>Program options</h5>
+<table width="100%" border="0" cellpadding="10">
+  <tr> 
+    <td nowrap><code>-C</code></td>
+    <td><code>Do not report SNPs from alignments with an ambiguous mapping, i.e. 
+      only report SNPs where the [R] and [Q] columns equal 0 and do not output 
+      these columns</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-h</code></td>
+    <td><code>Print help information and exit</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-H</code></td>
+    <td><code>Do not print the output header</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-I</code></td>
+    <td><code>Do not report indels</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-l</code></td>
+    <td><code>Include sequence length information in the output</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-q</code></td>
+    <td><code>Sort output lines by query IDs and SNP positions</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-r</code></td>
+    <td><code>Sort output lines by reference IDs and SNP positions</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-S</code></td>
+    <td><code>Specify which alignments to report by passing 'show-coords' lines 
+      to stdin</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-T</code></td>
+    <td><code>Switch to tab-delimited format</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-x int</code></td>
+    <td><code>Include x characters of surrounding SNP context in the output (default 
+      0) </code></td>
+  </tr>
+</table>
+<p>The <code>-C</code> option is a little confusing, but in simple terms it avoids 
+  calling SNPs from repetitive regions. &quot;ambiguous mapping&quot; refers to 
+  a position on the reference or query that is covered by more than one alignment. 
+  This can be caused by simple repeats, or overlapping alignments caused by tandem 
+  repeats that exist in different copy numbers. Either way, calling SNPs from 
+  these regions is questionable, and therefore the <code>-C</code> option should 
+  be invoked in most instances. To generate output suitable for further parsing, 
+  use the <code>-H -T</code> options. The <code>[BUFF]</code> output column will 
+  refer to the sequence positions requested by the <code>-r -q</code> options, 
+  so these options affect more than the order of the output. The <code>-S</code> 
+  option will accept all forms of <code>show-coords</code> output, so output can 
+  be piped into <code>show-snps</code> or a simple cut/paste from one xterm to 
+  another should get the job done. This option is helpful when the user has a 
+  specific alignment they would like to see SNPs from. <code>-x</code> does nothing 
+  other than print out the characters on either side of the listed position for 
+  both the reference and query. The <code>'.'</code> character is used to represent 
+  indels, while <code>'-'</code> represents end-of-sequence.</p>
+<h5>Output format</h5>
+<p>Output is to stdout and is slightly different depending on which command switches 
+  are set. For instance, by default the output is arranged in a table style, however 
+  if the <code>-T</code> option is active, the output will be tab-delimited. Also, 
+  the sequence files, alignment type and column headers are output by default, 
+  however if the <code>-H</code> option is active, the headers will be stripped 
+  from the output. Other options like <code>-l -C -x</code> will add or remove 
+  columns from the output. So, for description purposes, all possible column headers 
+  will be given and it is up to the user to pair the column header with the column 
+  number. The descriptions for each header tag follows. <code>[P1]</code> position 
+  of the SNP in the reference sequence. For indels, this position refers to the 
+  1-based position of the first character before the indel, e.g. for an indel 
+  at the very beginning of a sequence this would report 0. For indels on the reverse 
+  strand, this position refers to the forward-strand position of the first character 
+  before indel on the reverse-strand, e.g. for an indel at the very end of a reverse 
+  complemented sequence this would report 1.<code> [SUB]</code> character or gap 
+  at this position in the reference<code> [SUB]</code> character or gap at this 
+  position in the query<code> [P2]</code> position of the SNP in the query sequence<code> 
+  [BUFF]</code> distance from this SNP to the nearest mismatch (end of alignment, 
+  indel, SNP, etc) in the same alignment<code> [DIST]</code> distance from this 
+  SNP to the nearest sequence end<code> [R]</code> number of repeat alignments 
+  which cover this reference position<code> [Q]</code> number of repeat alignments 
+  which cover this query position<code> [LEN R]</code> length of the reference 
+  sequence<code> [LEN Q]</code> length of the query sequence <code>[CTX R]</code> 
+  surrounding reference context<code> [CTX Q]</code> surrounding query context<code> 
+  [FRM]</code> sequence direction (NUCmer) or reading frame (PROmer)<code> [TAGS]</code> 
+  the reference and query FastA IDs respectively. All positions are relative to 
+  the forward strand of the DNA input sequence, while the <code>[BUFF]</code> 
+  distance is relative to the sorted sequence.</p>
+<h4><a name="tiling"></a>5.4.7. show-tiling</h4>
+<p><code>show-tiling</code> attempts to construct a tiling path out of the query 
+  contigs as mapped to the reference sequences. Given the delta alignment information 
+  of a few long reference sequences and many small query contigs, <code>show-tiling</code> 
+  will determine the best mapped location of each query contig. Note that each 
+  contig may only be tiled once, so repetitive regions may cause this program 
+  some difficulty. This program is useful for aiding in the scaffolding and closure 
+  of an unfinished set of contigs, if a suitable, high similarity reference genome 
+  is available. Or, if using PROmer, <code>show-tiling</code> will help in the 
+  identification of syntenic regions and their contig's mapping to the references.</p>
+<p>This program is not suitable for &quot;many vs. many&quot; assembly comparisons, 
+  however a new tool based on the concepts of <code>show-tiling</code> should 
+  be available in the near future that will facilitate the mapping of assembly 
+  contigs.</p>
+<h5>Command line syntax</h5>
+<p><code>show-tiling [options] &lt;delta file&gt;</code></p>
+<p>The <code>&lt;delta file&gt;</code> is the delta output file of either <code>nucmer</code> 
+  or <code>promer</code>. Primary output will be to stdout.</p>
+<h5>Program options</h5>
+<table width="100%" border="0" cellpadding="10">
+  <tr> 
+    <td nowrap><code>-a</code></td>
+    <td><code>Describe the tiling path by printing the tab-delimited alignment 
+      regions</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-c</code></td>
+    <td><code>Assume the reference sequences are circular, and allow tiled contigs 
+      to span the origin</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-h</code></td>
+    <td><code>Print help information and exit</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-g int</code></td>
+    <td><code>Maximum gap between clustered alignments, where -1 will represent 
+      infinity (nucmer default 1000, promer default -1)</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-i float</code></td>
+    <td><code>Minimum percent identity (nucmer default 90.0, promer default 55.0)</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-l int</code></td>
+    <td><code>Minimum contig length (default 1)</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-p filename</code></td>
+    <td><code>Output a pseudo molecule of the query contigs to file</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-R</code></td>
+    <td><code>Deal with repetitive contigs by randomly placing them in one of 
+      their copy locations (implies -V 0)</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-t filename</code></td>
+    <td><code>Output a TIGR assembler style contig list of EVERY mapping contig 
+      to file</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-u filename</code></td>
+    <td><code>Output the tab-delimited alignment regions of the unusable contigs 
+      to file</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-v float</code></td>
+    <td><code>Minimum contig alignment coverage (nucmer default 95.0, promer default 
+      50.0)</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-V float</code></td>
+    <td><code>Minimum contig coverage difference (nucmer default 10.0, promer 
+      default 30.0)</code></td>
+  </tr>
+  <tr> 
+    <td nowrap><code>-x</code></td>
+    <td><code>Describe the tiling path by printing the XML contig linking information</code></td>
+  </tr>
+</table>
+<p>The <code>-i</code> and <code>-l</code> options filter out all contigs below 
+  these cutoffs. The <code>-p</code> option creates a pseudo molecule from the 
+  query sequence, and arranges them as the map to the reference. The <code>-v</code> 
+  option sets the minimum percent of the query contig that must be covered by 
+  aligning bases, while the <code>-V</code> option sets the difference in percent 
+  coverage to determine one mapping is better than another. To include the most 
+  possible contigs in the tiling, set the <code>-V</code> option to zero and lower 
+  the <code>-i</code> and <code>-v</code> options to reasonable values. For NUCmer 
+  data, percent coverage is the non-redundant number of aligning bases divided 
+  by the length of the query sequence, while for PROmer data, percent coverage 
+  is the extent of the syntenic region divided by the length of the query sequence. 
+  The difference being, <code>show-tiling</code> does not penalize a PROmer mapping 
+  for having big gaps and small alignments. The <code>-x</code> option output 
+  can be used as input to the TIGR scaffolder &quot;Bambus&quot;, for use as contig 
+  linking information. With the exception of the output generated by the <code>-t</code> 
+  option, all tiling paths include the minimal number of contigs needed to generate 
+  the maximum reference coverage. This means that there may be other, smaller 
+  contigs that map to the reference, but because they are shadowed by larger contigs, 
+  they are not reported. The <code>-R</code> option is very useful for maintaining 
+  uniform, 'random' coverage of reads when mapping to a reference.</p>
+<h5>Output format</h5>
+<p>Output is to <code>stdout</code> and differs depending on the command line 
+  options. Standard output has an 8 column list per mapped contig, separated by 
+  the FastA headers of each reference sequence. These columns are as follows: 
+  <code>[1]</code> start in the reference <code>[2]</code> end in the reference 
+  <code>[3]</code> gap between this contig and the next <code>[4]</code> length 
+  of this contig <code>[5]</code> alignment coverage of this contig <code>[6]</code> 
+  average percent identity of this contig <code>[7]</code> contig orientation 
+  <code>[8]</code> contig ID. Output of the <code>-a</code> and <code>-u</code> 
+  options have the same columns as <code>show-coords</code> run with the <code>-THcl</code> 
+  options. Output of the <code>-x</code> option follows standard XML format. An 
+  example of the standard output of <code>show-tiling</code> follows:</p>
+<pre><code>
+>gba:6615 5227293 bases
+-10807  20017   105     30825   100.00  99.99   +       253
+20123   21388   42      1266    100.00  100.00  -       121
+21431   93545   37      72115   100.00  100.00  +       272
+93583   96184   -15     2602    100.00  100.00  +       51
+96170   98575   161     2406    100.00  99.96   -       93
+98737   100543  1072    1807    100.00  99.83   -       94
+101616  103405  3121    1790    100.00  99.89   +       107
+5215716 5216412 73      697     100.00  100.00  -       92
+(output continues ...)
+>gbx:17223 181677 bases
+-12269  43162   -258    55432   100.00  100.00  -       9
+42905   49553   -106    6649    100.00  100.00  +       7
+49448   112332  -659    62885   100.00  100.00  -       21
+111674  112935  -519    1262    100.00  100.00  +       22
+112417  116940  -201    4524    100.00  100.00  +       23
+116740  160401  -27     43662   100.00  100.00  +       10
+160375  167673  1734    7299    100.00  100.00  -       159
+>gbx:17224 94829 bases
+-89937  5606    54601   95544   100.00  99.99   -       168
+60208   61126   -56235  919     100.00  99.24   -       43
+</code></pre>
+<p>The negative start positions indicate contigs that are wrapping around the 
+  origin, since this output was generated with the <code>-c</code> option.</p>
+<hr width="100%">
+<h2><a name="problems"></a>5. Known problems</h2>
+<p>MUMmer's modular design is very beneficial, however it has created a small 
+  set of inconveniences. Some modules like <code>mummer</code> have been updated 
+  in the recent 3.0 release, while others like <code>mgaps</code> have not. Since 
+  it is not always possible to update all modules at once, some legacy issues 
+  appear. For example, because <code>mgaps</code> was originally written to cluster 
+  the output of a matching algorithm that could only handle one reference sequence, 
+  its input and output is constrained to handle only a single reference sequence. 
+  When <code>mummer</code> was updated in the 3.0 release, it was modified to 
+  handle multiple reference sequences, but this causes a slight incompatibility 
+  as its output can no longer be fed into <code>mgaps</code> when it contains 
+  multiple reference sequences. The same type of annoyance occurs between <code>mummer</code> 
+  and <code>gaps</code>, as <code>gaps</code> was originally designed to handle 
+  only one reference <em>and</em> only one query sequence. Such incompatibilities 
+  can be inconvenient, but workarounds with stream editors and conversion scripts 
+  are common practice by those familiar with MUMmer. Learning more about the output 
+  of each program can lead to a better understanding of how the modules communicate 
+  with one another and make it possible to format the output of one module so 
+  that it can be understood by a legacy module.</p>
+<p><code>nucmer</code>, <code>promer</code> and <code>run-mummer3</code> all have 
+  a difficult time with tandem repeats. If the two sequences contain a different 
+  number of copies of the same tandem repeat, these alignment routines will sometimes 
+  generate a cluster on either side of the tandem and extend alignments past one 
+  another, failing to join them into a single alignment region. This generates 
+  two overlapping alignments and makes it difficult to determine what caused this 
+  erratic behavior. In addition, the %identity for this region may appear artificially 
+  low as the alignment extension attempted to align sequence that was offset by 
+  the difference in length of the tandem repeats, instead of identifying the single 
+  large insertion. Any difference in the tandem between the reference and query 
+  can be calculated as the difference of the alignment overlap in each sequence. 
+  This bug is more of a nuisance than a critical problem, so a fix is being considered 
+  but no timeline has been set for its implementation.</p>
+<p>The MUMmer programs do not perform validity checking on their inputs. If any 
+  part of the package appears to malfunction, please check that the input files 
+  are within the constraints of each program (i.e. number of sequences allowed, 
+  FastA format, memory usage, etc.).</p>
+<p>This document will be under constant edit, so if you notice any errors please 
+  <a href="#contact">contact us</a>.</p>
+<hr width="100%">
+<h2><a name="acknowledgements"></a>6. Acknowledgements</h2>
+<p>The development of MUMmer is supported in part by the National Science Foundation 
+  under grants IIS-9902923 and IIS-9820497, and by the National Institutes of 
+  Health under grants R01-LM06845 and N01-AI-15447.</p>
+<p>MUMmer3.0 is a joint development effort by Stefan Kurtz of the University of 
+  Hamburg and Adam Phillippy, Art Delcher and Steven Salzberg at TIGR. Stefan's 
+  contribution of the new suffix tree code was essential to making MUMmer3.0 an 
+  open source project. Please see the ACKNOWLEDGEMENTS file in the distribution 
+  for an updated list of contributors.</p>
+<hr width="100%">
+<h2><a name="contact"></a>7. Contact information</h2>
+<p>Please address questions and bug reports via Email to:</p>
+<p><a href="http://lists.sourceforge.net/lists/listinfo/mummer-help"><img src="../mummer-help.gif" alt="mummer-help(at)lists(dot)sourceforge(dot)net" width="290" height="24" border="0"></a></p>
+<hr width="100%">
+<div class="centered"> 
+  <p><em>VERSION 3.17 - May 2005</em></p></div>
+  <p><a href="http://sourceforge.net"><img
+src="http://sourceforge.net/sflogo.php?group_id=133157&amp;type=3" alt="SourceForge.net Logo" width="125" height="37" border="0"/></a></p>
+</body>
+</html>

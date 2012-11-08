@@ -1,0 +1,95 @@
+cleanMUMcand.dbg.o:cleanMUMcand.c
+	$(CC) $(CFLAGS) -DDEBUG -c cleanMUMcand.c -o $@
+
+clock.dbg.o:clock.c
+	$(CC) $(CFLAGS) -DDEBUG -c clock.c -o $@
+
+debug.dbg.o:debug.c
+	$(CC) $(CFLAGS) -DDEBUG -c debug.c -o $@
+
+mapfile.dbg.o:mapfile.c
+	$(CC) $(CFLAGS) -DDEBUG -c mapfile.c -o $@
+
+multiseq.dbg.o:multiseq.c
+	$(CC) $(CFLAGS) -DDEBUG -c multiseq.c -o $@
+
+procopt.dbg.o:procopt.c
+	$(CC) $(CFLAGS) -DDEBUG -c procopt.c -o $@
+
+safescpy.dbg.o:safescpy.c
+	$(CC) $(CFLAGS) -DDEBUG -c safescpy.c -o $@
+
+seterror.dbg.o:seterror.c
+	$(CC) $(CFLAGS) -DDEBUG -c seterror.c -o $@
+
+space.dbg.o:space.c
+	$(CC) $(CFLAGS) -DDEBUG -c space.c -o $@
+
+cleanMUMcand.prepro:cleanMUMcand.c
+	$(CC) -E -g3 $(CFLAGS) -DDEBUG -c cleanMUMcand.c -o $@
+
+clock.prepro:clock.c
+	$(CC) -E -g3 $(CFLAGS) -DDEBUG -c clock.c -o $@
+
+debug.prepro:debug.c
+	$(CC) -E -g3 $(CFLAGS) -DDEBUG -c debug.c -o $@
+
+mapfile.prepro:mapfile.c
+	$(CC) -E -g3 $(CFLAGS) -DDEBUG -c mapfile.c -o $@
+
+multiseq.prepro:multiseq.c
+	$(CC) -E -g3 $(CFLAGS) -DDEBUG -c multiseq.c -o $@
+
+procopt.prepro:procopt.c
+	$(CC) -E -g3 $(CFLAGS) -DDEBUG -c procopt.c -o $@
+
+safescpy.prepro:safescpy.c
+	$(CC) -E -g3 $(CFLAGS) -DDEBUG -c safescpy.c -o $@
+
+seterror.prepro:seterror.c
+	$(CC) -E -g3 $(CFLAGS) -DDEBUG -c seterror.c -o $@
+
+space.prepro:space.c
+	$(CC) -E -g3 $(CFLAGS) -DDEBUG -c space.c -o $@
+
+cleanMUMcand.splint:cleanMUMcand.c
+	splint ${SPLINTFLAGS} cleanMUMcand.c
+	touch cleanMUMcand.splint
+
+clock.splint:clock.c
+	splint ${SPLINTFLAGS} clock.c
+	touch clock.splint
+
+debug.splint:debug.c
+	splint ${SPLINTFLAGS} debug.c
+	touch debug.splint
+
+mapfile.splint:mapfile.c
+	splint ${SPLINTFLAGS} mapfile.c
+	touch mapfile.splint
+
+multiseq.splint:multiseq.c
+	splint ${SPLINTFLAGS} multiseq.c
+	touch multiseq.splint
+
+procopt.splint:procopt.c
+	splint ${SPLINTFLAGS} procopt.c
+	touch procopt.splint
+
+safescpy.splint:safescpy.c
+	splint ${SPLINTFLAGS} safescpy.c
+	touch safescpy.splint
+
+seterror.splint:seterror.c
+	splint ${SPLINTFLAGS} seterror.c
+	touch seterror.splint
+
+space.splint:space.c
+	splint ${SPLINTFLAGS} space.c
+	touch space.splint
+
+splintall:${SPLINTALL}
+
+splintclean:
+	rm -f *.splint
+

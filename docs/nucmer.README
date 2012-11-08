@@ -1,0 +1,312 @@
+--------------------------------------------------------------------------------
+NUCmer3.0:
+        An extension of the MUMmer package that calculates alignments
+        between two DNA multi-fasta files using the raw DNA sequence.
+
+Use Cases:
+        + aligning two unfinished shotgun sequencing assemblies
+        + aligning an unfinished sequencing assembly to a finished genome
+        + comparing two fairly similar genomes that have large rearrangements
+
+If any of this code is used in any publication, please cite the following:
+
+  Versatile and open software for comparing large genomes.
+  S. Kurtz, A. Phillippy, A.L. Delcher,
+  M. Smoot, M. Shumway, C. Antonescu, and S.L. Salzberg.
+  Genome Biology (2004), 5:R12.
+
+--------------------------------------------------------------------------------
+
+** NOTE **
+This manual is outdated, please refer to the HTML documentation included in
+this distribution or at:
+
+   http://mummer.sourceforge.net
+   http://mummer.sourceforge.net/manual
+   http://mummer.sourceforge.net/examples
+
+-- DESCRIPTION --
+   NUCmer3.0 (NUCleotide MUMmer) is a suite of programs to modify and refine
+the basic output of the MUMmer3.0 matching program 'mummer'.  NUCmer pre-
+processes the DNA multi-FASTA input files so that they can be examined by the
+match finding routine. After which, the matches are clustered and the matches
+within clusters are extended via Smith-Waterman techniques in order to expand
+the total alignment coverage and close the gaps between clustered MUMs. The
+"out.delta" output file contains the final alignment data, encoded
+with a style called delta encoding. Any of the 'show-*' programs are able to
+parse this file and present its information in a human readable format.
+
+
+-- NUCmer3.0 EXAMPLE --
+   To compare a set of assembly contigs "asmbl.fasta" to an already completed,
+related genome "genome.fasta" type:
+
+"nucmer -o -p output genome.fasta asmbl.fasta"
+
+Output will be...
+   output.delta       // alignment data encoded with delta encoding
+   output.coords      // list of alignments, % identity, etc...
+
+To generate more output, investigate the options of any of the 'show-*'
+programs, these programs can interpret the .delta output of NUCmer and provide
+useful information regarding the alignment. In addition, dotplots can be
+generated (if you have gnuplot installed) via the 'mummerplot' script. Also,
+the 'delta-filter' utility is very useful for removing chance and repeat-induced
+alignments. It can significantly reduce the number of alignments in the nucmer
+output, making it easier to interpret (see html manual for more information).
+
+
+-- RUNNING 'nucmer' --
+
+  USAGE: nucmer  [options]  <Reference>  <Query>
+
+
+  MANDATORY:
+    Reference       Set the input reference multi-FASTA file to "Reference"
+    Query           Set the input query multi-FASTA file to "Query"
+
+
+  OPTIONS:
+    --mum           Use only maximal exact matches that are unique in both the
+                    query and reference sequences as the alignment anchors.
+
+    --mumreference  Use only maximal exact matches that are unique in the
+                    reference sequences as the alignment anchors.
+
+    --maxmatch      Use all maximal exact matches as the alignment anchors.
+
+    -b|breakLen     Set the distance an alignment extension will attempt to
+                    extend poor scoring regions before giving up. The default
+                    distance is 200. This distance should be measured in DNA
+                    bases, and it effects the tolerance to error of the
+                    alignment extensions. A higher value will result in greater
+                    tolerance to error in hopes of finding good alignments on
+                    the other side of a poorly scoring region.
+
+    -c|mincluster   Sets the minimum length of a cluster. The default value is
+                    65. The length of a match cluster is determined by the sum
+                    of the lengths of the matches within. A higher value will
+                    decrease the sensitivity of the alignment, but will also
+                    result in more confident results.
+
+    --[no]delta     Toggles the creation of the delta file. The default
+                    behavior is --delta, but disabling the delta file will
+                    speed up the finishing stage by not creating alignments.
+                    This option implies --noextend.
+
+    --depend        Print the dependency information and exit.
+
+    -d|diagfactor   Set the clustering fraction of separation for diagonal
+                    difference. The default value is .12. A higher value will
+                    increase the tolerance of the clustering algorithm and
+                    allow for more indels in a cluster.
+
+    --[no]extend    Toggles the outward extension of alignments from their
+                    anchoring clusters. The default behavior is --extend, but
+                    disabling the extensions will speed up the finishing stage
+                    by not extending alignments. Clusters will still be fused
+                    into alignments, but they will not be expanded outward.
+
+    -f
+    --forward       Use only the forward strand of the Query sequences. The
+                    default behavior is to use both the forward and reverse
+                    strands.
+
+    -g|maxgap       Set the maximum gap between two adjacent matches in a
+                    cluster. The default value is 90. A smaller value will
+                    result in smaller (but more) clusters, a larger value will
+                    result in larger (but fewer) clusters.
+
+    -h
+    --help          Display help information and exit.
+
+    -l|minmatch     Set the minimum length of a single match. The default value
+                    is 20. Reducing this value will possibly increase the
+                    sensitivity of the alignment, but it will also allow for
+                    chance or "noise" matches. Take note that lowering this
+                    value will significantly increase runtime.
+
+    -o
+    --coords        Automatically generate the "out.coords" file using the
+                    'show-coords' program. This file lists all the alignments
+                    sorted by their reference coordinate in a user friendly
+                    format, without requiring the user to run 'show-coords'
+                    independently of nucmer.
+
+    --[no]optimize  Toggle alignment score optimization, i.e. if an alignment
+                    extension reaches the end of a sequence, it will backtrack
+                    to optimize the alignment score instead of terminating the
+                    alignment at the end of the sequence. By turning this
+                    option off, alignments within -b bases of the sequence end
+                    will be forced to extend to the end. Default behavior is
+                    --optimize, --nooptimize will result in longer alignments
+                    but may lead to lower alignment scores.
+
+    -p|prefix       Set the prefix of the output files. The default prefix is
+                    "out". Take note that nucmer will allow the user to
+                    overwrite existing files, so a unique prefix should be used
+                    for each subsequent run of nucmer to avoid data loss.
+
+    -r
+    --reverse       Use only the reverse complement of the Query sequences. The
+                    default behavior is to use both the forward and reverse
+                    strands.
+
+    --[no]simplify  Simplify alignments by removing shadowed clusters. This
+                    is the default behavior, however it can be turned off if a
+                    sequence is being aligned to itself in order to find inexact
+                    repeats.
+
+    -V
+    --version       Display the version information and exit
+
+
+
+-- NOTES --
+   When comparing two entire genomes, it is very helpful to mask the
+"uninteresting" regions of input using a utility such as "nseg" or "dust".
+This will allow the program to focus solely on aligning the regions of
+interest. Since only ACGT's will be matched, any other alpha character used
+to mask the sequence will not be matched.
+   Since NUCmer runs so quickly, it can be useful to run it numerous times
+with different parameters to fine-tune the resulting alignment and include or
+exclude missed or chance matches. It is also helpful to try the different
+uniqueness switches to attain the appropriate level of detail in the resulting
+output.
+
+
+
+-- OUTPUT FILES --
+
+ *** .delta OUTPUT ***
+
+   This output file is a representation of the all-vs-all alignment between
+the sequences contained in the multi-FASTA input files. It catalogs the
+coordinates of aligned regions and the distance between insertions and deletions
+contained in these alignment regions. The first two lines of the file are
+identical to the .cluster output. The first line lists the two original input
+files separated by a space, and the second line specifies the alignment data
+type, either "NUCMER" or "PROMER". Every grouping of alignment regions have
+a header, just like the cluster's header in the .cluster file. This is a FASTA
+style header and lists the two sequences that produced the following alignments
+after a '>' and separated by a space, after the two sequences are the lengths
+of those sequences in the same order. An example header might look like:
+
+>tagA1 tagB1 500 2000000
+
+   Following this sequence header is the alignment data. Each alignment region
+has a header that describes the start and end coordinates of the alignment in
+each sequence. These coordinates are inclusive and reference the forward strand
+of the current sequence. Thus, if the start coordinate is greater than the end
+coordinate, the alignment is on the reverse strand. The four digits are the
+start and end in the reference sequence respectively and the start and end in
+the query sequence respectively. These coordinates are always measured in DNA
+bases regardless of the alignment data type. The three digits after the starts
+and stops are the number of errors (non-identities), similarity errors (non-
+positive match scores) and non-alpha characters in the sequence (used to count
+stop-codons i promer data). An example header might look like:
+
+5198 22885 5389 23089 20 20 0
+
+   Each of these headers is followed by a string of signed digits, one per line,
+with the final line before the next header equaling 0 (zero). Each digit
+represents the distance to the next insertion in the reference (positive int)
+or deletion in the reference (negative int), as measured in DNA bases or amino
+acids depending on the alignment data type. For example, with 'nucmer' the
+delta sequence (1, -3, 4, 0) would represent an insertion at positions 1 and 7
+in the reference sequence and an insertion at position 3 in the query sequence.
+Or with letters:
+
+A = acgtagctgag$
+B = cggtagtgag$
+Delta = (1, -3, 4, 0)
+A = acg.tagctgag$
+B = .cggtag.tgag$
+
+   Using this delta information, it is possible to re-generate the alignment
+calculated by 'nucmer' or 'promer' as is done in the 'show-coords' program. This
+allows various utilities to be crafted to process and analyze the alignment
+data using a universal format. Below is what a .delta file might look like:
+
+/home/username/reference.fasta /home/username/query.fasta
+NUCMER
+>tagA1 tagB1 500 2000000
+88 198 1641558 1641668 0 0 0
+0
+167 4877 1 4714 15 15 0
+2456
+1
+-11
+769
+950
+1
+1
+-142
+-1
+0
+>tagA2 tagB4 50000 30000
+5198 22885 5389 23089 18 18 0
+-6
+-32
+-1
+-1
+-1
+7
+1130
+0
+
+
+
+ *** .cluster OUTPUT ***
+
+This output format is for debugging purposes and is now only available by
+using the -d switch for the 'postnuc' program.
+
+   This output file is a list of the match clusters that were generated by the
+'mgaps' MUMmer3.0 program. It is primarily a 5 column list, with the exception
+of the headers to be described later. 2 example rows could read:
+
+    1788     1622     59     -      -
+    1857     1691     23    10     10
+
+   Where the first column is the start coordinate of the match in the reference
+sequence, the second column is the start coordinate of the match in the query
+sequence, the third column is the length of the match, and the two final
+columns are the distance between the previous match's end and the current
+match's start (the gap distance). All coordinates reference the forward strand
+of each sequence, regardless of match direction, and are ALWAYS measured in
+DNA bases regardless of alignment data type (DNA or amino acid).
+   Each individual cluster is preceded by two digits (1 or -1). These two
+digits represent the direction of the cluster, either forward or reverse
+complement, in each sequence. A " 1 -1" would represent a match on the forward
+strand of the reference and the reverse strand of the query, while a " 1 1"
+would represent a forward match on each strand. Take note that since the
+match coordinates reference the forward strand, forward matches will have
+ascending matches and a reverse matches will have descending matches. Also,
+since the query is the only sequence every reverse complemented, expect the
+first digit on the cluster header to always be 1.
+   There are also 3 other types of headers. The first line of each .cluster
+file lists the two original input files separated by a space. The second line
+of each .cluster file lists the type of alignment data, either "NUCMER" or
+"PROMER". The third type of header resembles a FASTA header, and lists the
+two sequences that produced the following clusters after a '>' and their
+respective lengths separated by a whitespace. Note that each of these headers
+is unique, so all clusters/matches between any two sequences will appear under
+a single header identifying those two sequences. Below is a short example of
+what a .cluster file might look like:
+
+/home/username/reference.fasta /home/username/query.fasta
+NUCMER
+>tagA1 tagB1 1000 2000000
+ 1  1
+      88  1641558    111     -      -
+ 1  1
+     183       17     22     -      -
+     238       72    108    33     33
+     347      181     92     1      1
+     458      292     50    19     19
+     509      343     35     1      1
+>tagA2 tagB1 100000 2000000
+ 1 -1
+   86855   102105     23     -      -
+   86882   102078     77     4      4

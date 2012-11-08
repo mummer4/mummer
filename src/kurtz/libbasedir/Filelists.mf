@@ -1,0 +1,32 @@
+LIBOBJECTS=\
+  cleanMUMcand.o\
+  clock.o\
+  mapfile.o\
+  multiseq.o\
+  procopt.o\
+  safescpy.o\
+  seterror.o\
+  space.o
+
+LIBDEBUGOBJECTS=\
+  cleanMUMcand.dbg.o\
+  clock.dbg.o\
+  debug.dbg.o\
+  mapfile.dbg.o\
+  multiseq.dbg.o\
+  procopt.dbg.o\
+  safescpy.dbg.o\
+  seterror.dbg.o\
+  space.dbg.o
+
+SPLINTALL=\
+  cleanMUMcand.splint\
+  clock.splint\
+  debug.splint\
+  mapfile.splint\
+  multiseq.splint\
+  procopt.splint\
+  safescpy.splint\
+  seterror.splint\
+  space.splint
+

@@ -1,0 +1,99 @@
+-=- run-mummer1 (MUMmer1.0) README -=-
+
+** NOTE **
+This manual is outdated, please refer to the HTML documentation included in
+this distribution or at:
+
+   http://mummer.sourceforge.net
+   http://mummer.sourceforge.net/manual
+   http://mummer.sourceforge.net/examples
+
+This is the README for the original MUMmer 1.0 system, which is
+included in the MUMmer 3 package.  It is slower and uses more memory,
+but it does have some slightly different functions and output so we
+make it available.  
+
+
+
+MUMmer 1.0 code and documentation are copyright (c) 1999 by The Institute
+for Genomic Research.  The principle architect for the system was
+Arthur Delcher.
+
+This directory contains the source code for MUMmer program for
+aligning long DNA sequences.  If you use this code in any publication,
+please cite the following:
+   A.L. Delcher, S. Kasif, R.D. Fleischmann, J. Peterson,
+   O. White, and S.L. Salzberg.  Alignment of whole genomes.
+   Nucleic Acids Research, 27:11 (1999), 2369-2376.
+
+MUMmer works on Unix only.  This README file is the only documentation
+besides the code itself.  Since it is free, we cannot provide any
+other support.  The system is very easy to use, but you need to invest
+a few minutes up front reading this file and figuring out how to
+interpret the output.  If you discover bugs, we would be interested in
+hearing about them so we can correct them.  Address bug reports to
+<mummer-help@lists.sourceforge.net>. The system uses a LOT of RAM - if
+it crashes for that reason, that's not a bug.  We recommend at least
+512Mb to align most pairs of bacterial genomes, and 1Gb or more may be
+required.
+
+To use this system, first compile it by typing 'make' at the
+command line.  There is a script, 'run-mummer1.csh', that runs all
+the steps of aligning two genomes.  The script takes these arguments:
+
+     run-mummer1.csh <genome1> <genome2> <tag> [-r]
+
+The two genomes must DNA sequences in FASTA format.  Multi-FASTA
+files don't work.  The tag is used to create 4 output files,
+all with 'tag' as a prefix.  -flip  will reverse complement <genome2>.
+
+Of the four output files, two are intended for your inspection.
+<tag>.errorsgaps lists the alignment of all the MUMs (maximal unique
+matches - read the paper for definitions), and includes the longest
+ascending sequence of MUMs first.  This sequence is the best alignment
+of the two genomes by the program.  In between the MUMs are gaps,
+which are aligned using a Smith-Waterman implementation of our own.
+Those Smith-Waterman's are contained in the file <tag>.align.
+This can be a very long file if there are lots of gaps.  If either
+of the two gaps is too long (over 5000bp), then the alignment is
+not performed.
+
+IMPORTANT: the performance of the program can critically depend on the
+minimum MUM length you use.  The default is 20bp.  If you want to 
+change it, do the following:  edit the file run-mummer1.csh. Add a new
+length switch to the 'mummer' call.
+
+The other file - one that we often spend lots of time analyzing - is
+<tag>.errorsgaps.  The lines in that file are the MUMs, for example:
+   46989   271588     23    none   3262   3304    1022
+   47013   271612     24    none      1      1       1
+Columns 1 and 2 are the positions of a MUM in genomes 1 and 2.  The
+MUM is 24bp in length, shown in column 3.  Column 4 is the overlap
+from the previous MUM - usually this will be 'none' except when there
+are repeats present.  Columns 5 and 6 show the gaps from the *end*
+of the previous MUM.  Column 7 shows the number of errors - indels
+or mismatches - in the S-W alignment of the gap before this MUM.
+Hence in the two lines shown here, the second line is a MUM of 24bp,
+and it follows the previous MUM after a gap of just 1bp in each genome.
+This indicates a single nucleotide polymorphism.
+
+Files in this directory:
+
+   annotate.cc  Adds alignment info to gaps file produced by  gaps
+     or  gaps2 .  Reads frag info from the file named on the '>'
+     lines of the gap file.  The word "reverse" after that name
+     will make that sequence get reverse-complemented.
+     Also produces file  witherrors.gaps  which is the same as the
+     gaps input file, put with an extra column of number of
+     errors.
+
+   gaps.cc  Finds longest consistent set of matches in list
+     produced by mummer1 program.
+
+   run-mummer1.csh  Script to run alignment programs.  Format is:
+     run-mummer1.csh <genome1> <genome2> <tag> [-flip]
+     <tag> will be used to make output files:  <tag>.out , <tag>.gaps
+     and  <tag>.align .  -r  will reverse complement <genome2>
+
+Email questions, comments or bug reports to: <mummer-help@lists.sourceforge.net>
+

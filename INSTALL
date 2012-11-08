@@ -1,0 +1,96 @@
+-=- MUMmer3.x INSTALLATION README -=-
+
+-- TO INSTALL --
+   Extract the tarfile by typing:
+
+"tar -xvzf MUMmer3.x"
+
+   After extracting the tarfile into the desired installation directory,
+change to the "MUMmer3.x" directory.  Once in this directory, type:
+
+"make check"
+
+   This command will check for the necessary utilities that the MUMmer package
+depends on. If you see no error messages, the check was successful. Next, type:
+
+"make install"
+
+   This command will build the appropriate scripts and binaries in the current
+directory. Refer to the "README" file in this directory for further assistance,
+or the "docs" directory for detailed information on the various utilities.
+   To make all of the scripts and executables accessible from different
+directories, simply add the full MUMmer directory path to your system PATH, or
+link the desired MUMmer programs to your favorite bin directory. Please note
+that the 'make' command dynamically generates the MUMmer scripts with the
+appropriate paths, therefore if the MUMmer directory is moved after the 'make'
+command is issued, the scripts will fail to run. If the MUMmer executables
+are needed in a directory other than the install directory, it is recommended
+that the install directory be left untouched and its files linked to the
+desired destination. An alternative would be to move the install directory and
+reissue the 'make' command at the new location.
+
+
+
+-- SYSTEM REQUIREMENTS --
+   MUMmer3.10 has been tested successfully on:
+
+    - Redhat Linux 6.2, 7.3   (Pentium 4)
+    - Compaq Tru64 UNIX 5.1   (alpha)
+    - SunOS UNIX 5.8          (sparc)
+    - Mac OS X 10.2.8         (PowerPC G4)
+
+   Sufficient memory and disk space are necessary, but required sizes vary
+with input size. Be aware of your disk and memory usage, because insufficient
+capacities will result in incorrect or missing output. Required resources
+differ depending on the input size, but in general 512 MB of RAM and 1 GB of
+disk space is sufficient for most applications.
+   It is possible to port the code to any system with a C++ compiler but
+this has not been tested and will not be supported. In addition, you may need
+to alter the Makefile to direct 'make' to your native compiler and other
+system resources.
+   For Mac OSX, the Mac development kit must be downloaded and installed. This
+kit will include 'gcc', 'ar', and 'make' which are necessary for building
+MUMmer. MUMmer is not supported for any Mac operating system other than OSX.
+
+
+
+-- SOFTWARE REQUIREMENTS --
+   The MUMmer3.x package requires the following to run successfully. In the
+absence of one or more of these utilities, certain MUMmer programs may fail
+to run correctly. Listed in parenthesis are the versions used to test the
+MUMmer package. These versions, or subsequent versions should assure the proper
+execution of the various MUMmer programs. These utilities must be accessible
+via the system path:
+
+    - make (GNU make 3.79.1)
+    - perl (PERL     5.6.0)
+    - sh   (GNU sh   1.14.7)
+    - csh  (tcsh     6.10.00)
+    - g++  (GNU gcc  2.95.3)
+    - sed  (GNU sed  3.02)
+    - awk  (GNU awk  3.0.4)
+    - ar   (GNU ar   2.9.5)
+
+
+-- OPTIONAL UTILITIES --
+   To use the visualization tools included with MUMmer, it may be necessary
+to download and install the following utilities:
+
+    - fig2dev (fig2dev 3.2.3)
+    - gnuplot (gnuplot 4.0)
+    - xfig    (xfig    3.2)
+
+
+
+-- UN-INSTALLATION --
+   In the "MUMmer3.x" base directory type:
+
+"make uninstall"
+
+   This will remove all binary executables and runnable scripts from the
+base and aux_bin directories. The original source files will remain unchanged,
+thus reverting the package to its post-untar, pre-install state.
+
+Please address questions and bug reports to: <mummer-help@lists.sourceforge.net>
+
+Last update: May 12, 2005

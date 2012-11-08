@@ -1,0 +1,22 @@
+
+\newcommand{\Showoption}[1]{\mbox{\footnotesize \texttt{-#1}}}
+\newcommand{\Option}[3]{\index{Option!\texttt{-#1}}\item[\Showoption{#1}~#2]
+\mbox{}\\%
+#3}
+
+\newenvironment{Showprogramwithoptions}[2]{
+The program is called as follows:
+\par
+\noindent#1 [\emph{options}] \emph{indexname}
+\par
+#2
+\par
+And here is a description of the options:
+\par
+\begin{list}{}{}
+}{\end{list}}
+
+\newcommand{\MKV}{\texttt{mkvtree}\xspace}
+
+\parskip5pt
+\parindent0pt

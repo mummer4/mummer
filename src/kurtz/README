@@ -1,0 +1,36 @@
+/*
+  Copyright (c) 2003 by Stefan Kurtz and The Institute for
+  Genomic Research.  This is OSI Certified Open Source Software.
+  Please see the file LICENSE for licensing information and
+  the file ACKNOWLEDGEMENTS for names of contributors to the
+  code base.
+*/
+
+This directory contains the complete sources for 'mummer' (maxmat3.x) in three
+subdirectories:
+
+- libbasedir contains some basic functions which are used for other programs
+  as well. To simplify reusing them I have put them in an extra library.
+
+- streesrc contains the source for the suffix tree library.
+
+- mm3src contains the application specific source code for the
+  program maxmat3.x
+
+You can compile it using make. Since we use include statements
+in Makefile's your make has to support this feature. This e.g.
+holds for gnu make.
+
+The code was tested for the following platforms:
+
+- linux on Intel PIII
+- solaris2 on SUN-Sparc
+- tru64 on Compaq-Alpha
+- hp-machine with HP-UX
+
+
+#-- FOR DEVELOPERS --#
+If you would prefer to build the suffix tree source from this directory rather
+than the top level MUMmer directory, please uncomment the lines that begin with
+'##' in the Makefiles for each subdirectory to assure they use the appropriate
+values for compilation.

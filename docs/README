@@ -1,0 +1,12 @@
+Files in this directory...
+
+differences.README - differences between MUMmer2 and MUMmer3
+maxmat3man.pdf - PDF documenation for 'mummer' (maxmat3)
+maxmat3man.tex - LaTeX documentation for 'mummer' (maxmat3)
+maxmat3src.pdf - PDF documentation for the maxmat3 source
+nucmer.README - documentation for the NUCmer alignment utility
+optionman.sty  - LaTeX source for maxmat3man.tex
+promer.README - documentation for the PROmer alignment utility
+run-mummer1.README - documentation for the run-mummer1 script
+run-mummer3.README - documentation for the run-mummer3 script
+skaff.sty - LaTeX source for maxmat3man.tex

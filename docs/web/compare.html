@@ -1,0 +1,346 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Comparative applications</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<style type="text/css">
+<!--
+body {
+	background-color: #FFFFFF;
+}
+h2 {
+	background-color: #BBBBFF;
+	font-style: italic;
+}
+h3 {
+	background-color: #CDCDEE;
+}
+h4 {
+	background-color: #EFEFEF;
+}
+code {
+	color: #CC0000;
+}
+td {
+	vertical-align: top;
+}
+.centered {
+	text-align: center;
+}
+.right {
+	text-align: right;
+}
+-->
+</style>
+</head>
+<body>
+<h3>Published genomes suitable for whole genome comparison</h3>
+<p>The MUMmer package provides efficient means for comparing an entire genome 
+  against another. However, until 1999 there were no two genomes of sufficient 
+  similarity to compare. With the publication of the second strain of <em>Helicobacter 
+  pylori</em> in 1999, following the publication of the first strain in 1997, 
+  the scientific world had its first chance to look at two complete bacterial 
+  genomes whose DNA sequences were highly similar. The number of pairs of closely-related 
+  genomes has exploded in recent years, facilitating many comparative studies. 
+  For instance, the published databases include the following genomes for which 
+  multiple strains and/or multiple species have been sequenced:</p>
+<div class="centered"> 
+  <table width="60%" border="0">
+    <tr> 
+      <td nowrap> <h5>multiple strains of...</h5>
+        <ul>
+          <li><em>Agrobacterium tumefaciens</em></li>
+          <li><em>Bacillus anthracis</em></li>
+          <li><em>Brucella melitensis</em></li>
+          <li><em>Buchnera aphidicola</em></li>
+          <li><em>Chlamydophila pneumoniae</em></li>
+          <li><em>Escherichia coli</em></li>
+          <li><em>Helicobacter pylori</em></li>
+          <li><em>Mycobacterium tuberculosis</em></li>
+          <li><em>Neisseria meningitidis</em></li>
+          <li><em>Staphylococcus aureus</em></li>
+          <li><em>Streptococcus pyogenes</em></li>
+          <li><em>Streptococcus pneumoniae</em></li>
+          <li><em>Yersinia pestis</em></li>
+        </ul></td>
+      <td nowrap> <h5>multiple species of...</h5>
+        <ul>
+          <li><em>Bacillus</em></li>
+          <li><em>Chlamydia</em></li>
+          <li><em>Clostridium</em></li>
+          <li><em>Corynebacterium</em></li>
+          <li><em>Lactobacillus</em></li>
+          <li><em>Listeria</em></li>
+          <li><em>Methanosarcina</em></li>
+          <li><em>Mycobacterium</em></li>
+          <li><em>Mycoplasma</em></li>
+          <li><em>Plasmodium</em></li>
+          <li><em>Pseudomonas</em></li>
+          <li><em>Pyrococcus</em></li>
+          <li><em>Rickettsia</em></li>
+          <li><em>Saccharomyces</em></li>
+          <li><em>Staphylococcus</em></li>
+          <li><em>Streptococcus</em></li>
+          <li><em>Thermoplasma</em></li>
+          <li><em>Vibrio</em></li>
+          <li><em>Xanthomonas</em></li>
+          <li><em>Xylella</em></li>
+        </ul></td>
+    </tr>
+  </table>
+</div>
+<p>Most of these genomes can be obtained from the NCBI ftp site: <a href="ftp://ftp.ncbi.nlm.nih.gov/genomes/">ftp://ftp.ncbi.nlm.nih.gov/genomes/</a></p>
+<h3>Timing analysis for the whole genome alignment of Human vs. Human</h3>
+<p>With the capability to align the entire human genome to itself, there is no 
+  genome too large for MUMmer. The following table gives run times and space requirements 
+  for a cross comparison of all human chromosomes. The 1st column indicates the 
+  chromosome number, with &quot;Un&quot; referring to unmapped contigs. Column 
+  2 shows chromosome length and column 4 shows the length of the total genomic 
+  DNA searched against the chromosome in column 1. Column 3 shows the time to 
+  construct the suffix tree, and column 5 the time to stream the query sequence 
+  through it. Column 6 shows the maximum amount of computer memory occupied by 
+  the program and data, and column 7 shows memory usage for the suffix tree in 
+  bytes per base pair. Each human chromosome was used as a reference, and the 
+  rest of the genome was used as a query and streamed against it. To avoid duplication, 
+  we only included chromosomes in the query if they had not already been compared; 
+  thus we first used chromosome 1 as a reference, and streamed the other 23 chromosomes 
+  against it. Then we used chromosome 2 as a reference, and streamed chromosomes 
+  3&#8211;22, X, and Y against that, and so on.</p>
+<div class="centered"> 
+  <table border="0" cellpadding="1" cellspacing="3">
+    <tr align="right"> 
+      <td bgcolor="#EFEFEF"><strong><font size="2">Chr </font></strong></td>
+      <td bgcolor="#EFEFEF"><strong><font size="2">Ref length<br>
+        (Mbp)</font></strong></td>
+      <td bgcolor="#EFEFEF"><strong><font size="2">Suffix time<br>
+        (min)</font></strong></td>
+      <td bgcolor="#EFEFEF"><strong><font size="2">Qry length<br>
+        (Mbp)</font></strong></td>
+      <td bgcolor="#EFEFEF"><strong><font size="2">Query time<br>
+        (min)</font></strong></td>
+      <td bgcolor="#EFEFEF"><strong><font size="2">Total space</font><font size="2"><br>
+        (Mb)</font></strong></td>
+      <td bgcolor="#EFEFEF"><strong><font size="2">Suffix space<br>
+        (bytes/bp)</font></strong></td>
+    </tr>
+    <tr align="right"> 
+      <td bgcolor="#E6E6FA"><font size="2">1 </font></td>
+      <td bgcolor="#E6E6FA"><font size="2">221.8</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">24.6</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">2617.1</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">679.5</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">3702</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">15.43</font></td>
+    </tr>
+    <tr align="right"> 
+      <td bgcolor="#E6E6FA"><font size="2">2</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">237.6</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">27.4</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">2379.5</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">625.8</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">3908</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">15.43</font></td>
+    </tr>
+    <tr align="right"> 
+      <td bgcolor="#E6E6FA"><font size="2">3</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">194.8</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">21.2</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">2184.7</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">565.0</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">3232</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">15.43</font></td>
+    </tr>
+    <tr align="right"> 
+      <td bgcolor="#E6E6FA"><font size="2">4</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">188.4</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">22.4</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">1996.3</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">518.0</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">3121</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">15.43</font></td>
+    </tr>
+    <tr align="right"> 
+      <td bgcolor="#E6E6FA"><font size="2">5</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">177.7</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">18.6</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">1818.6</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">461.4</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">2952</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">15.43</font></td>
+    </tr>
+    <tr align="right"> 
+      <td bgcolor="#E6E6FA"><font size="2">6</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">175.8</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">17.9</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">1642.8</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">407.6</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">2900</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">15.43</font></td>
+    </tr>
+    <tr align="right"> 
+      <td bgcolor="#E6E6FA"><font size="2">7</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">153.8</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">15.7</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">1489.0</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">360.1</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">2550</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">15.43</font></td>
+    </tr>
+    <tr align="right"> 
+      <td bgcolor="#E6E6FA"><font size="2">8</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">142.8</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">14.4</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">1346.2</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">322.3</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">2378</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">15.43</font></td>
+    </tr>
+    <tr align="right"> 
+      <td bgcolor="#E6E6FA"><font size="2">9</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">117.0</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">10.7</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">1229.2</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">303.7</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">1974</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">15.43</font></td>
+    </tr>
+    <tr align="right"> 
+      <td bgcolor="#E6E6FA"><font size="2">10</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">131.1</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">13.2</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">1098.1</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">263.3</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">2195</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">15.43</font></td>
+    </tr>
+    <tr align="right"> 
+      <td bgcolor="#E6E6FA"><font size="2">11</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">133.2</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">13.1</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">964.9</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">225.6</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">2228</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">15.43</font></td>
+    </tr>
+    <tr align="right"> 
+      <td bgcolor="#E6E6FA"><font size="2">12</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">129.4</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">12.5</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">835.5</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">195.9</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">2168</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">15.43</font></td>
+    </tr>
+    <tr align="right"> 
+      <td bgcolor="#E6E6FA"><font size="2">13</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">95.2</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">8.6</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">740.3</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">163.6</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">1633</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">15.44</font></td>
+    </tr>
+    <tr align="right"> 
+      <td bgcolor="#E6E6FA"><font size="2">14</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">88.2</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">7.5</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">652.1</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">141.0</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">1523</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">15.44</font></td>
+    </tr>
+    <tr align="right"> 
+      <td bgcolor="#E6E6FA"><font size="2">15</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">83.6</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">6.8</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">568.5</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">122.1</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">1451</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">15.44</font></td>
+    </tr>
+    <tr align="right"> 
+      <td bgcolor="#E6E6FA"><font size="2">16</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">80.9</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">6.4</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">487.6</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">106.3</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">1409</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">15.44</font></td>
+    </tr>
+    <tr align="right"> 
+      <td bgcolor="#E6E6FA"><font size="2">17</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">80.7</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">6.6</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">406.9</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">91.8</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">1406</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">15.44</font></td>
+    </tr>
+    <tr align="right"> 
+      <td bgcolor="#E6E6FA"><font size="2">18</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">74.6</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">6.3</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">332.3</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">78.8</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">1311</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">15.44</font></td>
+    </tr>
+    <tr align="right"> 
+      <td bgcolor="#E6E6FA"><font size="2">19</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">56.4</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">3.7</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">275.8</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">56.1</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">1026</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">15.45</font></td>
+    </tr>
+    <tr align="right"> 
+      <td bgcolor="#E6E6FA"><font size="2">20</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">59.4</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">4.6</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">216.4</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">45.8</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">1073</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">15.45</font></td>
+    </tr>
+    <tr align="right"> 
+      <td bgcolor="#E6E6FA"><font size="2">21</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">33.9</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">2.1</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">182.5</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">33.7</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">673</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">15.48</font></td>
+    </tr>
+    <tr align="right"> 
+      <td bgcolor="#E6E6FA"><font size="2">22</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">33.8</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">2.0</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">148.6</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">26.4</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">672</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">15.48</font></td>
+    </tr>
+    <tr align="right"> 
+      <td bgcolor="#E6E6FA"><font size="2">Un</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">1.4</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">0.03</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">147.3</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">10.0</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">164</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">16.96</font></td>
+    </tr>
+    <tr align="right"> 
+      <td bgcolor="#E6E6FA"><font size="2">X</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">147.3</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">14.6</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">&nbsp;</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">4.8</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">2327</font></td>
+      <td bgcolor="#E6E6FA"><font size="2">15.57</font></td>
+    </tr>
+  </table>
+</div>
+<p>The Human Chromosomes can be obtained from the NCBI ftp site: <a href="ftp://ftp.ncbi.nih.gov/genomes/H_sapiens/">ftp://ftp.ncbi.nih.gov/genomes/H_sapiens/</a></p>
+</body>
+</html>

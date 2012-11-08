@@ -1,0 +1,354 @@
+%
+% Copyright (c) 2003 by Stefan Kurtz and The Institute for
+% Genomic Research.  This is OSI Certified Open Source Software.
+% Please see the file LICENSE for licensing information and
+% the file ACKNOWLEDGEMENTS for names of contributors to the
+% code base.
+%
+
+\documentclass[12pt]{article}
+\usepackage{a4wide,alltt,xspace,times}
+\usepackage{skaff}
+\usepackage{optionman}
+\newcommand{\MMthree}{\texttt{maxmat3}\xspace}
+\newcommand{\MUM}[0]{\textit{MUM}\xspace}
+\newcommand{\Ignore}[1]{}
+\newcommand{\Subs}[3]{#1[#2\ldots#3]}
+\newcommand{\Match}[3]{(#3,#1,#2)}
+
+\author{Stefan Kurtz\thanks{\SKaffiliation} \thanks{Minor alterations
+  made by Adam Phillippy, The Institute for Genomic Research}}
+
+\title{\textbf{A Program to find Maximal Matches}\\
+       \textbf{in Large Sequences}\\[2mm]
+       \textbf{Manual}\footnote{\copyright Stefan Kurtz and The
+       Institute for Genomic Research}}
+
+\begin{document}
+\maketitle
+
+\MMthree is a program to find maximal matches of some minimum length 
+between a reference-sequence and a query-sequence.  It also allows for
+the computation of \MUM-candidates as well as \MUM{s}. This document
+describes the options of \MMthree and the output format. In Section 
+\ref{SecBasicNotions}, we formally define some basic notions to clarify
+the semantics of \MMthree. However, the reader should be able to understand 
+the manual without reading that section. In the following, the notion
+\emph{match}  always refers to \emph{maximal matches} if not stated
+otherwise.
+
+\section{The Program and its Options}
+
+The program is called as follows:
+
+$\MMthree~~[\mathit{options}]~~\mathit{referencefile}~~
+           \mathit{queryfile}_{1}~~\cdots~~\mathit{queryfile}_{n}$
+
+And here is a description of the options:
+
+\begin{list}{}{}
+
+\Option{mum}{}{
+Compute \MUM{s}, i.e.\ matches that are unique in both sequences.
+}
+
+\Option{mumreference}{}{
+Compute \MUM-candidates, i.e.\ matches that are unique
+in the reference-sequence but not necessarily in the query-sequence.
+}
+
+\Option{maxmatch}{}{
+Compute all maximal matches, regardless of their uniqueness.
+}
+
+\Option{n}{}{
+Only match the characters $a$, $c$, $g$, or $t$. They can be either 
+in upper or in lower case.
+}
+
+\Option{l}{$q$}{
+Set the minimum length $q$ of a match to be reported. $q$ must be a 
+positive integer. Only matches of length at least $q$ are reported. 
+If this option is not used, then the default value for $q$ is 20.
+}
+
+\Option{b}{}{
+Compute direct matches and reverse complement matches.
+}
+
+\Option{r}{}{
+Only compute reverse complement matches.
+}
+
+\Option{s}{}{
+Show the matching substring.
+}
+
+\Option{c}{}{
+Report the query-position of a reverse complement match
+relative to the original query-sequence. Suppose \(x\) is the 
+reference-sequence and \(y\) is the query-sequence. By definition, a
+reverse complement match \(\Match{i}{j}{l}\) of \(x\) and \(y\) is a
+match of \(x\) and \(\overline{y}\), where \(\overline{y}\) is the
+reverse complement of \(y\), see Section \ref{SecBasicNotions}. By
+default, a match is reported as a triple
+\begin{alltt}
+i        j        l
+\end{alltt}
+Position \(j\) is relative to \(\overline{y}\). With this option,
+not \(j\) but \(m-j+1\) is reported, where \(m\) is the length of the 
+query-sequence. Now note that position \(m-j+1\) in \(y\) corresponds 
+to position \(j\) in \(\overline{y}\).
+}
+
+\Option{F}{}{
+Forces 4 column output format regardless of the number of reference
+sequence inputs, i.e. prefixes every output match with its reference
+sequence identifier.
+}
+
+\Option{L}{}{
+Show the length of the query-sequence on the header line.
+}
+
+\Option{h}{}{
+Show the possible options and exit.
+}
+\Option{help}{}{
+Show the possible options and exit.
+}
+
+\end{list}
+
+Options \Showoption{mum}, \Showoption{mumreference} and
+\Showoption{maxmatch} cannot be combined. If none of these options are
+used, then the program will default to \Showoption{mumreference}.
+
+Option \Showoption{b} and \Showoption{r} exclude each other. If none
+of these two options is used, then only direct matches are reported.
+Option \Showoption{c} can only be used in combination with
+option \Showoption{b} or option \Showoption{r}.
+
+There must be exactly one reference-file given and at least one
+query-file. The maximum number of query-files is 32.
+The reference-file and the query-files must be in multiple fasta format.
+The query-files are processed one after the other. The uniqueness condition
+for the \MUM{s} refers to the entire set of reference-sequences but
+only to one query-sequence. That is, if a \MUM is reported, the
+matching substring is unique in all reference-sequences and in the currently
+processed query-sequence. The uniqueness does not necessarily extend to
+all query-sequences.
+
+Input sequences can be over any set of lower or upper case
+characters. Thus DNA sequences as well as protein sequences are allowed.
+The characters are processed case insensitive. That is, a 
+lower case character is identified with the corresponding upper case 
+character. The sequence output via option \Showoption{s} is always
+in lower case. If option \Showoption{n} is used,
+then all characters except for $a$, $c$, $g$, and $t$ are replaced by
+a unique character which is different for the reference-sequences and
+the query-sequences. This prevents false matches involving, for
+example, the wildcard symbols $s$, $w$, $r$, $y$, $m$, $k$, $b$, 
+$d$, $h$, $v$, and $n$ often occurring in DNA sequences.
+We therefore recommend to use the option \Showoption{n}.
+
+\section{Output format}
+Suppose we have two fasta files \texttt{Data/U89959} and
+\texttt{Data/at.est}. The first file contains a complete BAC-sequence from
+Arabidopsis thaliana, while the second is a collection of 
+ESTs from the same organism. We want to use the first file as our
+reference-file and the second as out query-file.
+
+Now let us look for direct matches and reverse complement
+matches in the reference and in the query sequences.
+The length of the matches should be at least 18 (options \Showoption{b} 
+and \Showoption{l} 18). 
+We want to report the following:
+\begin{itemize}
+\item
+the length of the query-sequences (option \Showoption{L})
+\item
+the matching sequence (option \Showoption{s})
+\item
+the query-positions relative to the original sequence 
+(option \Showoption{c}). 
+\end{itemize}
+We also do not want to report matches involving wildcards 
+(option \Showoption{n}). The corresponding program call is as follows:
+
+\begin{verbatim}
+maxmat3.x -b -l 18 -L -s -c -n Data/U89959 Data/at.est
+\end{verbatim}
+
+Here is a part of the output:
+
+\begin{small}
+\begin{verbatim}
+# reading input file "Data/U89959" of length 106973
+# construct suffix tree for sequence of length 106973
+# (maximal input length is 536870908)
+# process 1725 characters per dot
+# ..............................................................
+# CONSTRUCTIONTIME maxmat3.x Data/U89959 0.11
+# reading input file "Data/at.est" of length 772376
+# matching query-file "Data/at.est"
+# against reference-file "Data/U89959"
+> gi|5587835|gb|AF078689.1|AF078689  Len = 275
+   90201       258        18
+taaaaaaaaaaaaaaaaa
+   52836       258        18
+taaaaaaaaaaaaaaaaa
+> gi|5587835|gb|AF078689.1|AF078689 Reverse  Len = 275
+> gi|4714033|dbj|C99914.1|C99914  Len = 628
+> gi|4714033|dbj|C99914.1|C99914 Reverse  Len = 628
+> gi|4714032|dbj|C99913.1|C99913  Len = 497
+> gi|4714032|dbj|C99913.1|C99913 Reverse  Len = 497
+> gi|4714031|dbj|C99911.1|C99911  Len = 661
+> gi|4714031|dbj|C99911.1|C99911 Reverse  Len = 661
+> gi|4714030|dbj|C99910.1|C99910  Len = 241
+    5066        23        19
+agaagaagaagaagaagaa
+    5069        23        19
+agaagaagaagaagaagaa
+    5072        23        19
+agaagaagaagaagaagaa
+    5075        23        19
+
+.....
+
+> gi|2763999|gb|R30040.1|R30040  Len = 475
+> gi|2763999|gb|R30040.1|R30040 Reverse  Len = 475
+# COMPLETETIME maxmat3.x Data/U89959 1.64
+# SPACE maxmat3.x Data/U89959 2.71
+\end{verbatim}
+\end{small}
+
+The lines starting with the symbol \texttt{\symbol{35}} report some useful
+information about the matching process. They tell which files are input
+and the length of the scanned sequences. They also report
+the used computational resources, i.e.\ the time required for 
+constructing the suffix tree, the total time of the matching process 
+(in seconds) and the space requirement (in megabytes). 
+The line starting with
+\texttt{\symbol{35}} and containing only dots shows the progress of the
+suffix tree construction. This is useful to estimate the remaining
+running time for very long sequences.
+
+For each query-sequence the corresponding header line is (up to the 
+first white-space character) reported in a line beginning with the 
+symbol \texttt{\symbol{62}}. The length of the
+query-sequence appears at the end of such a line. Below the header line 
+all matches against the corresponding query sequence 
+are reported as a triple of three numbers. 
+\begin{itemize}
+\item
+The first number is the position of the match in the reference-sequence.
+\item
+The second number is the position of the match in the query-sequence.
+\item
+The third number is the length of the match. 
+\end{itemize}
+Reverse complement matches are reported after a header line containing the 
+keyword \texttt{Reverse}. A matching sequence is reported in 
+a separate line following the line containing the positions and the 
+length of the match.  
+
+If the reference-file is a multiple fasta file with more than one
+sequence, then it is necessary to also report the header line of the
+reference-sequence and the position of the match relative to the start
+of the reference-sequence.  This leads to a slightly different format
+where each line containing the positions is prepended by the header of
+the reference-sequence (also available with the \Showoption{F}
+option). This format is shown in the following example, where we use
+two files containing protein sequences: The file \texttt{Data/prot1}
+is a file containing one protein sequence, while \texttt{Data/prot2}
+contains many protein sequences: We use \texttt{Data/prot2} as our
+reference-file and \texttt{Data/prot1} as our query-file:
+
+\begin{verbatim}
+maxmat3.x -L -l 7 Data/prot2 Data/prot1
+\end{verbatim}
+
+The output is as follows:
+
+\begin{small}
+\begin{verbatim}
+# reading input file "Data/prot2" of length 40839
+# construct suffix tree for sequence of length 40839
+# (maximum input length is 536870908)
+# CONSTRUCTIONTIME maxmat3.x Data/prot2 0.02
+# reading input file "Data/prot1" of length 45543
+# matching query-file "Data/prot1"
+# against reference-file "Data/prot2"
+> some_collection  Len = 45543
+  sp|ALL2_BOVIN|ALLERGEN                        139      1155   7
+  sp|ALG3_YEAST|PUTATIVE                        425      2904   7
+  sp|ALF_TRYBB|FRUCTOSE-BISPHOSPHATE            177      4794   7
+  sp|ALGB_YEAST|ALG11                           114     12599   7
+  sp|ALR_SYNY3|ALANINE                          354     33261   7
+  sp|ALGB_PSEAE|ALGINATE                        212     40991   7
+  sp|ALGB_PSEAE|ALGINATE                        314     41093   7
+  sp|ALGB_PSEAE|ALGINATE                        360     41138   7
+  sp|ALR_SYNY3|ALANINE                          79      44186   7
+  sp|ALP_CEPAC|ALKALINE                         366     45304   7
+# COMPLETETIME maxmat3.x Data/prot2 0.06
+# SPACE maxmat3.x Data/prot2 0.56
+\end{verbatim}
+\end{small}
+
+\section{Basic Notions}\label{SecBasicNotions}
+We assume that \(x\) is a sequence of length \(n\geq 1\) over some 
+alphabet \(\Sigma\).
+$x[i]$ denotes the character at position $i$ in $x$,
+for $i\in[1,n]$. For $i\leq j$, $\Subs{x}{i}{j}$ denotes the 
+substring of $x$ starting with the character at position $i$
+and ending with the character at position $j$ in \(x\). If \(i>j\), then 
+\(\Subs{x}{i}{j}\) is the empty sequence.
+
+Let \(y\) be a sequence of length \(m\). In this document we refer to
+\(x\) as the \emph{reference-sequence} and to \(y\) as the 
+\emph{query-sequence}.
+Let \(\ell>0\), \(i\in[1,n-\ell+1]\), and \(j\in[1,m-\ell+1]\).
+\(\Match{i}{j}{\ell}\) is a \emph{match} of \(x\) and \(y\) if and only if
+\(\Subs{x}{i}{i+\ell-1}=\Subs{y}{j}{j+\ell-1}\).
+\(\ell\) is the \emph{length of the match} and \(\Subs{x}{i}{i+\ell-1}\)
+is the \emph{matching substring}. Note that a match is contained in a 
+longer match if the characters to the left or to the right of the 
+occurrences in \(x\) and \(y\) are identical. To reduce redundancy, 
+we restrict attention to maximal matches.
+A match \(\Match{i}{j}{\ell}\) of \(x\) and \(y\) is \emph{maximal} if 
+and only if the following holds:
+\begin{itemize}
+\item
+\(i=1\) or \(j=1\) or \(x[i-1]\neq y[j-1]\)\hfill(left maximality)
+\item
+\(i+\ell=n+1\) or \(j+\ell=m+1\) or \(x[i+\ell]\neq 
+y[j+\ell]\)\hfill(right maximality)
+\end{itemize}
+A \emph{maximal unique match} of \(x\) and \(y\) (\MUM for short) is a 
+maximal match \(\Match{i}{j}{\ell}\) of \(x\) and \(y\) such that the 
+matching substring \(\Subs{x}{i}{i+\ell-1}\)
+occurs exactly once in \(x\) and once in \(y\). A \emph{\MUM-candidate} 
+is a maximal match \(\Match{i}{j}{l}\) of \(x\) and \(y\) 
+such that the matching substring 
+\(\Subs{x}{i}{i+\ell-1}\) occurs exactly once in \(x\). Note that 
+any \MUM is also a \MUM-candidate, but not vice versa, since for a
+\MUM-candidate the matching substring may occur more than once in \(y\).
+
+If \(\Sigma\) is the DNA alphabet with the characters \(a,c,g,t\), then we 
+define a function \(wcc\) over \(\Sigma\) by the following equations:
+\begin{eqnarray*}
+wcc(a)&=&t\\
+wcc(g)&=&c\\
+wcc(c)&=&g\\
+wcc(t)&=&a
+\end{eqnarray*}
+The reverse complement of 
+a DNA-sequence \(u=\Subs{u}{1}{k}\) is the sequence
+\[wcc(u[k])wcc(u[k-1])\ldots wcc(u[2])wcc(u[1])\]
+denoted by \(\overline{u}\).
+A \emph{reverse complement match} of \(x\) and \(y\) is a 
+match of \(x\) and \(\overline{y}\). The notion of maximality 
+naturally extends to reverse complement matches. To distinguish reverse
+complement matches from matches we often call the latter direct matches.
+\end{document}

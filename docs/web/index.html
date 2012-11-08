@@ -1,0 +1,266 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta name="GENERATOR" content="Mozilla/4.77 [en] (X11; U; Linux 2.2.19-6.2.1smp i686) [Netscape]">
+<title>The MUMmer Home Page</title>
+
+<TD VALIGN=TOP ALIGN=LEFT> <br> <center>
+    <TABLE BORDER=0 CELLPADDING=5 CELLSPACING=5 WIDTH=80%>
+      <TR> 
+        <TD VALIGN=MIDDLE><img SRC="logo.gif" height=104 width=240 align=CENTER></TD>
+        <TD VALIGN=MIDDLE><h3><strong><font color="#CC0000">Ultra-fast alignment 
+            of large-scale DNA and protein sequences</font></strong></h3></TD>
+      </TR>
+    </TABLE>
+  </center>
+  <h3><em><font color="#CC0000"> Overview </font></em></h3>
+  <p>MUMmer is a system for rapidly aligning entire genomes, whether
+    in complete or draft form. For example, MUMmer 3.0 can find all
+    20-basepair or longer exact matches between a pair of 5-megabase
+    genomes in 13.7 seconds, using 78 MB of memory, on a 2.4 GHz Linux
+    desktop computer. MUMmer can also align incomplete genomes; it can
+    easily handle the 100s or 1000s of contigs from a shotgun
+    sequencing project, and will align them to another set of contigs
+    or a genome using the NUCmer program included with the system. If
+    the species are too divergent for a DNA sequence alignment to
+    detect similarity, then the PROmer program can generate alignments
+    based upon the six-frame translations of both input sequences. The
+    original MUMmer system, version 1.0, is described in our <a
+    href=MUMmer.pdf>1999 <em>Nucleic Acids Research</em> paper</a>.
+    Version 2.1 appeared a few years later and is described in our <a
+    href=MUMmer2.pdf>2002 <em>Nucleic Acids Research</em> paper</a>,
+    while MUMmer 3.0 was recently described in our <a
+    href=MUMmer3.pdf>2004 <em>Genome Biology</em> paper</a>. We have also developed a GPU accelerated version of MUMmer called <a href="http://mummergpu.sf.net">MUMmerGPU</a>.</p>
+
+<p> For more
+    information regarding the MUMmer package, please refer to the:</p>
+
+    <big><b><a
+      href="http://sourceforge.net/project/showfiles.php?group_id=133157">Distribution</a></b></big><br>
+
+    <big><b><a href="manual">Online manual</a></b></big><br>
+
+    <big><b><a href="examples">Online tutorials</a></b></big><br>
+
+  <p>To receive software update notices, please join the users'
+    mailing list</a>. This list will only be used to announce major
+    version releases: <br> <a
+    href="http://lists.sourceforge.net/lists/listinfo/mummer-users"><img
+    src="mummer-users.gif"
+    alt="mummer-users(at)lists(dot)sourceforge(dot)net" width="299"
+    height="24" border="0"></a></p>
+  <p>Please send questions and all other correspondence directly to
+    the help list: <br> <a
+    href="http://lists.sourceforge.net/lists/listinfo/mummer-help"><img
+    src="mummer-help.gif"
+    alt="mummer-help(at)lists(dot)sourceforge(dot)net" width="299"
+    height="24" border="0"></a></p>
+
+  <h3><em><font color="#CC0000"> Open Source Announcement </font></em></h3>
+  <p><a href="http://sourceforge.net/projects/mummer">MUMmer is now an open source 
+    project</a> hosted at <a href="http://sourceforge.net">Sourceforge.net</a>. 
+    This means free access to all the source code for both non-profit and for-profit 
+    users! Please refer to the LICENSE file included in the package for a description 
+    of the Artistic License, the same OSI-certified open source licensed used 
+    by Perl and countless other packages. We encourage you to contact us (though 
+    you are not required to) if you wish to contribute to our ongoing improvement 
+    and development of the software.</p>
+
+  <p>Collaborative projects that utilize MUMmer's open source license include:
+  <ul>
+
+  <li><a href="http://insignia.cbcb.umd.edu">Insignia</a> - A web
+  service for the identification of DNA signatures suitable for
+  real-time pathogen detection assays.</li>
+
+  <li><a href="http://amos.sourceforge.net">AMOS</a> - A genome
+  assembly toolkit including AMOScmp, a comparative genome assembler
+  built with MUMmer.</li>
+
+  <li><a href="http://syntenyminer.sourceforge.net">SyntenyMiner</a> -
+  A visualization tool for interrogation of multiple whole genome
+  alignments.</li>
+
+  <li><a href="http://tandemizer.tgen.org">Tandemizer</a> - A
+  visualization tool for the analysis of tandem array blocks across
+  multiple genomes.</li>
+
+  </ul>
+  </p>
+
+
+  <h3><em><font color="#CC0000"> Highlights of Release 3.0 </font></em></h3>
+  <ul>
+    <li>Open source</li>
+    <li>Improved efficiency</li>
+    <li>Ability to find non-unique, repetitive matches as well as unique matches</li>
+    <li>New graphical output modules</li>
+  </ul>
+
+  <h3><em><font color="#CC0000"> Suffix Trees </font></em></h3>
+  <p>Residing at the core of the MUMmer package is the 'mummer' matching algorithm, 
+    which builds and searches a suffix tree data structure. Suffix trees can be 
+    built and searched in linear time using linear space. In creating this structure, 
+    MUMmer 3.0 uses approximately 17 bytes for each basepair in the reference 
+    sequence. Furthermore, the query sequence is "streamed" past the reference 
+    suffix tree, so that the memory requirements do not at all depend on the size 
+    of the query sequences.</p>
+  <p>Critical to the improvements in MUMmer 3.0 is a complete re-write
+    of the core suffix tree library, implemented by <a
+    href="http://www.zbh.uni-hamburg.de/staff.php?mode=_details&id=kurtz">Stefan
+    Kurtz</a> and explained in his various <a
+    href="http://www.zbh.uni-hamburg.de/staff.php?mode=_publications&id=kurtz">publications</a>.
+    The improvements resulting from the use of this library can be
+    seen in the table below. All statistics are from test runs on a
+    3.0 GHz Pentium 4 computer running Linux. Resulting output
+    includes both forward <em>and</em> reverse matches.</p>
+
+  <table width="100%" border="0" cellspacing="5">
+    <tr> 
+      <td align="center" nowrap>&nbsp;</td>
+      <td align="center"><strong>MUMmer 2.1</strong></td>
+      <td align="center"><strong>MUMmer 3.0</strong></td>
+    </tr>
+    <tr bgcolor="#E6E6FA"> 
+      <td align="center" nowrap><strong><em>E.coli</em> K12 vs.<br>
+        <em>E.coli</em> O157:H7</strong></td>
+      <td align="center">102 MB / 18 s</td>
+      <td align="center">77 MB / 17 s</td>
+    </tr>
+    <tr bgcolor="#E6E6FA"> 
+      <td align="center" nowrap><strong><em>S.cerevisiae</em> vs.<br>
+        <em>S.pombe</em></strong></td>
+      <td align="center">261 MB / 51 s</td>
+      <td align="center">204 MB / 47 s</td>
+    </tr>
+    <tr bgcolor="#E6E6FA"> 
+      <td align="center" nowrap><strong><em>A.fumigatus</em> vs.<br>
+        <em>A.nidulans</em></strong></td>
+      <td align="center">578 MB / 128 s</td>
+      <td align="center">459 MB / 120 s</td>
+    </tr>
+    <tr> 
+      <td align="center" nowrap>&nbsp;</td>
+      <td align="center">&nbsp;</td>
+      <td align="center">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td align="center" nowrap>&nbsp;</td>
+      <td align="center"><strong>NUCmer 2.1</strong></td>
+      <td align="center"><strong>NUCmer 3.0</strong></td>
+    </tr>
+    <tr bgcolor="#E6E6FA"> 
+      <td align="center" nowrap><strong><em>D.melanogaster</em> arm 2L vs.<br>
+        <em>D.pseudoobscura</em></strong></td>
+      <td align="center">684 MB / 879 s</td>
+      <td align="center">485 MB / 835 s</td>
+    </tr>
+    <tr> 
+      <td align="center" nowrap>&nbsp;</td>
+      <td align="center">&nbsp;</td>
+      <td align="center">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td align="center" nowrap>&nbsp;</td>
+      <td align="center"><strong>PROmer 2.1</strong></td>
+      <td align="center"><strong>PROmer 3.0</strong></td>
+    </tr>
+    <tr bgcolor="#E6E6FA"> 
+      <td align="center" nowrap><strong><em>P.falciparum</em> vs.<br>
+        <em>P.yoelii</em></strong></td>
+      <td align="center">752 MB / 1109 s</td>
+      <td align="center">522 MB / 975 s</td>
+    </tr>
+  </table>
+  <h3><em><font color="#CC0000"> Applications </font></em></h3>
+  <p>MUMmer 1 was used to detect numerous large-scale inversions in
+    bacterial genomes, leading to a new model of chromosome
+    inversions, reported in this <a href=XFiles.pdf>2000 <em>Genome
+    Biology</em> paper</a>. It was also used to discover evidence for
+    a recent whole-genome duplication in <em>Arabidopsis
+    thaliana</em>, reported in "Analysis of the genome sequence of the
+    flowering plant <em>Arabidopsis thaliana</em>." The Arabidopsis
+    Genome Initiative, <em>Nature</em> 408 (2000), 796-815.</p>
+  <p>MUMmer 2 was used to align all human chromosomes to one another
+    and to detect numerous large-scale, ancient segmental duplications
+    in the human genome, as reported in "The sequence of the human
+    genome." Venter <em>et al.</em>, <em>Science</em> 291 (2001),
+    1304-1351. PROmer was used to compare the human and mouse malaria
+    parasites <em>P.falciparium</em> and <em>P.yoelii</em>, as
+    described in "Genome sequence and comparative analysis of the
+    model rodent malaria parasite <em>Plasmodium yoelii yoelii</em>."
+    J.M. Carlton <em>et al.</em>, <em>Nature</em> 419 (2002),
+    512-519.</p>
+  <p>MUMmer 3 is the latest version, and is downloaded roughly 300
+    times every month. That's over 7,000 users in the 2 years after
+    its release. In addition, the three versions of MUMmer have a
+    combined citation count of over 700 papers.</p>
+  <p>For a list of published genomes suitable for whole genome
+    comparison and a timing analysis for the whole genome alignment of
+    Human vs. Human, please refer to our supplemental <a
+    href="applications.html">applications page</a>. Please note that
+    this page is somewhat dated.</p>
+
+    <h3><em><font color="#CC0000">Components</font></em></h3>
+  <p>MUMmer is a modular package with many components that can interact with one 
+    another to produce a desired output. There are a few basic scripts that encapsulate 
+    different sets of modules, and for most applications, typical users need only 
+    familiarize themselves with the 'mummer' program and these wrapper scripts. 
+    The 'mummer' program can find exact matches of a specified length in a matter 
+    of seconds, and sometimes this information in itself is sufficient. The scripts 
+    'run-mummer1', 'run-mummer3', 'nucmer' and 'promer' go much further, clustering 
+    the matches and aligning the non-exact regions between the matches via a modified 
+    Smith-Waterman algorithm. Refer to the documentation of each of these scripts 
+    in the "docs/" subdirectory of the MUMmer package for more information.</p>
+  <h3><em><font color="#CC0000"> Download </font></em></h3>
+  <p>MUMmer 3.0 is now an OSI certified, open source package. You can
+    <a
+    href="http://sourceforge.net/project/showfiles.php?group_id=133157">download</a>
+    the current source distribution from our <a
+    href="http://sourceforge.net/projects/mummer">SourceForge.net
+    project page</a>.</p>
+
+  <p>To install the software on your machine, type 'tar -xvzf MUMmer3.0.tar.gz' 
+    on the Unix command line to create the MUMmer 3.0 directory. Once inside the 
+    newly created directory, please read the "INSTALL" file for further instructions. 
+    The "README" file explains all the executable files that will be built in 
+    the base directory, while the files in the "docs/" subdirectory go into greater 
+    detail about the individual scripts and algorithms.</p>
+  <h3><em><font color="#CC0000"> References</font></em></h3>
+  <p><a href="manual">MUMmer 3 user manual</a></p>
+  <p><a href="examples">MUMmer 3 examples</a></p>
+  <p>Open source MUMmer 3.0 is described in "<a
+        href=MUMmer3.pdf>Versatile and open software for comparing large genomes</a>." 
+    S. Kurtz, A. Phillippy, A.L. Delcher, M. Smoot, M. Shumway, C. Antonescu, 
+    and S.L. Salzberg, <em>Genome Biology</em> (2004), 5:R12.</p>
+  <p>MUMmer 2.1, NUCmer, and PROmer are described in "<a href=MUMmer2.pdf>Fast 
+    Algorithms for Large-scale Genome Alignment and Comparision</a>." A.L. Delcher, 
+    A. Phillippy, J. Carlton, and S.L. Salzberg, <em>Nucleic Acids Research</em> 
+    (2002), Vol. 30, No. 11 2478-2483.</p>
+  <p>MUMmer 1.0 is described in "<a href=MUMmer.pdf>Alignment of Whole Genomes</a>." 
+    A.L. Delcher, S. Kasif, R.D. Fleischmann, J. Peterson, O. White, and S.L. 
+    Salzberg, <em>Nucleic Acids Research</em>, 27:11 (1999), 2369-2376.</p>
+  <p>Space efficent suffix trees are described in "<a
+    href=http://www.zbh.uni-hamburg.de/staff/kurtz/papers/Kur1999.pdf>Reducing
+    the Space Requirement of Suffix Trees</a>." S. Kurtz,
+    <em>Software-Practice and Experience</em>, 29(13): 1149-1171,
+    1999.</p>
+
+  <h3><em><font color="#CC0000"> Acknowledgments </font></em></h3>
+  <h5>The development of MUMmer is supported in part by the National Science Foundation 
+    under grants IIS-9902923 and IIS-9820497, and by the National Institutes of 
+    Health under grants R01-LM06845 and N01-AI-15447.</h5>
+  <p>Thanks to SourceForge for the fantastic service!</p>
+  <p>MUMmer3.0 is a joint development effort by Stefan Kurtz of the University 
+    of Hamburg and Adam Phillippy, Art Delcher and Steven Salzberg at TIGR. Stefan's 
+    contribution of the new suffix tree code was essential to making MUMmer 3.0 
+    an open source project. Also thanks to Corina Antonescu for the development 
+    of mapview.</p>
+  <hr width="100%">
+  <p align="center"><em>VERSION 3.20 - July 2007</em></p>
+  <p><a href="http://sourceforge.net"><img
+src="http://sourceforge.net/sflogo.php?group_id=133157&amp;type=3"
+alt="SourceForge.net Logo" width="125" height="37"
+border="0"/></a></p>
+
+  </body>
+</html>

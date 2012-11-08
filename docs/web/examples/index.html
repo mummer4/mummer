@@ -1,0 +1,526 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>The MUMmer 3 examples</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<style type="text/css">
+<!--
+body {
+	background-color: #FFFFFF;
+}
+h2 {
+	background-color: #BBBBFF;
+	font-style: italic;
+}
+h3 {
+	background-color: #CDCDEE;
+}
+h4 {
+	background-color: #EFEFEF;
+}
+code {
+	color: #CC0000;
+}
+td {
+	vertical-align: top;
+}
+.centered {
+	text-align: center;
+}
+-->
+</style>
+</head>
+
+<body>
+<p><img src="examples_logo.gif" alt="MUMmer 3 manual logo" border="0"></p>
+<hr>
+<h2>Table of Contents</h2>
+<ol>
+  <li><a href="#introduction">Introduction</a></li>
+  <li><a href="#examples">Examples</a> 
+    <ol>
+      <li><a href="#mapview">mapview</a> 
+        <ol>
+          <li><a href="#promermapview">Running promer</a></li>
+          <li><a href="#mapviewmapview">Running mapview</a></li>
+          <li><a href="#outputmapview">Viewing the output</a></li>
+        </ol>
+      </li>
+      <li><a href="#mummer">mummer</a> 
+        <ol>
+          <li><a href="#mummermummer">Running mummer</a></li>
+          <li><a href="#mummerplotmummer">Running mummerplot</a></li>
+          <li><a href="#outputmummer">Viewing the output</a></li>
+        </ol>
+      </li>
+      <li><a href="#nucmer">nucmer</a> 
+        <ol>
+          <li><a href="#nucmernucmer">Running nucmer</a></li>
+          <li><a href="#showcoordsnucmer">Running show-coords</a></li>
+          <li><a href="#showsnpsnucmer">Running show-snps</a></li>
+          <li><a href="#showtilingnucmer">Running show-tiling</a></li>
+          <li><a href="#outputnucmer">Viewing the output</a></li>
+        </ol>
+      </li>
+      <li><a href="#promer">promer</a> 
+        <ol>
+          <li><a href="#promerpromer">Running promer</a></li>
+          <li><a href="#showcoordspromer">Running show-coords</a></li>
+          <li><a href="#showalignspromer">Running show-aligns</a></li>
+          <li><a href="#outputpromer">Viewing the output</a></li>
+        </ol>
+      </li>
+      <li><a href="#mummer1">run-mummer1</a> 
+        <ol>
+          <li><a href="#runmummer1runmummer1">Running run-mummer1</a></li>
+          <li><a href="#outputrunmummer1">Viewing the output</a></li>
+        </ol>
+      </li>
+      <li><a href="#mummer3">run-mummer3</a> 
+        <ol>
+          <li><a href="#runmummer3runmummer3">Running run-mummer3</a></li>
+          <li><a href="#outputrunmummer3">Viewing the output</a></li>
+        </ol>
+      </li>
+    </ol>
+  </li>
+  <li><a href="#contact">Contact information</a></li>
+</ol>
+<hr width="100%">
+<h2><a name="introduction"></a>1. Introduction</h2>
+<p>Because of its breadth MUMmer can, at first glance, be an overwhelming sea 
+  of scripts and subroutines. This document attempts to walk the user through 
+  some of the more useful modules of the package, and provides example data and 
+  expected outputs to assure the correct and productive operation of MUMmer. All 
+  example data is real DNA sequence from various eukaryotic and prokaryotic organisms, 
+  and can be found in its entirety in the <a href="data">data directory</a>. Although 
+  the input sequences are only subsections of their respective genomes, they have 
+  been carefully selected to permit speedy and informative walk-throughs. It is 
+  not necessary to download all of the data at once, as each subsection will have 
+  separate links to the relevant files.</p>
+<p>For further information regarding any of the MUMmer programs or their output 
+  formats, please refer to the online <a href="../manual">MUMmer manual</a>.</p>
+<hr>
+<h2><a name="examples"></a>2. Examples</h2>
+<h3><a name="mapview"></a>2.1. mapview</h3>
+<p>MapView is a utility script for displaying sequence alignments as provided 
+  by NUCmer or PROmer. It takes the output from <code>show-coords</code> and converts 
+  it to a FIG, PDF or PS image file. By default, it produces FIG files which can 
+  be viewed with the common system utility <code>xfig</code> or converted to PDF 
+  or PS with the <code>fig2dev</code> utility (neither programs are included with 
+  MUMmer). <code>mapview</code> is useful for mapping multiple query contigs (e.g. 
+  from a draft sequencing project) against an annotated reference sequence. Exons 
+  and other features can also be plotted with the NUCmer or PROmer alignments, 
+  aiding in exon refinement and analysis. Individual MUMmer hits are plotted according 
+  to their percent identity, making regions of high or low similarity easily distinguishable.</p>
+<p>In the following sections, a short example is given that demonstrates how to 
+  use <code>mapview</code>. Since <code>nucmer</code> and <code>promer</code> 
+  have a near identical user interface, the alignments for this example will be 
+  generated using <code>promer</code>. This example aligns a few query sequences 
+  to a single reference sequence using <code>promer</code>, and then uses <code>mapview</code> 
+  to plot the resulting areas of conservation and the reference sequence annotation.</p>
+<h5>The following input files will be used to demonstrate this example:</h5>
+<ul>
+  <li><code><a href="data/D_melanogaster_2Rslice.cds">D_melanogaster_2Rslice.cds</a></code></li>
+  <li><code><a href="data/D_melanogaster_2Rslice.fasta">D_melanogaster_2Rslice.fasta</a></code></li>
+  <li><code><a href="data/D_melanogaster_2Rslice.utr">D_melanogaster_2Rslice.utr</a></code></li>
+  <li><code><a href="data/D_pseudoobscura_contigs.fasta">D_pseudoobscura_contigs.fasta</a></code></li>
+</ul>
+<h5>The following output files will be generated by this example:</h5>
+<ul>
+  <li><code><a href="data/mapview_0.fig">mapview_0.fig</a></code></li>
+  <li><code><a href="data/mapview_0.pdf">mapview_0.pdf</a></code></li>
+  <li><code><a href="data/promer.coords">promer.coords</a></code></li>
+</ul>
+<h4><a name="promermapview" id="promermapview"></a>2.1.1. Running promer</h4>
+<p>Please complete the <a href="#promer">PROmer walk-though</a> in order to generate 
+  the alignment between the <em>Drosophila melanogaster</em> chromosome 2R segment 
+  and the 2 contigs from <em>Drosophila pseudoobscura</em>. The PROmer walk-through 
+  will generate the <code>.coords </code>file that is necessary to continue with 
+  the rest of this tutorial. If already familiar with the <code>promer</code> 
+  alignment script, simply continue this tutorial using the supplied <code>promer.coords</code> 
+  file. Note that when generating the <code>.coords</code> file with <code>show-coords</code> 
+  it is important to use the <code>-l -r</code> options (and optionally the <code>-k</code> 
+  option) in order to generate the proper input format for <code>mapview</code>.</p>
+<h4><a name="mapviewmapview" id="mapviewmapview"></a>2.1.2. Running mapview</h4>
+<p>The output of <code>show-coords</code> is then used by MapView to create a 
+  FIG, PDF or PS file.</p>
+<p><code>mapview -n 1 -p mapview promer.coords </code></p>
+<p>The <code>-n</code> option is used to set the number of output files to 1. 
+  By default, MapView partitions its output among 10 files in order to keep the 
+  figures for large comparisons small. Since we are only comparing a small slice 
+  of the actual chromosome, only 1 file will be needed. The output of this command 
+  will be a single file named <code>mapview_0.fig</code>. A more informative plot 
+  can be generated by supplying a UTR and CDS coordinate file in <a href="http://www.sanger.ac.uk/Software/formats/GFF/">GFF 
+  format</a>. These files contain annotation information that will be plotted 
+  along side the PROmer alignments, thus making it possible to compare the conserved 
+  regions with annotated exon positions.</p>
+<p><code>mapview -n 1 -p mapview promer.coords D_melanogaster_2Rslice.utr D_melanogaster_2Rslice.cds</code></p>
+<p>This will generate a single file, <code>mapview_0.fig</code>, that will have 
+  the annotation information displayed above the blue reference rectangle. Below, 
+  you can see this file displayed with the xfig viewer. The only difference between 
+  this file and the file produced without the UTR and CDS files are the annotation 
+  rectangles above the blue rectangle at the very top of the figure. </p>
+<div class="centered"> <img src="mapview_fig.jpg" alt="mapview xfig" name="mapview_fig" id="mapview_fig"> 
+</div>
+<p>In order to generate a PDF format, use the same command plus the <code>-f pdf</code> 
+  option.</p>
+<p><code>mapview -n 1 -f pdf -p mapview promer.coords D_melanogaster_2Rslice.utr 
+  D_melanogaster_2Rslice.cds</code> </p>
+<p>This will generate the same image, <code>mapview_0.pdf</code>, but in PDF format.</p>
+<h4><a name="outputmapview" id="outputmapview"></a>2.1.3. Viewing the output</h4>
+<div class="centered"> <img src="mapplot.gif" alt="mapview plot example" name="mapplot" id="mapplot"> 
+</div>
+<p>The above MapView FIG shows a 220 kbp slice of <em>D. melanogaster</em> chromosome 
+  2L and its alignment to <em>D. pseudoobscura.</em> The alignment, generated 
+  by PROmer, shows all regions of conserved amino acid sequence. The blue rectangle 
+  spanning the figure represents the reference (<em>D. melanogaster</em>), with 
+  annotated genes shown above it and the PROmer alignments shown below it. Alternative 
+  splice variants of the same gene are stacked vertically. Exons are shown as 
+  boxes, with intervening introns connecting them. The 5' and 3' UTRs are colored 
+  pink and blue to indicate the gene's direction of translation. PROmer matches 
+  are shown twice, once just below the reference genome, where all matches are 
+  collapsed into red boxes, and in a larger display showing the separate matches 
+  within each contig, where the contigs are colored differently to indicate contig 
+  boundaries. The vertical position of the matches indicates their percent identity, 
+  ranging from 50% at the bottom of the display to 100% just below the red rectangles. 
+  Percent identity is of the amino acid translations used by PROmer. Matches from 
+  the same query sequence are connected by lines of the same color.</p>
+<h3><a name="mummer"></a>2.2. mummer</h3>
+<p><code>mummer</code> is a suffix tree algorithm designed to find maximal exact 
+  matches of some minimum length between two input sequences. The match lists 
+  produced by <code>mummer</code> can be used alone to generate alignment dot 
+  plots, or can be passed on to the clustering algorithms for the identification 
+  of longer non-exact regions of conservation. These match lists have great versatility 
+  because they contain huge amounts of information and can be passed forward to 
+  other interpretation programs for clustering, analysis, searching, etc.</p>
+<p>In the following sections, a short example is given that demonstrates how to 
+  use <code>mummer</code>. This example compares a single query sequence to a 
+  single reference sequence using <code>mummer</code>, and then uses <code>mummerplot</code> 
+  to generate a dot plot representation of the comparison.</p>
+<h5>The following input files will be used to demonstrate this example:</h5>
+<ul>
+  <li><code><a href="data/H_pylori26695_Eslice.fasta">H_pylori26695_Eslice.fasta</a></code></li>
+  <li><code><a href="data/H_pyloriJ99_Eslice.fasta">H_pyloriJ99_Eslice.fasta</a></code></li>
+</ul>
+<h5>The following output files will be generated by this example:</h5>
+<ul>
+  <li><code><a href="data/mummer.gp">mummer.gp</a></code></li>
+  <li><code><a href="data/mummer.mums">mummer.mums</a></code></li>
+  <li><code><a href="data/mummer.fplot">mummer.fplot</a></code></li>
+  <li><code><a href="data/mummer.rplot">mummer.rplot</a></code></li>
+  <li><code><a href="data/mummer.ps">mummer.ps</a></code></li>
+</ul>
+<h4><a name="mummermummer" id="mummermummer"></a>2.2.1. Running mummer</h4>
+<p><code>mummer</code> can handle multiple reference and multiple query sequences, 
+  however a dotplot of more that two sequences can be confusing, so for the case 
+  of this example we will be dealing with a single reference and a single query 
+  sequence.</p>
+<p><code>mummer -mum -b -c H_pylori26695_Eslice.fasta H_pyloriJ99_Eslice.fasta 
+  &gt; mummer.mums</code></p>
+<p>This command will find all maximal unique matches (<code>-mum</code>) between 
+  the reference and query on both the forward and reverse strands (<code>-b</code>) 
+  and report all the match positions relative to the forward strand (<code>-c</code>). 
+  Output is to <code>stdout</code>, so we will redirect it into a file named <code>mummer.mums</code>. 
+  This file lists all of the MUMs of the default length or greater between the 
+  two input sequences.</p>
+<h4><a name="mummerplotmummer" id="mummerplotmummer"></a>2.2.2. Running mummerplot</h4>
+<p>A dotplot of all the MUMs between two sequences can reveal their macroscopic 
+  similarity.</p>
+<p><code>mummerplot -x &quot;[0,275287]&quot; -y &quot;[0,265111]&quot; -postscript 
+  -p mummer mummer.mums</code></p>
+<p>This command will plot all of the MUMs in the <code>mummer.mums</code> file 
+  in postscript format (<code>-postscript</code>) between the given ranges for 
+  the X and Y axes. When plotting <code>mummer</code> output, it is necessary 
+  to use the lengths of the input sequences to set the plot ranges, otherwise 
+  the plot will be automatically scaled around the minimum and maximum data points. 
+  The four output files are prefixed by the string specified with the <code>-p</code> 
+  option. The <code>plot</code> files contains the data points, <code>mummer.gp</code> 
+  is a gnuplot script for plotting the data points in the <code>plot</code> files, 
+  and <code>mummer.ps</code> is the postscript plot generated by the gnuplot script. 
+  Below, you can see the <code>mummer.ps</code> file displayed with ghostview. 
+  Note that with newer versions of <code>mummerplot</code> the color and thickness 
+  of the plot lines may be different.</p>
+<div class="centered"> <img src="mummer_ps.jpg" alt="mummer postscript plot" name="mummer_ps" id="mummer_ps">
+</div>
+<p> Most image manipulation programs can edit the postscript output, or it can 
+  be sent directly to a printer with the <code>lpr</code> command. If you would 
+  rather use the default terminal for gnuplot, simply remove the <code>-postscript</code> 
+  option from the <code>mummerplot</code> call.</p>
+<h4><a name="outputmummer" id="outputmummer"></a>2.2.3. Viewing the output</h4>
+<div class="centered"> <img src="dotplot.gif" alt="mummerplot example" name="dotplot" id="dotplot">
+</div>
+<p>The above postscript plot represents the set of all MUMs between the two input 
+  sequences used in this example. Forward MUMs are plotted as red lines/dots while 
+  reverse MUMs are plotted as green lines/dots (blue may be used for reverse matches 
+  in newer versions). A line of dots with slope == 1 represents an undisturbed 
+  segment of conservation between the two sequences, while a line of slope == 
+  -1 represents an inverted segment of conservation between the two sequences. 
+  The green segment in the upper left quadrant of the graph shows both an inversion 
+  and translocation, as it is of negative slope and inconsistently located relative 
+  to the rest of the plot which falls on a line approximated by f(x) = x. However 
+  the green segment in the upper right quadrant of the graph shows only an inversion, 
+  as it is of negative slope but is consistent in location with the rest of the 
+  plot. Generally, the closer a plot is to an imaginary line f(x) = x (or -x) 
+  the fewer macroscopic differences exist between the two sequences.</p>
+<h3><a name="nucmer"></a>2.3. nucmer</h3>
+<p><code>nucmer</code> is the MUMmer's most user-friendly alignment script for 
+  standard DNA sequence alignment. It is a robust pipeline that allows for multiple 
+  reference and multiple query sequences to be aligned in a many vs. many fashion. 
+  For instance, a very common use for <code>nucmer</code> is to determine the 
+  position and orientation of a set of sequence contigs in relation to a finished 
+  sequence, however it can be just as effective in comparing two finished sequences 
+  to one another.</p>
+<p>In the following sections, a short example is given that demonstrates how to 
+  use <code>nucmer</code>. This example aligns a set of draft sequence contigs 
+  to a finished sequence using <code>nucmer</code>; displays the alignment coordinates 
+  using <code>show-coords</code>; and tiles them across the reference using <code>show-tiling</code>.</p>
+<h5>The following input files will be used to demonstrate this example:</h5>
+<ul>
+  <li><code><a href="data/B_anthracis_Mslice.fasta">B_anthracis_Mslice.fasta</a></code></li>
+  <li><code><a href="data/B_anthracis_contigs.fasta">B_anthracis_contigs.fasta</a></code></li>
+</ul>
+<h5>The following output files will be generated by this example:</h5>
+<ul>
+  <li><code><a href="data/nucmer.coords">nucmer.coords</a></code></li>
+  <li><code><a href="data/nucmer.delta">nucmer.delta</a></code></li>
+  <li><code><a href="data/nucmer.snps">nucmer.snps</a></code></li>
+  <li><code><a href="data/nucmer.tiling">nucmer.tiling</a></code></li>
+</ul>
+<h4><a name="nucmernucmer"></a>2.3.1. Running nucmer</h4>
+<p>Like <code>mummer</code>, <code>nucmer</code> can handle multiple reference 
+  and query sequences, however it is most commonly used to map a set of query 
+  sequences to a single reference sequence. This example will demonstrate that 
+  functionality, as a number of <em>B. anthracis</em> draft contigs will be mapped 
+  to the final assembly.</p>
+<p><code>nucmer -maxmatch -c 100 -p nucmer B_anthracis_Mslice.fasta B_anthracis_contigs.fasta</code></p>
+<p>To assure all contigs were mapped, all maximal matches were used as alignment 
+  anchors (<code>-maxmatch</code>) and because of the sequence similarity the 
+  minimum cluster size was bumped up to 100 (<code>-c 100</code>). The two output 
+  files are prefixed by the string specified with the <code>-p</code> option. 
+  <code>nucmer.delta</code> is an 
+  encoded file that represents the alignment between the two inputs. At this stage, 
+  the alignment of the two inputs is complete, however it is necessary to parse 
+  the <code>nucmer.delta</code> file with the provided utilities in order to extract 
+  useful information from the comparison.</p>
+<h4><a name="showcoordsnucmer"></a>2.3.2. Running show-coords</h4>
+<p>To view a summary of all the alignments produced by NUCmer, we need to run 
+  the <code>nucmer.delta</code> file through the <code>show-coords</code> utility.</p>
+<p><code>show-coords -r -c -l nucmer.delta &gt; nucmer.coords</code></p>
+<p>This command will list the coordinates, percent identities and other useful 
+  statistics of each alignment in a table. Each line of the table represents an 
+  individual pairwise alignment, and each line is sorted by its starting reference 
+  coordinate (<code>-r</code>). Additional information, like alignment coverage 
+  (<code>-c</code>) and sequence length (<code>-l</code>) can be added to the 
+  table with the appropriate options. Output is to <code>stdout</code>, so we 
+  have redirected it into the file, <code>nucmer.coords</code>.</p>
+<h4><a name="showsnpsnucmer" id="showsnpsnucmer"></a>2.3.4. Running show-snps</h4>
+<p>To view a summary of all the SNPs and indels between the two sequence sets, 
+  we need to run the <code>nucmer.delta</code> file through the <code>show-snps</code> 
+  utility.</p>
+<p><code>show-snps -C nucmer.delta &gt; nucmer.snps</code></p>
+<p>This will generate a report of all the SNPs internal to the alignments contained 
+  in the <code>nucmer.delta</code> file. Each line of the table represents a single 
+  mismatch in the pairwise alignment. With the <code>-C</code> option, only SNPs 
+  from uniquely aligned regions will be reported. Additional information can be 
+  added or removed with the command line switches described in the manual. Output 
+  is to <code>stdout</code>, so we have redirected it into the file, <code>nucmer.snps</code>.</p>
+<h4><a name="showtilingnucmer"></a>2.3.5. Running show-tiling</h4>
+<p>To produce a minimal tiling of contigs across the reference sequence, we need 
+  to run the <code>nucmer.delta</code> file through the <code>show-tiling</code> 
+  utility.</p>
+<p><code>show-tiling nucmer.delta &gt; nucmer.tiling</code></p>
+<p>This command will list the contigs and positions that generate the maximal 
+  alignment coverage across the reference sequence using the fewest contigs possible. 
+  This output can aid the closure of a draft genome when a closely related organism 
+  has already be finished.</p>
+<h4><a name="outputnucmer"></a>2.3.6. Viewing the output</h4>
+<p><code>nucmer</code> and <code>show-tiling</code> output can both be viewed 
+  with <code>mummerplot</code>, however these plots would offer little more information 
+  in regards to this example. <code>mapview</code> can also be used to display 
+  the output of <code>show-coords</code>, as is shown in the <a href="#mapview">mapview 
+  walkthrough</a>.</p>
+<h3><a name="promer"></a>2.4. promer</h3>
+<p><code>promer</code> is a close relative to the NUCmer script. It follows the 
+  exact same steps as NUCmer and even uses most of the same programs in its pipeline, 
+  with one exception - all matching and alignment routines are performed on the 
+  six frame amino acid translation of the DNA input sequence. This provides <code>promer</code> 
+  with a much higher sensitivity than <code>nucmer</code> because protein sequences 
+  tends to diverge much slower than their underlying DNA sequence. Therefore, 
+  on the same input sequences, <code>promer</code> may find many conserved regions 
+  that <code>nucmer</code> will not, simply because the DNA sequence is not as 
+  highly conserved as the amino acid translation.</p>
+<p>In the following sections, a short example is given that demonstrates how to 
+  use <code>promer</code>. This example aligns a few query sequences to single 
+  reference sequence using <code>promer</code>; displays the alignment coordinates 
+  using <code>show-coords</code>; and prints a pairwise alignment of one of the 
+  contigs using <code>show-aligns</code>.</p>
+<h5>The following input files will be used to demonstrate this example:</h5>
+<ul>
+  <li><code><a href="data/D_melanogaster_2Rslice.fasta">D_melanogaster_2Rslice.fasta</a></code></li>
+  <li><code><a href="data/D_pseudoobscura_contigs.fasta">D_pseudoobscura_contigs.fasta</a></code></li>
+</ul>
+<h5>The following output files will be generated by this example:</h5>
+<ul>
+  <li><code><a href="data/promer.aligns">promer.aligns</a></code></li>
+  <li><code><a href="data/promer.coords">promer.coords</a></code></li>
+  <li><code><a href="data/promer.delta">promer.delta</a></code></li>
+</ul>
+<h4><a name="promerpromer" id="promerpromer"></a>2.4.1. Running promer</h4>
+<p>Like <code>mummer</code>, <code>promer</code> can handle multiple reference 
+  and query sequences, however it is most commonly used to map a set of query 
+  sequences to a single reference sequence. This example will demonstrate that 
+  functionality, as two <em>D. pseudoobscura</em> draft contigs will be mapped 
+  to the final <em>D. melanogaster</em> assembly.</p>
+<p><code>promer -p promer D_melanogaster_2Rslice.fasta D_pseudoobscura_contigs.fasta</code></p>
+<p>Default parameters were used to align the two inputs, however if the alignment 
+  is too sensitive or not sensitive enough the minimum match length and cluster 
+  sizes can be adjusted accordingly. The two output files are prefixed by the 
+  string specified with the <code>-p</code> option. <code>promer.delta</code> is an encoded file that represents 
+  the alignment between the two inputs. At this stage, the alignment of the two 
+  inputs is complete, however it is necessary to parse the <code>promer.delta</code> 
+  file with the provided utilities in order to extract useful information from 
+  the comparison.</p>
+<h4><a name="showcoordspromer" id="showcoordspromer"></a>2.4.2. Running show-coords</h4>
+<p>To view a summary of all the alignments produced by PROmer, we need to run 
+  the <code>promer.delta</code> file through the <code>show-coords</code> utility.</p>
+<p><code>show-coords -r -c -l -L 100 -I 50 promer.delta &gt; promer.coords</code></p>
+<p>This command will list the coordinates, percent identities and other useful 
+  statistics of each alignment in a table. Each line of the table represents an 
+  individual pairwise alignment, and each line is sorted by its starting reference 
+  coordinate (<code>-r</code>). Additional information, like alignment coverage 
+  (<code>-c</code>) and sequence length (<code>-l</code>) can be added to the 
+  table with the appropriate options. And minimum length (<code>-L</code>) and 
+  minimum percent identity (<code>-I</code>) cutoffs can be specified to reduce 
+  poor alignments. Output is to <code>stdout</code>, so we have redirected it 
+  into the file, <code>promer.coords</code>. If this file is planned for input 
+  to <code>mapview</code>, it is important to always use the <code>-r</code> <code>-c</code> 
+  <code>-l</code> options.</p>
+<h4><a name="showalignspromer" id="showalignspromer"></a>2.4.3. Running show-aligns</h4>
+<p>To view all the pairwise alignments between two of the input sequences, we 
+  need to run the <code>promer.delta</code> file through the <code>show-coords</code> 
+  utility. </p>
+<p><code>show-aligns promer.delta &quot;D_melanogaster_2Rslice&quot; &quot;3214968&quot; 
+  &gt; promer.aligns</code></p>
+<p>This command will print all of the pairwise alignments stored in the <code>promer.delta</code> 
+  file for the sequences &quot;D_melanogaster_2Rslice&quot; and &quot;3214968&quot;. 
+  Output is to <code>stdout</code>, so we have redirected it into the file, <code>promer.aligns</code>. 
+  If the alignments do not fit within your screen width, or you would like them 
+  to be printed on longer lines, the screen width can be adjusted with the <code>-w</code> 
+  option. Since <code>show-aligns</code> only displays the alignments between 
+  two sequences, it will have to be run separately for each desired pair of sequences.</p>
+<h4><a name="outputpromer" id="outputpromer"></a>2.4.4. Viewing the output</h4>
+<p><code>promer</code> and <code>show-tiling</code> output can both be viewed 
+  with <code>mummerplot</code>, however these plots would offer little more information 
+  in regards to this example. <code>mapview</code> can also be used to display 
+  the output of <code>show-coords</code>, as is shown in the <a href="#mapview">mapview 
+  walkthrough</a> which uses the <code>promer.coords</code> file generated in 
+  this example to generate a plot of the alignment.</p>
+<h3><a name="mummer1"></a>2.5. run-mummer1</h3>
+<p><code>run-mummer1</code> is a legacy script from the original MUMmer1.0 release. 
+  It has been updated to utilize the new suffix tree code of version 3.0, however 
+  all other programs called from this script are identical to the original MUMmer 
+  release back in 1999. Even though it is an outdated program, it still has some 
+  advantages over the newer alignment scripts (<code>nucmer</code>, <code>promer</code>, 
+  <code>run-mummer3</code>). Like all of the alignment scripts, <code>run-mummer1</code> 
+  is a three step process - matching, clustering and extension. However, unlike 
+  the newer alignment scripts, <code>run-mummer1</code> uses the <code>gaps</code> 
+  program for its clustering step. The <code>gaps</code> program does not allow 
+  for rearrangements like <code>mgaps</code>, instead if finds the single longest 
+  increasing subset of matches across the full length of both sequences. This 
+  makes it well suited for SNP and small indel identification between small (&lt; 
+  10 Mbp), very similar sequences with few to no rearrangements.</p>
+<p>In the following sections, a short example is given that demonstrates how to 
+  use <code>run-mummer1</code>. This example aligns a single query sequence to 
+  a single reference sequence using <code>run-mummer1</code>.</p>
+<h5>The following input files will be used to demonstrate this example:</h5>
+<ul>
+  <li><code><a href="data/H_pylori26695_Bslice.fasta">H_pylori26695_Bslice.fasta</a></code></li>
+  <li><code><a href="data/H_pyloriJ99_Bslice.fasta">H_pyloriJ99_Bslice.fasta</a></code></li>
+</ul>
+<h5>The following output files will be generated by this example:</h5>
+<ul>
+  <li><code><a href="data/mummer1.align">mummer1.align</a></code></li>
+  <li><code><a href="data/mummer1.errorsgaps">mummer1.errorsgaps</a></code></li>
+  <li><code><a href="data/mummer1.gaps">mummer1.gaps</a></code></li>
+  <li><code><a href="data/mummer1.out">mummer1.out</a></code></li>
+</ul>
+<h4><a name="runmummer1runmummer1"></a>2.5.1. Running run-mummer1</h4>
+<p><code>run-mummer1</code> is only suited for a single reference and query sequence 
+  that have few to zero inversions or translocations. This example aligns two 
+  such sequences.</p>
+<p><code>run-mummer1 H_pylori26695_Bslice.fasta H_pyloriJ99_Bslice.fasta mummer1</code></p>
+<p>To adjust the minimum match length for the comparison, the user must manually 
+  edit the <code>run-mummer1</code> script. Output files are prefixed by the string 
+  specified at the end of the command line call. <code>mummer1.align</code> displays 
+  the alignments of each gap between adjacent MUMs, <code>mummer1.errorsgaps</code> 
+  lists each MUM and the number of errors between it and the previous MUM, <code>mummer1.gaps</code> 
+  lists the ordered set of MUMs and the gap distance to the previous MUM, and 
+  <code>mummer1.out</code> simply lists all of the MUMs greater than or equal 
+  to the minimum match length.</p>
+<h4><a name="outputrunmummer1"></a>2.5.2. Viewing the output</h4>
+<p>There are no visualization tools designed for <code>run-mummer1</code> output. 
+  To view a MUM dotplot, run <code>mummer</code> by itself on two individual sequence 
+  as demonstrated in the <a href="#mummer">mummer walkthrough</a>.</p>
+<h3><a name="mummer3"></a>2.6. run-mummer3</h3>
+<p><code>run-mummer3</code> is the simplest pipeline of the latest MUMmer3.0 programs. 
+  It runs the same matching and clustering algorithm as <code>nucmer</code> and 
+  <code>promer</code>, however it uses a different extension technique and does 
+  not perform the important pre- and post-processing steps of NUC/PROmer. Because 
+  of its simplistic form, <code>run-mummer3</code> can only handle a single reference 
+  sequence, but like <code>run-mummer1</code> its error-focused output makes it 
+  a handy tool for detecting SNPs and other small errors. The only major difference 
+  between <code>run-mummer3</code> and <code>run-mummer1</code> is the new version's 
+  ability to handle multiple query sequences and its tolerance of large rearrangements. 
+  This makes <code>run-mummer3</code> well suited for error detection between 
+  highly similar sequences that may have large rearrangements, inversions etc.</p>
+<p>In the following sections, a short example is given that demonstrates how to 
+  use <code>run-mummer3</code>. This example aligns a single query sequence to 
+  a single reference sequence using <code>run-mummer3</code>.</p>
+<h5>The following input files will be used to demonstrate this example:</h5>
+<ul>
+  <li><code><a href="data/H_pylori26695_Eslice.fasta">H_pylori26695_Eslice.fasta</a></code></li>
+  <li><code><a href="data/H_pyloriJ99_Eslice.fasta">H_pyloriJ99_Eslice.fasta</a></code></li>
+</ul>
+<h5>The following output files will be generated by this example:</h5>
+<ul>
+  <li><code><a href="data/mummer3.align">mummer3.align</a></code></li>
+  <li><code><a href="data/mummer3.errorsgaps">mummer3.errorsgaps</a></code></li>
+  <li><code><a href="data/mummer3.gaps">mummer3.gaps</a></code></li>
+  <li><code><a href="data/mummer3.out">mummer3.out</a></code></li>
+</ul>
+<h4><a name="runmummer3runmummer3"></a>2.6.1. Running run-mummer3</h4>
+<p><code>run-mummer3</code> can only handle a single reference sequence, but it 
+  is capable of dealing with multiple query sequences. However, this example aligns 
+  a single query sequence to a single reference sequence. Unlike <code>run-mumer1</code>, 
+  <code>run-mummer3</code> can handle inversions and translocations, but not with 
+  the same grace as <code>nucmer</code>.</p>
+<p><code>run-mummer3 H_pylori26695_Bslice.fasta H_pyloriJ99_Bslice.fasta mummer3</code></p>
+<p>To adjust any of the alignment parameters, the user must manual edit the <code>run-mummer3</code> 
+  scripts. Do not, however, add the <code>-c</code> option to the <code>mummer</code> 
+  invocation, as it will confuse the next steps in the pipeline. It may be easier 
+  to reverse complement the sequence yourself and run the script twice (once for 
+  forward, second for reverse) with the <code>-b</code> option removed. Try adding 
+  the <code>-D</code> option to the <code>combineMUMs</code> command line in the 
+  script to output a format that is easier to parse for SNPs and small indels. 
+  Output files are prefixed by the string specified at the end of the command 
+  line call. <code>mummer3.align</code> displays the alignments of each gap between 
+  adjacent MUMs, <code>mummer3.errorsgaps</code> lists each MUM and the number 
+  of errors between it and the previous MUM, <code>mummer3.gaps</code> lists the 
+  ordered set of MUMs and the gap distance to the previous MUM, and <code>mummer3.out</code> 
+  simply lists all of the MUMs greater than or equal to the minimum match length.</p>
+<h4><a name="outputrunmummer3"></a>2.6.2. Viewing the output</h4>
+<p>The <code>mummer3.out</code> file is identical to the output of <code>mummer</code> 
+  on a 1 vs many search, so it may be plotted as demonstrated in the <a href="#mummer">mummer 
+  walkthrough</a>.</p>
+<hr width="100%">
+<h2><a name="contact"></a>3. Contact information</h2>
+<p>Please address questions and bug reports via Email to:</p>
+<p><a href="http://lists.sourceforge.net/lists/listinfo/mummer-help" target="_blank"><img src="../mummer-help.gif" alt="mummer-help(at)lists(dot)sourceforge(dot)net" width="290" height="24" border="0"></a></p>
+<hr width="100%">
+<div class="centered"><p><em>VERSION 3.17 - May 2005</em></p></div>
+
+<a href="http://sourceforge.net"><img
+src="http://sourceforge.net/sflogo.php?group_id=133157&amp;type=3" alt="SourceForge.net Logo" width="125" height="37" border="0"/></a>
+</body>
+</html>

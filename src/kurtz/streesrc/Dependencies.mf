@@ -1,0 +1,164 @@
+access.o: access.c streedef.h ../libbasedir/types.h streemac.h \
+ symboldef.h ../libbasedir/errordef.h streetyp.h \
+ ../libbasedir/arraydef.h streeproto.h streeacc.h streehuge.h \
+ ../libbasedir/intbits.h ../libbasedir/spacedef.h \
+ ../libbasedir/debugdef.h ../libbasedir/protodef.h \
+ ../libbasedir/optdesc.h ../libbasedir/multidef.h \
+ ../libbasedir/mumcand.h
+addleafcount.o: addleafcount.c ../libbasedir/types.h \
+ ../libbasedir/protodef.h ../libbasedir/optdesc.h \
+ ../libbasedir/errordef.h ../libbasedir/multidef.h \
+ ../libbasedir/arraydef.h ../libbasedir/mumcand.h \
+ ../libbasedir/debugdef.h streedef.h streemac.h symboldef.h streetyp.h \
+ streeproto.h ../libbasedir/spacedef.h
+construct.o: construct.c ../libbasedir/intbits.h ../libbasedir/types.h \
+ ../libbasedir/errordef.h ../libbasedir/spacedef.h \
+ ../libbasedir/megabytes.h ../libbasedir/debugdef.h streedef.h \
+ streemac.h symboldef.h streetyp.h ../libbasedir/arraydef.h \
+ streeproto.h streeacc.h streehuge.h ../libbasedir/protodef.h \
+ ../libbasedir/optdesc.h ../libbasedir/multidef.h \
+ ../libbasedir/mumcand.h construct.gen
+depthtab.o: depthtab.c ../libbasedir/debugdef.h ../libbasedir/types.h \
+ streedef.h streemac.h symboldef.h ../libbasedir/errordef.h streetyp.h \
+ ../libbasedir/arraydef.h streeproto.h streeacc.h streehuge.h \
+ ../libbasedir/intbits.h ../libbasedir/spacedef.h \
+ ../libbasedir/protodef.h ../libbasedir/optdesc.h \
+ ../libbasedir/multidef.h ../libbasedir/mumcand.h
+dfs.o: dfs.c ../libbasedir/arraydef.h ../libbasedir/types.h \
+ ../libbasedir/spacedef.h ../libbasedir/errordef.h \
+ ../libbasedir/debugdef.h streedef.h streemac.h symboldef.h streetyp.h \
+ streeproto.h streeacc.h streehuge.h ../libbasedir/intbits.h \
+ ../libbasedir/protodef.h ../libbasedir/optdesc.h \
+ ../libbasedir/multidef.h ../libbasedir/mumcand.h dfs.gen
+ex2leav.o: ex2leav.c ../libbasedir/debugdef.h ../libbasedir/types.h \
+ streedef.h streemac.h symboldef.h ../libbasedir/errordef.h streetyp.h \
+ ../libbasedir/arraydef.h streeproto.h streeacc.h streehuge.h \
+ ../libbasedir/intbits.h ../libbasedir/spacedef.h
+iterator.o: iterator.c ../libbasedir/arraydef.h ../libbasedir/types.h \
+ ../libbasedir/spacedef.h ../libbasedir/errordef.h \
+ ../libbasedir/debugdef.h streedef.h streemac.h symboldef.h streetyp.h \
+ streeproto.h streeacc.h streehuge.h ../libbasedir/intbits.h \
+ ../libbasedir/protodef.h ../libbasedir/optdesc.h \
+ ../libbasedir/multidef.h ../libbasedir/mumcand.h
+linkloc.o: linkloc.c streedef.h ../libbasedir/types.h streemac.h \
+ symboldef.h ../libbasedir/errordef.h streetyp.h \
+ ../libbasedir/arraydef.h streeproto.h ../libbasedir/protodef.h \
+ ../libbasedir/optdesc.h ../libbasedir/multidef.h \
+ ../libbasedir/mumcand.h ../libbasedir/debugdef.h streeacc.h \
+ streehuge.h ../libbasedir/intbits.h ../libbasedir/spacedef.h
+loc.o: loc.c ../libbasedir/debugdef.h ../libbasedir/types.h \
+ ../libbasedir/args.h streedef.h streemac.h symboldef.h \
+ ../libbasedir/errordef.h streetyp.h ../libbasedir/arraydef.h \
+ streeproto.h ../libbasedir/protodef.h ../libbasedir/optdesc.h \
+ ../libbasedir/multidef.h ../libbasedir/mumcand.h streeacc.h \
+ streehuge.h ../libbasedir/intbits.h ../libbasedir/spacedef.h
+overmax.o: overmax.c ../libbasedir/intbits.h ../libbasedir/types.h \
+ ../libbasedir/errordef.h ../libbasedir/spacedef.h \
+ ../libbasedir/debugdef.h streedef.h streemac.h symboldef.h streetyp.h \
+ ../libbasedir/arraydef.h streeproto.h streeacc.h streehuge.h
+oversucc.o: oversucc.c streedef.h ../libbasedir/types.h streemac.h \
+ symboldef.h ../libbasedir/errordef.h streetyp.h \
+ ../libbasedir/arraydef.h streeproto.h streeacc.h streehuge.h \
+ ../libbasedir/intbits.h ../libbasedir/spacedef.h
+scanpref.o: scanpref.c ../libbasedir/debugdef.h ../libbasedir/types.h \
+ streedef.h streemac.h symboldef.h ../libbasedir/errordef.h streetyp.h \
+ ../libbasedir/arraydef.h streeproto.h streeacc.h streehuge.h \
+ ../libbasedir/intbits.h ../libbasedir/spacedef.h \
+ ../libbasedir/protodef.h ../libbasedir/optdesc.h \
+ ../libbasedir/multidef.h ../libbasedir/mumcand.h
+stree.o: stree.c ../libbasedir/debugdef.h ../libbasedir/types.h \
+ ../libbasedir/args.h ../libbasedir/protodef.h ../libbasedir/optdesc.h \
+ ../libbasedir/errordef.h ../libbasedir/multidef.h \
+ ../libbasedir/arraydef.h ../libbasedir/mumcand.h streedef.h \
+ streemac.h symboldef.h streetyp.h streeproto.h \
+ ../libbasedir/spacedef.h ../libbasedir/megabytes.h
+streedbg.o: streedbg.c ../libbasedir/types.h ../libbasedir/intbits.h \
+ ../libbasedir/errordef.h ../libbasedir/spacedef.h \
+ ../libbasedir/visible.h ../libbasedir/debugdef.h streedef.h \
+ streemac.h symboldef.h streetyp.h ../libbasedir/arraydef.h \
+ streeproto.h streeacc.h streehuge.h ../libbasedir/protodef.h \
+ ../libbasedir/optdesc.h ../libbasedir/multidef.h \
+ ../libbasedir/mumcand.h
+streefiledoc.o: streefiledoc.c
+access.dbg.o: access.c streedef.h ../libbasedir/types.h streemac.h \
+ symboldef.h ../libbasedir/errordef.h streetyp.h \
+ ../libbasedir/arraydef.h streeproto.h streeacc.h streehuge.h \
+ ../libbasedir/intbits.h ../libbasedir/spacedef.h \
+ ../libbasedir/debugdef.h ../libbasedir/protodef.h \
+ ../libbasedir/optdesc.h ../libbasedir/multidef.h \
+ ../libbasedir/mumcand.h
+addleafcount.dbg.o: addleafcount.c ../libbasedir/types.h \
+ ../libbasedir/protodef.h ../libbasedir/optdesc.h \
+ ../libbasedir/errordef.h ../libbasedir/multidef.h \
+ ../libbasedir/arraydef.h ../libbasedir/mumcand.h \
+ ../libbasedir/debugdef.h streedef.h streemac.h symboldef.h streetyp.h \
+ streeproto.h ../libbasedir/spacedef.h
+construct.dbg.o: construct.c ../libbasedir/intbits.h ../libbasedir/types.h \
+ ../libbasedir/errordef.h ../libbasedir/spacedef.h \
+ ../libbasedir/megabytes.h ../libbasedir/debugdef.h streedef.h \
+ streemac.h symboldef.h streetyp.h ../libbasedir/arraydef.h \
+ streeproto.h streeacc.h streehuge.h ../libbasedir/protodef.h \
+ ../libbasedir/optdesc.h ../libbasedir/multidef.h \
+ ../libbasedir/mumcand.h construct.gen
+depthtab.dbg.o: depthtab.c ../libbasedir/debugdef.h ../libbasedir/types.h \
+ streedef.h streemac.h symboldef.h ../libbasedir/errordef.h streetyp.h \
+ ../libbasedir/arraydef.h streeproto.h streeacc.h streehuge.h \
+ ../libbasedir/intbits.h ../libbasedir/spacedef.h \
+ ../libbasedir/protodef.h ../libbasedir/optdesc.h \
+ ../libbasedir/multidef.h ../libbasedir/mumcand.h
+dfs.dbg.o: dfs.c ../libbasedir/arraydef.h ../libbasedir/types.h \
+ ../libbasedir/spacedef.h ../libbasedir/errordef.h \
+ ../libbasedir/debugdef.h streedef.h streemac.h symboldef.h streetyp.h \
+ streeproto.h streeacc.h streehuge.h ../libbasedir/intbits.h \
+ ../libbasedir/protodef.h ../libbasedir/optdesc.h \
+ ../libbasedir/multidef.h ../libbasedir/mumcand.h dfs.gen
+ex2leav.dbg.o: ex2leav.c ../libbasedir/debugdef.h ../libbasedir/types.h \
+ streedef.h streemac.h symboldef.h ../libbasedir/errordef.h streetyp.h \
+ ../libbasedir/arraydef.h streeproto.h streeacc.h streehuge.h \
+ ../libbasedir/intbits.h ../libbasedir/spacedef.h
+iterator.dbg.o: iterator.c ../libbasedir/arraydef.h ../libbasedir/types.h \
+ ../libbasedir/spacedef.h ../libbasedir/errordef.h \
+ ../libbasedir/debugdef.h streedef.h streemac.h symboldef.h streetyp.h \
+ streeproto.h streeacc.h streehuge.h ../libbasedir/intbits.h \
+ ../libbasedir/protodef.h ../libbasedir/optdesc.h \
+ ../libbasedir/multidef.h ../libbasedir/mumcand.h
+linkloc.dbg.o: linkloc.c streedef.h ../libbasedir/types.h streemac.h \
+ symboldef.h ../libbasedir/errordef.h streetyp.h \
+ ../libbasedir/arraydef.h streeproto.h ../libbasedir/protodef.h \
+ ../libbasedir/optdesc.h ../libbasedir/multidef.h \
+ ../libbasedir/mumcand.h ../libbasedir/debugdef.h streeacc.h \
+ streehuge.h ../libbasedir/intbits.h ../libbasedir/spacedef.h
+loc.dbg.o: loc.c ../libbasedir/debugdef.h ../libbasedir/types.h \
+ ../libbasedir/args.h streedef.h streemac.h symboldef.h \
+ ../libbasedir/errordef.h streetyp.h ../libbasedir/arraydef.h \
+ streeproto.h ../libbasedir/protodef.h ../libbasedir/optdesc.h \
+ ../libbasedir/multidef.h ../libbasedir/mumcand.h streeacc.h \
+ streehuge.h ../libbasedir/intbits.h ../libbasedir/spacedef.h
+overmax.dbg.o: overmax.c ../libbasedir/intbits.h ../libbasedir/types.h \
+ ../libbasedir/errordef.h ../libbasedir/spacedef.h \
+ ../libbasedir/debugdef.h streedef.h streemac.h symboldef.h streetyp.h \
+ ../libbasedir/arraydef.h streeproto.h streeacc.h streehuge.h
+oversucc.dbg.o: oversucc.c streedef.h ../libbasedir/types.h streemac.h \
+ symboldef.h ../libbasedir/errordef.h streetyp.h \
+ ../libbasedir/arraydef.h streeproto.h streeacc.h streehuge.h \
+ ../libbasedir/intbits.h ../libbasedir/spacedef.h
+scanpref.dbg.o: scanpref.c ../libbasedir/debugdef.h ../libbasedir/types.h \
+ streedef.h streemac.h symboldef.h ../libbasedir/errordef.h streetyp.h \
+ ../libbasedir/arraydef.h streeproto.h streeacc.h streehuge.h \
+ ../libbasedir/intbits.h ../libbasedir/spacedef.h \
+ ../libbasedir/protodef.h ../libbasedir/optdesc.h \
+ ../libbasedir/multidef.h ../libbasedir/mumcand.h
+stree.dbg.o: stree.c ../libbasedir/debugdef.h ../libbasedir/types.h \
+ ../libbasedir/args.h ../libbasedir/protodef.h ../libbasedir/optdesc.h \
+ ../libbasedir/errordef.h ../libbasedir/multidef.h \
+ ../libbasedir/arraydef.h ../libbasedir/mumcand.h streedef.h \
+ streemac.h symboldef.h streetyp.h streeproto.h \
+ ../libbasedir/spacedef.h ../libbasedir/megabytes.h
+streedbg.dbg.o: streedbg.c ../libbasedir/types.h ../libbasedir/intbits.h \
+ ../libbasedir/errordef.h ../libbasedir/spacedef.h \
+ ../libbasedir/visible.h ../libbasedir/debugdef.h streedef.h \
+ streemac.h symboldef.h streetyp.h ../libbasedir/arraydef.h \
+ streeproto.h streeacc.h streehuge.h ../libbasedir/protodef.h \
+ ../libbasedir/optdesc.h ../libbasedir/multidef.h \
+ ../libbasedir/mumcand.h
+streefiledoc.dbg.o: streefiledoc.c

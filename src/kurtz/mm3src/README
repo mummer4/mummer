@@ -1,0 +1,12 @@
+
+This directory contains the sources of the 'mummer' (maxmat3.x) program:
+
+maxmatdef.h: some basic definitions
+findmumcand.c: computing MUM-candidate by traversing a suffix tree
+findmaxmat.c: computing maximal matches by traversing a suffix tree
+maxmaxinp.c: reading the input sequences
+maxmat3.c: the main program
+maxmatopt.c: parsing options
+procmaxmat.c: processing and output of MUM-candidates
+
+*.mf: some files to be included into Makefile

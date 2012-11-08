@@ -1,0 +1,83 @@
+findmaxmat.dbg.o:findmaxmat.c
+	$(CC) $(CFLAGS) -DDEBUG -c findmaxmat.c -o $@
+
+findmumcand.dbg.o:findmumcand.c
+	$(CC) $(CFLAGS) -DDEBUG -c findmumcand.c -o $@
+
+maxmat3.dbg.o:maxmat3.c
+	$(CC) $(CFLAGS) -DDEBUG -c maxmat3.c -o $@
+
+maxmatinp.dbg.o:maxmatinp.c
+	$(CC) $(CFLAGS) -DDEBUG -c maxmatinp.c -o $@
+
+maxmatopt.dbg.o:maxmatopt.c
+	$(CC) $(CFLAGS) -DDEBUG -c maxmatopt.c -o $@
+
+procmaxmat.dbg.o:procmaxmat.c
+	$(CC) $(CFLAGS) -DDEBUG -c procmaxmat.c -o $@
+
+findmaxmat.prepro:findmaxmat.c
+	$(CC) -E -g3 $(CFLAGS) -DDEBUG -c findmaxmat.c -o $@
+
+findmumcand.prepro:findmumcand.c
+	$(CC) -E -g3 $(CFLAGS) -DDEBUG -c findmumcand.c -o $@
+
+maxmat3.prepro:maxmat3.c
+	$(CC) -E -g3 $(CFLAGS) -DDEBUG -c maxmat3.c -o $@
+
+maxmatinp.prepro:maxmatinp.c
+	$(CC) -E -g3 $(CFLAGS) -DDEBUG -c maxmatinp.c -o $@
+
+maxmatopt.prepro:maxmatopt.c
+	$(CC) -E -g3 $(CFLAGS) -DDEBUG -c maxmatopt.c -o $@
+
+procmaxmat.prepro:procmaxmat.c
+	$(CC) -E -g3 $(CFLAGS) -DDEBUG -c procmaxmat.c -o $@
+
+findmaxmat.pr:findmaxmat.c
+	skproto.x findmaxmat.c > $@
+
+findmumcand.pr:findmumcand.c
+	skproto.x findmumcand.c > $@
+
+maxmat3.pr:maxmat3.c
+	skproto.x maxmat3.c > $@
+
+maxmatinp.pr:maxmatinp.c
+	skproto.x maxmatinp.c > $@
+
+maxmatopt.pr:maxmatopt.c
+	skproto.x maxmatopt.c > $@
+
+procmaxmat.pr:procmaxmat.c
+	skproto.x procmaxmat.c > $@
+
+findmaxmat.splint:findmaxmat.c
+	splint ${SPLINTFLAGS} findmaxmat.c
+	touch findmaxmat.splint
+
+findmumcand.splint:findmumcand.c
+	splint ${SPLINTFLAGS} findmumcand.c
+	touch findmumcand.splint
+
+maxmat3.splint:maxmat3.c
+	splint ${SPLINTFLAGS} maxmat3.c
+	touch maxmat3.splint
+
+maxmatinp.splint:maxmatinp.c
+	splint ${SPLINTFLAGS} maxmatinp.c
+	touch maxmatinp.splint
+
+maxmatopt.splint:maxmatopt.c
+	splint ${SPLINTFLAGS} maxmatopt.c
+	touch maxmatopt.splint
+
+procmaxmat.splint:procmaxmat.c
+	splint ${SPLINTFLAGS} procmaxmat.c
+	touch procmaxmat.splint
+
+splintall:${SPLINTALL}
+
+splintclean:
+	rm -f *.splint
+

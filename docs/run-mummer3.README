@@ -1,0 +1,99 @@
+-=- run-mummer3 (MUMmer3.0) README -=-
+
+** NOTE **
+This manual is outdated, please refer to the HTML documentation included in
+this distribution or at:
+
+   http://mummer.sourceforge.net
+   http://mummer.sourceforge.net/manual
+   http://mummer.sourceforge.net/examples
+ 
+If any of this code is used in any publication, please cite the following:
+
+  Fast algorithms for large-scale genome alignment and comparison.
+A.L. Delcher. A. Phillippy, J. Carlton, and S.L. Salzberg.  Nucleic
+Acids Research 30:11 (2002), 2478-2483.
+
+
+USAGE: ./run-mummer3 <reference> <query> <file prefix>
+
+        <reference> specifies the file with the first sequence in FastA
+                format. No more than on sequence is allowed.
+        <query> specifies the multi-fasta sequence FastA file that contains
+                the query sequences, to be aligned to the reference.
+        <file prefix> specifies the file prefix for the output files.
+
+        NOTE:
+        Coordinates from this script will be relative to their respective
+        strand. Thus reverse matches will have coordinates that reference the
+        reverse complemented query sequence! If this coordinate system is
+        confusing, use nucmer instead.
+
+
+MATCHING PARAMETERS:
+  It is important to customize the command line parameters of the matching
+and clustering algorithms to reflect the users desired alignment results.
+All of the programs in the run-mummer3 script (mummer, mgaps, and combineMUMs)
+can be passed various parameters to alter their performance and output. To view
+these options, run each program from the command line with the "-h" option to
+view their definable parameters. Then to make a permanent change to the script,
+simply add the desired parameters to the script using a standard text editor.
+
+NOTE: For SNP hunters the -D option to combineMUMs will be very handy for
+locating and parsing the difference positions.
+
+
+MATCHING ALGORITHMS:
+  It is also possible to change the matching algorithm used in the alignment
+generation. type 'mummer -help' to see the algorithm switches.
+
+
+OUTPUT FILES:
+  The four output files of this script are:
+        <prefix>.out
+        <prefix>.gaps
+        <prefix>.errorsgaps
+        <prefix>.align
+
+  + <prefix>.out
+        This file lists the coordinates of the matches found and the length
+        of each match found. A group of matches to a specific sequence in
+        the query file is headed by the FastA tag of that sequence. The first
+        and second columns list the start coordinates in the reference and
+        query sequences respectively. The final column is the length of the
+        match.
+
+  + <prefix>.gaps
+        The headers and 1st - 3rd columns of this file are exactly like the
+        <prefix>.out file above. However, matches are now sorted and clustered
+        according to their position in each of the sequences. Clusters of
+        matches are separated by a "#" character and matches from different
+        sequences in the query file are still separated by the FastA header
+        for that sequence.
+                The additional columns in this file (4th - 6th) describe
+        the gaps between adjacent matches. The 4th column represents the
+        number of overlapping characters between the current match and the
+        previous match. The 5th column displays the number of characters
+        between the beginning of this match in the reference and the end
+        of the previous match in the reference. Finally, the 6th column
+        displays the number of characters between the beginning of this
+        match in the query sequence and the end of the previous match in
+        the query sequence.
+
+  + <prefix>.errorsgaps
+        This file is identical to the <prefix>.gaps file, except for the
+        addition of a 7th column that displays the number of errors in the
+        gap described by columns 5 and 6. This is perhaps the most helpful
+        output file of the script, as it is easy to parse and interpret.
+
+  + <prefix>.align
+        This file also expands on the <prefix>.gaps file, but in a different
+        way than the witherrors.gaps file. This file intersperses the lines
+        of the <prefix>.gaps file with an actual alignment of the gap between
+        the previous two matches. Additionally, wherever there was a "#"
+        character in the <prefix>.gaps file, the <prefix>.align file adds
+        a line that lists the encompassing start and stop coordinates of the
+        previous alignment region, a error ratio, and an error percentage.
+
+
+Email questions, comments or bug reports to: <mummer-help@lists.sourceforge.net>

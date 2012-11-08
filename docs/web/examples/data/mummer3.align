@@ -1,0 +1,5324 @@
+> H_pyloriJ99_Bslice
+     183       17     22    none      -      -
+     238       72    108    none     33     33
+     Errors = 5
+A: taaatttaggtataaaacaccctcaattcaagggtttttgagtgagctttttg
+B: taaatttaggcataaaacgcccttaaatcaagggtttttgagcgagctttttg
+   ==========^       ^    ^  ^               ^==========
+     347      181     92    none      1      1
+     Errors = 1
+A: tagggttttgcgtgggcgtga
+B: tagggttttgtgtgggcgtga
+   ==========^==========
+     458      292     50    none     19     19
+     Errors = 3
+A: ttaaatgcggctcgatgagggcgtcaatttcattgattt
+B: ttaaatgcggttcgatgagagcgtcaatctcattgattt
+   ==========^        ^        ^==========
+     509      343     35    none      1      1
+     Errors = 1
+A: cgaaagcgagttggttgtttt
+B: cgaaagcgagctggttgtttt
+   ==========^==========
+     545      379     94    none      1      1
+     Errors = 1
+A: ctaacatgctagaagcgattt
+B: ctaacatgctggaagcgattt
+   ==========^==========
+     640      474     25    none      1      1
+     Errors = 1
+A: gccattttaacccttgagagt
+B: gccattttaatccttgagagt
+   ==========^==========
+     666      500     38    none      1      1
+     Errors = 1
+A: acaagctcaacaattcaatga
+B: acaagctcaataattcaatga
+   ==========^==========
+     705      539     44    none      1      1
+     Errors = 1
+A: agcccttattgccggctttac
+B: agcccttattaccggctttac
+   ==========^==========
+     750      584     38    none      1      1
+     Errors = 1
+A: caatattgtccgtggtcagca
+B: caatattgtctgtggtcagca
+   ==========^==========
+     807      641     23    none     19     19
+     Errors = 5
+A: tgctgtatttaagcatcgca-tgggcaatacccttagtcg
+B: tgctgtattttagcatcgcactag-caatgcccttagtcg
+   ==========^         ^ ^ ^    ^==========
+     834      668     35    none      4      4
+     Errors = 2
+A: ccgcgctcacataatcaaaatgcg
+B: ccgcgctcacgtagtcaaaatgcg
+   ==========^  ^==========
+     870      704     24    none      1      1
+     Errors = 1
+A: tgatcgctcccaaaacgcaca
+B: tgatcgctcctaaaacgcaca
+   ==========^==========
+     921      755     26    none     27     27
+     Errors = 3
+A: atcgtatttttcgctctctaataatttgtctaaaataaaaggcaatt
+B: atcgtattttccgctctctaacaatttgtctaaaatcaaaggcaatt
+   ==========^          ^              ^==========
+     966      800     29    none     19     19
+     Errors = 4
+A: ccccaggcaccagcacgatgtctaaaagatcctcatcgc
+B: ccccaggcactagcacgagatctaaaagctcctcatcgc
+   ==========^       ^^        ^==========
+    1014      848     20    none     19     19
+     Errors = 3
+A: ttttaaagcagtccatcgccccttcttgcaatctgtctg
+B: ttttaaagcaatccatcgccccttcttttaatctgtctg
+   ==========^                ^^==========
+    1035      869     25    none      1      1
+     Errors = 1
+A: tgatgatatgattgaagcgcg
+B: tgatgatatggttgaagcgcg
+   ==========^==========
+    1063      897     91    none      3      3
+     Errors = 2
+A: aaaatagcgactctttcattccc
+B: aaaatagcgattttttcattccc
+   ==========^ ^==========
+    1155      989     61    none      1      1
+     Errors = 1
+A: cggttactaattgttctagct
+B: cggttactaagtgttctagct
+   ==========^==========
+    1235     1069     24    none     19     19
+     Errors = 3
+A: ttaggatcaacatgcgtttcagcaaacaacccatcaatc
+B: ttaggatcaatatgcgtttcagcgaacagcccatcaatc
+   ==========^            ^    ^==========
+    1280     1114    207    none     21     21
+     Errors = 4
+A: ccgccgccgcagctctcgctaaaataggggcaaaagagctg
+B: ccgccgccgccgctctgggtaaaatagggggaaaagagctg
+   ==========^     ^ ^           ^==========
+    1518     1352     53    none     31     31
+     Errors = 6
+A: tttgaatgcttttatctctcgttttaagggcctttagaacagaatattgca
+B: tttgaatgctactatcccttgttttaagggcttttagaacggaatattgca
+   ==========^^    ^  ^           ^        ^==========
+    1581     1415     65    none     10     10
+     Errors = 2
+A: tattgacaatagcgttagtctggctcactt
+B: tattgacaatggcgttagtttggctcactt
+   ==========^        ^==========
+    1650     1484     23    none      4      4
+     Errors = 2
+A: aaatatccgccactttggctgcca
+B: aaatatccgctaccttggctgcca
+   ==========^  ^==========
+    1674     1508     20    none      1      1
+     Errors = 1
+A: ttgcttgataactctcatgca
+B: ttgcttgatagctctcatgca
+   ==========^==========
+    1788     1622     59    none     94     94
+     Errors = 7
+A: catcggttaagattttataaccaaattcctctttgatcgtttgtaacatttctaggcctt
+B: catcggttaaaattttataaccaaattcatctttgatagtttgtaacatttctaagcctt
+   ==========^                 ^        ^                ^     
+A: tttctaaaccaggccctctgtaactctctaaactcgtgcggttcgccttatcaa
+B: tttctaaaccaggtcctctgtaactctccaaactcgtgcggttagccttatcaa
+                ^              ^              ^==========
+    1857     1691     23    none     10     10
+     Errors = 3
+A: ctaggggttgcaatttagtggcgatacttc
+B: ctaggggttgtaatttaatagcgatacttc
+   ==========^      ^ ^==========
+    1881     1715     20    none      1      1
+     Errors = 1
+A: gattttctaagctctcaatga
+B: gattttctaaactctcaatga
+   ==========^==========
+    1952     1786     20    none     51     51
+     Errors = 4
+A: cgcatggcccagcgattaaaacggatttaggggtttttgttttagaagttttcatgactt
+B: cgcatggcccggcgattaaaacgggtttaggggtttttgtgttagaagttttcatgactt
+   ==========^             ^               ^                   
+A: ttcctttgttt
+B: atcctttgttt
+   ^==========
+    1973     1807     61    none      1      1
+     Errors = 1
+A: aatggtttctccaatcggctc
+B: aatggtttcttcaatcggctc
+   ==========^==========
+    2035     1869     26    none      1      1
+     Errors = 1
+A: tttctatgatgtagtgccaac
+B: tttctatgatatagtgccaac
+   ==========^==========
+    2077     1911    113    none     16     16
+     Errors = 8
+A: tttttaattcattcttgctcgctttctcttgaatga
+B: tttttaattcgttatttattactctttcttgaatga
+   ==========^  ^  ^^ ^^  ^ ^==========
+    2202     2036     74    none     12     12
+     Errors = 2
+A: ggttttttaactcttctttaacaggctctaaa
+B: ggttttttaattcttctttaataggctctaaa
+   ==========^          ^==========
+    2277     2111     77    none      1      1
+     Errors = 1
+A: attaaatgaacgctcccgcaa
+B: attaaatgaatgctcccgcaa
+   ==========^==========
+    2355     2189     21    none      1      1
+     Errors = 1
+A: gcgtattcaatgctcgcaatg
+B: gcgtattcaacgctcgcaatg
+   ==========^==========
+    2377     2211     24    none      1      1
+     Errors = 1
+A: tagaaagggactctttatagc
+B: tagaaagggattctttatagc
+   ==========^==========
+    2422     2256     22    none     21     21
+     Errors = 3
+A: tttaggggggttcacattgcccatgttgcaaatcacataca
+B: tttaggggggatcacattgcccatgttgcggatcacataca
+   ==========^                  ^^==========
+    2452     2286     32    none      8      8
+     Errors = 2
+A: tcgcccggtttggtgccagtgattaaat
+B: tcgcccggttgggtgcctgtgattaaat
+   ==========^      ^==========
+    2485     2319     61    none      1      1
+     Errors = 1
+A: gtgaatccacacaagaaatga
+B: gtgaatccacgcaagaaatga
+   ==========^==========
+    2547     2381     24    none      1      1
+     Errors = 1
+A: agctctttaagctcttcatat
+B: agctctttaaactcttcatat
+   ==========^==========
+    2572     2406     22    none      1      1
+     Errors = 1
+A: tctcttgaaactctaacgctc
+B: tctcttgaaattctaacgctc
+   ==========^==========
+    2595     2429     27    none      1      1
+     Errors = 1
+A: aaaaacgctttcactctttaa
+B: aaaaacgcttccactctttaa
+   ==========^==========
+    2639     2472     26    none     17     16
+     Errors = 7
+A: atctcattttgattaaaattcgttt-gtttttaaaacg
+B: atctcatttt--ttaaacttggttttcattttaaaacg
+   ==========^^     ^  ^    ^^^==========
+    2666     2499     73    none      1      1
+     Errors = 1
+A: atagctaaaattcttgcattt
+B: atagctaaaaatcttgcattt
+   ==========^==========
+    2740     2573     44    none      1      1
+     Errors = 1
+A: gtgtcgcattggatttagaaa
+B: gtgtcgcattagatttagaaa
+   ==========^==========
+    2785     2618     23    none      1      1
+     Errors = 1
+A: tgcaagaattgaagggcttag
+B: tgcaagaattaaagggcttag
+   ==========^==========
+    2809     2642     32    none      1      1
+     Errors = 1
+A: tatgggctaaggtggggctta
+B: tatgggctaaagtggggctta
+   ==========^==========
+    2844     2677     29    none      3      3
+     Errors = 3
+A: gagacggggctgtttttttagat
+B: gagacggggcgacttttttagat
+   ==========^^^==========
+    2875     2708     62    none      2      2
+     Errors = 2
+A: aagattgatgaaaattttaaga
+B: aagattgatgggaattttaaga
+   ==========^^==========
+    2938     2771     68    none      1      1
+     Errors = 1
+A: caaatgccgcactagaatgcg
+B: caaatgccgcgctagaatgcg
+   ==========^==========
+    3009     2842     39    none      3      3
+     Errors = 3
+A: gcgcgctaacagctttaatgcaa
+B: gcgcgctaaccattttaatgcaa
+   ==========^^^==========
+    3052     2885     20    none      4      4
+     Errors = 2
+A: aacgccccttgattatgggcgtga
+B: aacgccccttaatcatgggcgtga
+   ==========^  ^==========
+    3073     2906     56    none      1      1
+     Errors = 1
+A: gcgctttaaccagctttagcg
+B: gcgctttaacgagctttagcg
+   ==========^==========
+    3151     2984     73    none     22     22
+     Errors = 7
+A: aaactcaagcgattaaattgagtgctatgggtaaagagagcg
+B: aaactcaagcaatcacattaagcgctataggcaaagagagcg
+   ==========^  ^ ^   ^  ^     ^  ^==========
+    3225     3058     34    none      1      1
+     Errors = 1
+A: ttaggtaaggactttttgact
+B: ttaggtaagggctttttgact
+   ==========^==========
+    3274     3107     62    none     15     15
+     Errors = 3
+A: aaggctggatcaaaatgataaagaggatcaagaaa
+B: aaggctggataaaaacgataaagaagatcaagaaa
+   ==========^    ^        ^==========
+    3337     3170     66    none      1      1
+     Errors = 1
+A: ttatcgtggtgggccgcccca
+B: ttatcgtggtaggccgcccca
+   ==========^==========
+    3455     3287     42    none     52     51
+     Errors = 7
+A: ggattgttaaatgcgcgtgttagaaacgattgttgctttaagagagtatcgtaaaagttt
+B: ggattgttaa-tgcgggcgttagaaacgattgctactttaagagaatatcgtaaaagttt
+   ==========^    ^ ^              ^ ^          ^              
+A: ggaagaaagcgt
+B: gaaagaaagcgt
+    ^==========
+    3498     3330     51    none      1      1
+     Errors = 1
+A: gctttacacaaagggcatcaa
+B: gctttacacagagggcatcaa
+   ==========^==========
+    3568     3400     23    none     19     19
+     Errors = 3
+A: cccacacgatagtgagcgtttttgtcaatcccacgcaat
+B: cccacacgattgtaagcgtttttgtcaaccccacgcaat
+   ==========^  ^              ^==========
+    3648     3480     20    none     57     57
+     Errors = 6
+A: gggctaacgaagattttaacgcttaccctcgccctttagaaaaggatttggctttatgtg
+B: gggctaacgaggattttagcgcttacccgcgccctttggaaaaggatttggctttgtgtg
+   ==========^       ^         ^        ^                 ^    
+A: aaaaattaggcgttaat
+B: aaaaatcaggcgttaat
+         ^==========
+    3669     3501     34    none      1      1
+     Errors = 1
+A: gcggtgtttgtgcctaaaatt
+B: gcggtgtttgcgcctaaaatt
+   ==========^==========
+    3769     3601     24    none     66     66
+     Errors = 13
+A: ctatgaagcagagcaacgcctgaaactctatgctcctaaatttttatctagctctttaga
+B: ctatgaagcaaagcaacgcctaaaactctacgcccctgcatttttatcccactctttaga
+   ==========^          ^        ^  ^   ^^         ^^^         
+A: gggagccatgcgtaaagggcattttg
+B: gggggcggtgcgtaaggggcattttg
+      ^  ^^       ^==========
+    3819     3651     54    none     26     26
+     Errors = 6
+A: ggttgttcagatcgtgttaaaaatgtttcatcttgttaatcccact
+B: ggttgttcaggtcgtgttaagattgttccatcttactaatcccact
+   ==========^         ^ ^    ^      ^^==========
+    3887     3719     40    none     14     14
+     Errors = 3
+A: ttttaatcattgagcatttagtcaaagatttgct
+B: ttttaatcatccagcatttagtccaagatttgct
+   ==========^^           ^==========
+    3947     3779     24    none     20     20
+     Errors = 4
+A: catgcgagatcgtgcgcgatgacgataatttggctttaag
+B: catgcgagattgtgcgcgatagcgataatctggctttaag
+   ==========^         ^^       ^==========
+    4009     3841     26    none     38     38
+     Errors = 4
+A: aggaatgtgtatttgaatgccacacaaagaaaacaagccctagccattccaaaagctt
+B: aggaatgtgtgtttgaatgccacagaaagaaaacaagccctagcgatcccaaaagctt
+   ==========^             ^                   ^  ^==========
+    4047     3879     49    none     12     12
+     Errors = 2
+A: aaatccagcaggccatagataagggcgaaaaa
+B: aaatccagcaagccatagataggggcgaaaaa
+   ==========^          ^==========
+    4105     3937     46    none      9      9
+     Errors = 4
+A: tgaaattttagaaaccttggaagtggatt
+B: tgaaattttaaaaaatttagaagtggatt
+   ==========^   ^^  ^==========
+    4178     4010     46    none     27     27
+     Errors = 6
+A: gagcctttaacaatcatagagccaactaacacgctcattttggtggc
+B: gagcctttaaaaaccatagagccggctaacacgctggttttggtggc
+   ==========^  ^         ^^          ^^==========
+    4243     4075     93    none     19     19
+     Errors = 3
+A: tagataatttatgggtgtagtttggaatttttgtggcga
+B: tagataatttgtgggtgtagtttgaaatctttgtggcga
+   ==========^             ^   ^==========
+    4380     4209     87    none     44     41
+     Errors = 8
+A: tttaacgattgactattatttgaaaataaagcgtagaaaatgatttaaaaagcacttggt
+B: tttaacgattaactattatatgaaaa-a--gcgtaggaaatgatttaaaaagttcttggt
+   ==========^        ^      ^ ^^      ^               ^^======
+A: ggcg
+B: ggcg
+   ====
+    4501     4340     78    none     34     44
+     Errors = 14
+A: gctccctatccaaaatcc-atagcctaaaaatgcatgctt-----ta-gtc----atggt
+B: gctccctatc-aaaaccccatagcctaaaaacgcatgcttgaagctaagtcaaaaatggt
+   ==========^    ^  ^            ^        ^^^^^  ^   ^^^^=====
+A: ggtcg
+B: ggtcg
+   =====
+    4583     4422     22    none      4      4
+     Errors = 2
+A: taagcgaccaaaatattgagataa
+B: taagcgaccacaacattgagataa
+   ==========^  ^==========
+    4611     4446     85    none      6      2
+     Errors = 5
+A: tccaactaaacccgtataaaagagtg
+B: tccaactaaa----tttaaaagagtg
+   ==========^^^^ ^==========
+    4703     4540    109    none      7      9
+     Errors = 4
+A: aaggagccacgatgctc--atggtgaccc
+B: aaggagccactacgctcaaatggtgaccc
+   ==========^ ^    ^^==========
+    5056     4895     24    none    244    246
+     Errors = 3
+A: ttttttttaacgcttgtcaagaataattgagaaatattgcggttttttaaaaaatg
+B: ttttttttaatgcttgtcaagaataactgaaaaatattgcggttttttaaaaaatg
+   ==========^               ^   ^               ==========
+Region:        167 .. 4847               1 .. 4684           229 / 4684        4.89%
+Region:       5009 .. 5079            4849 .. 4918             4 / 71          5.63%
+#
+    5203     5395     28    none      -      -
+    5251     5446     26    none     20     23
+     Errors = 11
+A: gtttcacaaaaag----acagatattagtaagcaaacacataat
+B: gtttcacaaagggttttaacgct-ttagtaagcgaacacataat
+   ==========^^ ^^^^ ^^ ^ ^         ^==========
+    5284     5479     50    none      7      7
+     Errors = 4
+A: acacgctata-aagcctgcggtattgga
+B: acacgctatacaatc-ttcggtattgga
+   ==========^  ^ ^ ^==========
+    5431     5626     35    none     97     97
+     Errors = 12
+A: tgttgatcgtagggatcttcacgcctagttccacgccatgctgagctacatgatcgctcg
+B: tgttgatcgtggggatcttcacgcctaattccacgccatgctgagccgcatgatcgctcg
+   ==========^                ^                  ^^            
+A: ctttctttttgtttttagcgagattcattctcaagcccaagttgaataagaattgga
+B: cttttttcttattcttagcgaggttcattctcaagcctaaattgaacaagaattgga
+       ^  ^  ^  ^        ^              ^  ^     ^==========
+    5515     5710     47    none     49     49
+     Errors = 8
+A: ttttagcgctgtaaaaattattgaatgtcgctaaattcacgtattgagaattaagccacg
+B: ttttagcgctatagaaattattgaaggtcgctaaattcacatactgggaattcagccatg
+   ==========^  ^           ^              ^  ^  ^     ^     ^=
+A: aagtgccag
+B: aagtgccag
+   =========
+    5584     5779     26    none     22     22
+     Errors = 4
+A: aagaaatcttattgtttttggtggctttatcgttgataaagt
+B: aagaaatcttgctgtttttggtggttttatcattgataaagt
+   ==========^^            ^      ^==========
+    5611     5806     26    none      1      1
+     Errors = 1
+A: ggacatctgttcctaccccat
+B: ggacatctgtccctaccccat
+   ==========^==========
+    5656     5851     20    none     19     19
+     Errors = 4
+A: acacatcagaggcggagttgaaaaagctggatttgatat
+B: acacatcagaagccgaattgaaaaagctagatttgatat
+   ==========^  ^  ^           ^==========
+    5716     5911     20    none     40     40
+     Errors = 6
+A: aagcatggttgtaatcaaaaaaaccataataccttaacccccatcttcttttttcaccaa
+B: aagcatggttatagtcaaaaaagccgtaataccttaacccccaccttctcttttcaccaa
+   ==========^  ^        ^  ^                 ^     ^==========
+    5773     5968     23    none     37     37
+     Errors = 7
+A: aaaattgtttataccctatttgcacgccgatcccattcatcgcaccgttgttggttt
+B: aaaattgtttgtagcccacttgcacaccgatcccattcatggcaccattgttggttt
+   ==========^  ^  ^ ^      ^              ^     ^==========
+    5797     5992    152    none      1      1
+     Errors = 1
+A: agctgattaagccaacgcgtc
+B: agctgattaatccaacgcgtc
+   ==========^==========
+    5950     6145     49    none      1      1
+     Errors = 1
+A: atggggaattgggcgtgtttg
+B: atggggaattaggcgtgtttg
+   ==========^==========
+    6002     6197     25    none      3      3
+     Errors = 3
+A: ttgtttaaatccttaaggctgcc
+B: ttgtttaaattactaaggctgcc
+   ==========^^^==========
+    6028     6223     32    none      1      1
+     Errors = 1
+A: aatcaagtatcgtgcgcgcca
+B: aatcaagtatggtgcgcgcca
+   ==========^==========
+    6064     6259     29    none      4      4
+     Errors = 2
+A: gcttgatttgatcggcttgagtgc
+B: gcttgatttgctcagcttgagtgc
+   ==========^  ^==========
+    6103     6298     20    none     10     10
+     Errors = 4
+A: caaggctgttatttagggcggttatcgtct
+B: caaggctgttgtttaaagccgttatcgtct
+   ==========^    ^^  ^==========
+    6124     6319     23    none      1      1
+     Errors = 1
+A: cttccacataggcgcaaccgg
+B: cttccacatacgcgcaaccgg
+   ==========^==========
+    6160     6355     27    none     13     13
+     Errors = 4
+A: cccaagtgttagaagtaacccctgcatcaggta
+B: cccaagtgttgttagtaacccccgcatcaggta
+   ==========^^^         ^==========
+    6221     6416     40    none     34     34
+     Errors = 4
+A: acccccattgcggcaagctgccaagtagtttgtgataaattgttttgggatagt
+B: acccccattgtggcaagctgccaagtaatttgtgataaattggcttgggatagt
+   ==========^                ^              ^^==========
+    6268     6463     79    none      7      7
+     Errors = 2
+A: gatcggctagttcaagcatcttggctt
+B: gatcggctagctcaagtatcttggctt
+   ==========^     ^==========
+    6375     6567     33    none     28     25
+     Errors = 6
+A: ttgaaatctttcggcgcgttttgattgctttgcgggttgttaaggctt
+B: ttgaaatcttgcggcgcgttttgattgttttgc---tggttaaggctt
+   ==========^                ^     ^^^ ^==========
+    6409     6601     32    none      1      1
+     Errors = 1
+A: cgatttcttgcgcgtttttga
+B: cgatttcttgggcgtttttga
+   ==========^==========
+    6442     6634     31    none      1      1
+     Errors = 1
+A: cggcgctaaactccgtggcaa
+B: cggcgctaaattccgtggcaa
+   ==========^==========
+    6523     6715    122    none     50     50
+     Errors = 16
+A: acattccctgtcgtatttaaattccacggtgcacccccgtttgagttat-gagcggtatt
+B: acattccctgccgtatctaaaccccacggcgcgcccccgttt-tgtccttgattgtgatt
+   ==========^     ^    ^^      ^  ^         ^^  ^^ ^  ^^ ^^   
+A: tacccatgggc
+B: gacccatgggc
+   ^==========
+    6656     6848     20    none     11     11
+     Errors = 2
+A: cattagtttgtgttgttatttttatagttac
+B: cattagtttgcgttgttattgttatagttac
+   ==========^         ^==========
+    6678     6870     60    none      2      2
+     Errors = 2
+A: ttgttttcctttactatccaaa
+B: ttgttttcctgcactatccaaa
+   ==========^^==========
+    6760     6952     59    none     22     22
+     Errors = 3
+A: tttgataagcttgattaagcgttttaaaattgtcaatggata
+B: tttgataagcctgattaagctttttaaaattctcaatggata
+   ==========^         ^          ^==========
+    6871     7063     29    none     52     52
+     Errors = 9
+A: aattaatggatcttgaatcatgtcctggttggccatcaaaaattacgctttgatccccac
+B: aattaatggaacttgaattatgtcctggttggccctcaaaggttacgctttgttgtccac
+   ==========^       ^               ^     ^^          ^ ^^    
+A: tcttaccaggac
+B: tgttaccaggac
+    ^==========
+    6919     7111     62    none     19     19
+     Errors = 3
+A: cattataggctatcacattccacagccccaccgccgcat
+B: cattataggcgatgacattccacagccctaccgccgcat
+   ==========^  ^              ^==========
+    6982     7174     34    none      1      1
+     Errors = 1
+A: tttcgccaatcagcccttgcg
+B: tttcgccaattagcccttgcg
+   ==========^==========
+    7018     7210     38    none      2      2
+     Errors = 2
+A: ttatcgatcgtggcattgattt
+B: ttatcgatcgcagcattgattt
+   ==========^^==========
+    7057     7249    177    none      1      1
+     Errors = 1
+A: tcgttaccgcttgattgaggt
+B: tcgttaccgcctgattgaggt
+   ==========^==========
+    7244     7426     78     -13     10      0
+     Errors = 10
+A: agagagagagagagagagagtaaaagggtt
+B: agagagagag----------taaaagggtt
+   ==========^^^^^^^^^^==========
+    7339     7521     60    none     17     17
+     Errors = 2
+A: agaatgtattaaaagcattgtagcataaaatcgtttt
+B: agaatgtattcaaagcattgtagcatgaaatcgtttt
+   ==========^               ^==========
+    7419     7596     22    none     20     15
+     Errors = 6
+A: ttttttgcgcgtttgtttgggtggtattggaaagggtttt
+B: ttttttgcgcttttgtttgggtggt-----aaagggtttt
+   ==========^              ^^^^^==========
+    7442     7619     20    none      1      1
+     Errors = 1
+A: gattttgtttcaatggaacgc
+B: gattttgttttaatggaacgc
+   ==========^==========
+    7499     7682     23    none     37     43
+     Errors = 11
+A: taatgataaaagctt-a----a-cagagattttttgct-gcgcgtttttaaaagcgagcg
+B: taatgataaaggcttgattttaacagagattttt-gtttgcgcgtttttaaaaacgagcg
+   ==========^    ^ ^^^^ ^           ^ ^ ^              ^======
+A: gttt
+B: gttt
+   ====
+    7552     7714     43    none     30      9
+     Errors = 21
+A: caaataaaaagcaccccccaaaaaaagagattttagaaaggggggatttt
+B: caaataaaaa-c-cccc--aaaa-----------------gggggatttt
+   ==========^ ^    ^^    ^^^^^^^^^^^^^^^^^==========
+    7625     7780    167    none     30     23
+     Errors = 9
+A: actaaaaagcaagggggcttacatcatgccacccatgcctcccataccgc
+B: actaaaaagc-------cttacatcatgccgcccatgccacccataccgc
+   ==========^^^^^^^             ^        ^==========
+    7793     7948     52    none      1      1
+     Errors = 1
+A: ctttaaacatatccacatact
+B: ctttaaacatgtccacatact
+   ==========^==========
+    7883     8038     74    none     38     38
+     Errors = 5
+A: tcgtgtttttctacttcattcacgaccacaccgccatcataaccggcattgatagcga
+B: tcgtgtttttgcacttcattcacgaccacgccaccatcataaccggcgttgatagcga
+   ==========^^                 ^  ^              ^==========
+    7958     8113     32    none      1      1
+     Errors = 1
+A: catcatcgtgcaaattcaaat
+B: catcatcgtgtaaattcaaat
+   ==========^==========
+    7991     8146     26    none      1      1
+     Errors = 1
+A: ccgcgcgaatgagagccgcac
+B: ccgcgcgaataagagccgcac
+   ==========^==========
+    8030     8185     23    none     13     13
+     Errors = 2
+A: caatcacaataccttcttcaacagccgctttag
+B: caatcacaatgccttcttcaaccgccgctttag
+   ==========^           ^==========
+    8060     8215    161    none      7      7
+     Errors = 2
+A: cgctcaacgcatcatcaacccggtctt
+B: cgctcaacgcgtcatccacccggtctt
+   ==========^     ^==========
+    8230     8385     57    none      9      9
+     Errors = 3
+A: ctctgtctttgacatcatggctatggcct
+B: ctctgtctttaacgtcatcgctatggcct
+   ==========^  ^    ^==========
+    8288     8443     56    none      1      1
+     Errors = 1
+A: caatccttccggctttgccta
+B: caatccttccagctttgccta
+   ==========^==========
+    8348     8503     47    none      4      4
+     Errors = 2
+A: attcttcgctaataacttgaccgc
+B: attcttcgctgatgacttgaccgc
+   ==========^  ^==========
+    8396     8551     65    none      1      1
+     Errors = 1
+A: tttcttttcttctgtccccaa
+B: tttcttttctcctgtccccaa
+   ==========^==========
+    8462     8617    167    none      1      1
+     Errors = 1
+A: tattcaccactagagtcgtta
+B: tattcaccaccagagtcgtta
+   ==========^==========
+    8630     8785     44    none      1      1
+     Errors = 1
+A: tctcagcgtttgttacaaaat
+B: tctcagcgttggttacaaaat
+   ==========^==========
+    8689     8844     48    none     15     15
+     Errors = 4
+A: attgcatgccttctacaacatctagttcatcttca
+B: attgcatgccctctacgacatccaattcatcttca
+   ==========^     ^     ^ ^==========
+    8738     8893    104    none      1      1
+     Errors = 1
+A: cgccgtctttacccacttttt
+B: cgccgtctttgcccacttttt
+   ==========^==========
+    8843     8998     23    none      1      1
+     Errors = 1
+A: ccacttttttgctcgcttttt
+B: ccacttttttactcgcttttt
+   ==========^==========
+    8870     9025     25    none      4      4
+     Errors = 2
+A: gctcattaataatggcttcagcgg
+B: gctcattaatgatcgcttcagcgg
+   ==========^  ^==========
+    8896     9051     33    none      1      1
+     Errors = 1
+A: tccatgcctcgtttcacttca
+B: tccatgcctcttttcacttca
+   ==========^==========
+    8933     9088     38    none      4      4
+     Errors = 2
+A: cagccgtgatgttcctcaaacctt
+B: cagccgtgatatttctcaaacctt
+   ==========^  ^==========
+    8972     9127     23    none      1      1
+     Errors = 1
+A: ccagcacggtcgctgtggtcg
+B: ccagcacggttgctgtggtcg
+   ==========^==========
+    8996     9151     53    none      1      1
+     Errors = 1
+A: catcgccggcagcatcagcgg
+B: catcgccggctgcatcagcgg
+   ==========^==========
+    9050     9205     86    none      1      1
+     Errors = 1
+A: ccatgttagctaccgggcaac
+B: ccatgttagccaccgggcaac
+   ==========^==========
+    9167     9322     34    none     31     31
+     Errors = 3
+A: ggatcaacacgttcctgcctcttggccccatggttactttaacagcgtcat
+B: ggatcaacacattcctgcctcttggtcccatggttactttgacagcgtcat
+   ==========^              ^              ^==========
+    9215     9370    128    none     14     14
+     Errors = 2
+A: ccttcaaataaaaggtttctcgcgctatctgaaa
+B: ccttcaaatagaaggtttctcgcactatctgaaa
+   ==========^            ^==========
+    9344     9499     20    none      1      1
+     Errors = 1
+A: ctgtatgacaacaagagcctg
+B: ctgtatgacagcaagagcctg
+   ==========^==========
+    9365     9520     22    none      1      1
+     Errors = 1
+A: agcccacaatgcctagaatgt
+B: agcccacaatacctagaatgt
+   ==========^==========
+    9388     9543    141    none      1      1
+     Errors = 1
+A: tctagttctagcaccatgtat
+B: tctagttctaacaccatgtat
+   ==========^==========
+    9530     9685     83    none      1      1
+     Errors = 1
+A: aaggcttttccttagcgttat
+B: aaggcttttctttagcgttat
+   ==========^==========
+    9628     9783     53    none     15     15
+     Errors = 3
+A: ctcctaatggctgaaacttcatattagttctccta
+B: ctcctaatggttgaaacttcatttcagttctccta
+   ==========^           ^ ^==========
+    9682     9837     46    none      1      1
+     Errors = 1
+A: attgttattaagcgacataac
+B: attgttattacgcgacataac
+   ==========^==========
+    9747     9902     50    none     19     19
+     Errors = 6
+A: agccataaaaacaaagctaataatataactataaggatt
+B: agccataaaaccaaacataagattataattataaggatt
+   ==========^    ^^   ^ ^     ^==========
+    9838     9993     24    none     41     41
+     Errors = 6
+A: tttaaaaatacaaggattagagaaagggg-cgttattaacaaaccttattttaagatttt
+B: tttaaaaatataaggattagaaaaagggggcgttatcaacaaacctt-tttgaagatttt
+   ==========^          ^       ^      ^          ^   ^========
+A: at
+B: at
+   ==
+    9894    10050     49    none     32     33
+     Errors = 15
+A: tgagtataattcatt-caagcgagttaaaacaagaaagc-aagatgaagaaagc
+B: tgagtataatcccttttgagaaagtcaaa-ctaaaaagcccatttgaagaaagc
+   ==========^ ^  ^^^  ^^   ^   ^ ^ ^     ^^ ^^==========
+    9956    10112     27    none     13     13
+     Errors = 2
+A: atcgccttttgcaaacgatagacattgtagaag
+B: atcgccttttacaaacgatagatattgtagaag
+   ==========^           ^==========
+   10007    10163     57    none     24     24
+     Errors = 4
+A: ctcttatgtgaatttgaggaaatcaggttctagctacatggctt
+B: ctcttatgtggatttgaggaaatcaggttcgaattacatggctt
+   ==========^                   ^ ^^==========
+   10080    10236     58    none     16     16
+     Errors = 2
+A: cgtcaatcaaattaaagggttttaccattgctttgg
+B: cgtcaatcaagttaaagggttttactattgctttgg
+   ==========^              ^==========
+   10139    10295     49    none      1      1
+     Errors = 1
+A: cgtttgaaaagctttcgtttg
+B: cgtttgaaaaactttcgtttg
+   ==========^==========
+   10189    10345    136    none      1      1
+     Errors = 1
+A: ttcaatatagttttagagtat
+B: ttcaatatagctttagagtat
+   ==========^==========
+   10369    10525     42    none     44     44
+     Errors = 5
+A: agggcttagcctagagagtatcaaagcgtttaaattaggcttatgcacgaatagaattga
+B: agggcttagcatggagagcatcaaagcgtttaagttaggcttatgcacgaataaaattga
+   ==========^ ^     ^              ^                   ^======
+A: ttac
+B: ttac
+   ====
+   10424    10580     23    none     13     13
+     Errors = 4
+A: ataaggacaagctcattgaattaggcgtgctag
+B: ataaggacaaattgattgaattgggcgtgctag
+   ==========^^ ^        ^==========
+   10454    10610     53    none      7      7
+     Errors = 4
+A: agagcgataacgatcagaaaacctatt
+B: agagcgataaagaggataaaacctatt
+   ==========^  ^^ ^==========
+   10508    10664     70    none      1      1
+     Errors = 1
+A: atagccctagcgctcaagtgg
+B: atagccctagtgctcaagtgg
+   ==========^==========
+   10579    10735     21    none      1      1
+     Errors = 1
+A: tcgccccaaagtaagcttttt
+B: tcgccccaaaataagcttttt
+   ==========^==========
+   10601    10757     35    none      1      1
+     Errors = 1
+A: ataaatccagtttgctctatg
+B: ataaatccagcttgctctatg
+   ==========^==========
+   10667    10823    110    none     31     31
+     Errors = 3
+A: aagaacacatctataaacaaaagcaagtcattgtaacagaggggtatttgg
+B: aagaacacatttataaacaaaagcaggtcattgtaacagaagggtatttgg
+   ==========^              ^              ^==========
+   10778    10934     38    none      1      1
+     Errors = 1
+A: aaggcgatcccgaaatccttt
+B: aaggcgatccagaaatccttt
+   ==========^==========
+   10826    10982     20    none     10     10
+     Errors = 4
+A: aggcagggcgaaacgcagcctataaagcga
+B: aggcagggcggaatgcggcttataaagcga
+   ==========^  ^  ^  ^==========
+   10868    11024     26    none     22     22
+     Errors = 4
+A: gcttgatgttggctaaagagcaaaggaggggaggggtgattt
+B: gcttgatgttagctaaagagcaaaggaaagggggggtgattt
+   ==========^                ^^  ^==========
+   10898    11054     21    none      4      4
+     Errors = 2
+A: aaaacaacctggatccagcggata
+B: aaaacaacctagacccagcggata
+   ==========^  ^==========
+   11000    11156     35    none     81     81
+     Errors = 11
+A: gatcgctaatggccagattgaaaccttaaaaaattggctatcgcaccccatggcttttat
+B: gatcgctaatcatcagattgaaactttaaaaaattggctatcgcgccccatagctttcat
+   ==========^^^           ^                   ^      ^     ^  
+A: tgagtttgttttaaggcgcatggcggattcctatcttttag
+B: tgaatttgttttaaggcacatggcgggttcttatcttttag
+      ^             ^        ^   ^==========
+   11036    11192     23    none      1      1
+     Errors = 1
+A: aagataaggctcttaaagaaa
+B: aagataaggcccttaaagaaa
+   ==========^==========
+   11060    11216     25    none      1      1
+     Errors = 1
+A: tagggtttttaaaaaactttt
+B: tagggtttttgaaaaactttt
+   ==========^==========
+   11087    11243     23    none      2      2
+     Errors = 2
+A: cttttacaaagcgaatacaagc
+B: cttttacaaaatgaatacaagc
+   ==========^^==========
+   11111    11267     40    none      1      1
+     Errors = 1
+A: taatcgctacccttttgcaag
+B: taatcgctacgcttttgcaag
+   ==========^==========
+   11156    11312     32    none      5      5
+     Errors = 2
+A: attagagagcgagtctcttttcagc
+B: attagagagccagtttcttttcagc
+   ==========^   ^==========
+   11227    11383     27    none     39     39
+     Errors = 6
+A: aaacagaaaaacccaatcgccctcaaaggtttgcgcatgtttctagcgcgcccagtttg
+B: aaacagaaaagcctaatcgccctcaaaagttcgcgcatgtttctagcatgcccagtttg
+   ==========^  ^             ^   ^               ^^==========
+   11306    11462     50    none     52     52
+     Errors = 5
+A: tagaaaaattagtgatccgctatcttttagaagacagaagcttgttggatttagcggtgg
+B: tagaaaaattggtgatccgctaccttttagaagacagaagcctattggatttagcggtgg
+   ==========^           ^                  ^ ^                
+A: gctatatccata
+B: gttatatccata
+    ^==========
+   11372    11528    129    none     16     16
+     Errors = 2
+A: ttgacgctttgtgtcaagaaaaattagacgacccta
+B: ttgacgctttatgtcaagaaaaattggacgacccta
+   ==========^              ^==========
+   11508    11664     21    none      7      7
+     Errors = 3
+A: ccctaaaagctcgctcccttttagcga
+B: ccctaaaagcccgctttcttttagcga
+   ==========^    ^^==========
+   11539    11695     54    none     10     10
+     Errors = 2
+A: aaaatgatctgtttaaaaaaggctcgccag
+B: aaaatgatctttttaaaaagggctcgccag
+   ==========^        ^==========
+   11617    11773     68    none     24     24
+     Errors = 4
+A: ccatatgaaaaagattaaagctttagccttattcagtggggggt
+B: ccatatgaaacaaataaaagctttagccttatttagtggggggt
+   ==========^ ^  ^                 ^==========
+   11707    11863     56    none     22     22
+     Errors = 3
+A: taaccgctttgcactttaatatagggtttggggggaataaag
+B: taaccgctttacacttcaatatagggtttggagggaataaag
+   ==========^     ^              ^==========
+   11764    11920     29    none      1      1
+     Errors = 1
+A: ttggggctaagctcttggtgt
+B: ttggggctaaactcttggtgt
+   ==========^==========
+   11794    11950     41    none      1      1
+     Errors = 1
+A: gagagcagttttttaacgatg
+B: gagagcagttctttaacgatg
+   ==========^==========
+   11836    11992     20    none      1      1
+     Errors = 1
+A: gctatgggaaatatttcaacc
+B: gctatgggaagtatttcaacc
+   ==========^==========
+   11857    12013     48    none      1      1
+     Errors = 1
+A: cttgcattgactgccatgcca
+B: cttgcattgattgccatgcca
+   ==========^==========
+   11908    12064    107    none      3      3
+     Errors = 2
+A: gcttgaattgaacgcggattttg
+B: gcttgaattggatgcggattttg
+   ==========^ ^==========
+   12029    12185     20    none     14     14
+     Errors = 4
+A: gcgaagaggcgcgttttgatcccgttttagaccg
+B: gcgaagaggctcgttttgatcttattttagaccg
+   ==========^          ^^^==========
+   12091    12247     49    none     42     42
+     Errors = 10
+A: aacgcaagcaggtggtaaaaaaccgcaatttttagatgagttgttattgcgacccatgag
+B: aacgcaagcaagcggtgaaaaaccgcaatttttagacgaattgctcttaaggcccatgag
+   ==========^ ^   ^                   ^  ^   ^ ^  ^^ ^========
+A: cg
+B: cg
+   ==
+   12151    12307     32    none     11     11
+     Errors = 3
+A: aaaaagggttttgttgatagagaaaagcttt
+B: aaaaagggttgggttgatagggaaaagcttt
+   ==========^^        ^==========
+   12187    12343     56    none      4      4
+     Errors = 3
+A: gtagggggcgaagc-aggcaattgc
+B: gtagggggcg-tgctaggcaattgc
+   ==========^^  ^==========
+   12274    12430     47    none     31     31
+     Errors = 4
+A: agccaggtggagggtgtttgcttacagacattcaagtgagcaataagatta
+B: agccaggtggggggtgcttgcttacggacattcaagtgagtaataagatta
+   ==========^     ^        ^              ^==========
+   12323    12479     32    none      2      2
+     Errors = 2
+A: tgtttgaagacagcgtgattgt
+B: tgtttgaagatggcgtgattgt
+   ==========^^==========
+   12373    12529     38    none     18     18
+     Errors = 2
+A: ttattttgtcttaccccataacgctcgcttggtggtgg
+B: ttattttgtcctaccccataacgctcgtttggtggtgg
+   ==========^                ^==========
+   12419    12575     28    none      8      8
+     Errors = 3
+A: accataaattggatattcaacacccctt
+B: accataaattagacattgaacacccctt
+   ==========^  ^   ^==========
+   12463    12619     26    none     16     16
+     Errors = 4
+A: agattgaattactaaactgtaaaggccctttgagtt
+B: agattgaattgctaggctgtaaaggtcctttgagtt
+   ==========^   ^^         ^==========
+   12517    12673     60    none     28     28
+     Errors = 4
+A: ataaaaacgctagcaaagaagataaagaattagccggccgtatcgctt
+B: ataaaaacgccagccaagaagataaagaattggccggtcgtatcgctt
+   ==========^   ^                ^     ^==========
+   12592    12748     32    none     15     15
+     Errors = 2
+A: tcaaataggggatgaaaagcgcgagctttaccctt
+B: tcaaatagggaatgaaaagcgcgaactttaccctt
+   ==========^             ^==========
+   12625    12781     20    none      1      1
+     Errors = 1
+A: acgctagggaatatttgttcg
+B: acgctagggagtatttgttcg
+   ==========^==========
+   12657    12814    188    none     12     13
+     Errors = 3
+A: cttgaaaggg-agtttttgagggttttaggggt
+B: cttgaaaggggagtttttgagaattttaggggt
+   ==========^          ^^==========
+   12878    13035     21    none     33     33
+     Errors = 5
+A: ccctaaggggctattccctttttatatcccctatgaaaattgttatttggggc
+B: ccctaaggggttgttccctttttatatcccgtatgagaattgctatttggggc
+   ==========^ ^                 ^     ^     ^==========
+   12900    13057     30    none      1      1
+     Errors = 1
+A: ttgttgcattgataaccataa
+B: ttgttgcattaataaccataa
+   ==========^==========
+   12931    13088     54    none      1      1
+     Errors = 1
+A: cctagtgatctagatttaagg
+B: cctagtgatccagatttaagg
+   ==========^==========
+   13013    13170     50    none     28     28
+     Errors = 5
+A: atgttaaatacgatgaaaaacatttggttgcaaagctcgtgcctaatt
+B: atgttaaatatgatgaaaaacatttggtaaccaagcttgtgcctaatt
+   ==========^                 ^^ ^     ^==========
+   13073    13230     26    none     10     10
+     Errors = 3
+A: gcaatttagacgccgcaaaactctcccaaa
+B: gcaatttagaagccacaaagctctcccaaa
+   ==========^   ^    ^==========
+   13100    13257     29    none      1      1
+     Errors = 1
+A: atttttcaccggcttctaaag
+B: atttttcaccagcttctaaag
+   ==========^==========
+   13130    13287     38    none      1      1
+     Errors = 1
+A: agaaattgcccattgacaggt
+B: agaaattgcctattgacaggt
+   ==========^==========
+   13169    13326     24    none      1      1
+     Errors = 1
+A: gtaacaatttctctatcgcgt
+B: gtaacaatttttctatcgcgt
+   ==========^==========
+   13211    13368     62    none     18     18
+     Errors = 3
+A: tttgaaatacaataatgtttggcacatttatggggaaa
+B: tttgaaatacgacaatgtttggcacatctatggggaaa
+   ==========^ ^              ^==========
+   13284    13441     22    none     11     11
+     Errors = 3
+A: tagattggattaaagaccaattaaaccacca
+B: tagattggatcaaaaaccaactaaaccacca
+   ==========^   ^     ^==========
+   13307    13464     44    none      1      1
+     Errors = 1
+A: aagatggcgactctttagagg
+B: aagatggcgattctttagagg
+   ==========^==========
+   13373    13530     41    none     22     22
+     Errors = 4
+A: ataatttccccactaaaatgatttttgcaataggggctaccc
+B: ataatttccctaccaaaatgatttttgcgattggggctaccc
+   ==========^  ^              ^  ^==========
+   13415    13572     23    none      1      1
+     Errors = 1
+A: agcattttttgcaaaaaggcg
+B: agcattttttacaaaaaggcg
+   ==========^==========
+   13439    13596     23    none      1      1
+     Errors = 1
+A: aggtggtgatcgttgcttaca
+B: aggtggtgattgttgcttaca
+   ==========^==========
+   13463    13620     45    none      1      1
+     Errors = 1
+A: atttacaatacagttttgaaa
+B: atttacaatatagttttgaaa
+   ==========^==========
+   13509    13666     43    none      1      1
+     Errors = 1
+A: cgccctacaagccaaagaaca
+B: cgccctacaaaccaaagaaca
+   ==========^==========
+   13590    13747     70    none     38     38
+     Errors = 7
+A: aaatcgtagaatagtaaggcttttacactctttggctttgctttttta-cccttttaaa
+B: aaatcgtagagtagtaaggctttt-ttctcttcagctttgcttttttaccccttttaaa
+   ==========^             ^^^     ^^              ^==========
+   13670    13827     21    none     10     10
+     Errors = 4
+A: ttgagataataaagac-ttataaagttaatt
+B: ttgagataattaa-accttagaaagttaatt
+   ==========^  ^  ^   ^==========
+   13700    13857     91    none      9      9
+     Errors = 2
+A: aaattaaacagaagggttttgatgtccgc
+B: aaattaaacaaaagggttatgatgtccgc
+   ==========^       ^==========
+   13792    13949     80    none      1      1
+     Errors = 1
+A: tttttaacgccctagaagccc
+B: tttttaacgctctagaagccc
+   ==========^==========
+   13897    14054     50    none     25     25
+     Errors = 3
+A: atgtgtggaggaatttggaccggtggaaagagatcttattcacga
+B: atgtgtggagaaatttagaccggtggaaagagattttattcacga
+   ==========^     ^                 ^==========
+   13995    14152     65    none     48     48
+     Errors = 4
+A: tctttaaagctccgagtttagcgaattggtttatgggaattttttaatgattatcctgtc
+B: tctttaaagccccgagtttggcgaattggtttatgggagttttttaatgattatcctctc
+   ==========^        ^                  ^                  ^==
+A: agcgagcg
+B: agcgagcg
+   ========
+   14073    14230     20    none     13     13
+     Errors = 2
+A: tgaacgctaagtcttatttgatttctgtttttg
+B: tgaacgctaaatcttatttgatctctgtttttg
+   ==========^           ^==========
+   14094    14251     20    none      1      1
+     Errors = 1
+A: cgccttttatcttgctccctt
+B: cgccttttattttgctccctt
+   ==========^==========
+   14115    14272     35    none      1      1
+     Errors = 1
+A: ggattgatttgttgagcgctt
+B: ggattgatttattgagcgctt
+   ==========^==========
+   14151    14308     32    none      1      1
+     Errors = 1
+A: ggtttttagcgctctttagcg
+B: ggtttttagcactctttagcg
+   ==========^==========
+   14202    14359     45    none     19     19
+     Errors = 4
+A: ttgatgaagacattgcagatattatcgtggctaaaagca
+B: ttgatgaagatattgcagatattattatcgctaaaagca
+   ==========^              ^^ ^==========
+   14248    14405     35    none      1      1
+     Errors = 1
+A: tagagcgtagaatgttagaaa
+B: tagagcgtaggatgttagaaa
+   ==========^==========
+   14284    14441     86    none      1      1
+     Errors = 1
+A: tcaaacaaaaggtttcaaact
+B: tcaaacaaaaagtttcaaact
+   ==========^==========
+   14371    14528     44    none      1      1
+     Errors = 1
+A: atgagcatttcttgctcacta
+B: atgagcattttttgctcacta
+   ==========^==========
+   14416    14573     50    none      1      1
+     Errors = 1
+A: tccgtttagaaggggttagct
+B: tccgtttagagggggttagct
+   ==========^==========
+   14485    14642     26    none     19     19
+     Errors = 3
+A: atcttttcaccgagcgccagatggcgttggattctttag
+B: atcttttcactgagcgccaaatggcgttagattctttag
+   ==========^        ^        ^==========
+   14512    14669     27    none      1      1
+     Errors = 1
+A: tcgtggcgcgccttgtggtta
+B: tcgtggcgcgtcttgtggtta
+   ==========^==========
+   14563    14720     20    none     24     24
+     Errors = 5
+A: taaaattgatcaccaacaaaacattcaatctgattctcaatact
+B: taaaattgattataaacaaagcattcaatctgactctcaatact
+   ==========^ ^^      ^            ^==========
+   14617    14774     69    none     34     34
+     Errors = 4
+A: tgcaagcgattttgaatcaatttgaaaacaaagaagtgtatgaaaatcagtatt
+B: tgcaagcgatcttgaatcagtttgaaaataaagaagtgtatgagaatcagtatt
+   ==========^        ^        ^              ^==========
+   14704    14861     80    none     18     18
+     Errors = 3
+A: gaaaaaatctctcatgcatgctaatagggaaaatttta
+B: gaaaaaatctttcatgcacgctaatagagaaaatttta
+   ==========^       ^        ^==========
+   14809    14966     23    none     25     25
+     Errors = 3
+A: agctcaaaaattatgcccccaaactcttaagctccaaagaggttt
+B: agctcaaaaactatgcccccaaactcttaaactctaaagaggttt
+   ==========^                   ^   ^==========
+   14870    15027     94    none     38     38
+     Errors = 5
+A: atttttatgcggaatacattaatgggtttgatctccccttaaaacccttagtaggggg
+B: atttttatgcagaatatattaatgggtttgaactccctttaaaacccctagtaggggg
+   ==========^     ^              ^     ^         ^==========
+   14965    15122     54    none      1      1
+     Errors = 1
+A: aaaaaacctacaaccgcttga
+B: aaaaaacctataaccgcttga
+   ==========^==========
+   15022    15179     20    none      3      3
+     Errors = 2
+A: ttctatagcgatcggagcgcttt
+B: ttctatagcggtgggagcgcttt
+   ==========^ ^==========
+   15086    15243     46    none     44     44
+     Errors = 7
+A: tataccaagaaacgcctttagatattatcttctctatagagcctatgagtgtgcataaaa
+B: tataccaagagacgcctttggatattatcttttccatagagcctatgagcgtcaataaaa
+   ==========^        ^           ^  ^              ^  ^^======
+A: cgct
+B: cgct
+   ====
+   15139    15296     30    none      7      7
+     Errors = 2
+A: ttagcatgtccaatctcgttaaaaacg
+B: ttagcatgtctaatcttgttaaaaacg
+   ==========^     ^==========
+   15188    15345     26    none     19     19
+     Errors = 4
+A: ataccaagaactggtcaaaaccaaacgcctatccatgca
+B: ataccaagaattagtcaaaaccaaacgattatccatgca
+   ==========^ ^              ^^==========
+   15266    15423     25    none     52     52
+     Errors = 7
+A: cgccctaaacattcttatcaaagcccctagtttagagaatttagacgctcaaacaagctt
+B: cgccctaaacgttcttatcaaagcccccagtttggaggatttagacgctcaaaccagctt
+   ==========^                ^     ^   ^                ^     
+A: ggttttagggct
+B: aattttagggct
+   ^^==========
+   15292    15449     32    none      1      1
+     Errors = 1
+A: ttaaagaaaatttagtgggcg
+B: ttaaagaaaacttagtgggcg
+   ==========^==========
+   15325    15482     35    none      1      1
+     Errors = 1
+A: ttggcttgaagggggggtatt
+B: ttggcttgaaaggggggtatt
+   ==========^==========
+   15361    15518     36    none      1      1
+     Errors = 1
+A: aacgcatccacttaaaccacc
+B: aacgcatccatttaaaccacc
+   ==========^==========
+   15409    15566    125    none     12     12
+     Errors = 2
+A: ctctaaagccttagcgtgtttaatggtgtttg
+B: ctctaaagccctagcgtgtttgatggtgtttg
+   ==========^          ^==========
+   15553    15710     24    none     19     19
+     Errors = 4
+A: aagtgagccacaagaacgccaaagaaatcgccagagtga
+B: aagtgagccataataacgctaaagaaattgccagagtga
+   ==========^  ^     ^        ^==========
+   15595    15752     25    none     18     18
+     Errors = 5
+A: gcatactttaatcataggggctactgggagcggtaaaa
+B: gcatactttagttataggggcaaccggaagcggtaaaa
+   ==========^ ^        ^  ^  ^==========
+   15640    15797     32    none     20     20
+     Errors = 2
+A: ctgattagctttttaatgatgagcgctttgaaataccaaa
+B: ctgattagctatttaatgatgagcgctttaaaataccaaa
+   ==========^                  ^==========
+   15701    15858     40    none     29     29
+     Errors = 5
+A: tagcttttgataggatgcaggggctgtattctttcacaaaattttttaa
+B: tagcttttgacaggatgcaagggttgtattctttcaccgaattttttaa
+   ==========^        ^   ^             ^^==========
+   15742    15899     36    none      1      1
+     Errors = 1
+A: aatcttttagcatcaacccct
+B: aatcttttagtatcaacccct
+   ==========^==========
+   15814    15971     32    none     36     36
+     Errors = 3
+A: tttgcagaatctagaatttttgcaatccttctttttgagcatgtttgatcttgccc
+B: tttgcagaatttagaatttttgcaatccttttttttgagcatgttggatcttgccc
+   ==========^                   ^              ^==========
+   15869    16026     34    none     23     23
+     Errors = 3
+A: aagaagccttggaagatatgaatgcgatttctagcgcgattaa
+B: aagaagccttagaagacatgaatgcgatttctggcgcgattaa
+   ==========^     ^               ^==========
+   15925    16082     23    none     22     22
+     Errors = 4
+A: ccttataccctaaagcttttagtttgctagactttaaagaaa
+B: ccttataccccaaagattttagtttgctggattttaaagaaa
+   ==========^    ^            ^  ^==========
+   15967    16124     50    none     19     19
+     Errors = 2
+A: ttaaaagaacttcatctaaccaattgggtttgagtttag
+B: ttaaaagaacctcatctaaccaattgggcttgagtttag
+   ==========^                 ^==========
+   16018    16175     38    none      1      1
+     Errors = 1
+A: ctttgaatgatgcgttcaact
+B: ctttgaatgacgcgttcaact
+   ==========^==========
+   16075    16232     29    none     19     19
+     Errors = 4
+A: tgataaacctggatactatcacccaaaatcctaaagact
+B: tgataaacctagatgcgatcacccaaaaccctaaagact
+   ==========^   ^ ^           ^==========
+   16132    16289     38    none     28     28
+     Errors = 4
+A: tagcctattatttgttttataaaatcttagaagaatccaggaaaaacg
+B: tagcctattacttgttttataagatcttagaagagtctaggaaaaacg
+   ==========^           ^           ^  ^==========
+   16171    16328     26    none      1      1
+     Errors = 1
+A: ttttagacgagtttaaatcct
+B: ttttagacgaatttaaatcct
+   ==========^==========
+   16201    16358     35    none      4      4
+     Errors = 2
+A: aaaacgatttattgaacactaaaa
+B: aaaacgatttgttaaacactaaaa
+   ==========^  ^==========
+   16237    16394     35    none      1      1
+     Errors = 1
+A: cgcaagccagaaaagctaatg
+B: cgcaagccaggaaagctaatg
+   ==========^==========
+   16303    16460     38    none     31     31
+     Errors = 4
+A: ccttgcaagatatttaccaa-ttaagcggggttaaaaacgctcatagttttt
+B: ccttgcaagacatttaccaactta-gcggggttaaaaacgcccatagttttt
+   ==========^         ^   ^                ^==========
+   16342    16499     20    none      1      1
+     Errors = 1
+A: tcattttgtacccgcaaaaaa
+B: tcattttgtatccgcaaaaaa
+   ==========^==========
+   16363    16520     63    none      1      1
+     Errors = 1
+A: acgctagggagttgaaacaca
+B: acgctagggaattgaaacaca
+   ==========^==========
+   16427    16584     43    none      1      1
+     Errors = 1
+A: aaacacccctttgtatgccag
+B: aaacacccctctgtatgccag
+   ==========^==========
+   16474    16631     24    none      4      4
+     Errors = 2
+A: gtaacgggagctctaacatgattg
+B: gtaacgggagttccaacatgattg
+   ==========^  ^==========
+   16508    16665     22    none     10     10
+     Errors = 3
+A: gagtttggagagtttggggcgttatttgaa
+B: gagtttggagggcttggggtgttatttgaa
+   ==========^ ^      ^==========
+   16548    16705     42    none     18     18
+     Errors = 5
+A: tctttaattcggattctagccatgtgagtaaagtgaaa
+B: tctttaattcagattccagtcatgtcaataaagtgaaa
+   ==========^     ^  ^     ^ ^==========
+   16653    16795     83    none     63     48
+     Errors = 22
+A: cagagtggcgcgagaaacttttgaggagctagttttaaaaagttagttttgttttaaaaa
+B: cagagtggcgtgagaaacttttgaagagttagttt-aaaaagtcagttt-----caa---
+   ==========^             ^   ^      ^       ^     ^^^^^^  ^^^
+A: gttaatactattttgaagcactc
+B: -t-a-t-c-gt-gtgaagcactc
+   ^ ^ ^ ^ ^^ ^^==========
+   16786    16928     42    none     50     50
+     Errors = 5
+A: ttaccctaaaatcctattgcataggtctaaataagagcttagggatcattttagccataa
+B: ttaccctaaagtcctattgcataggtccaaataagagcttggggatcattttaaccatag
+   ==========^                ^            ^            ^     ^
+A: aaagcttatg
+B: aaagcttatg
+   ==========
+   16847    16992    162    none     19     22
+     Errors = 7
+A: acgctcaaat-agtcaagcaaa-aa-aatatcaattaaaagg
+B: acgctcaaattagtcaagcaaacaagcaaaaaaattaaaagg
+   ==========^           ^  ^^ ^ ^^==========
+   17010    17155     59    none      1      1
+     Errors = 1
+A: aacaattcactaagaaaaaaa
+B: aacaattcacgaagaaaaaaa
+   ==========^==========
+   17100    17245     29    none     31     31
+     Errors = 5
+A: ctttatacgccagagattaccagacttctttaggggtattagatcaagccg
+B: ctttatacgcaagggattataagacttctttaggggtattggatcaagccg
+   ==========^  ^     ^^                   ^==========
+   17142    17287     47    none     13     13
+     Errors = 2
+A: ttgataaaacgcaaagcgcttttacaagagggg
+B: ttgataaaacccaaagcgctttcacaagagggg
+   ==========^           ^==========
+   17190    17335    107    none      1      1
+     Errors = 1
+A: atgataatgtgcgcgcttatg
+B: atgataatgtacgcgcttatg
+   ==========^==========
+   17313    17458     50    none     16     16
+     Errors = 3
+A: aattcaaccgtgcgaacgaacgccagcgcagggcta
+B: aattcaaccgcgcgaatgaacgccaacgcagggcta
+   ==========^     ^        ^==========
+   17364    17509     46    none      1      1
+     Errors = 1
+A: ccattaaagagatcgattcta
+B: ccattaaagaaatcgattcta
+   ==========^==========
+   17412    17557     59    none      2      2
+     Errors = 2
+A: cgctctagggtggaagtgagcg
+B: cgctctagggcagaagtgagcg
+   ==========^^==========
+   17478    17623     23    none      7      7
+     Errors = 2
+A: aagcttatcagggcttacttaacccgg
+B: aagcttatcaaggcttgcttaacccgg
+   ==========^     ^==========
+   17502    17647     30    none      1      1
+     Errors = 1
+A: tttcgtatctctcagggttgt
+B: tttcgtatctttcagggttgt
+   ==========^==========
+   17533    17678     55    none      1      1
+     Errors = 1
+A: aaatggggatgagaataaggg
+B: aaatggggataagaataaggg
+   ==========^==========
+   17595    17740    116    none      7      7
+     Errors = 3
+A: aaagcccttttgtagcccaagacttgg
+B: aaagccctttcgtggctcaagacttgg
+   ==========^  ^  ^==========
+   17712    17857     20    none      1      1
+     Errors = 1
+A: tttttatgatcgattcggttt
+B: tttttatgattgattcggttt
+   ==========^==========
+   17736    17881     47    none      4      4
+     Errors = 3
+A: ataacgtgagtatagccttgccca
+B: ataacgtgagcgtggccttgccca
+   ==========^^ ^==========
+   17808    17953     56    none     25     25
+     Errors = 4
+A: aaaatttcactctcaaagatggagaaaaagtaacgccctttgaca
+B: aaaatttcaccctcaaggacggagaaaaagtaacaccctttgaca
+   ==========^     ^  ^              ^==========
+   17865    18010     77    none      1      1
+     Errors = 1
+A: tcaggaagcagttgccctaca
+B: tcaggaagcaattgccctaca
+   ==========^==========
+   17970    18115     32    none     28     28
+     Errors = 3
+A: actattatttggggtttgttggagggttagtaacttccttgtattcag
+B: actattatttagggtttgttggcgggttagtaacttcgttgtattcag
+   ==========^           ^              ^==========
+   18008    18153     39    none      6      6
+     Errors = 2
+A: ttgcagacactagaagcacgagcatt
+B: ttgcagacaccagaaacacgagcatt
+   ==========^    ^==========
+   18048    18193    125    none      1      1
+     Errors = 1
+A: tcatgcgcattaaaaacaaag
+B: tcatgcgcatcaaaaacaaag
+   ==========^==========
+   18196    18341     31    none     23     23
+     Errors = 3
+A: aattgctttctgggtttgtagcagccccacaaatcttttgctc
+B: aattgctttcagggtttgtaacagccccacaagtcttttgctc
+   ==========^         ^           ^==========
+   18237    18382     25    none     10     10
+     Errors = 2
+A: atattttatacgtgcgcagttttaaaaacg
+B: atattttatatgtgcgcagctttaaaaacg
+   ==========^        ^==========
+   18296    18440     31    none     34     33
+     Errors = 6
+A: gttttgagtcgtttaaaatgatttcaaaacccccaccaaaggaa-ttttagtttt
+B: gttttgagtcatttaaaatgattccaaaaccccc-c-aaagaaatttttagtttt
+   ==========^            ^          ^ ^    ^  ^==========
+   18328    18472     93    none      1      1
+     Errors = 1
+A: ggcattaaacgcaaacacgat
+B: ggcattaaacacaaacacgat
+   ==========^==========
+   18440    18584     53    none     19     19
+     Errors = 2
+A: ttacgagtttgcataaaaataacgagttacaattgttgt
+B: ttacgagtttacataaaaataacgagttgcaattgttgt
+   ==========^                 ^==========
+   18494    18638     41    none      1      1
+     Errors = 1
+A: cggtcaatgtttttaagatcc
+B: cggtcaatgtctttaagatcc
+   ==========^==========
+   18536    18680     35    none      1      1
+     Errors = 1
+A: gcaatctcaccatcattagcc
+B: gcaatctcactatcattagcc
+   ==========^==========
+   18611    18755     35    none     40     40
+     Errors = 6
+A: tcgttgaggggct-aatcattataagagaactcaccattcccttgattgatatgaaaaaa
+B: tcgttgaggg-cttgatcattataagagagctcaccattcctttgattgacatgaaaaaa
+   ==========^  ^^              ^           ^        ^=========
+A: t
+B: t
+   =
+   18668    18812     26    none     22     22
+     Errors = 3
+A: gccaaaacaaaaacaaggatttacgcccttataggatagaaa
+B: gccaaaacaagagcaaggatttacgcccttacaggatagaaa
+   ==========^ ^                  ^==========
+   18704    18848     26    none     10     10
+     Errors = 2
+A: aaggcgaagatgatattgttatgatttgtg
+B: aaggcgaagacgatattgtcatgatttgtg
+   ==========^        ^==========
+   18731    18875     86    none      1      1
+     Errors = 1
+A: ctcgctggactataggggtta
+B: ctcgctggaccataggggtta
+   ==========^==========
+   18821    18965     35    none      4      4
+     Errors = 2
+A: ggggatctgcaggcaataacaaac
+B: ggggatctgctgggaataacaaac
+   ==========^  ^==========
+   18857    19001    125    none      1      1
+     Errors = 1
+A: gctattttgatgggcgcttgg
+B: gctattttgacgggcgcttgg
+   ==========^==========
+   19007    19151     41    none     25     25
+     Errors = 4
+A: gcgttttgcttgctgatgactccccaagcgttttgaaaaccatgc
+B: gcgttttgctcgctgatgattccccaagcgtcttaaaaaccatgc
+   ==========^        ^           ^  ^==========
+   19055    19199     21    none      7      7
+     Errors = 3
+A: gcgtcaagcatatagattttatcaatg
+B: gcgtcaagcacattgactttatcaatg
+   ==========^  ^  ^==========
+   19097    19241     41    none     21     21
+     Errors = 3
+A: taaaaccttactagagcatttattcaaccccacaaccgatg
+B: taaaaccttattagagcatttgttcaacccaacaaccgatg
+   ==========^          ^        ^==========
+   19151    19295     23    none     13     13
+     Errors = 2
+A: ttaccgatttggaaatgccagaggcgagcggtt
+B: ttaccgatttagaaatgccagaagcgagcggtt
+   ==========^           ^==========
+   19175    19319     35    none      1      1
+     Errors = 1
+A: aagtgatcaagcaggttaaaa
+B: aagtgatcaaacaggttaaaa
+   ==========^==========
+   19214    19358     23    none      4      4
+     Errors = 2
+A: caaaaatccctatcgtggtcaatt
+B: caaaaatccccattgtggtcaatt
+   ==========^  ^==========
+   19241    19385     44    none      4      4
+     Errors = 2
+A: ctatgagcgggagttctaatgaag
+B: ctatgagcggcagctctaatgaag
+   ==========^  ^==========
+   19316    19460     41    none     31     31
+     Errors = 3
+A: atgatttcatttccaagtctaaccccaaagacatccagcgagtggttaagc
+B: atgatttcatctccaagtctaaccctaaagacatccagcgggtggttaagc
+   ==========^              ^              ^==========
+   19382    19526     52    none     25     25
+     Errors = 4
+A: aaaatacagcactatccccaccccttgctacgtgttagagagcga
+B: aaaatacagcgctatccccaccccttgctatgcgctagagagcga
+   ==========^                   ^ ^ ^==========
+   19468    19612    116    none     34     34
+     Errors = 5
+A: tcgtgcgccaacaaagtggggcaaaggtcttgcttgctttaaaggggtatgcgt
+B: tcgtgcgccagcaaagcggggcaaaggttttgctcgctttaaaagggtatgcgt
+   ==========^     ^           ^     ^        ^==========
+   19588    19732     23    none      4      4
+     Errors = 2
+A: gagagagccacaaagaaatttgcg
+B: gagagagccataaggaaatttgcg
+   ==========^  ^==========
+   19615    19759     44    none      4      4
+     Errors = 2
+A: atagcccggctttcaaagaggctg
+B: atagcccggcctttaaagaggctg
+   ==========^  ^==========
+   19723    19867     44    none     64     64
+     Errors = 7
+A: cgacaagcattatttttaactctttttaccaatacgctacctataaagacaggattttag
+B: cgacaagcatcattttcaactcttttcaccaatacgccacctacaaagacaggattttag
+   ==========^     ^         ^          ^     ^                
+A: ataaaaacaagcaattagaaaact
+B: acaaaaacaagcagttagaaaact
+    ^           ^==========
+   19777    19921     42    none     10     10
+     Errors = 3
+A: gtttgaggataaaccctctctatagcgaag
+B: gtttgaggattaaccccctttatagcgaag
+   ==========^     ^  ^==========
+   19820    19964     37    none      1      1
+     Errors = 1
+A: atgctctaaagtgagccggtt
+B: atgctctaaaatgagccggtt
+   ==========^==========
+   19864    20008     62    none      7      7
+     Errors = 3
+A: gatttgaaaagggggtgaaagagcatg
+B: gatttgaaaaaggagtcaaagagcatg
+   ==========^  ^  ^==========
+   19927    20071     29    none      1      1
+     Errors = 1
+A: agcaaaacgctgacgctttgt
+B: agcaaaacgccgacgctttgt
+   ==========^==========
+   19975    20119     50    none     19     19
+     Errors = 4
+A: tagagcatgtagaaaagcatttcaggccctatttagaaa
+B: tagagcatgtggaaaggcatttcaagccttatttagaaa
+   ==========^    ^        ^   ^==========
+   20028    20172     27    none      3      3
+     Errors = 2
+A: atcatatcactaagagcgattat
+B: atcatatcaccaggagcgattat
+   ==========^ ^==========
+   20104    20248     59    none     49     49
+     Errors = 6
+A: atttgctcatccaaacgattaaggatttcaaagaacgctatcataatatagaagtgattt
+B: atttgctcattcaaacgattaaggattttaaagaacgctaccacaatacagaagtgatct
+   ==========^                 ^           ^  ^    ^         ^=
+A: tagagcctg
+B: tagagcctg
+   =========
+   20164    20308     30    none      1      1
+     Errors = 1
+A: gcgtgatagacatcgttcaaa
+B: gcgtgatagatatcgttcaaa
+   ==========^==========
+   20195    20339     35    none      1      1
+     Errors = 1
+A: aattgcgattctagacgcttc
+B: aattgcgattttagacgcttc
+   ==========^==========
+   20231    20375     22    none      1      1
+     Errors = 1
+A: gcccgattgcttagaaatgcc
+B: gcccgattgcctagaaatgcc
+   ==========^==========
+   20288    20432     43    none     35     35
+     Errors = 9
+A: atcgccctagcatttttaaagtctccgtagaaaatgatgaagagcttattgaagt
+B: atcgccctagtattcttaaggtttctgtagaaaacgatgaggaaattattgaagt
+   ==========^   ^    ^  ^  ^        ^     ^  ^^==========
+   20356    20500     89    none     25     25
+     Errors = 3
+A: cgttttcttattttttaggcggccctacttgtttagcgggggatt
+B: cgttttcttactttttaggcggccccacttgtttggcgggggatt
+   ==========^              ^        ^==========
+   20449    20593     26    none      4      4
+     Errors = 2
+A: attatacgattgtcaaaaacaact
+B: attatacgatcgtgaaaaacaact
+   ==========^  ^==========
+   20576    20774     20    none    101    155
+     Errors = 67
+A: atggcgtgccgctcccaagcctggctagattggatcaacaagggtttaaaatccttaaaa
+B: atggcgtgccactgccaagcctggctaaaatagattcgcaaggttttaagatcctcaaaa
+   ==========^  ^             ^ ^ ^   ^^^     ^     ^     ^    
+A: acttttcttatgaagactataaaaacag-aa--a----ct-aa--a--gc-ttttgatta
+B: gcttttcttatgaagattataaaaacaggaattaagatctcaattaaagccttttgatta
+   ^               ^           ^  ^^ ^^^^  ^  ^^ ^^  ^         
+A: agg-----------------------c------------------tttttggggc
+B: aggttttttgattaaggttttttaatcaagtttttttaattaaggtttttggggc
+      ^^^^^^^^^^^^^^^^^^^^^^^ ^^^^^^^^^^^^^^^^^^==========
+   20642    20840     38    none     46     46
+     Errors = 8
+A: ttgtaaaaaggcttacgcacaacattccaacgccaagcccggtcagcaccgcgccaatgg
+B: ttgtaaaaagacccacgcacaacattccagtgccaagcccggccaacaccgcgccgatgg
+   ==========^ ^^               ^^           ^  ^         ^====
+A: tgtgca
+B: tgtgca
+   ======
+   20726    20924     20    none     46     46
+     Errors = 5
+A: cgagcatggtcaaagggactaggggcaagagccaaaagtattttttaaaagaatagcggc
+B: cgagcatggttaaagggattaggggcaagagccacaagtattttttaacagaataacggc
+   ==========^       ^               ^             ^      ^====
+A: gcatta
+B: gcatta
+   ======
+   20747    20945     47    none      1      1
+     Errors = 1
+A: aaaacgccaccgccaaaccca
+B: aaaacgccactgccaaaccca
+   ==========^==========
+   20795    20993     29    none      1      1
+     Errors = 1
+A: tgaaattacctccataagggc
+B: tgaaattacccccataagggc
+   ==========^==========
+   20831    21029     28    none      7      7
+     Errors = 2
+A: aacgctgatcgttgattgttacatggt
+B: aacgctgatcattgatcgttacatggt
+   ==========^     ^==========
+   20879    21077     47    none     20     20
+     Errors = 5
+A: cttttggtggtgtgcgtgagaagggttgtagcgatagaag
+B: cttttggtggcatgcgtgagaaaagttgtggcgatagaag
+   ==========^^          ^^     ^==========
+   20930    21128     41    none      4      4
+     Errors = 2
+A: catctctttggattaagggaatcg
+B: catctctttgaatcaagggaatcg
+   ==========^  ^==========
+   21011    21209     23    none     40     40
+     Errors = 9
+A: taaagcgcgcataatgctcggtgaaatgaaacattaaaggcacgctaggctgtttaggga
+B: taaagcgcgcgtaatgctcggtgaaatgaagcgccaaaggtacgctttggtgtttaggga
+   ==========^                   ^ ^^^     ^     ^^ ^==========
+   21071    21269     26    none     37     37
+     Errors = 8
+A: tagggaaaggcgcaaaaatgcctaataaaatcaagcccaaactgagcgctaacaaag
+B: tagggaaagggataaaaacacccaataaaatcaaacccaaactgagtgctaacaaag
+   ==========^^^     ^^  ^           ^           ^==========
+   21098    21296     78    none      1      1
+     Errors = 1
+A: aaaagcttttgggcaggcttt
+B: aaaagcttttaggcaggcttt
+   ==========^==========
+   21177    21375     21    none      1      1
+     Errors = 1
+A: gtttaagcagatctaaagaag
+B: gtttaagcaggtctaaagaag
+   ==========^==========
+   21221    21419     27    none     23     23
+     Errors = 6
+A: gcgataaacaacgcttgggtttttaaaatccaaaaacacccct
+B: gcgataaacagcgctaggggttttaaaatcttcaaacacccct
+   ==========^    ^   ^          ^^^==========
+   21252    21450     41    none      4      4
+     Errors = 4
+A: tatggaaaatcacattttgattaa
+B: tatggaaaatggtgttttgattaa
+   ==========^^^^==========
+   21321    21519     20    none     28     28
+     Errors = 8
+A: tggaatgcttttctttgaaaggctcattagcataaacgataaagggga
+B: tggaatgcttctctttaaaaagatcgttggcataaagaataaagggga
+   ==========^     ^   ^ ^  ^  ^       ^^==========
+   21348    21546     32    none      7      7
+     Errors = 2
+A: tctcgtattgttctttgggggcgatgc
+B: tctcgtattgctctttaggggcgatgc
+   ==========^     ^==========
+   21399    21597     23    none     19     19
+     Errors = 5
+A: catgcaaatagaacgcttcttcgcccaaactttcgccat
+B: catgcaaataatacgccccttcgcccaagctttcgccat
+   ==========^^    ^^          ^==========
+   21423    21621     44    none      1      1
+     Errors = 1
+A: cgcttaaatagatcattaagg
+B: cgcttaaataaatcattaagg
+   ==========^==========
+   21489    21687     68    none     22     22
+     Errors = 4
+A: tgctaatgatcttatctagcagatagtcgttgtaaaaaatgg
+B: tgctaatgattttgtctaacagatagtcgttataaaaaatgg
+   ==========^  ^    ^            ^==========
+   21564    21762     38    none      7      7
+     Errors = 2
+A: cagcgcttgagcaataaggcttaaaca
+B: cagcgcttgaacaatagggcttaaaca
+   ==========^     ^==========
+   21624    21822     22    none     22     22
+     Errors = 3
+A: ctttgttgtcgtagtttgggccatgcgagcctgcaaggtgta
+B: ctttgttgtcatagttggggccatgcgagccggcaaggtgta
+   ==========^     ^              ^==========
+   21723    21921     44    none     77     77
+     Errors = 10
+A: atgagcaagacattttcattagagtgttcttttaaaaggtcaggcaaattataaagtaaa
+B: atgagcaagatgttttcattagagcgttcttttaaaaggttgggcaaattatagagcaag
+   ==========^^            ^               ^^           ^  ^  ^
+A: gattcatcataaggagcgatcgcttcacaattggggc
+B: gattcatcataaggggcgatcgcttcgcaattggggc
+                 ^           ^==========
+   21795    21993     25    none     28     28
+     Errors = 3
+A: taagatagcttgtaaccttaacattcttttcgccgtcgttcgcgctat
+B: taagatagctggtaaccttaacgttcttttcgccgtcattcgcgctat
+   ==========^           ^              ^==========
+   21862    22066     70    none     42     48
+     Errors = 11
+A: aagactttgataccggctttagtcaagtaagttggcaaattttcataagcg------ttg
+B: aagactttgacacccgctttagtcaagtaagtgggcaagttttcataagcgcccaagctg
+   ==========^   ^                 ^     ^            ^^^^^^^==
+A: tttttaaa
+B: tttttaaa
+   ========
+   21971    22175     20    none     39     39
+     Errors = 9
+A: aagtggcgttgaaaagagtgagttcattatcggctaaacgcttgcttagtcttggggtg
+B: aagtggcgttaaaaagggtgagttcatgattttctaagcgtttgcttaatcttggggtg
+   ==========^     ^          ^  ^^^    ^  ^       ^==========
+   21992    22196     21    none      1      1
+     Errors = 1
+A: gtgggtttttgatagccataa
+B: gtgggtttttcatagccataa
+   ==========^==========
+   22023    22227     35    none     10     10
+     Errors = 5
+A: gggcgtaatt-atgtttcctagcgctttcgc
+B: gggcgtaattgctctttc-tggcgctttcgc
+   ==========^^ ^    ^ ^==========
+   22131    22335     25    none     73     73
+     Errors = 7
+A: caaacgaatgggaatgattgggtgaaaaaagagggagcggcttgatggtgggggcgaaaa
+B: caaacgaatgagaatggttgggcgaaaagagagggagcggcttgatagtgggggcgaaaa
+   ==========^     ^     ^     ^                 ^             
+A: atttgagagcgctcactctaaaagcgttcacgc
+B: atttaagagcgctcactctaaaggcgttcacgc
+       ^                 ^==========
+   22158    22362     52    none      2      2
+     Errors = 2
+A: gcgaagggcaaaattaagcccc
+B: gcgaagggcaggattaagcccc
+   ==========^^==========
+   22218    22422     29    none      8      8
+     Errors = 5
+A: caatttttagtgttagctaaagcgctag
+B: caatttttagcgttcataaaagcgctag
+   ==========^   ^^^^==========
+   22269    22473     86    none     22     22
+     Errors = 4
+A: taaacactaacgccaagatcgctaaaaagggcgcttttttag
+B: taaacactaaagccaagatcgctaagaatggtgcttttttag
+   ==========^              ^  ^  ^==========
+   22356    22560     47    none      1      1
+     Errors = 1
+A: cgaataatttgacgctcaaaa
+B: cgaataatttaacgctcaaaa
+   ==========^==========
+   22404    22608     35    none      1      1
+     Errors = 1
+A: ttaagacattacccatcatgc
+B: ttaagacattgcccatcatgc
+   ==========^==========
+   22473    22677     30    none     34     34
+     Errors = 6
+A: ccttataagcgctaatgaaatagaaagcaacggaattgagcaggctaaaaacta
+B: ccttataagcactaatgaaatagaaagcgacagaattgagccaactaaaaacta
+   ==========^                 ^  ^         ^^^==========
+   22504    22708     55    none      1      1
+     Errors = 1
+A: acgcatcaaagaagcagagat
+B: acgcatcaaataagcagagat
+   ==========^==========
+   22584    22788     27    none     25     25
+     Errors = 6
+A: aaaaaagcaccacaaccatcatggcgataaaactgacctggttgc
+B: aaaaaagcacgataataatcatggctataaaactaacctggttgc
+   ==========^ ^  ^^        ^        ^==========
+   22612    22816     73    none      1      1
+     Errors = 1
+A: ataaacataaacgaacaaagg
+B: ataaacataagcgaacaaagg
+   ==========^==========
+   22715    22919     31    none     30     30
+     Errors = 3
+A: aacttaggggttttaaaaacctcagatggaataatgatgccaaacacgcc
+B: aacttaggggctttaaaaacttcagatggaataatgatgtcaaacacgcc
+   ==========^         ^                  ^==========
+   22747    22951     37    none      1      1
+     Errors = 1
+A: atcaatcttaggattatatcg
+B: atcaatcttatgattatatcg
+   ==========^==========
+   22840    23044     21    none     56     56
+     Errors = 9
+A: tggtttatttaaag--tggaaagtgctttttttagggtggttgcatttaagagctttaaa
+B: tggtttattttaagggtggaaagcg-tttttt-agggtggttgcgtttaagagttttaaa
+   ==========^   ^^       ^ ^      ^           ^        ^      
+A: gcgcgttggttgtaggat
+B: gcgcgtttgttgtaggat
+          ^==========
+   22862    23066     24    none      1      1
+     Errors = 1
+A: tcatcacgcctcatagttagg
+B: tcatcacgccccatagttagg
+   ==========^==========
+   23052    23258     27    none    166    168
+     Errors = 54
+A: ggggcaaatc----caaataaggagcatgccatgaagtgtaaaagtggcaaacgctcttg
+B: ggggcaaatctgttcttaaaagg-gtttatcatgaaaagaaagcatgataaaaactcttg
+   ==========^^^^ ^^ ^    ^ ^^ ^^      ^^ ^  ^^^  ^^   ^^      
+A: gaaactattataccttgaaatttctttttcttggtttaaggtagtgtttttgat-gaaac
+B: gttagtattatacattaaaatctcttttaaggggtttaaagtggtcttttctatagaaaa
+    ^^ ^        ^  ^    ^      ^^^^       ^  ^  ^    ^^  ^    ^
+A: gctaattt-ctaag--agcgttcccctaagcctaaaaaacttaggggtttccttatgtga
+B: g-taattttattagccaaagttcccctaagcctaaaaagcttaggggtttcctt--gtg-
+    ^      ^^ ^  ^^ ^^                   ^               ^^   ^
+A: agcgggtttgtcct
+B: -ggtggtttgtcct
+   ^ ^^==========
+   23142    23302     25    none     63     17
+     Errors = 49
+A: ggggcgttttttggttagtggagcgcgcgaacgctaaagatgtttggggtttcttgcttg
+B: ggggcgtttt-------------c-----a----t-----tg---gg--tt-at------
+   ==========^^^^^^^^^^^^^ ^^^^^ ^^^^ ^^^^^  ^^^  ^^  ^^ ^^^^^^
+A: ggtggtttaaaatgatcgcttga
+B: -------aaaaaggatcgcttga
+   ^^^^^^^^    ^==========
+   23179    23338     53    none     12     11
+     Errors = 3
+A: gctaattttttatttagattgcaaaaaacgcc
+B: gctaattttt-atttagatagtaaaaaacgcc
+   ==========^        ^ ^==========
+   23233    23392     22    none      1      1
+     Errors = 1
+A: aaaaaactttgtttggtggaa
+B: aaaaaactttatttggtggaa
+   ==========^==========
+   23334    23548     71    none     79    134
+     Errors = 58
+A: aattaaaaaa----ag----ctaaaag----a--aaa-gt-------c-agt------t-
+B: aattaaaaaagtttagaaaaataaaagctttatgaaaagttaaaaagcgagtgggaagtc
+   ==========^^^^  ^^^^^      ^^^^ ^^   ^  ^^^^^^^ ^   ^^^^^^ ^
+A: a---aaaa--gattaaaccccctaaaaag-g-g-----a-----g---t---ttaaaaag
+B: agcgaaaaaagattaaacccccaaaaaagagagggttcaaaaaagaaatcccttaaaaag
+    ^^^    ^^            ^      ^ ^ ^^^^^ ^^^^^ ^^^ ^^^        
+A: g-agttt-aagcttttagtaagcaaacacatagt
+B: ggagttttaagcttttagtaagcgaacacatagt
+    ^     ^               ^==========
+   23406    23620     20    none      1      1
+     Errors = 1
+A: aatagtaatttgtgttgatcg
+B: aatagtaattcgtgttgatcg
+   ==========^==========
+   23502    23716     23    none     76     76
+     Errors = 24
+A: tggggatcttcacgcctaattccatgccatgttgcgc-gctatgatcag-cgc-ctattc
+B: tggggatctttgtgcctagttcaatgccatgttgggccgc-gttatcggtcgctctatgc
+   ==========^^^     ^   ^           ^  ^  ^^ ^   ^ ^   ^    ^ 
+A: ttttatttctggcgagattggtccttaagcccagattga
+B: tttt-t-cctagcgaggttcattctcaaacccagattga
+       ^ ^^  ^     ^  ^^ ^  ^  ^==========
+   23565    23779     46    none     40     40
+     Errors = 8
+A: agaattggaagttagaggtgttgattttagctttataataattgttcacattcgctaaat
+B: agaattggaaattcgccgtgttgattttggccttataataattattcacgttcgctaaat
+   ==========^  ^ ^^           ^  ^           ^     ^==========
+   23615    23829     27    none      4      4
+     Errors = 4
+A: gtcccggctagttggataccgcca
+B: gtcccggctaaggcgataccgcca
+   ==========^^^^==========
+   23643    23857     62    none      1      1
+     Errors = 1
+A: caaaagaaattttattgtgtt
+B: caaaagaaatcttattgtgtt
+   ==========^==========
+   23742    23956     35    none     37     37
+     Errors = 6
+A: ccacgccataagtccaaacatcagaatcggagttgaaaaattgggacttgttatagg
+B: ccacgccataggtccagacatcagaagaggcgttgaaaaattgggatttgttatagg
+   ==========^     ^         ^^  ^               ^==========
+   23784    23998     53    none      7      7
+     Errors = 3
+A: caaagccgtagtatctcgcgccccatc
+B: caaagccgtaataccttgcgccccatc
+   ==========^  ^  ^==========
+   23844    24058     37    none      7      7
+     Errors = 2
+A: cttgaaagccaatcccattcatcgcgc
+B: cttgaaagcctatcccgttcatcgcgc
+   ==========^     ^==========
+   23892    24106     53    none     11     11
+     Errors = 5
+A: gcggcgatta-gcccggcgcgtctgaaagggt
+B: gcggcgattaagccag-cacgcctgaaagggt
+   ==========^   ^ ^ ^  ^==========
+   23988    24202     56    none     43     43
+     Errors = 5
+A: gagaatggatgttggagtcaatgtagtaattatcctgtatgccttgcgggctgttagggt
+B: gagaatggatattggagtcaatatagtagttatcctgtatgccttgtgggctattagggt
+   ==========^           ^     ^                 ^     ^=======
+A: tag
+B: tag
+   ===
+   24051    24265     32    none      7      7
+     Errors = 4
+A: caggcaagctagagagcgccgctgtga
+B: caggcaagcttgaaatggccgctgtga
+   ==========^  ^ ^^==========
+   24105    24319     20    none     22     22
+     Errors = 5
+A: gttcgcctagctttttg-tactggccgctgaaattcgctaaag
+B: gttcgcctag-tttttgatactgactgctgaagttcgctaaag
+   ==========^      ^     ^ ^      ^==========
+   24150    24364     28    none     25     25
+     Errors = 4
+A: tgtaggcgagatttcgcgcattatggattcgctccgcttggtcgc
+B: tgtaggcgaggttgcgcgcgttatggattcgctcggcttggtcgc
+   ==========^  ^     ^              ^==========
+   24319    24530     22    none    141    138
+     Errors = 19
+A: gcgatgctgttttttagattcgttacggtttctcccacatacgcgcagccggctccccaa
+B: gcgatgctgtcttttagattcgttacggtctctcccacatacgcgcaaccggctccccaa
+   ==========^                  ^                 ^            
+A: gtgttagaagtaaccgtgccagatggcgtgccacggagattgccgtcgctacccttttca
+B: gtgttatcagttaccgtgccggatggcgtgccacggagatggccgt-tttgcactt--ca
+         ^^   ^        ^                   ^     ^^^ ^ ^   ^^  
+A: tggcatactcctaaagagtctttcacgaacgctgcagggat
+B: tggcacacccctaaagagtcttttacgaactctgcagggat
+        ^  ^              ^      ^==========
+   24357    24568     27    none     16     16
+     Errors = 2
+A: tttcaaagtccttcaccactgcttgagcgcggttta
+B: tttcaaagtctttcaccactgcttgggcgcggttta
+   ==========^              ^==========
+   24387    24598     52    none      3      3
+     Errors = 2
+A: cgcttgcgctctagcgttagcga
+B: cgcttgcgctttggcgttagcga
+   ==========^ ^==========
+   24489    24700     21    none     50     50
+     Errors = 8
+A: gggttgaatg-ctttcccagtgtctaggttgtgctggttttgcgcgttggcggtaacgat
+B: gggttgaatgtctt-cccggtgtctaggttgcgctggttttgcgcgtttgcagcaacgat
+   ==========^   ^   ^            ^                ^  ^ ^      
+A: tttggattgct
+B: cttggattgct
+   ^==========
+   24511    24722     55    none      1      1
+     Errors = 1
+A: tacggctatttcagcgttttt
+B: tacggctattgcagcgttttt
+   ==========^==========
+   24861    25003     28    none    295    226
+   No extension
+Region:       5203 .. 24565           5395 .. 24776         1254 / 19382       6.47%
+   24900    25042     26    none     11     11
+     Errors = 4
+A: ggaatatcttgcccgcttgct-ccaaaagcct
+B: ggaatatcttttccgct-gctcccaaaagcct
+   ==========^^     ^   ^==========
+   25094    25245     51    none    168    177
+     Errors = 46
+A: tgatttgataggctttattgatttttgcgtaattttcagtggatataccgctccactttc
+B: tgatttgataagctttattgattttcgcgtaattttcagtggataaaatgctgtatggtc
+   ==========^              ^                   ^ ^^   ^^ ^^^  
+A: ctggttcataa-aatgaat-c-gcaagcaatggtagt-cc-ccccatt--t--gacggca
+B: ctggttcataaccagtagtgccacaagtaatggtagtgcctccccattgatttgaaggcg
+              ^^ ^^ ^ ^ ^^    ^         ^  ^       ^^ ^^  ^   ^
+A: catt-ttcaaaggtttggacgcccccatttttatttttgtcagagccagggccacaaacg
+B: tgttgtggaaag-tttgaacgcccccatttttgcttgtgtctttaccgggaccacaaggg
+   ^^  ^ ^^    ^    ^              ^^  ^    ^^^^  ^  ^      ^^ 
+A: ctgatcgaatagctcatg
+B: ctgatcgcatagctcatg
+          ^==========
+   25146    25297     47    none      1      1
+     Errors = 1
+A: ctaaaagcaccgcttgatacg
+B: ctaaaagcacggcttgatacg
+   ==========^==========
+   25197    25348     29    none      4      4
+     Errors = 2
+A: aattcttcgcactagcgttcaaat
+B: aattcttcgcgctcgcgttcaaat
+   ==========^  ^==========
+   25227    25378     23    none      1      1
+     Errors = 1
+A: cgttattgatagcgttggggt
+B: cgttattgatggcgttggggt
+   ==========^==========
+   25308    25459     23    none     58     58
+     Errors = 9
+A: cggactgcctaataagagtgtttagggcactataactcgttaaaagattgttcagtcttt
+B: cggactgcctgatgagagcgtttaggacgctataattcgttaaaaggttgttcaatcttt
+   ==========^  ^    ^       ^ ^      ^          ^       ^     
+A: catagctatctgaaagat
+B: catagctgtctgaaagat
+          ^==========
+   25332    25483     41    none      1      1
+     Errors = 1
+A: gaatgcctttagtgtttttca
+B: gaatgcctttggtgtttttca
+   ==========^==========
+   25377    25528     95    none      4      4
+     Errors = 2
+A: tttgatagcccgcactcacaaaaa
+B: tttgatagccggcgctcacaaaaa
+   ==========^  ^==========
+   25481    25632     46    none      9      9
+     Errors = 5
+A: tttctccttttattacttgaaataagatt
+B: tttctcctttactttattaaaataagatt
+   ==========^^  ^^  ^==========
+   25533    25684     36    none      6      6
+     Errors = 3
+A: tgtgtctttaggtgaaaccataccgc
+B: tgtgtctttaagtaagaccataccgc
+   ==========^  ^ ^==========
+   25585    25736     37    none     16     16
+     Errors = 2
+A: agtataaattcatgggattttgatattaattaggcg
+B: agtataaattaatgggattttgatactaattaggcg
+   ==========^              ^==========
+   25636    25785     55    none     14     12
+     Errors = 5
+A: aaaaaaaaaaaggtttttgtgttatttctaaaca
+B: aaaaaaaaaa-gatttt-gtggtgtttctaaaca
+   ==========^ ^    ^   ^ ^==========
+   25933    26129     28    none    242    289
+   No extension
+Region:      24861 .. 25690          25003 .. 25839           81 / 837         9.68%
+   26078    26315     30    none    117    158
+     Errors = 73
+A: tttgcatgcggttagtaaaaaa--tt--accg-----ctcgct-tggtg---c-------
+B: tttgcatgcgattattaaaaaagcttggtgcgagattctcactcttgtgaagcacccaaa
+   ==========^   ^       ^^  ^^^^  ^^^^^   ^  ^ ^   ^^^ ^^^^^^^
+A: -g--a--gacgctt---att-ct--t------t-t-aaa--caa---ggctttgattcgt
+B: cgctaaagacgattgggatttctgctaaggagtcttaaatttaaaaaggctttga-gcgt
+   ^ ^^ ^^    ^  ^^^   ^  ^^ ^^^^^^ ^ ^   ^^^  ^^^        ^^   
+A: ttcttaaagct-taaccaacgcttctattcaacgctctg-ttaagacaaagccttaatcc
+B: tccttaaaactatcatcaacgctt-tatt-aaaacaaagccta-gcctaa-cattaatcc
+    ^      ^  ^ ^ ^        ^    ^  ^^ ^^^ ^^  ^ ^ ^  ^ ^=======
+A: cct
+B: cct
+   ===
+   26109    26346     38    none      1      1
+     Errors = 1
+A: gtcttgggcgtgtgatcctgg
+B: gtcttgggcgcgtgatcctgg
+   ==========^==========
+   26148    26385     22    none      1      1
+     Errors = 1
+A: gctctaaaagctgagcgcacc
+B: gctctaaaagttgagcgcacc
+   ==========^==========
+   26171    26408     81    none      1      1
+     Errors = 1
+A: cctacggttcggccaatgaca
+B: cctacggttctgccaatgaca
+   ==========^==========
+   26253    26490     59    none      1      1
+     Errors = 1
+A: aatccacattagggtagagat
+B: aatccacattggggtagagat
+   ==========^==========
+   26331    26568     23    none     19     19
+     Errors = 4
+A: ccactttcgcggcgatttcgctcaacctctcgtccattt
+B: ccactttcgcagcgatttcgctcaagcgttcgtccattt
+   ==========^              ^ ^^==========
+   26388    26625     71    none     34     34
+     Errors = 5
+A: cgcctttttggtgcagttcgtctttcaagccttttaagattttagcgcgcggat
+B: cgcctttttgatgcagttcatctttcagaccttttaagatttttgcgcgcggat
+   ==========^        ^       ^^              ^==========
+   26463    26700     20    none      4      4
+     Errors = 2
+A: ttttgtctttcactcgcgcgatgt
+B: ttttgtcttttacgcgcgcgatgt
+   ==========^  ^==========
+   26484    26721     83    none      1      1
+     Errors = 1
+A: atttatccacatttttcacat
+B: atttatccacgtttttcacat
+   ==========^==========
+   26568    26805     74    none      1      1
+     Errors = 1
+A: aagcgctaatgcccgcgctaa
+B: aagcgctaatacccgcgctaa
+   ==========^==========
+   26658    26895     45    none     16     16
+     Errors = 5
+A: aggcgttttggctgtgatcagcgtgcaaggttagga
+B: aggcgttttgcccatgatcggcgtgtaaggttagga
+   ==========^ ^^     ^     ^==========
+   26704    26941     25    none      1      1
+     Errors = 1
+A: gggcgtgatttccacttcgcc
+B: gggcgtgattcccacttcgcc
+   ==========^==========
+   26748    26985     38    none     19     19
+     Errors = 4
+A: tggtgtgttttaagcgactataaggataccctctcagca
+B: tggtgtgtttcaatcggctataaggataacctctcagca
+   ==========^  ^  ^           ^==========
+   26811    27048     71    none     25     25
+     Errors = 4
+A: cataagagcgtgcgatgtccggataaatgataggcgctcccactt
+B: cataagagcgcgcgatgtccggataaataatgggtgctcccactt
+   ==========^                 ^  ^  ^==========
+   26883    27120     44    none      1      1
+     Errors = 1
+A: tggccatagtttggtaatctt
+B: tggccatagtctggtaatctt
+   ==========^==========
+   26946    27183     41    none     19     19
+     Errors = 4
+A: tggaataaagggtggataagatagacactccgctagaga
+B: tggaataaagagtagataaaatagacaccccgctagaga
+   ==========^  ^     ^        ^==========
+   26988    27225     38    none      1      1
+     Errors = 1
+A: tgctagggaaggctgaaaaca
+B: tgctagggaaagctgaaaaca
+   ==========^==========
+   27044    27281     48    none     18     18
+     Errors = 2
+A: gcacaaagctcctgtggcgcaattccaattcaaattcc
+B: gcacaaagcttctgtggcgcaattccagttcaaattcc
+   ==========^                ^==========
+   27100    27337     37    none      8      8
+     Errors = 5
+A: cccctgtgaggagtaatttgcacacatc
+B: cccctgtgagtaatagcctgcacacatc
+   ==========^ ^  ^^^==========
+   27138    27375     46    none      1      1
+     Errors = 1
+A: cgactaaatcttctatcctat
+B: cgactaaatcctctatcctat
+   ==========^==========
+   27207    27444     29    none     23     23
+     Errors = 3
+A: ttgccattgacatagctgatcttagattggcatccagcggtag
+B: ttgccattgatatagctgatcttagattgacacccagcggtag
+   ==========^                  ^  ^==========
+   27237    27474     47    none      1      1
+     Errors = 1
+A: ctggatcgtaagaaaaaaacc
+B: ctggatcgtaggaaaaaaacc
+   ==========^==========
+   27299    27536     25    none     15     15
+     Errors = 2
+A: ccaccgctttaggcccacgagtgctttcaatcgtt
+B: ccaccgcttttggcccacgagtgcattcaatcgtt
+   ==========^             ^==========
+   27386    27624     50    none     62     63
+     Errors = 7
+A: ttcatagcgttcattattttcattattgactaaagtgacagacatt-tgacttccttaag
+B: ttcatagcgtgcattattttcattattgattaaagtaacagacattgtgatttccttaag
+   ==========^                  ^      ^         ^   ^         
+A: ttttgatagcattcaactcctaa
+B: ttttgatagtatccaactcctaa
+            ^  ^==========
+   27439    27678    118    none      3      4
+     Errors = 2
+A: taaaaacattgcg-ttttttcaag
+B: taaaaacatttcgtttttttcaag
+   ==========^  ^==========
+   27558    27797     62    none      1      1
+     Errors = 1
+A: aggataaacagtggcttacaa
+B: aggataaacaatggcttacaa
+   ==========^==========
+   27656    27895     26    none     36     36
+     Errors = 5
+A: gattaaagacaacaaattgcatgtgccaaaccaccccattatccccttcattgagg
+B: gattaaagacggcaaattgcatgtgccaaattaccccattatccctttcattgagg
+   ==========^^                  ^^             ^==========
+   27695    27934     71    none     13     13
+     Errors = 2
+A: gcattggatcagatattaccccggcgatgatta
+B: gcattggatcggatattaccccagcgatgatta
+   ==========^           ^==========
+   27767    28006     32    none      1      1
+     Errors = 1
+A: catggtatgaggtgtttgtgg
+B: catggtatgaagtgtttgtgg
+   ==========^==========
+   27824    28063     38    none     25     25
+     Errors = 5
+A: atcaaaaatttaaagattataaagaattaagcccagaagagcaat
+B: atcaaaaattcaaagaccataaagagttaagccctgaagagcaat
+   ==========^     ^^       ^        ^==========
+   27878    28117     20    none     16     16
+     Errors = 3
+A: ttgaagcgattaaccattataaagtttctattaaag
+B: ttgaagcgatcaaccactataaagtctctattaaag
+   ==========^     ^        ^==========
+   27914    28153     20    none     16     16
+     Errors = 2
+A: ggcctttgacaacgcctattggtgaagggtttagat
+B: ggcctttgaccacgcctattggtgaggggtttagat
+   ==========^              ^==========
+   27935    28174     38    none      1      1
+     Errors = 1
+A: ctttgaatgtagcgttacgcc
+B: ctttgaatgtggcgttacgcc
+   ==========^==========
+   27974    28213    164    none      1      1
+     Errors = 1
+A: tgtgcttgaggccggtaaggt
+B: tgtgcttgagaccggtaaggt
+   ==========^==========
+   28140    28379     29    none      2      2
+     Errors = 2
+A: aactaaaggttaaaaaaatccg
+B: aactaaaggtagaaaaaatccg
+   ==========^^==========
+   28235    28474     38    none     66     66
+     Errors = 7
+A: aagcagcggcataggggtaaaacccatcagtaaagaaggcacagagaggctagtgagaaa
+B: aagcagcggcgtagggataaaacccatcagcaaagaaggcacagagaggttggtgagaaa
+   ==========^     ^             ^                  ^ ^        
+A: ggcgattgaatacgcaattgataacg
+B: agcgattgaatacgcgattgataacg
+   ^              ^==========
+   28292    28531    103    none     19     19
+     Errors = 3
+A: ttgtgcataaaggtaacatcatgaaatacaccgaagggg
+B: ttgtgcataagggcaacatcatgaaatataccgaagggg
+   ==========^  ^              ^==========
+   28396    28635     54    none      1      1
+     Errors = 1
+A: aaccctaaaaacggtaaagaa
+B: aaccctaaaaccggtaaagaa
+   ==========^==========
+   28466    28705    152    none     16     16
+     Errors = 4
+A: tgcaacaaat-cttattgcgccctagcgaatacagcg
+B: tgcaacaaattct-cttgcgccctagtgaatacagcg
+   ==========^  ^^           ^==========
+   28619    28858     68    none      1      1
+     Errors = 1
+A: ctcctaaatatgccgggctgg
+B: ctcctaaatacgccgggctgg
+   ==========^==========
+   28688    28927     32    none      1      1
+     Errors = 1
+A: ggcatatgggttgggtggaag
+B: ggcatatgggctgggtggaag
+   ==========^==========
+   28757    28996     50    none     37     37
+     Errors = 3
+A: tcgtttctgcgatggaaaaagcgattaaaagcaagaaagtaacttacgatttcgctc
+B: tcgtttctgctatggaaaaagcgattaagagcaagaaagtaacttatgatttcgctc
+   ==========^                 ^                 ^==========
+   28808    29047     33    none      1      1
+     Errors = 1
+A: gctctgaatttgctagcgtga
+B: gctctgaattcgctagcgtga
+   ==========^==========
+   28904    29135     32    none     63     55
+     Errors = 16
+A: gtgaaagagcgttttttaagcttttaaatggtgtttgaatgcgaaaaaaaggctaatact
+B: gtgaaagagccttt---aagctct-----ggtgtttgaatgcgattata-ggctaatact
+   ==========^   ^^^     ^ ^^^^^               ^^ ^ ^          
+A: atcat-aaggaatgaagttgataa
+B: atcattaaggaataaagttgataa
+        ^       ^==========
+   28949    29180     26    none     13     13
+     Errors = 2
+A: atgtggttttgttcattttaacggcgatctttt
+B: atgtggttttattcattttaacagcgatctttt
+   ==========^           ^==========
+   28976    29207     28    none      1      1
+     Errors = 1
+A: tcatgcttttggtgagttatt
+B: tcatgcttttagtgagttatt
+   ==========^==========
+   29005    29236    117    none      1      1
+     Errors = 1
+A: cattatagcgcggctgtcatt
+B: cattatagcgtggctgtcatt
+   ==========^==========
+   29144    29375     24    none     22     22
+     Errors = 3
+A: acgaccctaaagatcaaaaaagcgtaaccgtttatcgtaacg
+B: acgaccctaaggatcaaaaaagcgtgaccgtctatcgtaacg
+   ==========^              ^     ^==========
+   29169    29400     43    none      1      1
+     Errors = 1
+A: cacgcgctttagcttcccttt
+B: cacgcgctttggcttcccttt
+   ==========^==========
+   29229    29460     20    none     17     17
+     Errors = 2
+A: atatttcagccctcgctcaaagtttaatcaatcagca
+B: atatttcagctctcgctcaaagtttagtcaatcagca
+   ==========^               ^==========
+   29261    29492     47    none     12     12
+     Errors = 2
+A: agtggaagtgaaatactatggttggcggatca
+B: agtggaagtgcaatactatggctggcggatca
+   ==========^          ^==========
+   29343    29574     22    none     35     35
+     Errors = 7
+A: tttttttaaagcccttaaaagagagcactgacatttcaaagcccatttttagctg
+B: tttttttaaaacccttaaaagagagcgatgagatgtcaaaacccgtttttagctg
+   ==========^               ^^   ^  ^     ^   ^==========
+   29396    29627     24    none     31     31
+     Errors = 7
+A: ttttatacgctttgctgttaatgggcttttttatcagcgcgcgttctgttt
+B: ttttatacgccctgctactagtgggcttttttatcagtgcacgttctgttt
+   ==========^^    ^^  ^                ^  ^==========
+   29437    29668     44    none     17     17
+     Errors = 3
+A: tttatttaagagcaaagctcattaaaacttttaggct
+B: tttatttaagggcaaagctcattaattcttttaggct
+   ==========^              ^^==========
+   29482    29713     28    none      1      1
+     Errors = 1
+A: attggagcgtgtattaaaaag
+B: attggagcgtttattaaaaag
+   ==========^==========
+   29541    29772     20    none     31     31
+     Errors = 5
+A: agggcaagctgatgctgtgaaaagcggtgttgtttccttttaaattgatag
+B: agggcaagctcacgctgtaaaaagcggtgttgtttcctctcaaattgatag
+   ==========^ ^     ^                   ^ ^==========
+   29597    29828     27    none     36     36
+     Errors = 5
+A: cgattttatagtctagttggtgggatttcaataaaaaatcattcagcaaacaatca
+B: cgattttataatctaattggtaggatttcaataaaaagtcattcaacaaacaatca
+   ==========^    ^     ^               ^       ^==========
+   29625    29856     35    none      1      1
+     Errors = 1
+A: agcccaaattgtcatggctaa
+B: agcccaaattatcatggctaa
+   ==========^==========
+   29661    29892     46    none      1      1
+     Errors = 1
+A: cttttaatttcagggcaaaat
+B: cttttaattttagggcaaaat
+   ==========^==========
+   29712    29943     47    none      5      5
+     Errors = 2
+A: ggcacgcatagccccccagcccctt
+B: ggcacgcataaccctccagcccctt
+   ==========^   ^==========
+   29784    30015     41    none     25     25
+     Errors = 4
+A: tgaaattgtggagacgttgggtcaaattgtccgtgtcaatggggg
+B: tgaaattgtgaaggcgttgggttaaattgtccgtatcaatggggg
+   ==========^  ^        ^           ^==========
+   29836    30067     64    none     11     11
+     Errors = 2
+A: gggcgatgaggggggctgaaactttatgata
+B: gggcgatgagaggggctgaagctttatgata
+   ==========^         ^==========
+   29913    30144     56    none     13     13
+     Errors = 5
+A: ggcggttatcttgcaagaacaaatgcgcatcgc
+B: ggcggttatcctgtaagaataggtgcgcatcgc
+   ==========^  ^     ^ ^^==========
+   29976    30207     26    none      7      7
+     Errors = 3
+A: tgggttttaacaagatagttttaacgc
+B: tgggttttaataaaatcgttttaacgc
+   ==========^  ^  ^==========
+   30003    30234     32    none      1      1
+     Errors = 1
+A: cgttgcaatactgggctaata
+B: cgttgcaatattgggctaata
+   ==========^==========
+   30051    30282     25    none     16     16
+     Errors = 3
+A: tggtttttccggcattcgtgttagttgcgctgataa
+B: tggtttttccagcattggtgttagtcgcgctgataa
+   ==========^     ^        ^==========
+   30093    30345     24    none     17     38
+     Errors = 23
+A: atggtttaacttttaaa--g-t-g--gt-a-----a----g-----cgccatcaaaga
+B: atggtttaacctttaaattgatagtcgttacctctaaactgataagccccatcaaaga
+   ==========^      ^^ ^ ^ ^^  ^ ^^^^^ ^^^^ ^^^^^ ^==========
+   30290    30542     24    none    173    173
+     Errors = 32
+A: agaagtcaatacatttttgatttgtggcaacttcacatt-tttaagtgcttctcttggga
+B: agaagtcaattcatttttgatttgtggtaacttcacattctttaa-cgcttctcttggga
+   ==========^                ^           ^     ^^             
+A: cttcaatgactaatctc-tcaaacacttggtcgcttaaagggttatcaatatcaaaaatg
+B: cttcaaccactaa-ctcgtttaatgattggtcgctcatagggttatcaatatcaaagatg
+         ^^     ^   ^ ^^  ^^^         ^ ^                  ^   
+A: aaacttaagatattgtggagtgagttataggtgattttgtcaatcaacgcata-attcag
+B: aaattcaaggtattgtggagcgagttatacgataccttgtcaattaacgcatagagt-ag
+      ^ ^   ^          ^        ^ ^^ ^^        ^        ^ ^ ^  
+A: tctcacgccctctgct
+B: tctaatgccctctgct
+      ^ ^==========
+   30390    30636     37    none     76     70
+     Errors = 17
+A: ctatggcggtaactatgcttttagatagtctagggctgatgttgccaagttgtgtcgcta
+B: ctatggcggttacgatactcttggatagtctaggactgatgttaccaagctgtgtcgcta
+   ==========^  ^  ^  ^  ^           ^        ^     ^          
+A: aatctgtcggcgaaatgaagcaataacccgcatcgg
+B: aatctg-ag---a--taaagcaataccccgcatcgg
+         ^^ ^^^ ^^ ^        ^==========
+Region:      25933 .. 30460          26129 .. 30706          330 / 4578        7.21%
+#
+   31536    31689     44    none      -      -
+   31734    31878     23    none    154    145
+     Errors = 53
+A: gtagtccgctcgcaatctt-tttataaatgctgat-aagattagaactctcaattgtaga
+B: gtagtccgcttttgattttattgacaa-tgct-attgagattagagctttcaatcgtgga
+   ==========^^^^  ^  ^  ^ ^  ^    ^  ^^        ^  ^     ^  ^  
+A: -gcctttaatagtcttgtggctcatatcatatttaagtcgtgagatttcatc-gccaaca
+B: agc-tttaatagtctcttg-ttggt-t--t-tt-aagtcgtgagagttc-tctgccataa
+   ^  ^           ^^  ^^ ^^ ^ ^^ ^  ^           ^   ^  ^    ^^ 
+A: gcatctaaaaacttgcttaagggcatcgccttaccaagcaccctaacgctaggtttat
+B: gcgtctaaagtttcgcttaaag--at-aagttatctttcactctcactctaggtttat
+     ^      ^^^ ^      ^ ^^  ^^^^   ^ ^^^   ^  ^  ^==========
+   31824    31971     25    none     67     70
+     Errors = 13
+A: gtctagctaacttcctgtccgctaacgctttatcaatagatgctgtcaaagaagtgtttc
+B: gtctagctaatttcttgtccgctaacgccttatcaatagctgatgtcaaggaagtgttcc
+   ==========^   ^             ^          ^  ^      ^        ^ 
+A: ttttcggctcatca--a-caaattctaaaa
+B: tttgtggctcatcatcaaccaattctaaaa
+      ^^         ^^ ^ ^==========
+   31868    32018     31    none     19     22
+     Errors = 6
+A: taattcaatagcatt-ttgtgtcctttt--tctaagcgagat
+B: taattcaataacattatcgtgtccttttgctttaagcgagat
+   ==========^    ^ ^          ^^ ^==========
+   31900    32050     34    none      1      1
+     Errors = 1
+A: atctttgagctttcagcgggt
+B: atctttgagccttcagcgggt
+   ==========^==========
+   31935    32085     67    none      1      1
+     Errors = 1
+A: tggtataataccaaaacttca
+B: tggtataatatcaaaacttca
+   ==========^==========
+   32003    32153     47    none      1      1
+     Errors = 1
+A: aagaatgctataacgctatta
+B: aagaatgctacaacgctatta
+   ==========^==========
+   32063    32213     59    none     13     13
+     Errors = 4
+A: ttaaagaggtccgtttcac-cttgttgcatgtga
+B: ttaaagaggttcgtttcactct-attgcatgtga
+   ==========^        ^  ^^==========
+   32123    32273     23    none      1      1
+     Errors = 1
+A: attatggccagacagaagcct
+B: attatggccaaacagaagcct
+   ==========^==========
+   32147    32297     56    none      1      1
+     Errors = 1
+A: aagaagaaaaagctaaggctt
+B: aagaagaaaaggctaaggctt
+   ==========^==========
+   32225    32375     29    none     22     22
+     Errors = 4
+A: atatagagtgcgagagcgttctaaaaagcggcgatttgattg
+B: atatagagtgtgagagcgttttaaagagcggtgatttgattg
+   ==========^         ^    ^     ^==========
+   32255    32405     23    none      1      1
+     Errors = 1
+A: tggatatggcgaaggattatg
+B: tggatatggctaaggattatg
+   ==========^==========
+   32300    32450     33    none     22     22
+     Errors = 3
+A: tgttattgattggggcgagcgaatctaatttgttgtatcgtt
+B: tgttattgatcggggcgagcgagtctaatttattgtatcgtt
+   ==========^           ^        ^==========
+   32342    32492     26    none      9      9
+     Errors = 3
+A: ccaaaatagc-ttggttgaacaatccagta
+B: ccaaaatagccttg-ttgagcaatccagta
+   ==========^   ^    ^==========
+   32754    32872     24    none    386    354
+   No extension
+Region:      31536 .. 32367          31689 .. 32517           92 / 832        11.06%
+   32974    33092     29    none    196    196
+     Errors = 52
+A: agcatgtgctactagtcattttagaacatgagagcggggaaaag-attattggcacttta
+B: agcatgtgctgttagccattttagagcatgggattgg-aataaggatttttaatacttta
+   ==========^^   ^         ^    ^  ^^  ^^ ^   ^   ^  ^^^      
+A: gaaaga-gatgactatgataaattaaaacaaatccttaaagactatttgttgcaatatgt
+B: gaa-gaagatggctaccataaaatggagcaaatccttaaagactacttgcaacaatacat
+      ^  ^    ^   ^^     ^ ^^ ^                 ^   ^^^     ^^ 
+A: gcctttaaagagcgatccagccaaaatgcctgctaggagttttgtgctattaagaatgct
+B: tcctttaaaaaacgatccaaccaaaataccagacaggagtcccgtattagcaagagtgtt
+   ^        ^ ^       ^       ^  ^ ^^      ^^^  ^^  ^^    ^  ^ 
+A: taaaagaatgtatgcgagttgttttgagagcgtgggcg
+B: taaaaaaatgtatgcgagttacttggatagcgtgggcg
+        ^              ^^  ^  ^==========
+   33019    33137     21    none     16     16
+     Errors = 8
+A: tgcttattttaatgctagatcaccccgattgttacg
+B: tgcttattttcattttagaatacgatgattgttacg
+   ==========^  ^^    ^^  ^^^==========
+   33125    33246     21    none     85     88
+     Errors = 21
+A: ttcaaaactcatggatagttttggcatcgctcgtttgtatt-ctaatcctgctttattgg
+B: ttcaaaactcctggatagttttggcatcactcgttcgtatttcaagtcc-gctttattgg
+   ==========^                 ^      ^     ^ ^ ^   ^          
+A: atttggataacc--a-tggtattcctaatgacattaatgataatgaaga
+B: attttgataaccctaatgatattaatgataacgacattaataatgaaga
+       ^       ^^ ^  ^    ^^ ^  ^  ^^^ ^ ^==========
+   33196    33317     47    none     50     50
+     Errors = 6
+A: gcgcccaaaaacactcccttaaaaaaatacgctaaaaatttgagcgctttagcccaagac
+B: gcgcccaaaagcactcccctaaaaaaatacactaaaaacttgagcgctttagcccaaaat
+   ==========^       ^           ^       ^                  ^ ^
+A: aacgctttag
+B: aacgctttag
+   ==========
+   33265    33386     47    none     22     22
+     Errors = 3
+A: ttttaagagtgatagaaattttagggcgcagaaaaaagaata
+B: ttttaagagtcatcgaaattttagggcgcaggaaaaagaata
+   ==========^  ^                 ^==========
+   33313    33434     68    none      1      1
+     Errors = 1
+A: tagggaaaacctccatcgctg
+B: tagggaaaacttccatcgctg
+   ==========^==========
+   33412    33533     32    none     31     31
+     Errors = 5
+A: aagaatatgaagtctattctttggatttagccttaatggtggctggggcaa
+B: aagaatatgaggtttattctttggatttggctttaatggtagctggggcaa
+   ==========^  ^              ^  ^        ^==========
+   33475    33596     50    none     31     31
+     Errors = 4
+A: attttgaaaaacgcttgaaaaaaacgctcaaagaaatccaacaaaacggcc
+B: attttgaaaagcgcctgaaaaaaacgctcaaagagatccagcaaaacggcc
+   ==========^   ^                   ^     ^==========
+   33527    33648     79    none      2      2
+     Errors = 2
+A: cccttttaggcacagggagcag
+B: cccttttaggtgcagggagcag
+   ==========^^==========
+   33610    33731     50    none      4      4
+     Errors = 2
+A: tgaaatgtttaggagcgaccactt
+B: tgaaatgtttgggggcgaccactt
+   ==========^  ^==========
+   33706    33827     20    none     46     46
+     Errors = 11
+A: acaaggcttttaataggcgtttttcagtcataaaagttgaagagccttctaaagaggcgt
+B: acaaggctttcaacaggcgcttttctatagtgaatgttgaagagccttctaaggaagcgt
+   ==========^  ^     ^     ^^ ^^ ^  ^                 ^  ^====
+A: gttact
+B: gttact
+   ======
+   33736    33857     33    none     10     10
+     Errors = 4
+A: tgattttaaaaaagatcgctcccctttatg
+B: tgattttaaagaatattgcccccctttatg
+   ==========^  ^  ^  ^==========
+   33775    33896     26    none      6      6
+     Errors = 2
+A: ggtgcgttatgatgagagcgtgttta
+B: ggtgcgttataatgaaagcgtgttta
+   ==========^    ^==========
+   33809    33930     31    none      8      8
+     Errors = 3
+A: gcgtggatttaacgagtgattacatgca
+B: gcgtggatttgacgagctattacatgca
+   ==========^     ^^==========
+   33841    33962     29    none      1      1
+     Errors = 1
+A: tgccggataaagcgattgaat
+B: tgccggataaggcgattgaat
+   ==========^==========
+   33940    34061     26    none     70     70
+     Errors = 8
+A: aggtgggatcgaggaaaaaaatcagccctaaaaagggcaaaaaaatcggcgttgatgatg
+B: aggtgggatcaaggaaaaagatcaaccctaaaaaaggcaaaaaaatcagcgttgatgacg
+   ==========^        ^    ^         ^            ^          ^ 
+A: tgaaagaaacgctcgctctaaagcttaaaa
+B: tgcaagaaacgctcgctctcaagcttaaaa
+     ^                ^==========
+   33976    34097     35    none     10     10
+     Errors = 3
+A: aaatgcgtttgagcagcgacaaaaaagccc
+B: aaatgcgtttaaacagcgataaaaaagccc
+   ==========^ ^      ^==========
+   34012    34133     21    none      1      1
+     Errors = 1
+A: aaaaatcgcttaaaaataaga
+B: aaaaatcgctaaaaaataaga
+   ==========^==========
+   34066    34187     74    none     33     33
+     Errors = 5
+A: ttttgcccaagcagaagcgatcagtcttgtcagcaatgcgattaaaatccagc
+B: ttttgcccaaaccgaagcgatcaaccttgtcagcaatgcgatcaaaatccagc
+   ==========^ ^          ^^                 ^==========
+   34141    34262     98    none      1      1
+     Errors = 1
+A: ctagtggggtggggaaaacag
+B: ctagtggggtagggaaaacag
+   ==========^==========
+   34249    34370     26    none     10     10
+     Errors = 2
+A: gcgtggcaaaactcatcgggagtcctagcg
+B: gcgtggcaaagctcatcggaagtcctagcg
+   ==========^        ^==========
+   34276    34397     32    none      1      1
+     Errors = 1
+A: tggggtttgaacaaggggggt
+B: tggggtttgagcaaggggggt
+   ==========^==========
+   34309    34430     38    none      1      1
+     Errors = 1
+A: cgattaaaaaacacccgcatt
+B: cgattaaaaagcacccgcatt
+   ==========^==========
+   34360    34481     20    none     13     13
+     Errors = 4
+A: agatagaaaaagcccattctaacgtgtatgatt
+B: agatagaaaaggcccaccctaatgtgtatgatt
+   ==========^     ^^    ^==========
+   34381    34502     38    none      1      1
+     Errors = 1
+A: tgttgttgcaagtgatggata
+B: tgttgttgcaggtgatggata
+   ==========^==========
+   34421    34542     22    none      2      2
+     Errors = 2
+A: atttaggcaatcaggcgagttt
+B: atttaggcaacaaggcgagttt
+   ==========^^==========
+   34445    34566     37    none      2      2
+     Errors = 2
+A: agcatgtgattttgattatgac
+B: agcatgtgatactgattatgac
+   ==========^^==========
+   34564    34685     62    none     82     82
+     Errors = 8
+A: aggataaggatacgctagggttttttagcgctaaaaacaccaagtatgataaagccgtta
+B: aggataaggacacgctagggttttttagcactaaaaacgccaagtatgatagagccgtta
+   ==========^                  ^        ^            ^        
+A: aagagcttttgacccctgaattacgctccaggattgatgcga
+B: aagagcttttaacccctgaattgcgatccagaattgatgcga
+             ^           ^  ^     ^==========
+   34627    34748     26    none      1      1
+     Errors = 1
+A: ttgtttctgtagaattagaca
+B: ttgtttctgtggaattagaca
+   ==========^==========
+   34671    34792     29    none     18     18
+     Errors = 5
+A: aagccctagcgctagagcaagacataaccttaaaattc
+B: aagccctagcactagagcaaggcgtgatcttaaaattc
+   ==========^          ^ ^ ^ ^==========
+   34714    34835     62    none     14     14
+     Errors = 2
+A: gttgtgaaattcatcgcgcaaaaaagctaccaaa
+B: gttgtgaaatgcatcgcgcaaaagagctaccaaa
+   ==========^            ^==========
+   34778    34899     22    none      2      2
+     Errors = 2
+A: aaatcaaaactaaattaagcga
+B: aaatcaaaacccaattaagcga
+   ==========^^==========
+   34801    34922     35    none      1      1
+     Errors = 1
+A: tactgctcttgcaatcgttta
+B: tactgctcttacaatcgttta
+   ==========^==========
+   34879    35000     63    none     43     43
+     Errors = 5
+A: tcgcttgcttgctagaaaaaaaccaattggttttaaaagaaatcaagcgcgcgcaaaagg
+B: tcgcttgcttattggaaaaaaaccaattggttctaaaagaaatcaagcgcgcacaaaagg
+   ==========^^ ^                  ^                   ^=======
+A: tga
+B: tga
+   ===
+   34943    35064     59    none      1      1
+     Errors = 1
+A: cgactatcacggacgctaatc
+B: cgactatcacagacgctaatc
+   ==========^==========
+   35003    35124     23    none      1      1
+     Errors = 1
+A: ccaagctcgccaagctcagag
+B: ccaagctcgctaagctcagag
+   ==========^==========
+   35027    35148     20    none      1      1
+     Errors = 1
+A: gcatgaaagtagaaatcgtgg
+B: gcatgaaagtggaaatcgtgg
+   ==========^==========
+   35048    35169     45    none      1      1
+     Errors = 1
+A: atgtcaataatggcgaacgct
+B: atgtcaataacggcgaacgct
+   ==========^==========
+   35102    35223     41    none      9      9
+     Errors = 2
+A: aaaaaggggcgaaatttgcgtcaatggtg
+B: aaaaaggggcaaaatttgtgtcaatggtg
+   ==========^       ^==========
+   35144    35265     44    none      1      1
+     Errors = 1
+A: taggcgatgtagtgatcattt
+B: taggcgatgtggtgatcattt
+   ==========^==========
+   35207    35328     70    none     19     19
+     Errors = 5
+A: atgaaatcaacgcacacaagccgagcatcgtgctagtgg
+B: atgaaatcaatacgcacaagccaagcattgtgctagtgg
+   ==========^^ ^        ^     ^==========
+   35288    35418    214    none     11     20
+     Errors = 10
+A: tgggcgggtt--g----tta---gacggcatgaaaaaaga
+B: tgggcgggttaagcgggttattagacggcgtgaaaaaaga
+   ==========^^ ^^^^   ^^^      ^==========
+   35503    35633     20    none      1      1
+     Errors = 1
+A: aaaaccgaaaaaatttagcct
+B: aaaaccgaaagaatttagcct
+   ==========^==========
+   35539    35669     88    none     16     16
+     Errors = 3
+A: ttaacatgctggggaattttgctaaattgtgatgtt
+B: ttaacatgctagggaattttgccaagttgtgatgtt
+   ==========^           ^  ^==========
+   35631    35761     29    none      4      4
+     Errors = 2
+A: agcattgtcaagcgttttttaaaa
+B: agcattgtcaggctttttttaaaa
+   ==========^  ^==========
+   35688    35818     20    none     28     28
+     Errors = 3
+A: ttcaaaaaggaggcgtggctttaaaagaattgcctaaaggcgtgtatt
+B: ttcaaaaagggggcgtggctttaaaggaattgcctaagggcgtgtatt
+   ==========^              ^           ^==========
+   35730    35860     20    none     22     22
+     Errors = 3
+A: tgtattattccaaaacctatcccaaacacgccaaagtcatca
+B: tgtattattctaaaacctaccccaaacacgctaaagtcatca
+   ==========^        ^           ^==========
+   35781    35911     20    none     31     31
+     Errors = 4
+A: aatccgatccctttgtagggttgtatttgttgcaaagcgcaccaagcgagt
+B: aatccgatccttttatagggctgtatttgttgcaaagcgcgccaagcgagt
+   ==========^   ^     ^                   ^==========
+   35802    35932     32    none      1      1
+     Errors = 1
+A: atgtttataccttaagggatt
+B: atgtttatacattaagggatt
+   ==========^==========
+   35931    36061     29    none     97     97
+     Errors = 16
+A: cccttataaggccaatggctagcataggggataaagaagccctagaaacgcgattattgg
+B: cccttataagacccatggccagtataggggctaatcaagccacagaagcgcgattattgg
+   ==========^  ^     ^  ^       ^   ^^     ^^    ^            
+A: tggggcaaagaggctatgagcgctacgctcaaatttcgcaaaagactcaaaaaaatg
+B: tagggcaaaaaggctatgaccgctacgctcaaatttcacaaaaaacccaaaaaaatg
+    ^       ^         ^                 ^     ^  ^==========
+   35971    36101     22    none     11     11
+     Errors = 2
+A: gcaatatttgctatcaaatgttagggctagg
+B: gcaatatttgttatcaaatgctagggctagg
+   ==========^         ^==========
+   35994    36124     20    none      1      1
+     Errors = 1
+A: taggggggaatggctttatag
+B: taggggggaacggctttatag
+   ==========^==========
+   36015    36145     20    none      1      1
+     Errors = 1
+A: aaacgaaatttatcaagcgct
+B: aaacgaaattcatcaagcgct
+   ==========^==========
+   36036    36166     43    none      1      1
+     Errors = 1
+A: ttttaaaccagcaagagcctt
+B: ttttaaaccaacaagagcctt
+   ==========^==========
+   36114    36244     50    none     35     35
+     Errors = 4
+A: ttagaagaacatcataagcgtttagtggtagtgcaatttgatccatttttcccta
+B: ttagaagaacgtcataagcgtttggtggtagcgcaatttgatccctttttcccta
+   ==========^            ^       ^            ^==========
+   36183    36313     33    none     19     19
+     Errors = 5
+A: tagcgatcaaccatcaaaagatccactcattagcggagt
+B: tagcgatcaatgattacaagatccactcgttagcggagt
+   ==========^^  ^ ^           ^==========
+   36262    36392     28    none     46     46
+     Errors = 7
+A: gagcaatcttaaataccaaagccttgcaaaagtggaaatcaaacgaaaccataaagtcaa
+B: gagcaatctttcataccaaagcctcgccaaagtgaaaatcaaacgaaaccatcaaatcaa
+   ==========^^            ^  ^      ^                 ^  ^====
+A: agaagt
+B: agaagt
+   ======
+   36309    36439     41    none     19     19
+     Errors = 3
+A: aagtcaataagcgttatggggggtttttactcaaagaca
+B: aagtcaataaacgctatggggggtttttgctcaaagaca
+   ==========^  ^              ^==========
+   36363    36493     75    none     13     13
+     Errors = 2
+A: tcgctttagatgagcgttttattatcactaaaa
+B: tcgctttagacgagcgttttatcatcactaaaa
+   ==========^           ^==========
+   36465    36595     21    none     27     27
+     Errors = 6
+A: atgggtgaattataaaagcgtggcgtccaacccaaaggctttaagag
+B: atgggtgaatcataaaagcgtttcgttcaacccgaaagctttaagag
+   ==========^          ^^   ^      ^  ^==========
+   36487    36617     24    none      1      1
+     Errors = 1
+A: agcgttaagcgcgcctaaaat
+B: agcgttaagcacgcctaaaat
+   ==========^==========
+   36517    36647     33    none      6      6
+     Errors = 2
+A: ttattagtcttgcgtaaaggctttga
+B: ttattagtctggcgtcaaggctttga
+   ==========^    ^==========
+   36580    36710     29    none     30     30
+     Errors = 4
+A: gtccgttgaagtattgatgaaaaatgacgcttatgaaattattctttctt
+B: gtccgttgaaacattgatgaaacatgacgcttatgaaatcattctttctt
+   ==========^^          ^                ^==========
+   36610    36740     29    none      1      1
+     Errors = 1
+A: cgcctctcacggcgattttag
+B: cgcctctcacagcgattttag
+   ==========^==========
+   36649    36779     28    none     10     10
+     Errors = 2
+A: ctgaattttttctctacactttgcatgcgc
+B: ctgaatttttcctctacaccttgcatgcgc
+   ==========^        ^==========
+   36678    36808     30    none      1      1
+     Errors = 1
+A: tttaatagcgtggtcgctttg
+B: tttaatagcgcggtcgctttg
+   ==========^==========
+   36709    36839     23    none      1      1
+     Errors = 1
+A: tctttgcttataggagtttga
+B: tctttgcttacaggagtttga
+   ==========^==========
+   36832    36962     33    none    100    100
+     Errors = 17
+A: aacagaatttcttcagcgctagcgcgctaacagaagcgttattgtttgtggggttttttg
+B: aacagaattttttcagtgctagcgcgcttttagaagcgttatggtttgtggggttttttg
+   ==========^     ^           ^^^           ^                 
+A: cacttttcaactacgctttaaaaaatcccatgcatttttatgaatttttccaaaacgcta
+B: cgctgtttaactacgctttgaaaaatccttcgcgcttttatgaattgtttcaaaacgcta
+    ^  ^  ^           ^        ^^^  ^^           ^  ^==========
+   36877    37007     24    none     12     12
+     Errors = 3
+A: taacatgatcgcgcaaagcctctctcaaagct
+B: taacatgatcactcaaagcctttctcaaagct
+   ==========^ ^        ^==========
+   36907    37037     20    none      6      6
+     Errors = 2
+A: taacttttctgaccatgcgctttctt
+B: taacttttctaaccacgcgctttctt
+   ==========^    ^==========
+   36928    37058     26    none      1      1
+     Errors = 1
+A: tagattttatctttaatcatg
+B: tagattttatttttaatcatg
+   ==========^==========
+   36961    37091     26    none      7      7
+     Errors = 2
+A: atgcccttagtttcatcagcgatttga
+B: atgcccttagcttcattagcgatttga
+   ==========^     ^==========
+   37017    37147     24    none     30     30
+     Errors = 3
+A: atgaaatgtctgtgtggctttttttaagcgttttgcaagggctttttttg
+B: atgaaatgtccgtgtggctttttttaagcattttgcaagcgctttttttg
+   ==========^                  ^         ^==========
+   37042    37172     20    none      1      1
+     Errors = 1
+A: tgctgtttgcaatcatcattt
+B: tgctgtttgcgatcatcattt
+   ==========^==========
+   37068    37198     23    none      6      6
+     Errors = 2
+A: tagtgtatttagaagtgcatgtgtgg
+B: tagtgtatttggaagcgcatgtgtgg
+   ==========^    ^==========
+   37093    37223     23    none      2      2
+     Errors = 2
+A: tctttaggggtgctgtttttag
+B: tctttaggggcactgtttttag
+   ==========^^==========
+   37117    37247     32    none      1      1
+     Errors = 1
+A: ttgggttttttaaaacctgga
+B: ttgggtttttcaaaacctgga
+   ==========^==========
+   37156    37286     38    none      7      7
+     Errors = 2
+A: ttatatgcctaaaaaagtgcttcgctc
+B: ttatatgccttaaaaaatgcttcgctc
+   ==========^     ^==========
+   37198    37328     29    none      4      4
+     Errors = 2
+A: ttttgttgttggtagggtttttga
+B: ttttgttgttagtggggtttttga
+   ==========^  ^==========
+   37243    37373     38    none     16     16
+     Errors = 5
+A: ttactaaggctttaatagacgctcatatgcaagaaa
+B: ttactaaggcgttaatggacgctagcatgcaagaaa
+   ==========^     ^      ^^^==========
+   37282    37412     32    none      1      1
+     Errors = 1
+A: tattggtggtagcgttatttt
+B: tattggtggtggcgttatttt
+   ==========^==========
+   37315    37445     77    none      1      1
+     Errors = 1
+A: ttatcatcggcgtgccttttt
+B: ttatcatcggtgtgccttttt
+   ==========^==========
+   37498    37628     20    none    106    106
+     Errors = 30
+A: ccaatttgagtgccaacctcagccaaaacgccct-taattccttacaatacat-c-acga
+B: ccaatttgagcgctaacctcactcaaagcgctttccaat-ctttaca--gcatgccacga
+   ==========^  ^       ^^    ^   ^^ ^^   ^ ^     ^^^   ^ ^    
+A: ccccacccgcttcttctagcgtttcttcttctatgagtgaaagcgtctctaaagaaaaag
+B: cctcgcccgctccttctcatatttcctcttctgcaagtcaaagcgtttctaaagaaaagg
+     ^ ^      ^     ^^^^    ^      ^^^   ^       ^           ^=
+A: aaacgcatt
+B: aaacgcatt
+   =========
+   37519    37649     72    none      1      1
+     Errors = 1
+A: cccccacatttaaggtagaaa
+B: cccccacattcaaggtagaaa
+   ==========^==========
+   37592    37722     40    none      1      1
+     Errors = 1
+A: ggatacaataaatacaaaaaa
+B: ggatacaatagatacaaaaaa
+   ==========^==========
+   37633    37763     29    none      1      1
+     Errors = 1
+A: atttaatgagaattttttttg
+B: atttaatgaggattttttttg
+   ==========^==========
+   37663    37793     44    none      1      1
+     Errors = 1
+A: gacttgtgttttttggttgca
+B: gacttgtgttgtttggttgca
+   ==========^==========
+   37715    37844     37    none      8      7
+     Errors = 3
+A: aaagcccttgcacattgttatgaaaaca
+B: aaagcccttgtaccttg-tatgaaaaca
+   ==========^  ^   ^==========
+   37794    37923     21    none     42     42
+     Errors = 7
+A: aagaaaagcctttcaatagcgagcagttgatctattt-agaagagcttttaaaccaccaa
+B: aagaaaagccgttcaatagcgagcagatg-gcttttttagaagagcttttaagccaccaa
+   ==========^               ^  ^^  ^   ^              ^=======
+A: gaa
+B: gaa
+   ===
+   37818    37947     48    none      3      3
+     Errors = 2
+A: agcatttagaaaacaagctttct
+B: agcatttagagagcaagctttct
+   ==========^ ^==========
+   37876    38005     23    none     10     10
+     Errors = 5
+A: aaagcgtgttcagactggagaggaaccgct
+B: aaagcgtgtttcggctagaaaggaaccgct
+   ==========^^ ^  ^  ^==========
+   37960    38089     44    none     61     61
+     Errors = 11
+A: aaatcgcttataaactcttaggcttgatgagttttatcgctcttgttttagcgatcgtgt
+B: aaatcgcttacaggcttttaggtttgatgagctttatcgcgcttgtcttagcgatcgttt
+   ==========^ ^^  ^     ^        ^        ^     ^           ^ 
+A: taatcagtgttctgcccttac
+B: taatcagtatcctgcccttac
+           ^ ^==========
+   38005    38134    104    none      1      1
+     Errors = 1
+A: attttttaaatcaggacaagc
+B: attttttaaaccaggacaagc
+   ==========^==========
+   38164    38293     36    none     55     55
+     Errors = 5
+A: accgagagagtattaaccgcattgacgataaatcgcgctatgaattggtgcgcttgcaaa
+B: accgagagagcattaatcgcattgacgataaatcccgctatgaactggtgcgcttgcaaa
+   ==========^     ^                 ^         ^               
+A: gcagttctaaagtgt
+B: gcagctctaaagtgt
+       ^==========
+   38233    38362     65    none     33     33
+     Errors = 3
+A: tttgattaaaacccaaaacagcatttatgtgcaaagccatttggaaagagaag
+B: tttgattaaagcccaaaacagcatctatgtgcaaagccatttagaaagagaag
+   ==========^             ^                 ^==========
+   38299    38428     23    none      1      1
+     Errors = 1
+A: ttgcgagcgtctccattgcgg
+B: ttgcgagcgtgtccattgcgg
+   ==========^==========
+   38335    38464     32    none     13     13
+     Errors = 3
+A: aacttttgaacgaaaacaagttggtgtatgaaa
+B: aacttttgaatgaaaacaagctcgtgtatgaaa
+   ==========^         ^ ^==========
+   38368    38497     56    none      1      1
+     Errors = 1
+A: tcgtattgagttatttgtttg
+B: tcgtattgagctatttgtttg
+   ==========^==========
+   38469    38604     29    none     45     51
+     Errors = 11
+A: accctaccggatttaaaatcacccgttacagcatcactgaaatc------actaataggg
+B: accctaccggctttaaaatcactcgctacagcatcactgaaatcgcgccgactaatagga
+   ==========^           ^  ^                  ^^^^^^         ^
+A: gtgattgatgc
+B: atgattgatgc
+   ^==========
+   38523    38658     47    none     25     25
+     Errors = 4
+A: tatacgctcttgtgggctttttgttggcttttagcgctttaaaag
+B: tatacgctctcatgggctttttgttggtttttagtgctttaaaag
+   ==========^^               ^      ^==========
+   38589    38724     50    none     19     19
+     Errors = 3
+A: aaacagccccggcgcatttaaaccaccctatgcaggatt
+B: aaacagccccagcgaatttaaaccaccccatgcaggatt
+   ==========^   ^             ^==========
+   38640    38775     55    none      1      1
+     Errors = 1
+A: aaaaccgctcaaaaatgtcca
+B: aaaaccgctccaaaatgtcca
+   ==========^==========
+   38696    38830     22      -2      1      0
+     Errors = 1
+A: tataaaatcccgcttgcgtta
+B: tataaaatcc-gcttgcgtta
+   ==========^==========
+   38719    38853     38    none      1      1
+     Errors = 1
+A: cgatggcgaccttattgtttt
+B: cgatggcgactttattgtttt
+   ==========^==========
+   38758    38892     41    none      1      1
+     Errors = 1
+A: attttgttttaggggataagg
+B: attttgttttgggggataagg
+   ==========^==========
+   38833    38967     31    none     34     34
+     Errors = 6
+A: tagaaagcaacgatcgtattttgcttatcaaacccctacaaattggcgtggatt
+B: tagaaagcaatgatcgcattttactcatcaaacccttacaaatcggcgtggatt
+   ==========^     ^     ^  ^         ^       ^==========
+   38866    39000     65    none      2      2
+     Errors = 2
+A: gtgattgataatgagggtaaga
+B: gtgattgatagcgagggtaaga
+   ==========^^==========
+   38932    39066     23    none      1      1
+     Errors = 1
+A: accctaatttgcaggttttta
+B: accctaatttacaggttttta
+   ==========^==========
+   38999    39142     24    none     44     53
+     Errors = 15
+A: aagataaaaattattattctaacgcttttttgaagccccaaaaagaaaat-a------t-
+B: aagataaaaactattacactaacgcttttatcaagccccaaaaagaaaatcaagaaaata
+   ==========^     ^^           ^ ^                  ^ ^^^^^^ ^
+A: -ggctgaaaatgc
+B: tgtctgaaaatgc
+   ^ ^==========
+   39041    39184     22    none     18     18
+     Errors = 7
+A: aaagatgcccccacaaacaacaaacccttaaaagaaga
+B: aaagatgcccaaaaaaataataagcccctaaaagaaga
+   ==========^^ ^   ^  ^  ^   ^==========
+   39064    39207     25    none      1      1
+     Errors = 1
+A: aagaagaaaccaaagaaaaag
+B: aagaagaaactaaagaaaaag
+   ==========^==========
+   39136    39279     51    none     47     47
+     Errors = 7
+A: gagactataactattggcgataacactaatgccatgaaaatcgttaaaaaagacattcaa
+B: gagactataattattggcgataacaccaacgcgatgaaaattattaaaaaagacatccaa
+   ==========^               ^  ^  ^        ^^             ^===
+A: aaaggct
+B: aaaggct
+   =======
+   39235    39378     47    none     48     48
+     Errors = 7
+A: gtattgttta-gggatttgttctaaaaagtccaaactctctttgatgcctaaagaaattt
+B: gtattgtttatgggctt-gttctaaaaaatccaaactctccttaatgcctaaagaaatct
+   ==========^   ^  ^          ^           ^  ^              ^=
+A: ttaacgaca
+B: ttaacgaca
+   =========
+   39283    39426     47    none      1      1
+     Errors = 1
+A: aaagattagcgctctctaaat
+B: aaagattagcactctctaaat
+   ==========^==========
+   39331    39474     50    none      1      1
+     Errors = 1
+A: gctatgataacccggtgaata
+B: gctatgataatccggtgaata
+   ==========^==========
+   39471    39614     30    none     90     90
+     Errors = 14
+A: aagacgtttcggctaaatggactttaaggctgggcaaggactatttgtgcatccgttttg
+B: aagacgtttctactaaatggactttaaggttgggtaaggattatctgtgtatccgttttg
+   ==========^^                 ^    ^     ^   ^    ^          
+A: tcaaaaaggc-taaagatgaataagtggcttaagggggcgattgtttttgt
+B: tcaaaa-ggcgcaaaggtgaataagtggattaaaggggcggttgtttttgt
+         ^   ^^    ^           ^    ^      ^==========
+   39543    39686     22    none     42     42
+     Errors = 5
+A: gcaacgattataaccatttctttaatctatcatcaaaagccaaaagcccccttaaataac
+B: gcaacgattacaaccttttctttaatctaccaccaaaagccaaaagcccccctaaataac
+   ==========^    ^             ^  ^                  ^========
+A: ca
+B: ca
+   ==
+   39566    39709     68    none      1      1
+     Errors = 1
+A: ctagccttttaaatgacgatg
+B: ctagccttttgaatgacgatg
+   ==========^==========
+   39635    39778     83    none      1      1
+     Errors = 1
+A: caactaacacagaaagctcca
+B: caactaacacggaaagctcca
+   ==========^==========
+   39774    39912     22    none     56     51
+     Errors = 16
+A: aagaaatgaaccattctaaagaagaaacttttaagaaccctcccatagatttaaagcaaa
+B: aagaaatgaattattccaaagaagagacttttactagccctcccatggatccaaa--aa-
+   ==========^^    ^        ^       ^^ ^         ^   ^^   ^^  ^
+A: cacaaacccccctaaa
+B: ca-a-ccccccctaaa
+     ^ ^^==========
+   39845    39983     34    none     49     49
+     Errors = 8
+A: agacttttcttcaaagcaatgggatttactagccgctcgcatcacccctttcaaacaagg
+B: agacttttctccaaaacaattagatttactggcctctcgcatcacccctttcaagcaaag
+   ==========^    ^    ^^        ^   ^                   ^   ^=
+A: ccctaaaaa
+B: ccctaaaaa
+   =========
+   39910    40048     38    none     31     31
+     Errors = 5
+A: tgattttccccatggataaccctaaaggcattgatggttttactaacctta
+B: tgattttccctgtggataaccctaatggcattgatagtttcactaacctta
+   ==========^^             ^         ^    ^==========
+   39949    40087     23    none      1      1
+     Errors = 1
+A: ctaatgaaaataagcttttac
+B: ctaatgaaaacaagcttttac
+   ==========^==========
+   40006    40144     26    none     34     34
+     Errors = 7
+A: ccattacagcggataaaatgatacccgcctttctcatcacgcctatttctagcc
+B: ccattacagctgacaaaatgatacccgcttttttgattacgcccatttctagcc
+   ==========^  ^              ^   ^ ^  ^     ^==========
+   40042    40180     20    none     10     10
+     Errors = 3
+A: ctggtaaagtcatcgcgcaggtggagagcg
+B: ctggtaaagtgattgcgcaagtggagagcg
+   ==========^  ^     ^==========
+   40075    40213     35    none     13     13
+     Errors = 4
+A: atatttttgctcacatgggcaaggccgtcttaa
+B: atatttttgcaagcatgggcaaagccgtcttaa
+   ==========^^^         ^==========
+   40111    40249     53    none      1      1
+     Errors = 1
+A: aagtcataggttattacagca
+B: aagtcataggctattacagca
+   ==========^==========
+   40168    40306     20    none      4      4
+     Errors = 2
+A: ttgtatggagccgcatcatcactc
+B: ttgtatggagtcgaatcatcactc
+   ==========^  ^==========
+   40189    40327     53    none      1      1
+     Errors = 1
+A: cccatggcatcaatatcatgc
+B: cccatggcattaatatcatgc
+   ==========^==========
+   40243    40381     29    none      1      1
+     Errors = 1
+A: ataacggcttggtgggggaat
+B: ataacggcttagtgggggaat
+   ==========^==========
+   40273    40411     29    none      1      1
+     Errors = 1
+A: ggaatttccagcgctatggcg
+B: ggaatttccaacgctatggcg
+   ==========^==========
+   40303    40441     61    none      1      1
+     Errors = 1
+A: tgctttctactctcactaacg
+B: tgctttctacgctcactaacg
+   ==========^==========
+   40372    40510     24    none      8      8
+     Errors = 5
+A: aataaagaaggag-ccaccaatttctttg
+B: aataaagaag-aggtgactaatttctttg
+   ==========^  ^^^  ^==========
+   40397    40535     40    none      1      1
+     Errors = 1
+A: ttatcttttaatgcaattgat
+B: ttatcttttattgcaattgat
+   ==========^==========
+   40438    40576     20    none      1      1
+     Errors = 1
+A: tcaatcaagtagtcaatcaaa
+B: tcaatcaagtggtcaatcaaa
+   ==========^==========
+   40495    40633     38    none     37     37
+     Errors = 5
+A: ttttaagagataagagcaaaatcgctcctattgtggtgattagagaagggagtaggg
+B: ttttaagagacaagagcaagatcgcccccattgtggtgattagagaggggagtaggg
+   ==========^        ^     ^  ^                 ^==========
+   40534    40672     57    none      1      1
+     Errors = 1
+A: ctgacatctttttccctatac
+B: ctgacatcttcttccctatac
+   ==========^==========
+   40597    40735     41    none      6      6
+     Errors = 4
+A: actcaaaaatccccaattaaaaacgc
+B: actcaaaaatgccagtttaaaaacgc
+   ==========^  ^^^==========
+   40690    40828     59    none     52     52
+     Errors = 8
+A: aagagagcctgacaagaaaacgcatgaaaattaaaaatatcttactgagtggggggagcg
+B: aagagagcctagcaagaaagcccatgaaaattaaaaatgtcttattgagtggggggagtg
+   ==========^^       ^ ^                ^     ^             ^ 
+A: ggaaacgcctat
+B: gcaaacgcctat
+    ^==========
+   40768    40906     44    none     19     19
+     Errors = 2
+A: agctttttgaccataaaagcttgtttgaattgagtttta
+B: agctttttgatcataaaagcttgtttgagttgagtttta
+   ==========^                 ^==========
+   40813    40951     29    none      1      1
+     Errors = 1
+A: aaacgctcattgtgtgcaatg
+B: aaacgctcatcgtgtgcaatg
+   ==========^==========
+   40876    41014     20    none     34     34
+     Errors = 5
+A: attttttagccctagaagagataaagaatgaaatcaaaaacaaaagcgtgggtt
+B: attttttagctctagaagaaataaaaaacgaaatcaaaaacaagagcgtgggtt
+   ==========^        ^     ^  ^              ^==========
+   40900    41038     26    none      4      4
+     Errors = 2
+A: ttttattagagagcttgagtaaaa
+B: ttttattagaaagtttgagtaaaa
+   ==========^  ^==========
+   40927    41065     60    none      1      1
+     Errors = 1
+A: ctaacgccatcgctttgagcg
+B: ctaacgccattgctttgagcg
+   ==========^==========
+   41086    41224     77    none     99     99
+     Errors = 12
+A: aagcgatcatttgattaaagaccttcaagcgtatgaaaacgcgataaaaaaagcgattga
+B: aagcgatcatctgattaaagactttcaagcgtatgaaaatgcgataaaaaaagcgattaa
+   ==========^           ^                ^                  ^ 
+A: tctagcccaaaaaggttttttagtcacttttggggtgagtattgacaagcccaacacgg
+B: tttagctcaaaaaggctttttagtcacttttgggattagcattgaaaaacccaacacgg
+    ^    ^        ^                  ^ ^  ^     ^  ^==========
+   41164    41302     26    none      1      1
+     Errors = 1
+A: caagcctagacaaagcgatag
+B: caagcctagaaaaagcgatag
+   ==========^==========
+   41209    41347     56    none     19     19
+     Errors = 3
+A: aaaaaagcgg-gggtttttatttcaatagcggcatgtttg
+B: aaaaaagcggagggtttt-atttcaatagtggcatgtttg
+   ==========^       ^          ^==========
+   41338    41476    151    none     73     73
+     Errors = 7
+A: agcatgcccccactattttaaaggggtgtgaaagagcgtttgaatctttagaaaacgcgt
+B: agcatgcccctactattttaaaggggtgcgaaagagcgtttgaatccttagaaaacacgc
+   ==========^                 ^                 ^         ^  ^
+A: atttttttgaaaaaaagatcgctcgtttgagcg
+B: atttttttgaacaaaagatcgcgcgtttgagcg
+              ^          ^==========
+   41544    41682     42    none     55     55
+     Errors = 7
+A: gcggctaacgagc-ctaaagaaaatgtcagcttgaatcaaacgcctgtttttgccaaaga
+B: gcggctaacg-gcactaaagaaaatgtcagcctgaatcaaacgcctatttttgccaaaga
+   ==========^  ^                 ^              ^             
+A: aagcgaaaataattta
+B: gagcacaaataattta
+   ^   ^^==========
+   41605    41743     24    none     19     19
+     Errors = 4
+A: ctcttttaggcgttgagaatttagcggttattgacacta
+B: ctcttttaggggttgaggatttagcgatcattgacacta
+   ==========^      ^        ^ ^==========
+   41704    41842     35    none     75     75
+     Errors = 9
+A: cgctcttttaatcgctcataaagacaaggctaaggatttaaaagctttagtgaacgaggt
+B: cgctcttttagtcgctcataaagacaaagctaaggatttaaaagccctagtgagcgagat
+   ==========^                ^                 ^^      ^    ^ 
+A: agaaacaaacaaccaagaattgttgcaaacgcaca
+B: agaaacacacaaccaagaattattacaaacgcaca
+          ^             ^  ^==========
+   41740    41878     62    none      1      1
+     Errors = 1
+A: cttgggggagttatgaagtct
+B: cttgggggagctatgaagtct
+   ==========^==========
+   41815    41953     32    none     13     13
+     Errors = 2
+A: aaccaaacgcaaggctttctttacaaaagcatt
+B: aaccaaacgctaggctttctttgcaaaagcatt
+   ==========^           ^==========
+   41848    41986     26    none      1      1
+     Errors = 1
+A: aacactgggtagtgattagcg
+B: aacactgggtggtgattagcg
+   ==========^==========
+   41889    42027     46    none     15     15
+     Errors = 3
+A: cgagcgtggagttggatcaccagttgtttgaattg
+B: cgagcgtggaattggatcaccaatcgtttgaattg
+   ==========^           ^ ^==========
+   41986    42124     20    none     51     51
+     Errors = 7
+A: taaaaacaccctacaccgcctggctaattacggcaagatccctttaattatcatagaagt
+B: taaaaacaccttacaccgcctagctaattatggcaaaatccctttgattatcatagaggt
+   ==========^          ^        ^     ^        ^           ^  
+A: tcaagtgggcg
+B: ccaagtgggcg
+   ^==========
+   42072    42209     28    none     66     65
+     Errors = 10
+A: agtatgtcggtgaagacgatattgtgcgcattgatgatgattttaacagacaaaatcaaa
+B: agtatgtcggcgaagacgatattgtaagggttgatgacgattttaacagacagaatcaaa
+   ==========^              ^^ ^^       ^              ^       
+A: acgcctaataaagaaaatttaataaa
+B: acgcctaatgaa-aagatttaataaa
+            ^  ^  ^==========
+   42101    42238    145    none      1      1
+     Errors = 1
+A: aataaaggaaaaataatgaaa
+B: aataaaggaacaataatgaaa
+   ==========^==========
+   42291    42428     29    none     45     45
+     Errors = 5
+A: gatcgatcatctgtatgaagatttgcatagcgatcataaaaggcgttttttcttacacta
+B: gatcgatcatttgtatgaagatttgcacagcgaacacaaaaggcgttttttcttgcacta
+   ==========^                ^     ^  ^                 ^=====
+A: tgggg
+B: tgggg
+   =====
+   42351    42488     23    none     31     31
+     Errors = 4
+A: atagctctaatcttatccatttaatcgctaccactaagcctacagagattt
+B: atagctctaacctcatccatttgatcgctaccactaagcccacagagattt
+   ==========^  ^        ^                 ^==========
+   42387    42524     20    none     13     13
+     Errors = 2
+A: atttagccgctcaaagccatgtaaaagtctctt
+B: atttagccgcgcaaagccatgtgaaagtctctt
+   ==========^           ^==========
+   42408    42545     47    none      1      1
+     Errors = 1
+A: ttgaaacccccgaatacaccg
+B: ttgaaaccccagaatacaccg
+   ==========^==========
+   42474    42611     29    none     19     19
+     Errors = 3
+A: ggattttagaagccatgcggattttaggattagaaaaga
+B: ggattttagaggccatgcggattttgggcttagaaaaga
+   ==========^              ^  ^==========
+   42504    42641     38    none      1      1
+     Errors = 1
+A: tttatcaagccagcacgagcg
+B: tttatcaagctagcacgagcg
+   ==========^==========
+   42543    42680     71    none      1      1
+     Errors = 1
+A: tagaaaccccgcaaaatgaaa
+B: tagaaaccccacaaaatgaaa
+   ==========^==========
+   42639    42776     20    none     25     25
+     Errors = 3
+A: tttacatcaccaaaaattacagagaggcctataacttgtttgcgg
+B: tttacatcactaaaaattacagagaggcttataatttgtttgcgg
+   ==========^                 ^     ^==========
+   42660    42797    113    none      1      1
+     Errors = 1
+A: ttaatggcattctttttaacc
+B: ttaatggcatcctttttaacc
+   ==========^==========
+   42774    42911     35    none      1      1
+     Errors = 1
+A: tagggaatttagacgctaaaa
+B: tagggaatttggacgctaaaa
+   ==========^==========
+   42882    43019     41    none     73     73
+     Errors = 8
+A: ccaaagattacgtgaaaatgatgcatttaatgctccaagcgcccatcccacaagattatg
+B: ccaaagattatgtgaaaatgatgcatttgatgctccaagcacccaccccacaagattatg
+   ==========^                 ^           ^    ^              
+A: tgatcgccacaggaaagaccacaagcgtgcgcg
+B: taatcgctacagggaagaccacgagcgtgcgcg
+    ^     ^     ^        ^==========
+   42931    43068     74    none      8      8
+     Errors = 4
+A: aatttatcggtatcaatttagaatttca
+B: aatttatcggcattgatctagaatttca
+   ==========^  ^^  ^==========
+   43127    43264     69    none    122    122
+     Errors = 15
+A: gaacgctttaaaattgaacttaagccatttaaaaaaaggccaaatcgtggtgcgcataga
+B: gaacgctttacaattaaacttaagccatttaaaaacgggcaaaatcgtggtgcgtataga
+   ==========^    ^                   ^^   ^             ^     
+A: cgagcgttatttcaggcctaccgaagtggatttgcttttaggcgatcccactaaggcaga
+B: cgagcactatttcaggcctactgaagtggatttgctcttaggcgatcccactggggctga
+        ^^              ^              ^               ^^   ^  
+A: gaaagagctagactgggttagg
+B: gaaagagctgggctgggttagg
+            ^ ^==========
+   43197    43334     26    none      1      1
+     Errors = 1
+A: aagaatgccaaaaaaaccttt
+B: aagaatgccagaaaaaccttt
+   ==========^==========
+   43229    43366     25    none      6      6
+     Errors = 2
+A: aagatgggggttatattttaaggaat
+B: aagatgggggctatactttaaggaat
+   ==========^    ^==========
+   43273    43410     44    none     19     19
+     Errors = 4
+A: tgaatgagattattttaatcactggtgcctatggcatgg
+B: tgaatgagatcattttaatcaccggcgcttatggcatgg
+   ==========^           ^  ^  ^==========
+   43362    43499     27    none     45     45
+     Errors = 5
+A: ttaaaaaaaataagcctgatgttactct-actcactcctaaaaagagcgaattgtgtttg
+B: ttaaaaaaaacaagcctgatgttac-cttactcacccctaaaaagagcgaattgtatttg
+   ==========^              ^  ^      ^                   ^====
+A: ttggat
+B: ttggat
+   ======
+   43390    43527     62    none      1      1
+     Errors = 1
+A: acgttcaagcttatttgaaag
+B: acgttcaagcctatttgaaag
+   ==========^==========
+   43465    43602     32    none     13     13
+     Errors = 3
+A: ggggcattgtcgctaacatgaatgatctttcaa
+B: ggggcattgtggcaaacatgaacgatctttcaa
+   ==========^  ^        ^==========
+   43533    43670     42    none     36     36
+     Errors = 5
+A: agaatttactgatgggcttgtacctcttttctagcgctttagattcgggcgtgaaa
+B: agaatttactcatgggtttgtatcttttttctagcgctttagatttgggcgtgaaa
+   ==========^     ^     ^  ^                   ^==========
+   43591    43728     41    none     16     16
+     Errors = 3
+A: cttgcgcttaccctaaattcgcccccaaccctttaa
+B: cttgcgcttatcctaaatacgcccctaaccctttaa
+   ==========^       ^      ^==========
+   43642    43779     44    none     10     10
+     Errors = 2
+A: gctctttagagccaacgaacgaaggctacg
+B: gctctttagaaccaacgaatgaaggctacg
+   ==========^        ^==========
+   43735    43872     35    none     49     49
+     Errors = 6
+A: agtattgcgagtatgtgagcgctgaaaagggcgttttttataaaac-cttagtgccttgc
+B: agtattgcgaatacgtgagcgctgaaaaaggcgttttttataaaactct-agtgccttgt
+   ==========^  ^              ^                 ^  ^         ^
+A: aacctttatg
+B: aacctttatg
+   ==========
+   43771    43908     26    none      1      1
+     Errors = 1
+A: ttgaagaaaaaatagcgcaca
+B: ttgaagaaaagatagcgcaca
+   ==========^==========
+   43798    43935     36    none      1      1
+     Errors = 1
+A: cagggcttatcgctaggatgc
+B: cagggcttattgctaggatgc
+   ==========^==========
+   43837    43974     29    none      3      3
+     Errors = 2
+A: aaatgaaaaagagtttgcgatgt
+B: aaatgaaaaaaattttgcgatgt
+   ==========^ ^==========
+   43867    44004     38    none      1      1
+     Errors = 1
+A: gcacggccaggagagagtatc
+B: gcacggccagaagagagtatc
+   ==========^==========
+   43963    44100     74    none     58     58
+     Errors = 8
+A: ccagattcatttctctagcttatgagaatatcgcttcaa-tccctagcgtgatgaatgtt
+B: ccagattcatcgctctcgcttatgagaatatcgct-caaatgcctagcgtgatgaatgtc
+   ==========^^    ^                  ^   ^ ^                 ^
+A: ggctctggcgtggattaca
+B: ggctctggagtggattaca
+           ^==========
+   44040    44177     21    none      3      3
+     Errors = 2
+A: ttgtgaaagacttatccaaacca
+B: ttgtgaaagattcatccaaacca
+   ==========^ ^==========
+   44062    44199     28    none      1      1
+     Errors = 1
+A: tgggcatgcagcaaaagctta
+B: tgggcatgcaacaaaagctta
+   ==========^==========
+   44091    44228     85    none      1      1
+     Errors = 1
+A: tccaaacaaagggctttaaaa
+B: tccaaacaaaaggctttaaaa
+   ==========^==========
+   44197    44334     20    none     21     21
+     Errors = 3
+A: agaggtttgaaataaaatcaaggctcttatggagctataaa
+B: agaggtttgatctaaaatcaaggctcttatagagctataaa
+   ==========^^                  ^==========
+   44360    44499     24    none    143    145
+     Errors = 31
+A: aacgctccgctattaagcgttaggctagtggtagttgcgatattgtgatc--gttttagc
+B: aacgctccgccattaggcgttaggctagcgatatttacgatattgcgatcacaagttcgc
+   ==========^    ^            ^ ^  ^  ^        ^    ^^^^^  ^  
+A: ttcaaacaaactttgagccattaaaa-gggatttggt-gtgtggcttcgctct-caattt
+B: ttcaaacaaactt-gagccattaaaaaggggtttggttgcatg-ctttactcttcacct-
+                ^            ^   ^      ^ ^^  ^   ^^    ^  ^^ ^
+A: caagtgctttcaaaaagcaaggtgtgttactattctattttttcataa
+B: caagcgctttcaaaaagcaaggcgtgttagcattctaatttttcataa
+       ^                 ^      ^^      ^==========
+   44494    44627     23    none    110    104
+     Errors = 31
+A: ctagggggtaaggaatgtaagggggcttttt-tgttaggccaaccaccaacttctttgca
+B: ctagggggtagggaatataaggg--ctttttctatgagattaaccacc-gctt----gct
+   ==========^     ^      ^^      ^ ^ ^  ^^^       ^^   ^^^^  ^
+A: ttaaaaacaaa-ctcgtattttacaa-gagagagttttgattggcatgagatctatcttt
+B: ttaaa-tcaaaacttgtattttacaaccag-tagctataatttgcatgagatttatcttt
+        ^^    ^  ^           ^^  ^^  ^ ^ ^   ^         ^       
+A: tagatgagcgggc
+B: tatatgagcgggc
+     ^==========
+   44532    44665     21    none     15     15
+     Errors = 5
+A: tccctctattgaactgaatgtcctagatttttatg
+B: tccctctattaaattgaatgttttggatttttatg
+   ==========^  ^       ^^ ^==========
+   44565    44699     23    none     12     13
+     Errors = 3
+A: tgtctgtttt-agaggtgattgtcagttggttt
+B: tgtctgtttttagagatgattgccagttggttt
+   ==========^    ^      ^==========
+   44649    44781     25    none     61     59
+     Errors = 10
+A: ctttccaaaaacccaagtccctttatcagtgtctctatgctaacttcttttatatgctga
+B: ctttccaaaattccaagtccctttatcagt--ctttatactaacttcctttatatgctga
+   ==========^^                  ^^  ^   ^        ^            
+A: caccgaaataaataaaattga
+B: caacgaagtatataaaattga
+     ^    ^  ^==========
+   44675    44807     30    none      1      1
+     Errors = 1
+A: atcgccaaatcttagcgtttt
+B: atcgccaaattttagcgtttt
+   ==========^==========
+   44720    44849     25    none     15     12
+     Errors = 6
+A: aaataaggaaatccatcattgttagcacaattccc
+B: aaataaggaagtc--t-atcgttatcacaattccc
+   ==========^  ^^ ^  ^    ^==========
+   44757    44889     31    none     12     15
+     Errors = 5
+A: tgatttttgcactcaata-ta--gcgatactatca
+B: tgatttttgcgctcaataatatagtgatactatca
+   ==========^       ^  ^^ ^==========
+   44856    44997     26    none     68     77
+     Errors = 19
+A: gatgtctatctaataaaggc--tg----ttc-t--taaaagttacttcaatatttattgg
+B: gatgtctatccaataaagaccgtgaccatacctactgaaagttacttcaatgtctattgg
+   ==========^       ^ ^^  ^^^^ ^ ^ ^^ ^              ^ ^      
+A: gggtttttcactgccactacacccagaaaaaaacaca
+B: gggtttttcactaccactacaccccacaaaaaacaca
+               ^           ^^^==========
+   44954    45100     30    none     72     77
+     Errors = 18
+A: ccaaaaatgattgctagcattaagcccgctttttt-gtaac-cc-accactaacac--tc
+B: ccaaaaatgaccgctcatatcaagcccgctttttttgtaacacccactattaaaaccctc
+   ==========^^   ^^^  ^              ^     ^  ^  ^ ^   ^  ^^  
+A: tcttattgcaagttttttctcaaatgccttgagtata
+B: tcttattgtaagttttctctcaaatagcttgagtata
+           ^       ^        ^^==========
+   45077    45226     66    none     93     96
+     Errors = 30
+A: acttagcttaagcggactctaaacca-tttttagggca--ggcttaaaacgatt-aaaaa
+B: acttagcttaggtgatctctaaaaaaatttagagggcaaaggc-ggtggggttttaaaaa
+   ==========^ ^ ^^       ^^ ^   ^^      ^^   ^^^^^^^ ^  ^     
+A: atgacggcgtgttaacaaatcctaggcaataattcgccctctggcacctctaaaatc
+B: gtgccttagttttagcaaatcctaggcagcaattcgccctctggcatctctaaaatc
+   ^  ^ ^^^  ^   ^             ^^                ^==========
+   45177    45326     26    none     34     34
+     Errors = 7
+A: tttcaaacactttgccaatcacgcaagcgtttttagctttttcgttacttttta
+B: tttcaaacaccccgccgatcacgcaagcgtttttcgctttctcattacttttta
+   ==========^^^   ^                 ^     ^  ^==========
+   45294    45443     35    none     91     91
+     Errors = 8
+A: ctaaggctttaggggcgtctttttgattgagcgctaaaacaaacaccccctcattggcta
+B: ctaaggcttttggggcgtccttttgattgagcgctaacacaaacaccccctcattagcca
+   ==========^        ^                 ^                 ^  ^ 
+A: gcgcgtagggttctaaccctaaaatctcacaaatccctttcgtttcttctt
+B: gcgcgtagggttctagccctaaaatctcgcaaatccctttagtttcttctt
+                  ^            ^           ^==========
+   45369    45518    103    none     40     40
+     Errors = 5
+A: cttcttctataacgattttcactctagagctgttcgcccattcgttcagcacgctcgcta
+B: cttcttctatgacgattttcactctggagctattcgcccattcgttcaatacgctcgcta
+   ==========^              ^     ^                ^^==========
+   45515    45664     21    none     43     43
+     Errors = 9
+A: caatcgctttctagattcgttttaagcttgatttcattacgcatcgcaaataagcttgcc
+B: caatcgctttgcaaattggttttaagtttgatttcatgacgcgtcgcaaacaggcttgcc
+   ==========^^ ^   ^        ^          ^    ^       ^ ^=======
+A: cca
+B: cca
+   ===
+   45537    45686     39    none      1      1
+     Errors = 1
+A: gattggcgatagtgtcgctta
+B: gattggcgatcgtgtcgctta
+   ==========^==========
+   45578    45727     36    none      2      2
+     Errors = 2
+A: ttgtaaatggtacgaagaaatc
+B: ttgtaaatggcgcgaagaaatc
+   ==========^^==========
+   45615    45764     59    none      1      1
+     Errors = 1
+A: taccaatgcaggttgtgttga
+B: taccaatgcaagttgtgttga
+   ==========^==========
+   45684    45833     38    none     10     10
+     Errors = 2
+A: tgtctagggagaggagtttcaggttggctt
+B: tgtctagggaaaggagttttaggttggctt
+   ==========^        ^==========
+   45741    45890     77    none     19     19
+     Errors = 4
+A: tggattgtaaaatttgttttaaaagagaaatttctaagc
+B: tggattgtaagatttgctttaaaagagggatttctaagc
+   ==========^     ^          ^^==========
+   45819    45968     32    none      1      1
+     Errors = 1
+A: catcattcgcactcccgcaaa
+B: catcattcgcgctcccgcaaa
+   ==========^==========
+   45855    46004     38    none      4      4
+     Errors = 2
+A: ctatatcgcccccattaaaaatta
+B: ctatatcgcctccgttaaaaatta
+   ==========^  ^==========
+   45894    46043     47    none      1      1
+     Errors = 1
+A: tatccgtgctcacgcaatatt
+B: tatccgtgcttacgcaatatt
+   ==========^==========
+   45942    46091     44    none      1      1
+     Errors = 1
+A: cttcatcaaatgcaacaatcc
+B: cttcatcaaacgcaacaatcc
+   ==========^==========
+   45987    46136    108    none      1      1
+     Errors = 1
+A: ctcgctcaatcaaagcgtttg
+B: ctcgctcaattaaagcgtttg
+   ==========^==========
+   46096    46245     47    none      1      1
+     Errors = 1
+A: gcttgaccgatagggatactg
+B: gcttgaccgacagggatactg
+   ==========^==========
+   46187    46336     35    none     44     44
+     Errors = 10
+A: aaaaaatactgcctcttta-gccctctcaatcgtttggctaattgttcgcataataattg
+B: aaaaaatactccct-ttgaagctttttcaatcgcttggctaattgttcgcacaacaattg
+   ==========^   ^  ^ ^  ^^ ^       ^                 ^  ^=====
+A: gttgc
+B: gttgc
+   =====
+   46247    46396     22    none     25     25
+     Errors = 5
+A: tgcacaccaccacatgctctttaaaaggcacgattaaagcggtaa
+B: tgcacaccacgacatgccctttaaaaggcgcaatcaaagcggtaa
+   ==========^      ^           ^ ^  ^==========
+   46270    46419     29    none      1      1
+     Errors = 1
+A: atttctactaggctgttaaaa
+B: atttctactaagctgttaaaa
+   ==========^==========
+   46304    46453     41    none      5      5
+     Errors = 3
+A: gcgatgcgttcaggctctaaaacgc
+B: gcgatgcgtttgggttctaaaacgc
+   ==========^^  ^==========
+   46354    46503     53    none      9      9
+     Errors = 2
+A: gataaaattctttcaaacacaccacgctg
+B: gataaaattccttcaaacgcaccacgctg
+   ==========^       ^==========
+   46408    46557     30    none      1      1
+     Errors = 1
+A: tcgctttgtaaggctagattt
+B: tcgctttgtagggctagattt
+   ==========^==========
+   46481    46630     35    none     43     43
+     Errors = 10
+A: gcccgctctctgcttcaaagctaatcgttcctgttaaatccaaactaaacgctactatat
+B: gcccgctctcggcttcaaaactaatcgttcccaccacgcccaaactaaacgccactatat
+   ==========^        ^           ^^^^ ^^^             ^=======
+A: caa
+B: caa
+   ===
+   46519    46668     29    none      3      3
+     Errors = 2
+A: aattggtggctatgctttgaatt
+B: aattggtggcgacgctttgaatt
+   ==========^ ^==========
+   46610    46759     28    none     62     62
+     Errors = 6
+A: tgcatttgttggaaaatttctaattcgtcttctttaaaatgcttttgaacgcgctttaaa
+B: tgcatttgtttaaaaattcctaattcgtcttctttgaaatgcttttgaacgcgttttaaa
+   ==========^^      ^                ^                 ^      
+A: agcttgttgagttggtgtttta
+B: agcttgttgagctggtgtttta
+              ^==========
+   46642    46791     51    none      4      4
+     Errors = 3
+A: tctaaaaccaggcgtctaggctct
+B: tctaaaaccaatcttctaggctct
+   ==========^^ ^==========
+   46702    46851     72    none      9      9
+     Errors = 5
+A: attcttcaaacctggcggtttcttcaatg
+B: attcttcaaatctagccacttcttcaatg
+   ==========^  ^  ^^^==========
+   46787    46936     35    none     13     13
+     Errors = 3
+A: ccccactcccatcccagacaatgcctataaagg
+B: ccccactcccgtcccaaacaatacctataaagg
+   ==========^     ^     ^==========
+   46823    46972     82    none      1      1
+     Errors = 1
+A: gatcttgtaacaatgcgtcta
+B: gatcttgtaataatgcgtcta
+   ==========^==========
+   46907    47056     22    none      2      2
+     Errors = 2
+A: aaagccatttgagtggtggtgt
+B: aaagccattttggtggtggtgt
+   ==========^^==========
+   46955    47104     97    none     26     26
+     Errors = 5
+A: ttttgatgcttgtcgcaagctaagatggtgggtttaaaatcatagg
+B: ttttgatgctcatcgcaagctaagagcgtgggtttgaaatcatagg
+   ==========^^             ^^        ^==========
+   47071    47220     21    none     19     19
+     Errors = 5
+A: agtaaaagaatggaagttccgctatccaataagctaaaa
+B: agtaaaagaacagaagtttcgctatctagtaagctaaaa
+   ==========^^      ^       ^ ^==========
+   47095    47244     24    none      3      3
+     Errors = 2
+A: gccctttttgttgcgctccaagc
+B: gccctttttgctccgctccaagc
+   ==========^ ^==========
+   47147    47296     23    none     28     28
+     Errors = 9
+A: aaatcttttttggcgaaccattagagcgtttaggcaaggtgaggtaaa
+B: aaatctttttgggcgcattaaaagagcgtttgggtaaagtgaggtaaa
+   ==========^    ^ ^^ ^^         ^  ^  ^==========
+   47175    47324     31    none      5      5
+     Errors = 2
+A: gggcaaaccccctagccaaacgcat
+B: gggcaaaccctctaaccaaacgcat
+   ==========^   ^==========
+   47245    47394     30    none     39     39
+     Errors = 7
+A: cattatccacatgctgcacgatgctgtcatcaatcctatggatgatagcgcggttgtgc
+B: cattatccacgcgctgcgcgatgctatcatcaatcctgtggatgatggtgcggttgtgc
+   ==========^^     ^       ^           ^        ^ ^==========
+   47300    47449     35    none     25     25
+     Errors = 11
+A: aatcaaaaatgaaactcaag-gcgtcaatctcagcctcatcgctcg
+B: aatcaaaaat-aaaatgaagcgaatcgatctctttttcatcgctcg
+   ==========^   ^ ^   ^ ^^  ^     ^^^^==========
+   47369    47518     32    none     34     34
+     Errors = 5
+A: tgaaattcgcgctcgtgaacacaatagggaaatccaataaatccagcaataaag
+B: tgaaattcgcactcgtgaatacaataggggaatctaataaatctagcaataaag
+   ==========^        ^         ^    ^        ^==========
+   47405    47554     43    none      4      4
+     Errors = 2
+A: tatagggcaaaatcacgccataaa
+B: tatagggcaagataacgccataaa
+   ==========^  ^==========
+   47453    47602     32    none      5      5
+     Errors = 4
+A: ggggctaattttatatcaggttttt
+B: ggggctaattgggtgtcaggttttt
+   ==========^^^ ^==========
+   47504    47653     32    none     19     19
+     Errors = 6
+A: gaatgggggcgcttgtagaaattaagctctcgcattcta
+B: gaatgggggcacttaccgaatttaagctttcgcattcta
+   ==========^   ^^^   ^       ^==========
+   47581    47730     24    none     45     45
+     Errors = 6
+A: acgcatgctgtttggctgtgttcaaatctttaaacatgagtgcgaaaggctttagggggc
+B: acgcatgctgcttggctgcgtttagatctttaaacatgagcgcgaaaggctttaaggggc
+   ==========^       ^   ^ ^               ^             ^=====
+A: ggttt
+B: ggttt
+   =====
+   47631    47780     22    none     26     26
+     Errors = 5
+A: aaagccgtaatctttctatggtttgaaaattccttccatcgcacaa
+B: aaagccgtaacctctctatggttttaaaattcctcgcatcgcacaa
+   ==========^  ^          ^         ^^==========
+   47654    47803     68    none      1      1
+     Errors = 1
+A: gagcaaagcctcccaaacctt
+B: gagcaaagccccccaaacctt
+   ==========^==========
+   47738    47887     29    none     16     16
+     Errors = 2
+A: gagcgtcatcgtttttgaatcgcttgtaattgagcg
+B: gagcgtcatcatttttgaatcgcttataattgagcg
+   ==========^              ^==========
+   47851    48000     26    none     84     84
+     Errors = 21
+A: actttttgcagctgatgccttgaatgtggaagcgcttattggtg-gggtcttgatagata
+B: actttttgcaacttatgccttgaatatggaatcgtttgtt-atgagcgtctttataaacg
+   ==========^  ^           ^     ^  ^  ^  ^^  ^ ^     ^   ^ ^^
+A: gaagcacaaaaatcgcagagtttgaagggttttagggcggagttt
+B: gatgcgcaaaatttgcagagcttgaaaggttttaaggcggagttt
+     ^  ^     ^ ^      ^     ^       ^==========
+   47879    48028     23    none      2      2
+     Errors = 2
+A: tcatagggcaaagcgtttaaaa
+B: tcatagggcatggcgtttaaaa
+   ==========^^==========
+   47909    48058     47    none      7      7
+     Errors = 3
+A: tgtatctcgccccacacttcgcgcaag
+B: tgtatctcgctccgcatttcgcgcaag
+   ==========^  ^  ^==========
+   47981    48130     26    none     25     25
+     Errors = 7
+A: agtttttatccctgatttctctcaagcaatccttgcacacgccta
+B: agtttttatctctaatctcgcacaagcaatcctcacacacgccta
+   ==========^  ^  ^  ^ ^           ^^==========
+   48020    48169     23    none     13     13
+     Errors = 3
+A: tagggatttggctgagcaaattcaaggggtggt
+B: tagggatttgactgagcagatttaaggggtggt
+   ==========^       ^   ^==========
+   48068    48217     32    none     25     25
+     Errors = 3
+A: tgctttctaagatcctaaaaccattgaaatgaagtgccttatcat
+B: tgctttctaaaatcctaaaatcattgaaatgaagcgccttatcat
+   ==========^         ^             ^==========
+   48134    48283     37    none     34     34
+     Errors = 5
+A: tgattttttcaaccaacgctaaaggaggcaaccctttttttagagcgtttaaaa
+B: tgattttttccaccaacgctaaagggggtaatcctttttttagggcgtttaaaa
+   ==========^              ^  ^  ^           ^==========
+   48172    48321     20    none      1      1
+     Errors = 1
+A: gcgggtaagatgatttctaaa
+B: gcgggtaagacgatttctaaa
+   ==========^==========
+   48241    48390     83    none     49     49
+     Errors = 6
+A: gccgcttgggtgttacgcacaaagcccacaagctctaatttttgagctagggtataaata
+B: gccgcttgggcgttacgcacaaagcctacaagccctaatttttgagccaggatataaaca
+   ==========^               ^      ^             ^   ^      ^=
+A: aaagggcgc
+B: aaagggcgc
+   =========
+   48349    48498     36    none     25     25
+     Errors = 4
+A: aatgcaaacttccatgctgtttgattaaggtgttgcaatcaaccc
+B: aatgcaaactcccatgctgtttgattaaagtattacaatcaaccc
+   ==========^                 ^  ^  ^==========
+   48412    48561     20    none     27     27
+     Errors = 5
+A: cgtgtgttgtttcaaggtttctaaaatgagcgcgtctttagggtcgt
+B: cgtgtgttgtcttaaggtttctaaaatgagcgtatcattagggtcgt
+   ==========^ ^                   ^^  ^==========
+   48441    48590     39    none      9      9
+     Errors = 4
+A: tgtaagtgggcacgattaaagcgttattg
+B: tgtaagtggggacaatcagagcgttattg
+   ==========^  ^  ^ ^==========
+   48507    48656     33    none     27     27
+     Errors = 4
+A: aagttgccggcaagcgttgttggttttcatcaaaaatggctttaggg
+B: aagttgccggtaagcgttgttggttttcattataaacggctttaggg
+   ==========^                   ^ ^   ^==========
+   48541    48690     62    none      1      1
+     Errors = 1
+A: tgagtttatagggcgtgccgt
+B: tgagtttataaggcgtgccgt
+   ==========^==========
+   48604    48753     25    none      1      1
+     Errors = 1
+A: aggctgtgtagtgctcatcgt
+B: aggctgtgtaatgctcatcgt
+   ==========^==========
+   48630    48779     23    none      1      1
+     Errors = 1
+A: tcttcgcatgtgctataaaca
+B: tcttcgcatgcgctataaaca
+   ==========^==========
+   48654    48803     33    none      1      1
+     Errors = 1
+A: gtgtctttatctaaaaaacga
+B: gtgtctttatttaaaaaacga
+   ==========^==========
+   48703    48852     57    none     16     16
+     Errors = 2
+A: tatggctatcggtatcatcgcctttgagatagccat
+B: tatggctatccgtatcatcgccttttagatagccat
+   ==========^              ^==========
+   48761    48910     45    none      1      1
+     Errors = 1
+A: tttaagcatgttttctattcc
+B: tttaagcatggtttctattcc
+   ==========^==========
+   48807    48956     23    none      1      1
+     Errors = 1
+A: tttttttctaacaggcattgg
+B: tttttttctagcaggcattgg
+   ==========^==========
+   48856    49005     50    none     26     26
+     Errors = 3
+A: ttggttaaaacgctcccagccccatcgctttctatactcccgccct
+B: ttggttaaaatgctcccggccccatcgctttctatgctcccgccct
+   ==========^      ^                 ^==========
+   48922    49071    131    none     16     16
+     Errors = 4
+A: gttttaaaaaccctaaacttttgagtttgaaattca
+B: gttttaaaaaacctaaatgtttgagcttgaaattca
+   ==========^      ^^      ^==========
+   49063    49212     48    none     10     10
+     Errors = 2
+A: atgtgtcgttagtgtcaatccttgcgatct
+B: atgtgtcgttggtgtcaattcttgcgatct
+   ==========^        ^==========
+   49137    49286     35    none     26     26
+     Errors = 5
+A: ataaccgataatatcgttagtgtggacgcacactagcactttagcg
+B: ataaccgatagtgtcgttagtatggacgcacaccaacactttagcg
+   ==========^ ^        ^           ^ ^==========
+   49243    49392     42    none     71     71
+     Errors = 10
+A: tgaatgatgtttaaaaaactttccctagcctctttgatacaatacgcccagtcgctaaac
+B: tgaatgatgtgtaaaaagctctccctggcctcttcaatacaatacgcccagtcgccaaac
+   ==========^      ^  ^     ^       ^^                   ^    
+A: tcatgggggaaagccattagaatcgcttgga
+B: tcatgggggaacgccattaagatcgcttgga
+              ^       ^^==========
+   49303    49452     38    none     18     18
+     Errors = 3
+A: tcttttcattcaaaatatccttttaaataactataaca
+B: tcttttcattaaaaatatccttttaagcaactataaca
+   ==========^               ^^==========
+   49364    49514     28    none     23     24
+     Errors = 7
+A: gtttttaaaa-c-agattcaaacgctttttagcggtttgaaaata
+B: gtttttaaaagctagct-caaacgcttttgcgcgatttgaaaata
+   ==========^ ^  ^ ^           ^^   ^==========
+   49432    49582     28    none     40     40
+     Errors = 6
+A: ctgattctatgccgataaaattccgttctaaatttttgcacgctaagccggtggtgccgc
+B: ctgattctataccgataaaatttcgctttaaatttttgcacgctaaaccagtggtgccgc
+   ==========^           ^  ^ ^                  ^  ^==========
+   49466    49616     20    none      6      6
+     Errors = 3
+A: aaaggatctagcacgatgtcattagg
+B: aaaggatctaacactgtgtcattagg
+   ==========^   ^^==========
+   49489    49639     22    none      3      3
+     Errors = 2
+A: gtttgtgtggatggaaatgattt
+B: gtttgtgtgggtagaaatgattt
+   ==========^ ^==========
+   49513    49663     23    none      2      2
+     Errors = 2
+A: tccattaaggccaggctttttt
+B: tccattaaggttaggctttttt
+   ==========^^==========
+   49579    49729     23    none     43     43
+     Errors = 8
+A: tggggtgtttggttttttcaagcccgcttaccacagggctttttaaaatcaaaggccgta
+B: tggggtgtttcactctttcaatcccgctcaccacagggctttttaagatcaagggccgta
+   ==========^^^ ^      ^      ^                 ^     ^=======
+A: aat
+B: aat
+   ===
+   49621    49771     23    none     19     19
+     Errors = 2
+A: tttcatttttgggtttgttaaacacccacttggctttct
+B: tttcatttttaggtttgttaaacacccatttggctttct
+   ==========^                 ^==========
+   49681    49831     50    none     37     37
+     Errors = 5
+A: taaccgcccacagagcaaattccgtgtcttggacataacgccggtgaatgtttcttg
+B: taaccgcccatagggcaaattctgtgtcttggacatagcgccggtggatgtttcttg
+   ==========^  ^        ^              ^        ^==========
+   49732    49882     41    none      1      1
+     Errors = 1
+A: agtctttgaccacaaagccgt
+B: agtctttgactacaaagccgt
+   ==========^==========
+   49774    49924     20    none      1      1
+     Errors = 1
+A: tatagcttataaacctgtaag
+B: tatagcttatgaacctgtaag
+   ==========^==========
+   49795    49945     22    none      1      1
+     Errors = 1
+A: agcaaaaaataaccatgcagc
+B: agcaaaaaatcaccatgcagc
+   ==========^==========
+   49824    49974     54    none      7      7
+     Errors = 2
+A: tttggattgactaagggggcgtagcgt
+B: tttggattgattaaggaggcgtagcgt
+   ==========^     ^==========
+   49891    50041     22    none     13     13
+     Errors = 3
+A: attccccaaaatctatgccttgccttttagcgc
+B: attccccaaagtctatgccctgtcttttagcgc
+   ==========^        ^  ^==========
+   49915    50065     23    none      2      2
+     Errors = 2
+A: tttagggtgggaaaattgtttt
+B: tttagggtggagaaattgtttt
+   ==========^^==========
+   49951    50101     34    none     13     13
+     Errors = 3
+A: ccgaaatgttataaggagggtccgtgatgatcg
+B: ccgaaatgttgtaaggaggatctgtgatgatcg
+   ==========^        ^  ^==========
+   50042    50191     48    none     57     56
+     Errors = 11
+A: ttttgctggtaaaagtctttgatgatttcaaaagcgtcagcgtgataaatttgtatcatt
+B: ttttgctggtggaaatccttgatgatttcaaaggcgttagcgtgatggatttgtatcatt
+   ==========^^  ^  ^              ^    ^        ^^            
+A: ttcttaagctttttaag
+B: t-cttgcgctttttaag
+    ^   ^^==========
+   50109    50258     34    none     19     19
+     Errors = 2
+A: gaggaggcacagcgttaccgatttgcttacaaacgctcg
+B: gaggaggcacggcgttaccgatttgcttgcaaacgctcg
+   ==========^                 ^==========
+   50144    50293     33    none      1      1
+     Errors = 1
+A: aagatataattatcgctaaaa
+B: aagatataatcatcgctaaaa
+   ==========^==========
+   50178    50327     23    none      1      1
+     Errors = 1
+A: cggcttctctaggcgtgatag
+B: cggcttctctgggcgtgatag
+   ==========^==========
+   50202    50351     23    none      1      1
+     Errors = 1
+A: ggtgcaattcggggtgggagt
+B: ggtgcaattcagggtgggagt
+   ==========^==========
+Region:      32754 .. 50224          32872 .. 50373         1245 / 17502       7.11%
+#
+   52032    50438     25    none      -      -
+   52062    50468     31    none      5      5
+     Errors = 2
+A: tctaaatgcaagtcgttttctaaaa
+B: tctaaatgcaggtcattttctaaaa
+   ==========^   ^==========
+   52094    50500     34    none      1      1
+     Errors = 1
+A: gttcctttgatttttgtaacg
+B: gttcctttgacttttgtaacg
+   ==========^==========
+   52209    50615     71    none     81     81
+     Errors = 15
+A: ttgccaaattggatgcacgcttaaagtattgagagcgtttaaaacctgtgctttgctttc
+B: ttgccaaatttgatgcttgcttaaaatattgagagcgtttaaaactcgcgctttgctttc
+   ==========^     ^^       ^                   ^^ ^           
+A: ttcatagccatagacagattttgaagccttataagaacaca
+B: ttcatatccaggggtaaattttgaaaccttgtaagaacaca
+         ^   ^^ ^^ ^        ^    ^==========
+   52300    50707     23    none     20     21
+     Errors = 4
+A: aattaaaagggtcaatagcgtt-aaaaagcaagaaacaagc
+B: aattaaaaggatcaatggcgtttaaaaagcgagaaacaagc
+   ==========^     ^     ^       ^==========
+   52349    50757     28    none     26     27
+     Errors = 5
+A: aataaccttttatttttt-aaaaggattataagatagcgctcattag
+B: aataacctttcattttttttaaaggattataaaataacgctcattag
+   ==========^       ^^            ^   ^==========
+Region:      52017 .. 52376          50423 .. 50784           28 / 362         7.73%
+#
+   56114    53289     63    none      -      -
+   56234    53413     32    none     57     61
+     Errors = 14
+A: aaggtttgatcaaagagcataagggg-att-aaggattaaaccaaattcatttgaagcat
+B: aaggtttgattaaagagcataagggggatttaaagattggatcaagctcatttgaagcgt
+   ==========^               ^   ^  ^    ^^ ^   ^^           ^ 
+A: t--aatgtttcaagctctcaa
+B: tttaatgctttaagctctcaa
+    ^^    ^  ^==========
+   56288    53467     21    none     22     22
+     Errors = 3
+A: tggtttcaaaagcctctttagtgcctgttcgtacgctagaaa
+B: tggtttcaaaggcctctttagtgcctgatcgcacgctagaaa
+   ==========^                ^   ^==========
+   56312    53491    101    none      3      3
+     Errors = 2
+A: caaactaaacaccacaatagcta
+B: caaactaaacgcaacaatagcta
+   ==========^ ^==========
+   56432    53611     29    none     19     19
+     Errors = 2
+A: tagccccagaaagcatgccagcaatcgctccaatgcgcg
+B: tagccccagagagcatgccagcaatcgcgccaatgcgcg
+   ==========^                 ^==========
+   56480    53659     47    none     19     19
+     Errors = 4
+A: accaaaaaagcgagaataaaatcacagatccaaaactcg
+B: accaaaaaagtgaaaacaaaatcacagagccaaaactcg
+   ==========^  ^  ^           ^==========
+   56541    53720     58    none     14     14
+     Errors = 3
+A: cgatgctgagaatgctggcgtttctatccgttga
+B: cgatgctgaggatgctagcgtttttatccgttga
+   ==========^     ^      ^==========
+   56626    53805    144    none     27     27
+     Errors = 4
+A: gcctagaaatagccatcactaatttttgtggggcgtctttattgaaa
+B: gcctagaaatcgtcatcactaatttttggggggcgtttttattgaaa
+   ==========^ ^               ^       ^==========
+   56771    53950     35    none      1      1
+     Errors = 1
+A: attgactcatcacaatgaaaa
+B: attgactcattacaatgaaaa
+   ==========^==========
+   56825    54004     35    none     19     19
+     Errors = 3
+A: ctaaactcaaatcaaatttatgcacatacgcaacgccta
+B: ctaaactcaagtcaaatttatgtacataagcaacgccta
+   ==========^           ^     ^==========
+   56861    54040    110    none      1      1
+     Errors = 1
+A: atgccccaatcaaagaaataa
+B: atgccccaattaaagaaataa
+   ==========^==========
+   56972    54151     23    none      1      1
+     Errors = 1
+A: aatagcctaagccccaagcaa
+B: aatagcctaacccccaagcaa
+   ==========^==========
+   56996    54175     98    none      1      1
+     Errors = 1
+A: ttgaaataatggcgactacgc
+B: ttgaaataatagcgactacgc
+   ==========^==========
+   57095    54274     59    none      1      1
+     Errors = 1
+A: ggattatcatcacgatcggca
+B: ggattatcataacgatcggca
+   ==========^==========
+   57173    54352     86    none     19     19
+     Errors = 2
+A: aatccgtccaacacaccgccttatacccccctaaaaagg
+B: aatccgtccagcacaccgccttataccctcctaaaaagg
+   ==========^                 ^==========
+   57260    54439     83    none      1      1
+     Errors = 1
+A: caaagagtttggccccactca
+B: caaagagtttagccccactca
+   ==========^==========
+   57344    54523     38    none      1      1
+     Errors = 1
+A: agatgtgtttgtcatcgctaa
+B: agatgtgtttatcatcgctaa
+   ==========^==========
+   57386    54565     35    none      4      4
+     Errors = 2
+A: ctgaaatggtgatggaattagcga
+B: ctgaaatggtaatagaattagcga
+   ==========^  ^==========
+   57425    54604     20    none      4      4
+     Errors = 2
+A: tgcgtaagcgtttggccacaaaaa
+B: tgcgtaagcgcttagccacaaaaa
+   ==========^  ^==========
+   57515    54694     26    none     70     70
+     Errors = 8
+A: cccagttaatcaatgcgcccaaactcaaccctatggcgatatgtgagttgataagccctc
+B: cccagttaatgagtgcgcccaaactcaagcctatggcgatgtgtgaattgataagccccc
+   ==========^ ^               ^           ^     ^           ^ 
+A: ccacatataaagctccaggcaatcccatta
+B: ccacatataaagctcccggtaatcccatta
+                   ^  ^==========
+   57557    54736     26    none     16     16
+     Errors = 4
+A: acccgctcatatcgctcgcccccgcgctcaaagcgc
+B: acccgctcatgtcgctcgctcctgcactcaaagcgc
+   ==========^        ^  ^  ^==========
+   57587    54766     85    none      4      4
+     Errors = 2
+A: cagggcccatggaacgatcgccta
+B: cagggcccatagagcgatcgccta
+   ==========^  ^==========
+   57673    54852     21    none      1      1
+     Errors = 1
+A: gaataaacgataaacatcgta
+B: gaataaacgacaaacatcgta
+   ==========^==========
+   57695    54874    118    none      1      1
+     Errors = 1
+A: caataggggtacttaaaacaa
+B: caataggggtgcttaaaacaa
+   ==========^==========
+   57823    55002     50    none     10     10
+     Errors = 3
+A: tcccataacggtgataagagatgctaaccg
+B: tcccataacgatgatacgaaatgctaaccg
+   ==========^     ^  ^==========
+   57880    55059     29    none      7      7
+     Errors = 3
+A: aacgcccatttaggcatggtttagccg
+B: aacgcccattcaagcagggtttagccg
+   ==========^ ^   ^==========
+   57916    55095     55    none      7      7
+     Errors = 4
+A: ccatccctaaagcgctcgcttgttcgt
+B: ccatccctaatctgcttgcttgttcgt
+   ==========^^^   ^==========
+   57979    55158     32    none      8      8
+     Errors = 3
+A: cgattgaaagtattcaatttctcgctaa
+B: cgattgaaagcgttcaacttctcgctaa
+   ==========^^     ^==========
+   58051    55230     22    none     40     40
+     Errors = 4
+A: tttcataaacaataggggcgcttgcttggagcgcttttaagcattctaagaaaaaggtta
+B: tttcataaacgataggggcgtttgcttggagtgcttttaagcattctaaaaaaaaggtta
+   ==========^         ^          ^                 ^==========
+   58074    55253     20    none      1      1
+     Errors = 1
+A: tctttgttcgttcgttcgttt
+B: tctttgttcgctcgttcgttt
+   ==========^==========
+   58095    55274     24    none      1      1
+     Errors = 1
+A: tctatgctgagcgttaaaggg
+B: tctatgctgatcgttaaaggg
+   ==========^==========
+   58120    55299     66    none      1      1
+     Errors = 1
+A: gagaaattaaacatgctaaag
+B: gagaaattaagcatgctaaag
+   ==========^==========
+   58187    55366     57    none      1      1
+     Errors = 1
+A: gcccacgcttttaactttagt
+B: gcccacgcttgtaactttagt
+   ==========^==========
+   58264    55443     38    none     20     20
+     Errors = 3
+A: tagtctttagtttggctgaattcatgtttgtaatgataag
+B: tagtctttagcttggctgaattcatgcttataatgataag
+   ==========^               ^  ^==========
+   58321    55500     20    none     19     19
+     Errors = 3
+A: aaatcgcgcgcttcaactcatgcgtatgctcatcatagc
+B: aaatcgcgcgtttcaactcatgcgtgtgttcatcatagc
+   ==========^              ^  ^==========
+   58354    55533     32    none     13     13
+     Errors = 5
+A: ctttttgagttaagttttctaaggcttcgctta
+B: ctttttgagtcaagccctctaaagcttcgctta
+   ==========^   ^^^     ^==========
+   58404    55583    114    none     18     18
+     Errors = 4
+A: aggcgttttcgtcttcttcttcttggcagatattcaca
+B: aggcgttttcatcttcttcttcttgatggatattcaca
+   ==========^              ^^^==========
+   58519    55698     65    none      1      1
+     Errors = 1
+A: ctgtggtgggcttgttgatat
+B: ctgtggtgggtttgttgatat
+   ==========^==========
+   58585    55764     39    none      1      1
+     Errors = 1
+A: tttcgtccaacgactctaacg
+B: tttcgtccaaagactctaacg
+   ==========^==========
+   58659    55838    101    none     35     35
+     Errors = 3
+A: ggtagaattggctatttctatcgcttcgtctaaatcttttgcttccatcacggat
+B: ggtagaattgactatttctatcgcctcgtctaaatcttttgctttcatcacggat
+   ==========^             ^                   ^==========
+   58774    55953     26    none     14     14
+     Errors = 4
+A: gggttatcattgacaaagcttaccgggatttcgt
+B: gggttatcatcaacaaagcttgctgggatttcgt
+   ==========^^         ^ ^==========
+   58801    55980     50    none      1      1
+     Errors = 1
+A: catagctttttaattcatcta
+B: catagcttttcaattcatcta
+   ==========^==========
+   58852    56031     71    none      1      1
+     Errors = 1
+A: ccgctagagcgccgattttgt
+B: ccgctagagcaccgattttgt
+   ==========^==========
+   58927    56106     29    none      4      4
+     Errors = 2
+A: gagtctttttaaagttctcatctt
+B: gagtctttttgaaattctcatctt
+   ==========^  ^==========
+   58957    56136    101    none      1      1
+     Errors = 1
+A: ctttttctaatactaaaagcg
+B: ctttttctaacactaaaagcg
+   ==========^==========
+   59059    56238     29    none      1      1
+     Errors = 1
+A: tgctcacaatggtggcgtttt
+B: tgctcacaatagtggcgtttt
+   ==========^==========
+   59089    56268     20    none      1      1
+     Errors = 1
+A: tttcagcgctcaaggctaaag
+B: tttcagcgcttaaggctaaag
+   ==========^==========
+   59115    56294     21    none      6      6
+     Errors = 3
+A: tggggttagcttttaacattttataa
+B: tggggttagccttgagcattttataa
+   ==========^  ^ ^==========
+   59185    56364     74    none     49     49
+     Errors = 5
+A: cggtgtcttcgcccccggttaaaatggcaaactggatgctttcatctcttaaaagatgtt
+B: cggtgtcttcaccccctgttaaaatggcaaacttgatgctttcatcttttaaaagatgct
+   ==========^     ^                ^             ^          ^=
+A: cgctaatat
+B: cgctaatat
+   =========
+   59272    56451     47    none     13     13
+     Errors = 2
+A: aaaagcactcacaaagcttatagcccgttacgc
+B: aaaagcactcgcaaagcttataacccgttacgc
+   ==========^           ^==========
+   59323    56502     53    none      4      4
+     Errors = 3
+A: cccgattgcccgtagctagggggg
+B: cccgattgccagcggctagggggg
+   ==========^ ^^==========
+   59434    56613    107    none     58     58
+     Errors = 8
+A: aattccatggggcaatgaccacgcccacgcctttaggggtgaattgcgtttttgtgtttt
+B: aattccatggagcgatgaccacacccacgcctttgggggtgaatttcgtttttttatttt
+   ==========^  ^        ^           ^          ^       ^ ^    
+A: gctcttgcaacaccctta
+B: gctcttgtaacaccctta
+          ^==========
+   59542    56721     29    none      1      1
+     Errors = 1
+A: aaatccctatcaaatcgcctc
+B: aaatccctattaaatcgcctc
+   ==========^==========
+   59605    56784     65    none     34     34
+     Errors = 4
+A: taaaaagctgggcggtttgactcattaaggcatggatttctgtaaagctttttt
+B: taaaaagctgagcggtttgactcaataaagcatggatttctgtgaagctttttt
+   ==========^             ^   ^              ^==========
+   59671    56850     20    none      1      1
+     Errors = 1
+A: aaatcgcttccttatccgcta
+B: aaatcgcttctttatccgcta
+   ==========^==========
+   59692    56871     46    none      1      1
+     Errors = 1
+A: aatgcacgctagcgatttttt
+B: aatgcacgctggcgatttttt
+   ==========^==========
+   59739    56918     24    none      1      1
+     Errors = 1
+A: aaaggggttagattaggatct
+B: aaaggggttaaattaggatct
+   ==========^==========
+   59767    56946     23    none      4      4
+     Errors = 2
+A: acctcccatccatctctgggtaaa
+B: acctcccatctatttctgggtaaa
+   ==========^  ^==========
+   59806    56985     83    none     16     16
+     Errors = 3
+A: ctaaaataggagcgttacgcattttctcgcgcactt
+B: ctaaaataggggcgttatgcattttatcgcgcactt
+   ==========^      ^       ^==========
+   59959    57138     26    none     70     70
+     Errors = 9
+A: ggtttgggtaagtggtatgcccgctttgtttggcgttcctatcttgagtcctatgggtgg
+B: ggtttgggtaggtggtatgcccggtttgtttggcgtttctgtcttgggtcctgtgggtgg
+   ==========^            ^             ^  ^     ^     ^       
+A: cattgtctaaagtggcaattcctttaaggc
+B: tattgtctaaagtggcgatccctttaaggc
+   ^               ^  ^==========
+   59992    57171     41    none      7      7
+     Errors = 2
+A: aaaagcgttgttcttgatctttccatt
+B: aaaagcgttgctcttggtctttccatt
+   ==========^     ^==========
+   60034    57213     20    none      1      1
+     Errors = 1
+A: taaagaaagccttcatgaaat
+B: taaagaaagctttcatgaaat
+   ==========^==========
+   60069    57248     21    none     15     15
+     Errors = 3
+A: tatcgcttgaggtgttttcgtctaacctcctcacc
+B: tatcgcttgaagtgttttcatctagcctcctcacc
+   ==========^        ^    ^==========
+   60100    57279     38    none     10     10
+     Errors = 2
+A: agtaagcgatcgcattgttaaaatgcgctt
+B: agtaagcgattgcattgttgaaatgcgctt
+   ==========^        ^==========
+   60175    57354     26    none     37     37
+     Errors = 3
+A: aaagaatgagcttgtgcatctcttttagttcctggctcgcttgcaaactcatgccct
+B: aaagaatgagtttgtgcatctcttttaattcctggctcgcttgcaagctcatgccct
+   ==========^                ^                  ^==========
+   60202    57381     20    none      1      1
+     Errors = 1
+A: tttcaaagctgaaatgctcta
+B: tttcaaagctaaaatgctcta
+   ==========^==========
+   60256    57435     20    none     34     34
+     Errors = 4
+A: acacaacaggatcattaatggcatggatacgcgtatagacataagcgatttcaa
+B: acacaacagggtcattaagggcatggatgcgcgtatagacataggcgatttcaa
+   ==========^       ^         ^              ^==========
+   60286    57465     23    none     10     10
+     Errors = 2
+A: aaatattatgactcgctgcgccaatatgaa
+B: aaatattatggctcgctgcaccaatatgaa
+   ==========^        ^==========
+   60310    57489     22    none      1      1
+     Errors = 1
+A: atttataattatcgccctcta
+B: atttataattgtcgccctcta
+   ==========^==========
+   60340    57519     27    none      8      8
+     Errors = 2
+A: acaaaatccaacattttattgtaattag
+B: acaaaatccagcattttgttgtaattag
+   ==========^      ^==========
+   60370    57549     20    none      3      3
+     Errors = 2
+A: gtcttgcttattggaaaatgtgg
+B: gtcttgcttactagaaaatgtgg
+   ==========^ ^==========
+   60412    57591     44    none     22     22
+     Errors = 5
+A: gtaacgcccaatctttcacggaagcgatagtttcttcgctct
+B: gtaacgcccagtctttcatagaagcgatcgtctcttcgctct
+   ==========^       ^^        ^  ^==========
+   60463    57642     62    none      7      7
+     Errors = 2
+A: ggattttaatgggcttcaaccctttta
+B: ggattttaataggctttaaccctttta
+   ==========^     ^==========
+   60601    57780     20    none     76     76
+     Errors = 11
+A: cataagaatccggaatataggcttgcagcacaataccagcgttcaaatcaaatttagcga
+B: cataagaatcagggatataagcttgcaacacaataccggcgttcaaatcaaatttggcga
+   ==========^  ^     ^       ^         ^                 ^    
+A: tggattccataaacgactccactgttagctctaaat
+B: tagactccataaacgattccaccgtaagctctaaat
+    ^  ^           ^     ^  ^==========
+   60634    57813     23    none     13     13
+     Errors = 2
+A: ccctaaattcttccatatccaaattgatgaatt
+B: ccctaaattcctccatatccaagttgatgaatt
+   ==========^           ^==========
+   60658    57837     20    none      1      1
+     Errors = 1
+A: gcatgccttgttttttttctt
+B: gcatgccttgctttttttctt
+   ==========^==========
+   60699    57878     63    none     21     21
+     Errors = 5
+A: cttctaaagccagggcgtaaagagcgtctaggcgtttgaca
+B: cttctaaagctaaagcataaagagcgtctaagcgtttgaca
+   ==========^ ^^  ^             ^==========
+   60763    57942     69    none      1      1
+     Errors = 1
+A: aaaaaatcgtcgtgattttaa
+B: aaaaaatcgttgtgattttaa
+   ==========^==========
+   60835    58014     20    none      3      3
+     Errors = 3
+A: aaaacgcgcattagcttcttctt
+B: aaaacgcgcagacgcttcttctt
+   ==========^^^==========
+   60892    58071     27    none     37     37
+     Errors = 4
+A: cgcctaaaacctcttcgccaataaaattcacattcaaaatgattttttcattttttc
+B: cgcctaaaacttcctcgccaataaaattcacgttcaaaatgattttctcattttttc
+   ==========^  ^                 ^              ^==========
+   60925    58104     26    none      6      6
+     Errors = 2
+A: aatccgctcttttaactggctctctt
+B: aatccgctctcttaattggctctctt
+   ==========^    ^==========
+   60952    58131     53    none      1      1
+     Errors = 1
+A: ccaagaccatcgctttcgtgt
+B: ccaagaccattgctttcgtgt
+   ==========^==========
+   61006    58185     36    none      1      1
+     Errors = 1
+A: tcatatcagggagcattttcc
+B: tcatatcaggcagcattttcc
+   ==========^==========
+   61056    58235     72    none     14     14
+     Errors = 3
+A: cattaaaagcactttttcaaacggagaaaaaatc
+B: cattaaaagccatttttcaaacgaagaaaaaatc
+   ==========^^           ^==========
+   61135    58314     23    none      7      7
+     Errors = 2
+A: tattgtccaagcacctgaaactccgat
+B: tattgtccaaacacctaaaactccgat
+   ==========^     ^==========
+   61177    58356     27    none     19     19
+     Errors = 2
+A: taagctctatgagcatgactttgttttcagggttgttta
+B: taagctctataagcatgactttgttttcggggttgttta
+   ==========^                 ^==========
+   61225    58404     49    none     21     21
+     Errors = 4
+A: ttgcattttagagtggaacgctttttcctgatcgctcaaat
+B: ttgcattttaaaatggaacgctttttcttgctcgctcaaat
+   ==========^ ^              ^  ^==========
+   61282    58461     43    none      8      8
+     Errors = 3
+A: gctaattctagcgaatcgtcaatgattt
+B: gctaattctaatgaatcctcaatgattt
+   ==========^^     ^==========
+   61326    58505     73    none      1      1
+     Errors = 1
+A: taagaatttgacttgattgta
+B: taagaatttggcttgattgta
+   ==========^==========
+   61407    58586    111    none      8      8
+     Errors = 3
+A: tttaaattttgttctagcggtaattaat
+B: tttaaattttattccagtggtaattaat
+   ==========^   ^  ^==========
+   61532    58711     56    none     14     14
+     Errors = 2
+A: tttcgtttaataataaattataacattcgcatcg
+B: tttcgtttaaaaataaattataatattcgcatcg
+   ==========^            ^==========
+   61603    58782     39    none     15     15
+     Errors = 3
+A: taaacggatttacaaaaaattttac-aaacaaagga
+B: taaacggattgacaaaaa-ttttacaaaacaaagga
+   ==========^       ^      ^==========
+   61661    58840     20    none     19     19
+     Errors = 3
+A: aaaatggtatgatgattggcacactcggcgcgttgttat
+B: aaaatggtattatgatcggcacactcggtgcgttgttat
+   ==========^     ^           ^==========
+   61682    58861     30    none      1      1
+     Errors = 1
+A: tgagcggttgctctagctttg
+B: tgagcggttgttctagctttg
+   ==========^==========
+   61769    58948     32    none     57     57
+     Errors = 9
+A: tttcgcttgtattcctaaagaccattctctaaaagacgcttccacaaaaaaagaagtgca
+B: tttcgcttgtctccctaaagaccattcttcaaaagacgcttctaccaaaaaagaagcgca
+   ==========^ ^               ^^            ^  ^          ^   
+A: atacacgcctaagggct
+B: atacattcctaagggct
+        ^^==========
+   61811    58990     26    none     10     10
+     Errors = 2
+A: attcttctaatttaaaccactgggattcta
+B: attcttctaacttaaaccattgggattcta
+   ==========^        ^==========
+   61863    59043     40    none     26     27
+     Errors = 6
+A: aggggtttattagatggggcaaaaaaagggaggg-ataataaagctc
+B: aggggtttatgagagggggcgaaaaaaggggggggaaaataaagctc
+   ==========^   ^     ^         ^   ^ ^==========
+   61927    59108     42    none     24     25
+     Errors = 7
+A: acaataacaaccttttttaacattgatatgagat--aaaaggagat
+B: acaataacaatcttttt-aacactgatataatataaaaaaggagat
+   ==========^      ^    ^      ^ ^  ^^==========
+   62019    59203     33    none     50     53
+     Errors = 24
+A: ttgtagaaaacatgaata--cagaaaatacgaatatttcaagaacgactgcttccac--c
+B: ttgtagaaaatgcgaataatgagaaaata-gaa-aaaccaaatacttcaaatcccactgc
+   ==========^^^     ^^^        ^   ^ ^^^   ^^  ^^ ^^^ ^    ^^ 
+A: -ccccccccccccca
+B: ttccaccccccccca
+   ^^  ^==========
+   62149    59342     29    none     97    106
+     Errors = 26
+A: tttaaaatctgttggagatcttacagatcgctttaaaaaattagaag-tc-caa-ttaga
+B: tttaaaatctattacagatcttaaagatcgccttaaaaaattagaagatcttaaattaga
+   ==========^  ^^        ^       ^               ^  ^^  ^     
+A: agaccttgaaccccttatcaaaatctctcgttacatag-gat-cct--ttt-tt-agaaa
+B: agactttgaaccccttagaaaactctctcattttatagttataggtaatttgtttggaaa
+       ^            ^^   ^      ^  ^^    ^^  ^^^ ^^   ^  ^^====
+A: atcctc
+B: atcctc
+   ======
+Region:      56114 .. 62189          53289 .. 59382          322 / 6094        5.28%
+#
+   62502    59848     24    none      -      -
+   62751    60103     34    none    225    231
+   No extension
+Region:      62502 .. 62525          59848 .. 59871            0 / 24          0.00%
+   62847    60199     33    none     62     62
+     Errors = 11
+A: ttggaagtcagagggtgcttgaattttggattt-gtagcaacaactcatagcgcaatgga
+B: ttggaagtcaaagatcgcttgaatttt-aattttgtagcaacaactcacagcgcaatgga
+   ==========^  ^^^           ^^    ^              ^           
+A: tttgatcgcatacgttcttagcg
+B: cttgatcgcatctgttcttagcg
+   ^          ^^==========
+   62919    60271     61    none     39     39
+     Errors = 5
+A: tttagaaagcctttataacaaagcgagccaagaattaagcgataagaagagcgataaag
+B: tttagaaagcttttataaccaagcgagccaagaattaggcgataagagaagcgataaag
+   ==========^        ^                 ^         ^^==========
+   62982    60334     39    none      2      2
+     Errors = 2
+A: attaaggataagaaatttgagc
+B: attaaggatagtaaatttgagc
+   ==========^^==========
+   63033    60385     34    none     12     12
+     Errors = 3
+A: ttatgactatacatgcaaaagcctatacccag
+B: ttatgactattcatgcaaaaagctatacccag
+   ==========^         ^^==========
+   63120    60466     25    none     53     47
+     Errors = 20
+A: caaaagatgcaaagggtggtcttaatcggctatacatacgacaaaaaaacaccaccatat
+B: caaaagatgcgaagagtggttttaagaggctata-a-gc-acaatgata-a--aatgtat
+   ==========^   ^     ^    ^^       ^ ^^ ^    ^^ ^ ^ ^^ ^^^   
+A: tatactatcgtgg
+B: cacactatcgtgg
+   ^ ^==========
+Region:      62751 .. 63144          60103 .. 60490           41 / 394        10.41%
+#
+   63559    60988     31    none      -      -
+   63636    61065     22    none     46     46
+     Errors = 8
+A: caccaagttatcgcgctcactaaagagc-aggatagccttaaacaagagcgagcgcaatt
+B: caccaagttaccgcgctcactaatgagcgag-atagtctcgaacaagagcgagcgcgatt
+   ==========^            ^    ^  ^    ^  ^^               ^===
+A: gcaagat
+B: gcaagat
+   =======
+   63917    61382     22    none    259    295
+   No extension
+Region:      63559 .. 63657          60988 .. 61086            8 / 99          8.08%
+   64073    61538     31    none    134    134
+     Errors = 29
+A: aagagaacatagcgctcaaagagagggcttatggcttgaaagagcaaccctc-aaa--ac
+B: aagagaacatcgccctcaaagagagggttgatggcttgaacgagcagctctccaaattgc
+   ==========^  ^             ^ ^          ^     ^ ^   ^   ^^^ 
+A: aacca-aaa--ccataattaaaggagaaatatcatggtaacacccttaaaaagtttaaaa
+B: aaccacaaaaaccacaat-aaagga-aa-tatcatggtaa-a--agaaaaaagtttagaa
+        ^   ^^   ^   ^      ^  ^           ^ ^^^^^          ^  
+A: ctgcctattggccacccgttagtagagattttgtgcgagc
+B: ctgcctcttggccaccccttagtagagaaattgtgcgagc
+         ^          ^          ^^==========
+   64212    61677     25    none    108    108
+     Errors = 20
+A: aataaagccgtattcaatgaagaagctccgattaatttcaaaaaagaagtgtcagaagaa
+B: aataaagccgcattcaatgaaaaaagtgagccgaatttcaaagatgaagtgtcagaagaa
+   ==========^          ^  ^^ ^^ ^^^         ^ ^               
+A: gagaaaatcaagttcaagcaagcgctaagagtgcttcatgcgattgtcaataatgaggct
+B: gacaaaatcaaattcaaacaagcgctgcgggtgtttcatgcgatcgtcaataatgagact
+     ^        ^     ^        ^^ ^   ^          ^            ^==
+A: tctttaag
+B: tctttaag
+   ========
+   64274    61739     29    none     37     37
+     Errors = 6
+A: tttctgatgacaatcaaaaattcatggagggtttagcgcaagctgacaagatcacta
+B: tttctgatgaaaatcaaaaattcctagaggatttagcgcaagctaaaaagatcacta
+   ==========^            ^ ^    ^             ^ ^==========
+   64320    61785     26    none     17     17
+     Errors = 3
+A: tagaaaaaacattagaaatcgtttcttatagcgatgt
+B: tagaaaaaaccttagagatcgtttctgatagcgatgt
+   ==========^     ^         ^==========
+   64380    61845     30    none     34     34
+     Errors = 9
+A: ggattttgaagcgtttaaagaaat-gatgctcaaagtggataacatagcggtagg
+B: ggattttgaaaagcttaaa-aaattgatgctcaatgtggatagtgtagcggtagg
+   ==========^^ ^     ^    ^         ^       ^^^==========
+   64428    61893     20    none     18     18
+     Errors = 2
+A: tatagccaaagccaattgcttgatttgaacggagggca
+B: tatagccaaaaccaattgcttgatttggacggagggca
+   ==========^                ^==========
+   64464    61929     35    none     16     16
+     Errors = 5
+A: ttgggatttagatgtgcctagcttgtctaaagaaag
+B: ttgggatttataggcgcctagcgtgcctaaagaaag
+   ==========^ ^ ^       ^  ^==========
+   64580    62027     35    none     81     63
+     Errors = 30
+A: tgataatttacccaaagaagaaatcggcggagaagagatagaaaagaatttctatgcccg
+B: tgataattta------gactctagcggc--a-aagaaat-g----ga-tttttatgcgcg
+   ==========^^^^^^  ^^^^ ^    ^^ ^    ^  ^ ^^^^  ^   ^     ^  
+A: ttcaagtttgaaagatgtaaacaagcagggtgttgtcgcta
+B: ctcaagtttgaaggatttaaacaag--gg-cgttgtcgcta
+   ^           ^   ^        ^^  ^^==========
+   64646    62093     21    none     31     31
+     Errors = 7
+A: aaagcacgactgcagcttacatggataacaacggaaaataccgcttgctct
+B: aaagcacgaccgcagcctatatggataagaacggggaataacgcttgctct
+   ==========^     ^  ^        ^     ^^    ^==========
+   64763    62210     30    none     96     96
+     Errors = 29
+A: tattggcggggatgtagatatagagagtttg-caaaaatatgaaaaccccacgatagtgg
+B: tattggcgggctagtagatgacgcaagcctgacaaa-gtttgaaaaccctacgatcgtgg
+   ==========^^^      ^^^ ^^  ^^  ^    ^^ ^         ^     ^    
+A: agttcagatataaagaaaagtttcttaaagattacaacgctttaagccaccgccctt
+B: agttcagacacataaaaaaatttattacagaatacaacgcactagatcaccgccctt
+           ^ ^ ^ ^    ^   ^   ^   ^        ^^  ^^^==========
+   64794    62241     23    none      1      1
+     Errors = 1
+A: gaacgatatacaagtggcgca
+B: gaacgatatagaagtggcgca
+   ==========^==========
+   64863    62310     33    none     46     46
+     Errors = 11
+A: agcccaaaaggaac-tttcaagcgctcaaggtaatcatttttatcggtttttttctcaat
+B: agcccaaaag-aacgctgcaatcgttaaagggaatgatttgtatcggtttttttctaaat
+   ==========^   ^^ ^   ^  ^ ^    ^   ^    ^               ^===
+A: tgaagca
+B: tgaagca
+   =======
+   64915    62362     24    none     19     19
+     Errors = 5
+A: gatgaaaaacggaattttagggatctcatagaggatttt
+B: gatgaaaaacagaattttagggatttagaagaggatttt
+   ==========^             ^ ^^^==========
+   64944    62391     34    none      5      5
+     Errors = 2
+A: tagaaagcttcactaattgcacgga
+B: tagaaagctttactcattgcacgga
+   ==========^   ^==========
+   64995    62442     49    none     17     17
+     Errors = 4
+A: aaatctatgcatactgcatcggccgttgcatcaacaa
+B: aaatctatgcttactgcatcagccgcagcatcaacaa
+   ==========^         ^    ^^==========
+   65045    62492     52    none      1      1
+     Errors = 1
+A: ttttatcctatcccatcaagt
+B: ttttatcctaccccatcaagt
+   ==========^==========
+   65098    62545     22    none      1      1
+     Errors = 1
+A: agttttgaaaaaggcttgaaa
+B: agttttgaaagaggcttgaaa
+   ==========^==========
+   65121    62568     33    none      1      1
+     Errors = 1
+A: atccttacccaggcatgtttt
+B: atccttaccccggcatgtttt
+   ==========^==========
+   65173    62620     52    none     19     19
+     Errors = 4
+A: acggctaaaatgttcaaagtggaattaaaagcgagcgag
+B: acggctaaaactttcaaagtggaattgagagcgagcgag
+   ==========^^              ^ ^==========
+   65253    62700     28    none     28     28
+     Errors = 9
+A: ctacgggtttgataaatttgcaaaattagacaagcccatttattacgg
+B: ctacgggttttttaaatcagagaagttagacaagccggtttattacgg
+   ==========^^     ^^ ^^  ^           ^^==========
+   65285    62732     35    none      4      4
+     Errors = 2
+A: attttgggggcgggacgacggatt
+B: attttgggggaggaacgacggatt
+   ==========^  ^==========
+   65339    62786     22    none     19     19
+     Errors = 6
+A: gggaaaaaagcgctaatcctaaattcgcttacaaaatga
+B: gggaaaaaagagctagccccaaatttgcctacaaaatga
+   ==========^    ^^  ^     ^  ^==========
+   65375    62822     29    none     14     14
+     Errors = 3
+A: cattttagcaatggaggggataagtatttaggcg
+B: cattttagcagcggaggggataaatatttaggcg
+   ==========^^           ^==========
+   65564    63011     20    none    160    160
+     Errors = 23
+A: tattggaattgttggcttgggaaatgtatgcccaaaatttccaagagctgaaagcaaaag
+B: tattggaattattggcttgggaaacgtatgccaaaaatttccaaacgctaaaagaaaaag
+   ==========^             ^       ^           ^^   ^    ^     
+A: atgttgtcattgctaaacccaactatgacaggatcgatacgcaacgctttggatctttta
+B: atattgtcatcgctaagcccaactatgacaggattgatacgcaactcttcggatcgttta
+     ^       ^     ^                 ^          ^   ^     ^    
+A: tgcaaaactccagagaagcacgcttgaatttgcaaacgattgcttctaacttgcgccctt
+B: tgcaaaattccagtggagtgcgtttgaatttgcaaacgatcgcttctcaattgcgccctt
+          ^     ^ ^  ^^  ^                 ^      ^ ^==========
+   65600    63047     24    none     16     16
+     Errors = 3
+A: ttttagaaaaattagacgctaatatcatagaagcga
+B: ttttagaaaatttagacgccaatattatagaagcga
+   ==========^        ^     ^==========
+   65780    63224     26    none    156    153
+     Errors = 31
+A: agaaaatgaagaatttgagatagaaggcttt-gaaaaggaatttaaagtcca-gctgttg
+B: agaaaatgaaaactttgagata-aagggttttgaaaaggattttaaag-ccatgctgttt
+   ==========^ ^         ^    ^   ^        ^       ^   ^      ^
+A: gataggaatgggggagattcaccagtagaaga-cttcaaagtggattacaaagaactttt
+B: gataggaacggggtaga--aac-agaatgcgatctt-aaagttgattgcaaagagctttt
+           ^    ^   ^^^  ^  ^ ^^^  ^   ^     ^    ^      ^     
+A: aaacctcttaaaagacaagatagatgacggcgttaaaaacttctttgcaggattttcta
+B: aaacctcttaaaaggcaagatagaagatggcgttgccaacttctttgccggattttcta
+                 ^         ^  ^      ^^^           ^==========
+   65870    63314     23    none     64     64
+     Errors = 12
+A: tggctgaaaatattgataatcagtgtcgggcgtttcatattttcttagg-agggaatgcg
+B: tggctgaaaacattgatgatcagtgtcgggcgtttcacattttcttaggcagg-aatgtg
+   ==========^      ^                   ^           ^   ^    ^ 
+A: agcaaatcggtgctggtcaaacaag
+B: agccgttcggcgttagtcaaacaag
+      ^^^    ^ ^ ^==========
+   65955    63399     23    none     62     62
+     Errors = 10
+A: ttgaaaacgctaaagaagagcagctcaaagcttacaagcaaaagacttctaaagatgatt
+B: ttgaaaacgccaaagaaaagcagctcaaagattaccatcaaaagacttctaaaaatgatt
+   ==========^      ^            ^    ^ ^               ^      
+A: tcacattcattctttatgagcc
+B: ttaaattcatcatttatgagcc
+    ^ ^      ^^==========
+   65981    63425     26    none      3      3
+     Errors = 3
+A: aggcacagaagcctcagacaaac
+B: aggcacagaaaaatcagacaaac
+   ==========^^^==========
+   66131    63575     20    none    124    124
+     Errors = 23
+A: tagagcttacaggagaagacgtttctaacaagcccgcttatttaaagcccacttgcaaaa
+B: tagagcttacgggagaagacgtttctaacacgcccgcttatttgaagcccacttgcaaaa
+   ==========^                   ^            ^                
+A: ccggtgtggctttcggacttttagaaagcagacccaaagcaggcgggattgaaagaccct
+B: ctggggtggcttttgggcttttagaaagcagggacaaggctcaagggattgaaatgccct
+    ^  ^        ^  ^              ^^^   ^  ^^^^          ^^    
+A: ctata-gattttaatcctgtgttta
+B: ctataagct-ccaaccctgtgttta
+        ^ ^ ^^^  ^==========
+   66219    63663     39    none     68     68
+     Errors = 12
+A: aatacgatttgggtattgagagagaagggaaattccacactagaatcagtcgggattctt
+B: aatacgatttaggcattgagatagaggggaaattccacgctaaaatccatagggattctt
+   ==========^  ^       ^   ^            ^   ^    ^^ ^         
+A: taaaacccaatgaataccagattttcca
+B: taaagcctaatgaatactagattttcca
+       ^  ^         ^==========
+   66389    63833     29    none    131    131
+     Errors = 24
+A: ggctttgatgggttagagatacgctacagcgataaatctct-cgccaacaccaacacttt
+B: ggctttgatgagttagagatacgatacagcgacaaagc-cttagccaacaccaacactct
+   ==========^            ^        ^   ^ ^  ^^               ^ 
+A: agacattgaagacacacaactgattttcatagcgttagaagagcatgaagaagtggatgt
+B: ggacattaaagatacgcaaatgatttccatagcgctagaagaggttgaagaagtggaagt
+   ^      ^    ^  ^   ^      ^       ^        ^^            ^  
+A: gaaggtgtgcagtatagattcacaaagcatta
+B: gaaggtgtgttgcgtggattcccaaagcatta
+            ^^ ^^ ^     ^==========
+   66445    63889     26    none     27     27
+     Errors = 5
+A: tgtttaaagataaccaattaatctatgaaagcgaggcagaaaaatta
+B: tgtttaaagacggccaattgatctatgaaagcgaggtagaaaaatta
+   ==========^^^      ^                ^==========
+   66582    64026     22    none    111    111
+     Errors = 15
+A: ctaagaacgcgtatgcgtttgttgtgattgaagaaagcgttatggtgtttaaacgcacca
+B: ctaagaacgcttatgcgtttgtcgtgattgaaaaaagtattatggtgtttaaatgcgcca
+   ==========^           ^         ^    ^^              ^  ^   
+A: aagatgaggggttaatgcctatctttgaaggctttgtgcctttaaaagagggctttttga
+B: aagacaaggggctaatccctatcactgaaggctttgtgccgttaaaagagggctttttga
+       ^^     ^    ^      ^^               ^                   
+A: aaagttttaaa
+B: gaagttttaaa
+   ^==========
+   66610    64054     36    none      6      6
+     Errors = 2
+A: gcgttgcaatttggaatttttagaaa
+B: gcgttgcaatctggattttttagaaa
+   ==========^    ^==========
+   66812    64256     25    none    166    166
+     Errors = 31
+A: tttgtatgacaaacca-tccgcacacgagatcttttccttgtgcaaggagctgaaaaatt
+B: tttgtatgacta-ccaatttccaagcgaggttttttcattgtgtaaggatttgaaaaatt
+   ==========^ ^   ^ ^^^  ^^    ^ ^     ^     ^     ^^         
+A: ccatctgggacaggaagcttgtggtagcgctagtggaggctttagaggggtttaaggatt
+B: ccatttgggacagaaagcttgtggtagtgctagtggaggctttggagggttttaagggtt
+       ^        ^             ^               ^     ^       ^  
+A: ggaatttgtcgcttaaaatagaagacaagcgttctaacagcttgggtaatggcaccaaaa
+B: tgaatttgtctcttaagatagaagataggcattctaatagcttgggtaatggcgttcaaa
+   ^         ^     ^        ^ ^  ^      ^               ^^^^===
+A: aattgct
+B: aattgct
+   =======
+   66862    64306     44    none     25     25
+     Errors = 6
+A: acgctgatttagggagcgactataaaacaatcgtgatagacagca
+B: acgctgatttggggagcaaccacaaaccaatcgtaatagacagca
+   ==========^      ^  ^ ^   ^       ^==========
+   66907    64351     62    none      1      1
+     Errors = 1
+A: aagaaaaatataaaagagaaa
+B: aagaaaaatacaaaagagaaa
+   ==========^==========
+   66970    64414     34    none      1      1
+     Errors = 1
+A: atgggggtggaagcattagaa
+B: atgggggtgggagcattagaa
+   ==========^==========
+   67007    64451    108    none      3      3
+     Errors = 3
+A: aagcctgattttgatgaagaaaa
+B: aagcctgattccaatgaagaaaa
+   ==========^^^==========
+   67141    64585     25    none     26     26
+     Errors = 7
+A: gagttactaagagaggaagtgaacagcttgagtaatcatttccata
+B: gagttactaaacgaggaagtgaatagcttgaatggccatttccata
+   ==========^^           ^       ^ ^^^==========
+   67167    64611     31    none      1      1
+     Errors = 1
+A: gaatcatggcgagacgctagg
+B: gaatcatggcaagacgctagg
+   ==========^==========
+   67240    64684     90    none     42     42
+     Errors = 6
+A: tagcgaggtgctggataatttgaaaagcactttcaatgaatttgatgaagctgcgcaaga
+B: tagcgaggtgttggataacttgaaaggcactttcaatgaatttaatgaggccgcgcaaga
+   ==========^       ^      ^                 ^    ^  ^========
+A: gc
+B: gc
+   ==
+   67360    64804     22    none     30     30
+     Errors = 5
+A: ggaaaacggatacagaagaagtcaaagaggttgttaaaaaatgcagggaa
+B: ggaaaacggacacagaagaagtcaaaaaggttgttggaagatgcagggaa
+   ==========^               ^        ^^  ^==========
+   67385    64829     76    none      3      3
+     Errors = 2
+A: taaaagatccttacaagaagaaa
+B: taaaagatccctgcaagaagaaa
+   ==========^ ^==========
+   67671    65121     26    none    210    216
+   No extension
+Region:      63904 .. 67460          61369 .. 64904          417 / 3557       11.72%
+   67775    65225     22    none     78     78
+     Errors = 19
+A: tgaaatctacgccactcaagccaaagcgagcgcggaacttgtagaggga-gcttggaaga
+B: tgaaatctactcgaatcaagccaaagcgagcgcgaatcttat-gaatcaagcttgggagg
+   ==========^ ^ ^                   ^ ^   ^ ^  ^^^ ^      ^  ^
+A: gcgttaaaaagtcgttggacttttataccgataagcacc
+B: gcattaaaaagaggttgcatttttatactgataagcacc
+     ^        ^^    ^ ^        ^==========
+   67957    65407     22    none    160    160
+     Errors = 41
+A: gaatttatcaaacgcttgaactatgcgagtgaagcgatagacaacgaatacaa-tatcgc
+B: gaatttatcaggcgtttgaaacaagcgagcgatgcgatagataacgaatacaactttc-c
+   ==========^^  ^     ^^ ^     ^  ^        ^           ^ ^  ^ 
+A: gcccccagaaattttgaacg-agagcgattttgaaagccctacgat-tgtttataaccct
+B: aactccaggcgtttt-attggaatacgattttgaacggcctgctatctctt-atacccct
+   ^^ ^    ^^^    ^ ^^ ^ ^^^          ^ ^   ^ ^  ^ ^  ^   ^    
+A: aaaaaaagcgtttatgatgaacacttgaaagatttgagggaagattttagcttttcttta
+B: aaaaaaagcgtttttaatgagcgcttgaaggatttgagggaaaattttagcgcttcttta
+                ^ ^    ^ ^      ^            ^        ^^=======
+A: tac
+B: tac
+   ===
+   68026    65488     20    none     47     59
+     Errors = 25
+A: tgatttgaaaaaca-ga---at--taacgc-ttcttctaagcta-gat--cgcac-ca-c
+B: tgatttgaaagacaagatccatcataacgccttgt-ctaa-cgatgatttagaacgcatg
+   ==========^   ^  ^^^  ^^      ^  ^ ^    ^ ^ ^   ^^^ ^  ^  ^^
+A: a-acctct-aaagagcaagaa
+B: atagcttttagagagcaagaa
+    ^ ^  ^ ^ ^==========
+   68254    65710     27    none    208    202
+     Errors = 53
+A: tttgaaaagaatttagaggatttgatgccaggctttagaggtggaactgacactttgtct
+B: tttgaaaagagtttagaggattggatg---gg-tgcata-ttctta-tgatgaaaaccct
+   ==========^           ^    ^^^  ^ ^^ ^ ^^ ^^^ ^   ^^^^^^^^  
+A: ggcgatgaattagagcacatggcaagctttagagggcaagaatttgaaaagaatttagag
+B: aacgatgaattagatcgcatggcaatatctaaagagcaggagttggaaaagagtttagag
+   ^^            ^ ^        ^^ ^  ^  ^   ^  ^  ^       ^       
+A: gatttgatgccgagttctttaggcgtgcattcttatgatgagagcttgaatttagccaaa
+B: gatttgatgccaagcgttttaggcgtgccttcttataacgaaagcttgactttagccaaa
+              ^  ^^^           ^       ^ ^  ^       ^          
+A: aagaattgcgttaaaaattgtaagaaagctttaggagattttacagaa
+B: aatcgttgcgttaaaaactttaaggaagctttagaaggttttacagaa
+     ^^^            ^ ^    ^         ^  ^==========
+   68336    65792     20    none     55     55
+     Errors = 10
+A: aagaatcccccaacgatttgaacgctataaacgaagcttttaatcatttggaaacagagt
+B: aagaatcccctaacgattcaaacgctatcaatgaagcctttgataatttagaaacagagt
+   ==========^       ^^        ^  ^     ^   ^  ^    ^          
+A: tagaacgcgctacag
+B: tagagcgcgctacag
+       ^==========
+   68519    65975     29    none    163    163
+     Errors = 35
+A: aaaatttgagccaaaaaatagcgcctattttagagcggtatgaaaatgataagcggcaaa
+B: aaaatttgagtcaaaaaatcgatcccgttttagaacggaatgaaaattata--cg-caaa
+   ==========^        ^ ^^  ^^       ^   ^        ^   ^^  ^    
+A: aa---ttgg-gttatggcgagtttttagaaa-aagaaaaagagggctttatggtagatga
+B: aagcgttggagt-atagggagtttttagaaagccgtaaa-gagagctttattgtagatga
+     ^^^    ^  ^  ^ ^             ^^^ ^   ^   ^       ^        
+A: gcaaaacccttatccggaagaagtccgctttaatgagttgcgtttagcggaatttgagag
+B: aaaaaacccctatccggaagaagtcagctttaatgaatggcgttgggcggaatttgatag
+   ^^       ^               ^          ^ ^     ^^           ^==
+A: cgttttta
+B: cgttttta
+   ========
+   68564    66020     30    none     16     16
+     Errors = 4
+A: tgcctttagaggatttagataaacctgcatgcgctc
+B: tgcctttagaagatttaaataaaaccgcatgcgctc
+   ==========^      ^     ^ ^==========
+   68615    66071     23    none     21     21
+     Errors = 6
+A: aaaggctttagaagccacgcttaaaaatagggatttgggct
+B: aaaggctttacaagctacgcttaaagacaacgatttgggct
+   ==========^    ^         ^ ^ ^^==========
+   68639    66095     20    none      1      1
+     Errors = 1
+A: atgcgacagaattggaacaga
+B: atgcgacagagttggaacaga
+   ==========^==========
+   68671    66127     40    none     12     12
+     Errors = 3
+A: tcgcaaaaggtttcattcctaaggggtatttg
+B: tcgcaaaaggattcatccctagggggtatttg
+   ==========^     ^    ^==========
+   68718    66174     46    none      7      7
+     Errors = 3
+A: tttagggaatgtggcgttggtgagaga
+B: tttagggaatttagcgctggtgagaga
+   ==========^ ^   ^==========
+   68798    66254     20    none     34     34
+     Errors = 10
+A: cgaaaggatacttactatggaaacaattcctgcaaactcagaactgaattggga
+B: cgaaaggatattcactatggacagaatttctacagaaacagaattgaattggga
+   ==========^ ^        ^ ^    ^  ^  ^ ^^     ^==========
+   68861    66317     32    none     43     43
+     Errors = 7
+A: atttgtagagccgctcaatgaaaaggcgttgagcgggttagaagagcggttgaaaatagg
+B: atttgtagagtcgctcaatgaaaatgcgttgagcgatctagaagagcgattggaaatagg
+   ==========^             ^          ^^^          ^   ^=======
+A: ctt
+B: ctt
+   ===
+   68894    66350     30    none      1      1
+     Errors = 1
+A: taaggactttgtcaaacgatc
+B: taaggactttatcaaacgatc
+   ==========^==========
+   69016    66472     30    none     92     92
+     Errors = 13
+A: tttagccaatggcgttcttttgtggtgggcaataagtcttacacgttcaaacatgttttg
+B: tttagccaattgcgttatttcatggtgggcaatgagtcttacatgttcaaacatgttttg
+   ==========^     ^   ^^           ^         ^                
+A: aacttcaatttagagggcttatttattgattttatgcagagtttaaaagaat
+B: aatttcaatttagagagcttgttgattgatttcatgcaaagcttaaaagaat
+     ^            ^    ^  ^        ^     ^  ^==========
+   69049    66505     34    none      3      3
+     Errors = 2
+A: tgaagaaatcatcttcgctaatg
+B: tgaagaaatcgtattcgctaatg
+   ==========^ ^==========
+   69097    66553     23    none     14     14
+     Errors = 5
+A: tattatcttttgaatacggctaccgatgtggtgc
+B: tattatctttggaataccaccactgatgtggtgc
+   ==========^      ^^ ^  ^==========
+   69166    66622     30    none     46     46
+     Errors = 12
+A: ttttagacactgatgatggctcaaaacatgcgctgttgcaccttaaaatgtttttgaaaa
+B: ttttagacaccgataatggttcaaaaaaagtgctattaaatcttaatatgtttttaaaaa
+   ==========^   ^    ^      ^ ^ ^   ^  ^^ ^     ^        ^====
+A: aactgg
+B: aactgg
+   ======
+   69315    66774     37    none    119    122
+     Errors = 24
+A: ttaaaatgtt-tt--ctcatgaagtttatttggagggttgcacccttgaattaagaaaga
+B: ttaaaatgttgttttctcataaagtttttttggagggttgcaccaatgagttaagaagga
+   ==========^  ^^     ^      ^                ^^   ^       ^  
+A: tttgcgatgattttgaaaaaaatgccatgcaagatgatttagggcagaaactcaggagtg
+B: tttgcgactctttcgtagaaggggccatgcaagatgatttggggcagaaactcaaaagtg
+          ^^^   ^ ^ ^  ^^^                 ^             ^^    
+A: atgtgctagaggacatgctaaa
+B: aggcgctagagaacatgctaaa
+    ^ ^       ^==========
+   69445    66907     53    none     93     96
+     Errors = 28
+A: aaaatttagaagatgacacccaataccaaa-gaagaataattgacgagcaaattgaagaa
+B: aaaatttagagcaggaaactcaatacgaaatga-gaaaaatcaacgagcaacttgaagaa
+   ==========^^ ^  ^  ^      ^   ^  ^   ^   ^^        ^        
+A: gccaaatctttgatgaggcaaattgatatg-aatttc-c-a-tccatcaagcgagatc
+B: gccaagcgtttggagaagcaagttgatatgcaagatcgccactc-acaaagcgagatc
+        ^^^    ^^  ^    ^        ^  ^^  ^ ^ ^  ^ ^^==========
+   69573    67029     59    none     75     69
+     Errors = 27
+A: agagaagctagtaaaagatatgatgagtatcttaaatctaaggataaaaatgattga--t
+B: agagaagctaagaggcgctatggtgaatatcttaa------ggataaaaatgattgaaat
+   ==========^^ ^^^ ^    ^   ^        ^^^^^^                ^^ 
+A: --gtgaatggtttattaaaagaactggatgatgccttag
+B: aagcgaatggtt--gcaaaa-a-ctagacgatgccttag
+   ^^ ^        ^^^^    ^ ^  ^  ^==========
+   69633    67089     62    none      1      1
+     Errors = 1
+A: agccgatcatctcaccaatag
+B: agccgatcatttcaccaatag
+   ==========^==========
+   69723    67179     24    none     28     28
+     Errors = 3
+A: cagacgcgccaaagttcaatgaagagggcgcttacccacaatttttaa
+B: cagacgcgccgaagttcaatgaagagggtgcttaccctcaatttttaa
+   ==========^                 ^        ^==========
+   69786    67242     68    none     39     39
+     Errors = 9
+A: tggtttattggaaattaaaggcaagaatggcgctagcatggaattttgcttgcctaaag
+B: tggtttattgcaagttaggggcaaaaatggtgctaacatggaatttttattgcctaaag
+   ==========^  ^   ^^     ^     ^    ^           ^^==========
+Region:      67671 .. 69853          65121 .. 67309          342 / 2189       15.62%
+> H_pyloriJ99_Bslice Reverse

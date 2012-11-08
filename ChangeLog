@@ -1,0 +1,52 @@
+-- Version history --
+
+3.23 - Added -D and --banded option to nucmer. These options can be used to
+       specify the largest indel that will be included in an alignment
+       segment without breaking it in two pieces.
+3.22 - Significant 'dnadiff' bug fixes. Breakpoints, unaligned seqs, and
+       SNP counts now reported accurately. Unaligned contig output format
+       switched to match show-diff format. Dynamic memory allocation for
+       run-mummer1. Turned off output of the near useless .cluster files
+       from nucmer and promer (let us know if you still want them).
+3.21 - gcc compatability fix.
+3.20 - Added 'dnadiff' comparative analysis script, 'show-diff' nucmer
+       utility, and fixed a number of build issues.
+3.19 - Fixed gcc4 build problem	.
+3.18 - Fixed bugs in delta-filter, began migrating to delta library.
+3.17 - Many changes, major upgrade. Added/improved delta-filter, show-snps,
+       mummerplot, and mgaps. Multiplot capability added to mummerplot.
+3.16 - Added 'delta-filter' utility.
+3.15 - Fixed --nooptimize in nuc/promer.
+3.14 - Fixed gcc3 compilation bug.
+3.13 - Added -d, -g, -G and -o options to show-coords and updated
+       documentation. Fixed bug in show-tiling -R.
+3.12 - Added the --nosimplify option to nucmer for repeat searching. Fixed
+       a bug in nucmer and promer. Fixed rounding issue in show-coords.
+       Updated citations.
+3.11 - Fixed bug show-tiling -R option. Added some mapview changes. Fixed
+       the issue with mummerplot being to faint.
+3.10 - Now Mac OSX compatible. Added -R option to show-tiling.
+3.08 - Added MUMmer examples web docs which gives brief walkthroughs.
+3.07 - Added the 'mapview' plotting utility and appropriate documentation.
+       Fixed origin wrap shadowing bug in show-tiling when using the -c option.
+       NUCmer and PROmer now convert to absolute paths to avoid ambiguity.
+3.06 - Added -F and -h option to mummer. Changed -mumcand option to
+       -mumreference, but left deprecated -mumcand option available. Added
+       -maxmatch option to mummer, and changed default behavior of all
+       applicable programs to -mumreference (nucmer, promer and mummer).
+       Added -w (screen width) option to show-aligns. Updated documentation
+       with all of these changes.	
+3.05 - Added -k option to show-coords to only display the best frame for
+       overlapping PROmer alignments. Added --[no]optimize option to nucmer
+       and promer to allow alignment score optimization to be turned off, i.e
+       allow alignments to extend to the ends of sequences rather than
+       backtracking to optimize the alignment score. Updated docs.
+3.04 - Fixed combineMUMs bug and added new option, added some developer
+       support in the src/kurtz subdirectory, and added extra INSTALL
+       information in the docs.
+3.03 - Added HTML user manual in the /docs/htmlmanual/ subdir.
+3.02 - Fixed small bug in show-coords. Added additional options
+       to show-coords. Added extra help text to show-tiling. Changed
+       contact email address. Consistent padding added to combineMUMs.
+3.01 - Fixed off-by-one error in multi-reference 'mummer' usage.
+3.00 - Initial open source release!
