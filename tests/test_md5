@@ -1,0 +1,3 @@
+#! /bin/bash
+
+exec md5sum -c <(echo $1 -) 2>&1

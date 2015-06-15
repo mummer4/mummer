@@ -10,6 +10,7 @@
 
 #include  "tigrinc.hh"
 
+namespace mummer_mgaps {
 
 const int  DEFAULT_FIXED_SEPARATION = 5;
 const long int  DEFAULT_MAX_SEPARATION = 1000;
@@ -61,107 +62,16 @@ static void  Filter_Matches
     (Match_t * A, int & N);
 static int  Find
     (int a);
-static void  Parse_Command_Line
-    (int argc, char * argv []);
 static void  Process_Matches
     (Match_t * A, int N, const char * label);
 static int  Process_Cluster
     (Match_t * A, int N, const char * label);
 static void  Union
     (int a, int b);
-static void  Usage
-    (char * command);
 
 
 
 
-int  main
-    (int argc, char * argv [])
-
-  {
-   Match_t  * A = NULL;
-   char  line [MAX_LINE];
-   char  save [MAX_LINE];
-   int  first = TRUE;
-   int  header_line_ct = 0;
-   long int  S1, S2, Len;
-   long int  N = 0, Size = 0;
-
-   Parse_Command_Line  (argc, argv);
-
-   Size = 500;
-   A = (Match_t *) Safe_malloc (Size * sizeof (Match_t));
-   UF = (int *) Safe_malloc (Size * sizeof (int));
-
-   while  (fgets (line, MAX_LINE, stdin) != NULL)
-     {
-      if  (line [0] == '>')
-          {
-           if  (first)
-               first = FALSE;
-             else
-               Process_Matches (A, N, save);
-           N = 0;
-           strcpy (save, line);
-           if  (Check_Labels && (++ header_line_ct % 2 == 0))
-               assert (strstr (line, "Reverse") != NULL);
-          }
-      else if  (sscanf (line, "%ld %ld %ld", & S1, & S2, & Len) == 3)
-          {
-           if  (N >= Size - 1)
-               {
-                Size *= 2;
-                A = (Match_t *) Safe_realloc (A, Size * sizeof (Match_t));
-                UF = (int *) Safe_realloc (UF, Size * sizeof (int));
-               }
-           N ++;
-           A [N] . Start1 = S1;
-           A [N] . Start2 = S2;
-           A [N] . Len = Len;
-           A [N] . Good = FALSE;
-           A [N] . Tentative = FALSE;
-          }
-     }
-
-   Process_Matches (A, N, save);
-
-
-#if  0
-   printf ("> Other matches\n");
-   Prev = -1;
-   for  (i = 0;  i < N;  i ++)
-     if  (! A [i] . Good)
-         {
-          if  (Prev == -1)
-              printf ("%8ld %8ld %6ld %7s %6s %6s\n",
-                  A [i] . Start1, A [i] . Start2, A [i] . Len,
-                  "none", "-", "-");
-            else
-              {
-               if  (A [i] . Simple_From == Prev)
-                   Adj = A [i] . Simple_Adj;
-                 else
-                   Adj = 0;
-               printf ("%8ld %8ld %6ld",
-                   A [i] . Start1 + Adj, A [i] . Start2 + Adj,
-                   A [i] . Len - Adj);
-               if  (Adj == 0)
-                   printf (" %7s", "none");
-                 else
-                   printf (" %7ld", - Adj);
-               if  (A [i] . Simple_From == Prev)
-                   printf (" %6ld %6ld\n",
-                       A [i] . Start1 + Adj - A [Prev] . Start1 - A [Prev] . Len,
-                       A [i] . Start2 + Adj - A [Prev] . Start2 - A [Prev] . Len);
-                 else
-                   printf (" %6s %6s\n", "-", "-");
-              }
-          Prev = i;
-         }
-#endif
-
-   return  0;
-  }
 
 
 
@@ -355,87 +265,6 @@ static void  Filter_Matches
 
 
 
-static int  Find
-    (int a)
-
-//  Return the id of the set containing  a  in  UF .
-
-  {
-   int  i, j, k;
-
-   if  (UF [a] < 0)
-       return  a;
-
-   for  (i = a;  UF [i] > 0;  i = UF [i])
-     ;
-   for  (j = a;  UF [j] != i;  j = k)
-     {
-      k = UF [j];
-      UF [j] = i;
-     }
-
-   return  i;
-  }
-
-
-
-static void  Parse_Command_Line
-    (int argc, char * argv [])
-
-//  Get options and parameters from command line with  argc
-//  arguments in  argv [0 .. (argc - 1)] .
-
-  {
-   int  ch, errflg = FALSE;
-   char  * p;
-
-   optarg = NULL;
-
-   while  (! errflg
-             && ((ch = getopt (argc, argv, "Cd:ef:l:s:")) != EOF))
-     switch  (ch)
-       {
-        case  'C' :
-          Check_Labels = TRUE;
-          break;
-
-        case  'd' :
-          Fixed_Separation = strtol (optarg, & p, 10);
-          break;
-
-        case  'e' :
-          Use_Extents = TRUE;
-          break;
-
-        case  'f' :
-          Separation_Factor = strtod (optarg, & p);
-          break;
-
-        case  'l' :
-          Min_Output_Score = strtol (optarg, & p, 10);
-          break;
-
-        case  's' :
-          Max_Separation = strtol (optarg, & p, 10);
-          break;
-
-        case  '?' :
-          fprintf (stderr, "Unrecognized option -%c\n", optopt);
-
-        default :
-          errflg = TRUE;
-       }
-
-   if  (errflg || optind != argc)
-       {
-        Usage (argv [0]);
-        exit (EXIT_FAILURE);
-       }
-
-   return;
-  }
-
-
 
 static int  Process_Cluster
     (Match_t * A, int N, const char * label)
@@ -449,7 +278,7 @@ static int  Process_Cluster
    int  best, prev;
    int  print_ct = 0;
    int  i, j, k;
-     
+
    do
      {
       for  (i = 0;  i < N;  i ++)
@@ -655,6 +484,28 @@ static void  Process_Matches
   }
 
 
+static int  Find
+    (int a)
+
+//  Return the id of the set containing  a  in  UF .
+
+  {
+   int  i, j, k;
+
+   if  (UF [a] < 0)
+       return  a;
+
+   for  (i = a;  UF [i] > 0;  i = UF [i])
+     ;
+   for  (j = a;  UF [j] != i;  j = k)
+     {
+      k = UF [j];
+      UF [j] = i;
+     }
+
+   return  i;
+  }
+
 
 static void  Union
     (int a, int b)
@@ -677,8 +528,9 @@ static void  Union
 
    return;
   }
+} // namespace mummer_mgaps
 
-
+using namespace mummer_mgaps;
 
 static void  Usage
     (char * command)
@@ -709,5 +561,148 @@ static void  Usage
    return;
   }
 
+static void  Parse_Command_Line
+    (int argc, char * argv [])
 
+//  Get options and parameters from command line with  argc
+//  arguments in  argv [0 .. (argc - 1)] .
+
+  {
+   int  ch, errflg = FALSE;
+   char  * p;
+
+   optarg = NULL;
+
+   while  (! errflg
+             && ((ch = getopt (argc, argv, "Cd:ef:l:s:")) != EOF))
+     switch  (ch)
+       {
+        case  'C' :
+          Check_Labels = TRUE;
+          break;
+
+        case  'd' :
+          Fixed_Separation = strtol (optarg, & p, 10);
+          break;
+
+        case  'e' :
+          Use_Extents = TRUE;
+          break;
+
+        case  'f' :
+          Separation_Factor = strtod (optarg, & p);
+          break;
+
+        case  'l' :
+          Min_Output_Score = strtol (optarg, & p, 10);
+          break;
+
+        case  's' :
+          Max_Separation = strtol (optarg, & p, 10);
+          break;
+
+        case  '?' :
+          fprintf (stderr, "Unrecognized option -%c\n", optopt);
+
+        default :
+          errflg = TRUE;
+       }
+
+   if  (errflg || optind != argc)
+       {
+        Usage (argv [0]);
+        exit (EXIT_FAILURE);
+       }
+
+   return;
+  }
+
+
+int  main
+    (int argc, char * argv [])
+
+  {
+   Match_t  * A = NULL;
+   char  line [MAX_LINE];
+   char  save [MAX_LINE];
+   int  first = TRUE;
+   int  header_line_ct = 0;
+   long int  S1, S2, Len;
+   long int  N = 0, Size = 0;
+
+   Parse_Command_Line  (argc, argv);
+
+   Size = 500;
+   A = (Match_t *) Safe_malloc (Size * sizeof (Match_t));
+   UF = (int *) Safe_malloc (Size * sizeof (int));
+
+   while  (fgets (line, MAX_LINE, stdin) != NULL)
+     {
+      if  (line [0] == '>')
+          {
+           if  (first)
+               first = FALSE;
+             else
+               Process_Matches (A, N, save);
+           N = 0;
+           strcpy (save, line);
+           if  (Check_Labels && (++ header_line_ct % 2 == 0))
+               assert (strstr (line, "Reverse") != NULL);
+          }
+      else if  (sscanf (line, "%ld %ld %ld", & S1, & S2, & Len) == 3)
+          {
+           if  (N >= Size - 1)
+               {
+                Size *= 2;
+                A = (Match_t *) Safe_realloc (A, Size * sizeof (Match_t));
+                UF = (int *) Safe_realloc (UF, Size * sizeof (int));
+               }
+           N ++;
+           A [N] . Start1 = S1;
+           A [N] . Start2 = S2;
+           A [N] . Len = Len;
+           A [N] . Good = FALSE;
+           A [N] . Tentative = FALSE;
+          }
+     }
+
+   Process_Matches (A, N, save);
+
+
+#if  0
+   printf ("> Other matches\n");
+   Prev = -1;
+   for  (i = 0;  i < N;  i ++)
+     if  (! A [i] . Good)
+         {
+          if  (Prev == -1)
+              printf ("%8ld %8ld %6ld %7s %6s %6s\n",
+                  A [i] . Start1, A [i] . Start2, A [i] . Len,
+                  "none", "-", "-");
+            else
+              {
+               if  (A [i] . Simple_From == Prev)
+                   Adj = A [i] . Simple_Adj;
+                 else
+                   Adj = 0;
+               printf ("%8ld %8ld %6ld",
+                   A [i] . Start1 + Adj, A [i] . Start2 + Adj,
+                   A [i] . Len - Adj);
+               if  (Adj == 0)
+                   printf (" %7s", "none");
+                 else
+                   printf (" %7ld", - Adj);
+               if  (A [i] . Simple_From == Prev)
+                   printf (" %6ld %6ld\n",
+                       A [i] . Start1 + Adj - A [Prev] . Start1 - A [Prev] . Len,
+                       A [i] . Start2 + Adj - A [Prev] . Start2 - A [Prev] . Len);
+                 else
+                   printf (" %6s %6s\n", "-", "-");
+              }
+          Prev = i;
+         }
+#endif
+
+   return  0;
+  }
 

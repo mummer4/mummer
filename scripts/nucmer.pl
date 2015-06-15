@@ -333,6 +333,8 @@ sub main ( )
 
     #-- Run mummer | mgaps and assert return value is zero
     print (STDERR "2,3: RUNNING mummer AND CREATING CLUSTERS\n");
+    print("$algo_path $algo $mdir -l $size -n $pfx.ntref $qry_file |\n",
+          "| $mgaps_path -l $clus -s $gap -d $ddiff -f $dfrac > $pfx.mgaps\n");
     open(ALGO_PIPE, "$algo_path $algo $mdir -l $size -n $pfx.ntref $qry_file |")
 	or $tigr->bail ("ERROR: could not open $algo_path output pipe $!");
     open(CLUS_PIPE, "| $mgaps_path -l $clus -s $gap -d $ddiff -f $dfrac > $pfx.mgaps")
@@ -378,7 +380,7 @@ sub main ( )
     }
 
     #-- Remove the temporary output
-    $err[0] = unlink ("$pfx.ntref", "$pfx.mgaps");
+#    $err[0] = unlink ("$pfx.ntref", "$pfx.mgaps");
 
     if ( $err[0] != 2 ) {
 	$tigr->logError ("WARNING: there was a problem deleting".
