@@ -4,18 +4,18 @@ CC = g++
 
 : foreach *.cc |> !cxx |>
 
-: annotate.o tigrinc.o |> !lxxd |> annotate
-: combineMUMs.o tigrinc.o |> !lxxd |> combineMUMs
-: delta-filter.o tigrinc.o delta.o |> !lxxd |> delta-filter
-: gaps.o tigrinc.o |> !lxxd |> gaps
-: mgaps.o tigrinc.o |> !lxxd |> mgaps
-: postnuc.o tigrinc.o sw_align.o |> !lxxd |> postnuc
-: postpro.o tigrinc.o sw_align.o translate.o |> !lxxd |> postpro
-: prenuc.o tigrinc.o |> !lxxd |> prenuc
-: prepro.o tigrinc.o translate.o |> !lxxd |> prepro
-: repeat-match.o tigrinc.o |> !lxxd |> repeat-match
-: show-aligns.o tigrinc.o translate.o delta.o |> !lxxd |> show-aligns
-: show-coords.o tigrinc.o delta.o |> !lxxd |> show-coords
-: show-tiling.o tigrinc.o delta.o |> !lxxd |> show-tiling
-: show-snps.o tigrinc.o translate.o delta.o |> !lxxd |> show-snps
-: show-diff.o tigrinc.o delta.o |> !lxxd |> show-diff
+: annotate.o tigrinc.o |> !lxxd |> $(BIN_DIR)/annotate
+: combineMUMs.o tigrinc.o |> !lxxd |> $(BIN_DIR)/combineMUMs
+: delta-filter.o tigrinc.o delta.o |> !lxxd |> $(BIN_DIR)/delta-filter
+: gaps.o tigrinc.o |> !lxxd |> $(BIN_DIR)/gaps
+: mgaps.o tigrinc.o |> !lxxd |> $(BIN_DIR)/mgaps $(BIN_DIR)/<exec>
+: postnuc.o tigrinc.o sw_align.o |> !lxxd |> $(BIN_DIR)/postnuc
+: postpro.o tigrinc.o sw_align.o translate.o |> !lxxd |> $(BIN_DIR)/postpro
+: prenuc.o tigrinc.o |> !lxxd |> $(BIN_DIR)/prenuc
+: prepro.o tigrinc.o translate.o |> !lxxd |> $(BIN_DIR)/prepro
+: repeat-match.o tigrinc.o |> !lxxd |> $(BIN_DIR)/repeat-match
+: show-aligns.o tigrinc.o translate.o delta.o |> !lxxd |> $(BIN_DIR)/show-aligns
+: show-coords.o tigrinc.o delta.o |> !lxxd |> $(BIN_DIR)/show-coords
+: show-tiling.o tigrinc.o delta.o |> !lxxd |> $(BIN_DIR)/show-tiling
+: show-snps.o tigrinc.o translate.o delta.o |> !lxxd |> $(BIN_DIR)/show-snps
+: show-diff.o tigrinc.o delta.o |> !lxxd |> $(BIN_DIR)/show-diff

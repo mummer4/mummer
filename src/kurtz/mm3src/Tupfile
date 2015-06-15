@@ -12,4 +12,4 @@ LIBSTREE=$(LIBSTREEDIR)/libstree.a
 
 
 : foreach *.c | $(LIBSTREEDIR)/streeproto.h $(LIBBASEDIR)/protodef.h |> !cc |>
-: $(MUM3OBJECTS) $(LIBBASE) $(LIBSTREE) |> !ld |> mummer
+: $(MUM3OBJECTS) $(LIBBASE) $(LIBSTREE) |> !ld |> $(BIN_DIR)/mummer

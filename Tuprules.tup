@@ -21,9 +21,23 @@ T_ARFLAGS = @(ARFLAGS)
 ifdef BIN_DIR
 BIN_DIR = @(BIN_DIR)
 else
-BIN_DIR = .
+BIN_DIR = $(TUP_CWD)/bin
 endif
+ifdef AUX_BIN_DIR
+AUX_BIN_DIR = @(AUX_BIN_DIR)
+else
 AUX_BIN_DIR = $(BIN_DIR)
+endif
+ifdef SCRIPT_DIR
+SCRIPT_DIR = @(SCRIPT_DIR)
+else
+SCRIPT_DIR = $(BIN_DIR)
+endif
+ifdef BIN_PATH
+BIN_PATH = @(BIN_PATH)
+else
+BIN_PATH = .
+endif
 
 CSH = /bin/csh
 PERL = /usr/bin/perl
