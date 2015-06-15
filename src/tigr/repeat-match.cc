@@ -25,7 +25,7 @@ int  Global_Non_Skip_Ct = 0;
 
 const int  DEFAULT_MIN_MATCH_LEN = 20;
 const char  DOLLAR_CHAR = '$';
-const char  DONT_KNOW_CHAR = 'N';
+// const char  DONT_KNOW_CHAR = 'N';
 const int  MAX_NAME_LEN = 500;
 const char  START_CHAR = '%';
 

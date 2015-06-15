@@ -369,7 +369,11 @@ int  main
            is_forward = ! is_forward;
            if  (is_forward)
                {
-                assert (Read_String (match_fp, & Query, & query_size, header));
+#ifndef NDEBUG
+                 bool read_header =
+#endif
+                   Read_String (match_fp, & Query, & query_size, header);
+                assert (read_header);
                 Query_Len = strlen (Query + 1);
                 if  (Nucleotides_Only)
                     {
@@ -425,8 +429,11 @@ int  main
           }
         else
           {
-           assert (sscanf (line, "%ld %ld %ld",
-                           & ref_pos, & query_pos, & match_len) == 3);
+#ifndef NDEBUG
+            int tokens =
+#endif
+              sscanf (line, "%ld %ld %ld", & ref_pos, & query_pos, & match_len);
+            assert(tokens == 3);
            if  (first_match)
                {
                 ref_lo = ref_pos;

@@ -1585,8 +1585,6 @@ void validateData
   vector<Cluster>::iterator Cp;
   vector<Match>::iterator Mp;
   vector<Alignment>::iterator Ap;
-  long int x, y, i;
-  char Xc, Yc;
 
   for ( Cp = Clusters.begin( ); Cp < Clusters.end( ); Cp ++ )
     {
@@ -1617,10 +1615,12 @@ void validateData
       for ( Mp = Cp->matches.begin( ); Mp < Cp->matches.end( ); Mp ++ )
 	{
 	  //-- assert for each match in cluster, it is indeed a match
-	  x = Mp->sA;
-	  y = Mp->sB;
-	  for ( i = 0; i < Mp->len; i ++ )
+#ifndef NDEBUG
+	  long int x = Mp->sA;
+	  long int y = Mp->sB;
+	  for (long int i = 0; i < Mp->len; i ++ )
 	    assert ( A[Cp->frameA][x ++] == B[Cp->frameB][y ++] );
+#endif
 
 	  //-- assert for each match in cluster, it is contained in an alignment
 	  for ( Ap = Alignments.begin( ); Ap < Alignments.end( ); Ap ++ )
@@ -1644,10 +1644,10 @@ void validateData
       assert ( Ap->eA >= 1 && Ap->eA <= Af->len );
       assert ( Ap->sB >= 1 && Ap->sB <= Bf->len );
       assert ( Ap->eB >= 1 && Ap->eB <= Bf->len );
-      
-      Xc = toupper(isalpha(A[Ap->frameA][Ap->sA]) ?
+#ifndef NDEBUG
+      char Xc = toupper(isalpha(A[Ap->frameA][Ap->sA]) ?
 		   A[Ap->frameA][Ap->sA] : STOP_CHAR);
-      Yc = toupper(isalpha(B[Ap->frameB][Ap->sB]) ?
+      char Yc = toupper(isalpha(B[Ap->frameB][Ap->sB]) ?
 		   B[Ap->frameB][Ap->sB] : STOP_CHAR);
       assert ( 0 <= MATCH_SCORE [getMatrixType( )] [Xc - 'A'] [Yc - 'A'] );
       
@@ -1656,9 +1656,10 @@ void validateData
       Yc = toupper(isalpha(B[Ap->frameB][Ap->eB]) ?
 		   B[Ap->frameB][Ap->eB] : STOP_CHAR);
       assert ( 0 <= MATCH_SCORE [getMatrixType( )] [Xc - 'A'] [Yc - 'A'] );
+#endif
     }
 
-  for ( i = 0; i < 7; i ++ )
+  for (int i = 0; i < 7; i ++ )
     {
       if ( A [i] != NULL )
 	free ( A [i] );

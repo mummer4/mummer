@@ -1476,14 +1476,14 @@ void validateData
      //  is valid
 
 {
-  char * A, * B, * Brev = NULL;
+  char * Brev = NULL;
   vector<Cluster>::iterator Cp;
   vector<Match>::iterator Mp;
   vector<Alignment>::iterator Ap;
-  long int x, y, i;
-  char Xc, Yc;
 
-  A = Af->seq;
+#ifndef NDEBUG
+  char * A = Af->seq, * B;
+#endif
 
   for ( Cp = Clusters.begin( ); Cp < Clusters.end( ); Cp ++ )
     {
@@ -1491,26 +1491,36 @@ void validateData
 
       //-- Pick the right directional sequence for B
       if ( Cp->dirB == FORWARD_CHAR )
+#ifndef NDEBUG
 	B = Bf->seq;
+#endif
+      ;
       else if ( Brev != NULL )
+#ifndef NDEBUG
 	B = Brev;
+#endif
+      ;
       else
 	{
 	  Brev = (char *) Safe_malloc ( sizeof(char) * (Bf->len + 2) );
 	  strcpy ( Brev + 1, Bf->seq + 1 );
 	  Brev[0] = '\0';
 	  Reverse_Complement (Brev, 1, Bf->len);
+#ifndef NDEBUG
 	  B = Brev;
+#endif
 	}
 
       for ( Mp = Cp->matches.begin( ); Mp < Cp->matches.end( ); Mp ++ )
 	{
 	  //-- assert for each match in cluster, it is indeed a match
-	  x = Mp->sA;
-	  y = Mp->sB;
-	  for ( i = 0; i < Mp->len; i ++ )
+#ifndef NDEBUG
+	  long int x = Mp->sA;
+	  long int y = Mp->sB;
+	  for (long int i = 0; i < Mp->len; i ++ )
 	    assert ( A[x ++] == B[y ++] );
-	  
+#endif
+
 	  //-- assert for each match in cluster, it is contained in an alignment
 	  for ( Ap = Alignments.begin( ); Ap < Alignments.end( ); Ap ++ )
 	    {
@@ -1529,10 +1539,14 @@ void validateData
       if ( Ap->dirB == REVERSE_CHAR )
 	{
 	  assert (Brev != NULL);
+#ifndef NDEBUG
 	  B = Brev;
+#endif
 	}
+#ifndef NDEBUG
       else
 	B = Bf->seq;
+#endif
       
       assert ( Ap->sA <= Ap->eA );
       assert ( Ap->sB <= Ap->eB );
@@ -1541,14 +1555,15 @@ void validateData
       assert ( Ap->eA >= 1 && Ap->eA <= Af->len );
       assert ( Ap->sB >= 1 && Ap->sB <= Bf->len );
       assert ( Ap->eB >= 1 && Ap->eB <= Bf->len );
-      
-      Xc = toupper(isalpha(A[Ap->sA]) ? A[Ap->sA] : STOP_CHAR);
-      Yc = toupper(isalpha(B[Ap->sB]) ? B[Ap->sB] : STOP_CHAR);
+#ifndef NDEBUG
+      char Xc = toupper(isalpha(A[Ap->sA]) ? A[Ap->sA] : STOP_CHAR);
+      char Yc = toupper(isalpha(B[Ap->sB]) ? B[Ap->sB] : STOP_CHAR);
       assert ( 0 <= MATCH_SCORE [0] [Xc - 'A'] [Yc - 'A'] );
-      
+
       Xc = toupper(isalpha(A[Ap->eA]) ? A[Ap->eA] : STOP_CHAR);
       Yc = toupper(isalpha(B[Ap->eB]) ? B[Ap->eB] : STOP_CHAR);
       assert ( 0 <= MATCH_SCORE [0] [Xc - 'A'] [Yc - 'A'] );
+#endif
     }
   
   if ( Brev != NULL )

@@ -8,8 +8,16 @@
 # : foreach *.cc |> !cxx |>
 # : foreach *.cpp |> !cxx |>
 
-CC  = gcc
+ifdef CC
+CC  = @(CC)
+else
+CC = gcc
+endif
+ifdef CXX
+CXX = @(CXX)
+else
 CXX = g++
+endif
 AR  = ar
 
 T_CPPFLAGS = -Wall @(CPPFLAGS)

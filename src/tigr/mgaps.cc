@@ -7,6 +7,9 @@
 *  matches.
 */
 
+#include <cassert>
+#include <algorithm>
+#include <vector>
 
 #include  "tigrinc.hh"
 
@@ -18,29 +21,55 @@ const long int  DEFAULT_MIN_OUTPUT_SCORE = 200;
 const double  DEFAULT_SEPARATION_FACTOR = 0.05;
 
 
-struct  Match_t
-  {
-   long int  Start1, Start2, Len;
-   long int  Simple_Score;
-   long int  Simple_From;
-   long int  Simple_Adj;
+// Union find data structures. Indices MUST be in the range [1, s],
+// where s is the size given to reset (no checks).
+struct UnionFind {
+  std::vector<int> m_UF;
+
+  void reset(size_t s) {
+    m_UF.resize(0);
+    m_UF.resize(s + 1, -1);
+    assert(s >= 1 && m_UF[1] == -1);
+  }
+
+  int find(int a) { //  Return the id of the set containing  a  in  UF .
+    if(m_UF [a] < 0)
+     return  a;
+
+   int i;
+   for(i = a;  m_UF [i] > 0;  i = m_UF [i])
+     ;
+   for(int k, j = a;  m_UF [j] != i;  j = k) {
+      k = m_UF [j];
+      m_UF [j] = i;
+   }
+   return  i;
+  }
+
+
+  void union_sets(int a, int b) { //  Union the sets whose id's are  a  and  b  in  UF .
+   assert (m_UF [a] < 0 && m_UF [b] < 0);
+
+   if(m_UF [a] < m_UF [b]) {
+     m_UF [a] += m_UF [b];
+     m_UF [b] = a;
+   } else if(m_UF[b] < m_UF[a]) {
+     m_UF [b] += m_UF [a];
+     m_UF [a] = b;
+   }
+  }
+};
+
+
+struct  Match_t {
+   long int Start1, Start2, Len;
+   long int Simple_Score;
+   long int Simple_From;
+   long int Simple_Adj;
    int  cluster_id : 30;
    unsigned int  Good : 1;
    unsigned int  Tentative : 1;
-  };
-
-
-inline
-long int  Max  (long int A, long int B)
-
-//  Return the larger of  A  and  B .
-
-  {
-   if  (A < B)
-       return  B;
-     else
-       return  A;
-  }
+};
 
 
 static int  Check_Labels = FALSE;
@@ -48,7 +77,6 @@ static int  Fixed_Separation = DEFAULT_FIXED_SEPARATION;
 static long int  Max_Separation = DEFAULT_MAX_SEPARATION;
 static long int  Min_Output_Score = DEFAULT_MIN_OUTPUT_SCORE;
 static double  Separation_Factor = DEFAULT_SEPARATION_FACTOR;
-static int  * UF = NULL;
 static int  Use_Extents = FALSE;
   // If TRUE use end minus start as length of cluster instead of
   // sum of component lengths
@@ -60,15 +88,9 @@ static int  By_Cluster
     (const void * A, const void * B);
 static void  Filter_Matches
     (Match_t * A, int & N);
-static int  Find
-    (int a);
-static void  Process_Matches
-    (Match_t * A, int N, const char * label);
+static void  Process_Matches(Match_t * A, UnionFind& UF, int N, const char * label);
 static int  Process_Cluster
     (Match_t * A, int N, const char * label);
-static void  Union
-    (int a, int b);
-
 
 
 
@@ -292,13 +314,13 @@ static int  Process_Cluster
             long int  Olap, Olap1, Olap2;
 
             Olap1 = A [j] . Start1 + A [j] . Len - A [i] . Start1;
-            Olap = Max (0, Olap1);
+            Olap = std::max((long)0, Olap1);
             Olap2 = A [j] . Start2 + A [j] . Len - A [i] . Start2;
-            Olap = Max (Olap, Olap2);
+            Olap = std::max(Olap, Olap2);
 
             // penalize off diagonal matches
-            Pen = Olap + abs ( (A [i] . Start2 - A [i] . Start1) -
-                               (A [j] . Start2 - A [j] . Start1) );
+            Pen = Olap + std::abs ( (A [i] . Start2 - A [i] . Start1) -
+                                    (A [j] . Start2 - A [j] . Start1) );
 
             if  (A [j] . Simple_Score + A [i] . Len - Pen > A [i] . Simple_Score)
                 {
@@ -380,8 +402,7 @@ static int  Process_Cluster
 
 
 
-static void  Process_Matches
-    (Match_t * A, int N, const char * label)
+static void  Process_Matches(Match_t * A, UnionFind& UF, int N, const char * label)
 
 //  Process matches  A [1 .. N]  and output them after
 //  a line containing  label .
@@ -389,7 +410,7 @@ static void  Process_Matches
   {
    long int  cluster_size, sep;
    int  print_ct = 0;
-   int  a, b, i, j;
+   int  i, j;
 
    if  (N <= 0)
        {
@@ -399,9 +420,7 @@ static void  Process_Matches
 
    //  Use Union-Find to create connected-components based on
    //  separation and similar diagonals between matches
-
-   for  (i = 1;  i <= N;  i ++)
-     UF [i] = -1;
+   UF.reset(N);
 
    qsort (A + 1, N, sizeof (Match_t), By_Start2);
 
@@ -420,21 +439,16 @@ static void  Process_Matches
          if  (sep > Max_Separation)
              break;
 
-         diag_diff = abs ((A [j] . Start2 - A [j] . Start1) - i_diag);
-         if  (diag_diff <= Max (Fixed_Separation, long (Separation_Factor * sep)))
-             {
-              a = Find (i);
-              b = Find (j);
-              if  (a != b)
-                  Union (a, b);
-             }
+         diag_diff = std::abs ((A [j] . Start2 - A [j] . Start1) - i_diag);
+         if  (diag_diff <= std::max(Fixed_Separation, (int)(Separation_Factor * sep)))
+           UF.union_sets(UF.find(i), UF.find(j));
         }
      }
 
    //  Set the cluster id of each match
 
    for  (i = 1;  i <= N;  i ++)
-     A [i] . cluster_id = Find (i);
+     A [i] . cluster_id = UF.find (i);
 
    qsort (A + 1, N, sizeof (Match_t), By_Cluster);
 
@@ -483,51 +497,6 @@ static void  Process_Matches
    return;
   }
 
-
-static int  Find
-    (int a)
-
-//  Return the id of the set containing  a  in  UF .
-
-  {
-   int  i, j, k;
-
-   if  (UF [a] < 0)
-       return  a;
-
-   for  (i = a;  UF [i] > 0;  i = UF [i])
-     ;
-   for  (j = a;  UF [j] != i;  j = k)
-     {
-      k = UF [j];
-      UF [j] = i;
-     }
-
-   return  i;
-  }
-
-
-static void  Union
-    (int a, int b)
-
-//  Union the sets whose id's are  a  and  b  in  UF .
-
-  {
-   assert (UF [a] < 0 && UF [b] < 0);
-
-   if  (UF [a] < UF [b])
-       {
-        UF [a] += UF [b];
-        UF [b] = a;
-       }
-     else
-       {
-        UF [b] += UF [a];
-        UF [a] = b;
-       }
-
-   return;
-  }
 } // namespace mummer_mgaps
 
 using namespace mummer_mgaps;
@@ -634,7 +603,9 @@ int  main
 
    Size = 500;
    A = (Match_t *) Safe_malloc (Size * sizeof (Match_t));
-   UF = (int *) Safe_malloc (Size * sizeof (int));
+   // UF = (int *) Safe_malloc (Size * sizeof (int));
+   //   std::vector<Match_t> A;
+   UnionFind UF;
 
    while  (fgets (line, MAX_LINE, stdin) != NULL)
      {
@@ -643,7 +614,7 @@ int  main
            if  (first)
                first = FALSE;
              else
-               Process_Matches (A, N, save);
+               Process_Matches (A, UF, N, save);
            N = 0;
            strcpy (save, line);
            if  (Check_Labels && (++ header_line_ct % 2 == 0))
@@ -655,7 +626,6 @@ int  main
                {
                 Size *= 2;
                 A = (Match_t *) Safe_realloc (A, Size * sizeof (Match_t));
-                UF = (int *) Safe_realloc (UF, Size * sizeof (int));
                }
            N ++;
            A [N] . Start1 = S1;
@@ -666,7 +636,7 @@ int  main
           }
      }
 
-   Process_Matches (A, N, save);
+   Process_Matches (A, UF, N, save);
 
 
 #if  0
