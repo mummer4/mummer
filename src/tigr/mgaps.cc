@@ -48,12 +48,13 @@ struct UnionFind {
 
 
   void union_sets(int a, int b) { //  Union the sets whose id's are  a  and  b  in  UF .
-   assert (m_UF [a] < 0 && m_UF [b] < 0);
+    if(a == b) return;
+    assert (m_UF [a] < 0 && m_UF [b] < 0);
 
    if(m_UF [a] < m_UF [b]) {
      m_UF [a] += m_UF [b];
      m_UF [b] = a;
-   } else if(m_UF[b] < m_UF[a]) {
+   } else {
      m_UF [b] += m_UF [a];
      m_UF [a] = b;
    }
