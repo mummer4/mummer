@@ -10,6 +10,8 @@
 #include <cassert>
 #include <algorithm>
 #include <vector>
+#include <iostream>
+#include <string>
 
 #include  "tigrinc.hh"
 
@@ -70,6 +72,8 @@ struct  Match_t {
    int  cluster_id : 30;
    unsigned int  Good : 1;
    unsigned int  Tentative : 1;
+  Match_t() = default;
+  Match_t(long int S1, long int S2, long int L) : Start1(S1), Start2(S2), Len(L), Good(FALSE), Tentative(FALSE) { }
 };
 
 
@@ -588,57 +592,32 @@ static void  Parse_Command_Line
   }
 
 
-int  main
-    (int argc, char * argv [])
+int  main(int argc, char * argv []) {
+  std::string line, header;
+  int  header_line_ct = 0;
+  long int  S1, S2, Len;
 
-  {
-   Match_t  * A = NULL;
-   char  line [MAX_LINE];
-   char  save [MAX_LINE];
-   int  first = TRUE;
-   int  header_line_ct = 0;
-   long int  S1, S2, Len;
-   long int  N = 0, Size = 0;
+  Parse_Command_Line  (argc, argv);
 
-   Parse_Command_Line  (argc, argv);
+  std::vector<Match_t> A(1);
+  UnionFind UF;
 
-   Size = 500;
-   A = (Match_t *) Safe_malloc (Size * sizeof (Match_t));
-   // UF = (int *) Safe_malloc (Size * sizeof (int));
-   //   std::vector<Match_t> A;
-   UnionFind UF;
-
-   while  (fgets (line, MAX_LINE, stdin) != NULL)
-     {
-      if  (line [0] == '>')
-          {
-           if  (first)
-               first = FALSE;
-             else
-               Process_Matches (A, UF, N, save);
-           N = 0;
-           strcpy (save, line);
-           if  (Check_Labels && (++ header_line_ct % 2 == 0))
-               assert (strstr (line, "Reverse") != NULL);
-          }
-      else if  (sscanf (line, "%ld %ld %ld", & S1, & S2, & Len) == 3)
-          {
-           if  (N >= Size - 1)
-               {
-                Size *= 2;
-                A = (Match_t *) Safe_realloc (A, Size * sizeof (Match_t));
-               }
-           N ++;
-           A [N] . Start1 = S1;
-           A [N] . Start2 = S2;
-           A [N] . Len = Len;
-           A [N] . Good = FALSE;
-           A [N] . Tentative = FALSE;
-          }
-     }
-
-   Process_Matches (A, UF, N, save);
-
+  int c = std::cin.peek();
+  while(c != '>' && c != EOF) // Skip to first header
+    std::getline(std::cin, line);
+  while(c != EOF) {
+    std::getline(std::cin, header); // Get header
+    if(Check_Labels && (++ header_line_ct % 2 == 0))
+      assert (strstr (header.c_str(), "Reverse") != NULL);
+    header += '\n';
+    A.resize(1);
+    for(c = std::cin.peek(); c != '>' && c != EOF; c = std::cin.peek()) {
+      std::getline(std::cin, line);
+      if  (sscanf (line.c_str(), "%ld %ld %ld", & S1, & S2, & Len) == 3)
+        A.push_back(Match_t(S1, S2, Len));
+    }
+    Process_Matches (A.data(), UF, A.size() - 1, header.c_str());
+  }
 
 #if  0
    printf ("> Other matches\n");
