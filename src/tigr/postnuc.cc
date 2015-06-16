@@ -1490,18 +1490,19 @@ void validateData
       assert ( Cp->wasFused );
 
       //-- Pick the right directional sequence for B
-      if ( Cp->dirB == FORWARD_CHAR )
+      if ( Cp->dirB == FORWARD_CHAR ) {
 #ifndef NDEBUG
 	B = Bf->seq;
 #endif
-      ;
-      else if ( Brev != NULL )
+        ;
+      }
 #ifndef NDEBUG
+      else if ( Brev != NULL ) {
 	B = Brev;
+        ;
+      }
 #endif
-      ;
-      else
-	{
+      else {
 	  Brev = (char *) Safe_malloc ( sizeof(char) * (Bf->len + 2) );
 	  strcpy ( Brev + 1, Bf->seq + 1 );
 	  Brev[0] = '\0';
@@ -1509,7 +1510,7 @@ void validateData
 #ifndef NDEBUG
 	  B = Brev;
 #endif
-	}
+      }
 
       for ( Mp = Cp->matches.begin( ); Mp < Cp->matches.end( ); Mp ++ )
 	{
