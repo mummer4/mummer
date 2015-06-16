@@ -88,10 +88,6 @@ static int  Use_Extents = FALSE;
   // sum of component lengths
 
 
-static int  By_Start2
-    (const void * A, const void * B);
-static int  By_Cluster
-    (const void * A, const void * B);
 static void  Filter_Matches
     (Match_t * A, int & N);
 static void  Process_Matches(Match_t * A, UnionFind& UF, int N, const char * label);
@@ -99,70 +95,16 @@ static int  Process_Cluster
     (Match_t * A, int N, const char * label);
 
 
+bool By_Start2(const Match_t& A, const Match_t& B) {
+  return (A.Start2 < B.Start2) || (A.Start2 == B.Start2 && A.Start1 < B.Start1);
+}
 
+bool By_Cluster(const Match_t& A, const Match_t& B) {
+  return (A.cluster_id < B.cluster_id) ||
+    (A.cluster_id == B.cluster_id && By_Start2(A, B));
+}
 
-
-
-static int  By_Start2
-    (const void * A, const void * B)
-
-//  Return how  A  and  B  compare if converted to  Match_t
-//  based on  Start2  value.  If  Start2  values are equal use
-//  Start1  values for comparison.
-
-  {
-   Match_t  * x, * y;
-
-   x = (Match_t *) A;
-   y = (Match_t *) B;
-
-   if  (x -> Start2 < y -> Start2)
-       return  -1;
-   else if  (x -> Start2 > y -> Start2)
-       return  1;
-   else if  (x -> Start1 < y -> Start1)
-       return  -1;
-   else if  (x -> Start1 > y -> Start1)
-       return  1;
-     else
-       return  0;
-  }
-
-
-
-static int  By_Cluster
-    (const void * A, const void * B)
-
-//  Return how  A  and  B  compare if converted to  Match_t
-//  first based on  cluster_id  value, then by  Start2  value,
-//  then by  Start1  value.
-
-  {
-   Match_t  * x, * y;
-
-   x = (Match_t *) A;
-   y = (Match_t *) B;
-
-   if  (x -> cluster_id < y -> cluster_id)
-       return -1;
-   else if  (x -> cluster_id > y -> cluster_id)
-       return  1;
-   else if  (x -> Start2 < y -> Start2)
-       return  -1;
-   else if  (x -> Start2 > y -> Start2)
-       return  1;
-   else if  (x -> Start1 < y -> Start1)
-       return  -1;
-   else if  (x -> Start1 > y -> Start1)
-       return  1;
-     else
-       return  0;
-  }
-
-
-
-static void  Filter_Matches
-    (Match_t * A, int & N)
+static void  Filter_Matches(Match_t * A, int & N) {
 
 //  Remove from  A [0 .. (N - 1)]  any matches that are internal to a repeat,
 //  e.g., if seq1 has 27 As and seq2 has 20 then the first and
@@ -171,125 +113,84 @@ static void  Filter_Matches
 //  diagonal.  Pack all remaining matches into the front of  A  and
 //  reduce the value of  N  if any matches are removed.
 //  Matches in  A  *MUST* be sorted by  Start2  value.
+  for  (int i = 0;  i < N;  i ++)
+    A[i].Good = TRUE;
 
-  {
-   int  i, j;
+  for  (int i = 0;  i < N - 1;  i ++) {
+    if  (! A[i].Good) continue;
 
-   for  (i = 0;  i < N;  i ++)
-     A [i] . Good = TRUE;
+    const int i_diag = A[i].Start2 - A[i].Start1;
+    int       i_end  = A[i].Start2 + A[i].Len;
 
-   for  (i = 0;  i < N - 1;  i ++)
-     {
-      int  i_diag, i_end;
-
-      if  (! A [i] . Good)
-          continue;
-
-      i_diag = A [i] . Start2 - A [i] . Start1;
-      i_end = A [i] . Start2 + A [i] . Len;
-
-      for  (j = i + 1;  j < N && A [j] . Start2 <= i_end;  j ++)
-        {
-         int  olap;
-         int  j_diag;
-
-         assert (A [i] . Start2 <= A [j] . Start2);
-
-         if  (! A [j] . Good)
-             continue;
-
-         j_diag = A [j] . Start2 - A [j] . Start1;
-         if  (i_diag == j_diag)
-             {
-              int  j_extent;
-
-              j_extent = A [j] . Len + A [j] . Start2 - A [i] . Start2;
-              if  (j_extent > A [i] . Len)
-                  {
-                   A [i] . Len = j_extent;
-                   i_end = A [i] . Start2 + j_extent;
-                  }
-              A [j] . Good = FALSE;
-             }
-         else if  (A [i] . Start1 == A [j] . Start1)
-             {
-              olap = A [i] . Start2 + A [i] . Len - A [j] . Start2;
-              if  (A [i] . Len < A [j] . Len)
-                  {
-                   if  (olap >=  A [i] . Len / 2)
-                       {
-                        A [i] . Good = FALSE;
-                        break;
-                       }
-                  }
-              else if  (A [j] . Len < A [i] . Len)
-                  {
-                   if  (olap >= A [j] . Len / 2)
-                       {
-                        A [j] . Good = FALSE;
-                       }
-                  }
-                else
-                  {
-                   if  (olap >= A [i] . Len / 2)
-                       {
-                        A [j] . Tentative = TRUE;
-                        if  (A [i] . Tentative)
-                            {
-                             A [i] . Good = FALSE;
-                             break;
-                            }
-                       }
-                  }
-             }
-         else if  (A [i] . Start2 == A [j] . Start2)
-             {
-              olap = A [i] . Start1 + A [i] . Len - A [j] . Start1;
-              if  (A [i] . Len < A [j] . Len)
-                  {
-                   if  (olap >=  A [i] . Len / 2)
-                       {
-                        A [i] . Good = FALSE;
-                        break;
-                       }
-                  }
-              else if  (A [j] . Len < A [i] . Len)
-                  {
-                   if  (olap >= A [j] . Len / 2)
-                       {
-                        A [j] . Good = FALSE;
-                       }
-                  }
-                else
-                  {
-                   if  (olap >= A [i] . Len / 2)
-                       {
-                        A [j] . Tentative = TRUE;
-                        if  (A [i] . Tentative)
-                            {
-                             A [i] . Good = FALSE;
-                             break;
-                            }
-                       }
-                  }
-             }
+    for  (int j = i + 1;  j < N && A[j].Start2 <= i_end;  j ++) {
+      assert (A[i].Start2 <= A[j].Start2);
+      if  (! A[j].Good) continue;
+      int j_diag = A[j].Start2 - A[j].Start1;
+      if  (i_diag == j_diag) {
+        int  j_extent = A[j].Len + A[j].Start2 - A[i].Start2;
+        if  (j_extent > A[i].Len) {
+          A[i].Len = j_extent;
+          i_end = A[i].Start2 + j_extent;
         }
-     }
+        A[j].Good = FALSE;
+      } else if  (A[i].Start1 == A[j].Start1) {
+        int olap = A[i].Start2 + A[i].Len - A[j].Start2;
+        if  (A[i].Len < A[j].Len) {
+          if  (olap >=  A[i].Len / 2) {
+            A[i].Good = FALSE;
+            break;
+          }
+        } else if  (A[j].Len < A[i].Len) {
+          if  (olap >= A[j].Len / 2)
+            A[j].Good = FALSE;
+        } else {
+          if  (olap >= A[i].Len / 2) {
+            A[j].Tentative = TRUE;
+            if  (A[i].Tentative) {
+              A[i].Good = FALSE;
+              break;
+            }
+          }
+        }
+      } else if  (A[i].Start2 == A[j].Start2) {
+        int olap = A[i].Start1 + A[i].Len - A[j].Start1;
+        if  (A[i].Len < A[j].Len) {
+          if  (olap >=  A[i].Len / 2) {
+            A[i].Good = FALSE;
+            break;
+          }
+        } else if  (A[j].Len < A[i].Len) {
+          if  (olap >= A[j].Len / 2)
+            A[j].Good = FALSE;
 
-   for  (i = j = 0;  i < N;  i ++)
-     if  (A [i] . Good)
-         {
-          if  (i != j)
-              A [j] = A [i];
-          j ++;
-         }
-   N = j;
-
-   for  (i = 0;  i < N;  i ++)
-     A [i] . Good = FALSE;
-
-   return;
+        } else {
+          if  (olap >= A[i].Len / 2) {
+            A[j].Tentative = TRUE;
+            if  (A[i].Tentative) {
+              A[i].Good = FALSE;
+              break;
+            }
+          }
+        }
+      }
+    }
   }
+
+  int j = 0;
+  for  (int i = 0;  i < N;  i ++) {
+    if  (A[i].Good) {
+      if  (i != j)
+        A[j] = A[i];
+      j ++;
+    }
+  }
+  N = j;
+
+  for  (int i = 0;  i < N;  i ++)
+    A[i].Good = FALSE;
+
+  return;
+}
 
 
 
@@ -418,17 +319,16 @@ static void  Process_Matches(Match_t * A, UnionFind& UF, int N, const char * lab
    int  print_ct = 0;
    int  i, j;
 
-   if  (N <= 0)
-       {
-         std::cout << label << '\n';
-        return;
-       }
+   if  (N <= 0) {
+     std::cout << label << '\n';
+     return;
+   }
 
    //  Use Union-Find to create connected-components based on
    //  separation and similar diagonals between matches
    UF.reset(N);
 
-   qsort (A + 1, N, sizeof (Match_t), By_Start2);
+   std::sort(A + 1, A + N + 1, By_Start2);
 
    Filter_Matches (A + 1, N);
 
@@ -456,7 +356,7 @@ static void  Process_Matches(Match_t * A, UnionFind& UF, int N, const char * lab
    for  (i = 1;  i <= N;  i ++)
      A [i] . cluster_id = UF.find (i);
 
-   qsort (A + 1, N, sizeof (Match_t), By_Cluster);
+   std::sort(A + 1, A + N + 1, By_Cluster);
 
    for  (i = 1;  i <= N;  i += cluster_size)
      {
