@@ -66,33 +66,31 @@ struct UnionFind {
 
 
 struct  Match_t {
-   long int Start1, Start2, Len;
-   long int Simple_Score;
-   long int Simple_From;
-   long int Simple_Adj;
-   int  cluster_id : 30;
-   unsigned int  Good : 1;
-   unsigned int  Tentative : 1;
+  long int Start1, Start2, Len;
+  long int Simple_Score;
+  long int Simple_From;
+  long int Simple_Adj;
+  unsigned int  cluster_id : 30;
+  unsigned int  Good : 1;
+  unsigned int  Tentative : 1;
   Match_t() = default;
-  Match_t(long int S1, long int S2, long int L) : Start1(S1), Start2(S2), Len(L), Good(FALSE), Tentative(FALSE) { }
+  Match_t(long int S1, long int S2, long int L) : Start1(S1), Start2(S2), Len(L), Good(true), Tentative(false) { }
 };
 
 
-static int  Check_Labels = FALSE;
-static int  Fixed_Separation = DEFAULT_FIXED_SEPARATION;
-static long int  Max_Separation = DEFAULT_MAX_SEPARATION;
-static long int  Min_Output_Score = DEFAULT_MIN_OUTPUT_SCORE;
-static double  Separation_Factor = DEFAULT_SEPARATION_FACTOR;
-static int  Use_Extents = FALSE;
-  // If TRUE use end minus start as length of cluster instead of
+static bool     Check_Labels      = false;
+static int      Fixed_Separation  = DEFAULT_FIXED_SEPARATION;
+static long int Max_Separation    = DEFAULT_MAX_SEPARATION;
+static long int Min_Output_Score  = DEFAULT_MIN_OUTPUT_SCORE;
+static double   Separation_Factor = DEFAULT_SEPARATION_FACTOR;
+static bool     Use_Extents       = false;
+  // If true use end minus start as length of cluster instead of
   // sum of component lengths
 
 
-static void  Filter_Matches
-    (Match_t * A, int & N);
-static void  Process_Matches(Match_t * A, UnionFind& UF, int N, const char * label);
-static int  Process_Cluster
-    (Match_t * A, int N, const char * label);
+static void Filter_Matches(Match_t * A, int & N);
+static int  Process_Matches(Match_t * A, UnionFind& UF, int N, std::vector<std::vector<Match_t>>& clusters);
+static int  Process_Cluster(Match_t * A, int N, std::vector<std::vector<Match_t>>& cluster);
 
 
 bool By_Start2(const Match_t& A, const Match_t& B) {
@@ -113,9 +111,6 @@ static void  Filter_Matches(Match_t * A, int & N) {
 //  diagonal.  Pack all remaining matches into the front of  A  and
 //  reduce the value of  N  if any matches are removed.
 //  Matches in  A  *MUST* be sorted by  Start2  value.
-  for  (int i = 0;  i < N;  i ++)
-    A[i].Good = TRUE;
-
   for  (int i = 0;  i < N - 1;  i ++) {
     if  (! A[i].Good) continue;
 
@@ -132,22 +127,22 @@ static void  Filter_Matches(Match_t * A, int & N) {
           A[i].Len = j_extent;
           i_end = A[i].Start2 + j_extent;
         }
-        A[j].Good = FALSE;
+        A[j].Good = false;
       } else if  (A[i].Start1 == A[j].Start1) {
         int olap = A[i].Start2 + A[i].Len - A[j].Start2;
         if  (A[i].Len < A[j].Len) {
           if  (olap >=  A[i].Len / 2) {
-            A[i].Good = FALSE;
+            A[i].Good = false;
             break;
           }
         } else if  (A[j].Len < A[i].Len) {
           if  (olap >= A[j].Len / 2)
-            A[j].Good = FALSE;
+            A[j].Good = false;
         } else {
           if  (olap >= A[i].Len / 2) {
-            A[j].Tentative = TRUE;
+            A[j].Tentative = true;
             if  (A[i].Tentative) {
-              A[i].Good = FALSE;
+              A[i].Good = false;
               break;
             }
           }
@@ -156,18 +151,18 @@ static void  Filter_Matches(Match_t * A, int & N) {
         int olap = A[i].Start1 + A[i].Len - A[j].Start1;
         if  (A[i].Len < A[j].Len) {
           if  (olap >=  A[i].Len / 2) {
-            A[i].Good = FALSE;
+            A[i].Good = false;
             break;
           }
         } else if  (A[j].Len < A[i].Len) {
           if  (olap >= A[j].Len / 2)
-            A[j].Good = FALSE;
+            A[j].Good = false;
 
         } else {
           if  (olap >= A[i].Len / 2) {
-            A[j].Tentative = TRUE;
+            A[j].Tentative = true;
             if  (A[i].Tentative) {
-              A[i].Good = FALSE;
+              A[i].Good = false;
               break;
             }
           }
@@ -185,223 +180,154 @@ static void  Filter_Matches(Match_t * A, int & N) {
     }
   }
   N = j;
-
-  for  (int i = 0;  i < N;  i ++)
-    A[i].Good = FALSE;
-
-  return;
 }
 
+// static std::vector<Match_t> Process_Cluster(Match_t * A, int N) {
+//   std::vector<Match_t> res;
+//   Process_Cluster(A, N, res);
+//   return res;
+// }
 
-
-
-static int  Process_Cluster
-    (Match_t * A, int N, const char * label)
-
+static int  Process_Cluster(Match_t * A, int N, std::vector<std::vector<Match_t>>& out) {
 //  Process the cluster of matches in  A [0 .. (N - 1)]  and output them
 //  after a line containing  label .  Return the number of clusters
 //  printed.
+  int  count = 0;
 
-  {
-   long int  adj, total, hi, lo, extent, score;
-   int  best, prev;
-   int  print_ct = 0;
-   int  i, j, k;
+  do {
+    for  (int i = 0;  i < N;  i ++) {
+      A [i] . Simple_Score = A [i] . Len;
+      A [i] . Simple_Adj = 0;
+      A [i] . Simple_From = -1;
+      for  (int j = 0;  j < i;  j ++) {
+        const long int Olap1 = A [j] . Start1 + A [j] . Len - A [i] . Start1;
+        const long int Olap2 = A [j] . Start2 + A [j] . Len - A [i] . Start2;
+        const long int Olap = std::max(std::max((long)0, Olap1), Olap2);
 
-   do
-     {
-      for  (i = 0;  i < N;  i ++)
-        {
-         A [i] . Simple_Score = A [i] . Len;
-         A [i] . Simple_Adj = 0;
-         A [i] . Simple_From = -1;
-         for  (j = 0;  j < i;  j ++)
-           {
-            long int  Pen;
-            long int  Olap, Olap1, Olap2;
+          // penalize off diagonal matches
+        const long int Pen = Olap + std::abs ( (A [i] . Start2 - A [i] . Start1) -
+                                               (A [j] . Start2 - A [j] . Start1) );
 
-            Olap1 = A [j] . Start1 + A [j] . Len - A [i] . Start1;
-            Olap = std::max((long)0, Olap1);
-            Olap2 = A [j] . Start2 + A [j] . Len - A [i] . Start2;
-            Olap = std::max(Olap, Olap2);
-
-            // penalize off diagonal matches
-            Pen = Olap + std::abs ( (A [i] . Start2 - A [i] . Start1) -
-                                    (A [j] . Start2 - A [j] . Start1) );
-
-            if  (A [j] . Simple_Score + A [i] . Len - Pen > A [i] . Simple_Score)
-                {
-                 A [i] . Simple_From = j;
-                 A [i] . Simple_Score = A [j] . Simple_Score + A [i] . Len - Pen;
-                 A [i] . Simple_Adj = Olap;
-                }
-           }
+        if  (A [j] . Simple_Score + A [i] . Len - Pen > A [i] . Simple_Score) {
+          A [i] . Simple_From = j;
+          A [i] . Simple_Score = A [j] . Simple_Score + A [i] . Len - Pen;
+          A [i] . Simple_Adj = Olap;
         }
+      }
+    }
 
-      best = 0;
-      for  (i = 1;  i < N;  i ++)
-        if  (A [i] . Simple_Score > A [best] . Simple_Score)
-            best = i;
-      total = 0;
-      hi = LONG_MIN;
-      lo = LONG_MAX;
-      for  (i = best;  i >= 0;  i = A [i] . Simple_From)
-        {
-         A [i] . Good = TRUE;
-         total += A [i] . Len;
-         if  (A [i] . Start1 + A [i] . Len > hi)
-             hi = A [i] . Start1 + A [i] . Len;
-         if  (A [i] . Start1 < lo)
-             lo = A [i] . Start1;
-        }
-      extent = hi - lo;
+    int best = 0;
+    for  (int i = 1;  i < N;  i ++)
+      if  (A [i] . Simple_Score > A [best] . Simple_Score)
+        best = i;
+    long int total = 0;
+    long int hi    = LONG_MIN;
+    long int lo    = LONG_MAX;
+    for  (int i = best;  i >= 0;  i = A [i] . Simple_From) {
+      A [i] . Good = true;
+      total += A [i] . Len;
+      hi = std::max(hi, A[i].Start1 + A[i].Len);
+      lo = std::min(lo, A[i].Start1);
+    }
+    const long int score = Use_Extents ? hi - lo : total;
 
-      if  (Use_Extents)
-          score = extent;
-        else
-          score = total;
-      if  (score >= Min_Output_Score)
-          {
-           print_ct ++;
-           std::cout << label << '\n';
-           prev = -1;
-           for  (i = 0;  i < N;  i ++)
-             if  (A [i] . Good)
-                 {
-                  if  (prev == -1)
-                    std::cout << std::setw(8) << A[i].Start1 << ' '
-                              << std::setw(8) << A[i].Start2 << ' '
-                              << std::setw(6) << A[i].Len << ' '
-                              << "   none      -      -\n";
-                    else
-                      {
-                       adj = A [i] . Simple_Adj;
-                       std::cout << std::setw(8) << (A[i].Start1 + adj) << ' '
-                                 << std::setw(8) << (A[i].Start2 + adj) << ' '
-                                 << std::setw(6) << (A[i].Len - adj) << ' ';
-                       if  (adj == 0)
-                         std::cout << std::setw(7) << "none" << ' ';
-                       else
-                         std::cout << std::setw(7) << (-adj) << ' ';
-                       std::cout << std::setw(6) << (A [i] . Start1 + adj - A [prev] . Start1 - A [prev] . Len) << ' '
-                                 << std::setw(6) << (A [i] . Start2 + adj - A [prev] . Start2 - A [prev] . Len) << '\n';
-                      }
-                  prev = i;
-                 }
-           label = "#";
+    if  (score >= Min_Output_Score) {
+      count ++;
+      std::vector<Match_t>* cluster = nullptr;
+      for  (int i = 0;  i < N;  i ++)
+        if  (A [i] . Good) {
+          if(!cluster) {
+            out.push_back(std::vector<Match_t>());
+            cluster = &out.back();
           }
-
-      for  (i = k = 0;  i < N;  i ++)
-        if  (! A [i] . Good)
-            {
-             if  (i != k)
-                 {
-                  A [k] = A [i];
-                 }
-             k ++;
-            }
-      N = k;
-     }  while  (N > 0);
-
-   return  print_ct;
-  }
-
-
-
-
-static void  Process_Matches(Match_t * A, UnionFind& UF, int N, const char * label)
-
-//  Process matches  A [1 .. N]  and output them after
-//  a line containing  label .
-
-  {
-   long int  cluster_size, sep;
-   int  print_ct = 0;
-   int  i, j;
-
-   if  (N <= 0) {
-     std::cout << label << '\n';
-     return;
-   }
-
-   //  Use Union-Find to create connected-components based on
-   //  separation and similar diagonals between matches
-   UF.reset(N);
-
-   std::sort(A + 1, A + N + 1, By_Start2);
-
-   Filter_Matches (A + 1, N);
-
-   for  (i = 1;  i < N;  i ++)
-     {
-      long int  i_end = A [i] . Start2 + A [i] . Len;
-      long int  i_diag = A [i] . Start2 - A [i] . Start1;
-
-      for  (j = i + 1;  j <= N;  j ++)
-        {
-         long int  diag_diff;
-
-         sep = A [j] . Start2 - i_end;
-         if  (sep > Max_Separation)
-             break;
-
-         diag_diff = std::abs ((A [j] . Start2 - A [j] . Start1) - i_diag);
-         if  (diag_diff <= std::max(Fixed_Separation, (int)(Separation_Factor * sep)))
-           UF.union_sets(UF.find(i), UF.find(j));
+          assert(cluster != nullptr);
+          cluster->push_back(A[i]);
         }
-     }
+    }
 
-   //  Set the cluster id of each match
+    int k = 0;
+    for  (int i = 0;  i < N;  i ++) {
+      if  (! A [i] . Good) {
+        if  (i != k)
+          A [k] = A [i];
+        k ++;
+      }
+    }
+    N = k;
+  }  while  (N > 0);
 
-   for  (i = 1;  i <= N;  i ++)
-     A [i] . cluster_id = UF.find (i);
+  return count;
+}
 
-   std::sort(A + 1, A + N + 1, By_Cluster);
 
-   for  (i = 1;  i <= N;  i += cluster_size)
-     {
-
-      for  (j = i + 1;  j <= N && A [i] . cluster_id == A [j] . cluster_id;  j ++)
-        ;
-      cluster_size = j - i;
-      print_ct += Process_Cluster (A + i, cluster_size, label);
-      if  (print_ct > 0)
-        label = "#";
-     }
-
-#if  0
-   //  Find the largest cluster
-
-   j = 1;
-   for  (i = 2;  i <= N;  i ++)
-     if  (UF [i] < UF [j])
-         j = i;
-
-   //  j is now the largest cluster
-
-   cluster_size = - UF [j];
-
-   for  (i = k = 1;  i <= N;  i ++)
-     if  (Find (i) == j)
-         {
-          if  (i != k)
-              {
-               Match_t  tmp = A [i];
-
-               A [i] = A [k];
-               A [k] = tmp;
-              }
-          k ++;
-         }
-
-   assert (cluster_size == k - 1);
-#endif
-
-   if  (print_ct == 0)
-     std::cout << label << '\n';
-
-   return;
+static void Print_Cluster(const std::vector<std::vector<Match_t>>& clusters, const char* label) {
+  for(const auto cl : clusters) {
+    std::cout << label << '\n'
+              << std::setw(8) << cl[0].Start1 << ' '
+              << std::setw(8) << cl[0].Start2 << ' '
+              << std::setw(6) << cl[0].Len << ' '
+              << "   none      -      -\n";
+    for(size_t i = 1; i < cl.size(); ++i) {
+      const int long adj = cl[i] . Simple_Adj;
+      std::cout << std::setw(8) << (cl[i].Start1 + adj) << ' '
+                << std::setw(8) << (cl[i].Start2 + adj) << ' '
+                << std::setw(6) << (cl[i].Len - adj) << ' ';
+      if  (adj == 0)
+        std::cout << std::setw(7) << "none" << ' ';
+      else
+        std::cout << std::setw(7) << (-adj) << ' ';
+      std::cout << std::setw(6) << (cl[i].Start1 + adj - cl[i-1].Start1 - cl[i-1].Len) << ' '
+                << std::setw(6) << (cl[i].Start2 + adj - cl[i-1].Start2 - cl[i-1].Len) << '\n';
+    }
+    label = "#";
   }
+}
+
+static int Process_Matches(Match_t * A, UnionFind& UF, int N, std::vector<std::vector<Match_t>>& clusters) {
+  //  Process matches  A [1 .. N]  and output them after
+  //  a line containing  label .
+
+  //  Use Union-Find to create connected-components based on
+  //  separation and similar diagonals between matches
+  UF.reset(N);
+
+  std::sort(A + 1, A + N + 1, By_Start2);
+  Filter_Matches (A + 1, N);
+
+  for  (int i = 1;  i < N;  i ++) {
+    long int i_end  = A [i] . Start2 + A [i] . Len;
+    long int i_diag = A [i] . Start2 - A [i] . Start1;
+
+    for  (int j = i + 1;  j <= N;  j ++) {
+      long int sep = A [j] . Start2 - i_end;
+      if  (sep > Max_Separation)
+        break;
+
+      long int diag_diff = std::abs ((A [j] . Start2 - A [j] . Start1) - i_diag);
+      if  (diag_diff <= std::max(Fixed_Separation, (int)(Separation_Factor * sep)))
+        UF.union_sets(UF.find(i), UF.find(j));
+    }
+  }
+
+  //  Set the cluster id of each match and reset Good flag
+  for  (int i = 1;  i <= N;  i ++) {
+    A [i] . cluster_id = UF.find (i);
+    assert(A[i].cluster_id > 0);
+    A[i].Good = false;
+  }
+  std::sort(A + 1, A + N + 1, By_Cluster);
+
+  // Determine and process clusters
+  int cluster_size, print_ct = 0;
+  for (int i = 1;  i <= N;  i += cluster_size) {
+    int j;
+    for  (j = i + 1;  j <= N && A [i] . cluster_id == A [j] . cluster_id;  j ++)
+      ;
+    cluster_size = j - i;
+    print_ct += Process_Cluster (A + i, cluster_size, clusters);
+  }
+  return print_ct;
+}
 
 } // namespace mummer_mgaps
 
@@ -442,7 +368,7 @@ static void  Parse_Command_Line
 //  arguments in  argv [0 .. (argc - 1)] .
 
   {
-   int  ch, errflg = FALSE;
+   int  ch, errflg = false;
    char  * p;
 
    optarg = NULL;
@@ -452,7 +378,7 @@ static void  Parse_Command_Line
      switch  (ch)
        {
         case  'C' :
-          Check_Labels = TRUE;
+          Check_Labels = true;
           break;
 
         case  'd' :
@@ -460,7 +386,7 @@ static void  Parse_Command_Line
           break;
 
         case  'e' :
-          Use_Extents = TRUE;
+          Use_Extents = true;
           break;
 
         case  'f' :
@@ -479,7 +405,7 @@ static void  Parse_Command_Line
           std::cerr << "Unrecognized option -" << optopt << '\n';
 
         default :
-          errflg = TRUE;
+          errflg = true;
        }
 
    if  (errflg || optind != argc)
@@ -503,6 +429,7 @@ int  main(int argc, char * argv []) {
 
   std::vector<Match_t> A(1);
   UnionFind UF;
+  std::vector<std::vector<Match_t>> clusters;
 
   int c = std::cin.peek();
   while(c != '>' && c != EOF) // Skip to first header
@@ -517,42 +444,13 @@ int  main(int argc, char * argv []) {
       if  (sscanf (line.c_str(), "%ld %ld %ld", & S1, & S2, & Len) == 3)
         A.push_back(Match_t(S1, S2, Len));
     }
-    Process_Matches (A.data(), UF, A.size() - 1, header.c_str());
+    clusters.clear();
+    const int nb_elements = Process_Matches (A.data(), UF, A.size() - 1, clusters);
+    if(nb_elements > 0)
+      Print_Cluster(clusters, header.c_str());
+    else
+      std::cout << header << '\n';
   }
-
-#if  0
-   printf ("> Other matches\n");
-   Prev = -1;
-   for  (i = 0;  i < N;  i ++)
-     if  (! A [i] . Good)
-         {
-          if  (Prev == -1)
-              printf ("%8ld %8ld %6ld %7s %6s %6s\n",
-                  A [i] . Start1, A [i] . Start2, A [i] . Len,
-                  "none", "-", "-");
-            else
-              {
-               if  (A [i] . Simple_From == Prev)
-                   Adj = A [i] . Simple_Adj;
-                 else
-                   Adj = 0;
-               printf ("%8ld %8ld %6ld",
-                   A [i] . Start1 + Adj, A [i] . Start2 + Adj,
-                   A [i] . Len - Adj);
-               if  (Adj == 0)
-                   printf (" %7s", "none");
-                 else
-                   printf (" %7ld", - Adj);
-               if  (A [i] . Simple_From == Prev)
-                   printf (" %6ld %6ld\n",
-                       A [i] . Start1 + Adj - A [Prev] . Start1 - A [Prev] . Len,
-                       A [i] . Start2 + Adj - A [Prev] . Start2 - A [Prev] . Len);
-                 else
-                   printf (" %6s %6s\n", "-", "-");
-              }
-          Prev = i;
-         }
-#endif
 
    return  0;
   }
