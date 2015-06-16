@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <vector>
 #include <iostream>
+#include <iomanip>
 #include <string>
 
 #include  "tigrinc.hh"
@@ -361,32 +362,32 @@ static int  Process_Cluster
       if  (score >= Min_Output_Score)
           {
            print_ct ++;
-           fputs (label, stdout);
+           std::cout << label << '\n';
            prev = -1;
            for  (i = 0;  i < N;  i ++)
              if  (A [i] . Good)
                  {
                   if  (prev == -1)
-                      printf ("%8ld %8ld %6ld %7s %6s %6s\n",
-                          A [i] . Start1, A [i] . Start2, A [i] . Len,
-                          "none", "-", "-");
+                    std::cout << std::setw(8) << A[i].Start1 << ' '
+                              << std::setw(8) << A[i].Start2 << ' '
+                              << std::setw(6) << A[i].Len << ' '
+                              << "   none      -      -\n";
                     else
                       {
                        adj = A [i] . Simple_Adj;
-                       printf ("%8ld %8ld %6ld",
-                           A [i] . Start1 + adj, A [i] . Start2 + adj,
-                           A [i] . Len - adj);
+                       std::cout << std::setw(8) << (A[i].Start1 + adj) << ' '
+                                 << std::setw(8) << (A[i].Start2 + adj) << ' '
+                                 << std::setw(6) << (A[i].Len - adj) << ' ';
                        if  (adj == 0)
-                           printf (" %7s", "none");
-                         else
-                           printf (" %7ld", - adj);
-                       printf (" %6ld %6ld\n",
-                           A [i] . Start1 + adj - A [prev] . Start1 - A [prev] . Len,
-                           A [i] . Start2 + adj - A [prev] . Start2 - A [prev] . Len);
+                         std::cout << std::setw(7) << "none" << ' ';
+                       else
+                         std::cout << std::setw(7) << (-adj) << ' ';
+                       std::cout << std::setw(6) << (A [i] . Start1 + adj - A [prev] . Start1 - A [prev] . Len) << ' '
+                                 << std::setw(6) << (A [i] . Start2 + adj - A [prev] . Start2 - A [prev] . Len) << '\n';
                       }
                   prev = i;
                  }
-           label = "#\n";
+           label = "#";
           }
 
       for  (i = k = 0;  i < N;  i ++)
@@ -419,7 +420,7 @@ static void  Process_Matches(Match_t * A, UnionFind& UF, int N, const char * lab
 
    if  (N <= 0)
        {
-        fputs (label, stdout);
+         std::cout << label << '\n';
         return;
        }
 
@@ -465,7 +466,7 @@ static void  Process_Matches(Match_t * A, UnionFind& UF, int N, const char * lab
       cluster_size = j - i;
       print_ct += Process_Cluster (A + i, cluster_size, label);
       if  (print_ct > 0)
-          label = "#\n";
+        label = "#";
      }
 
 #if  0
@@ -497,7 +498,7 @@ static void  Process_Matches(Match_t * A, UnionFind& UF, int N, const char * lab
 #endif
 
    if  (print_ct == 0)
-       fputs (label, stdout);
+     std::cout << label << '\n';
 
    return;
   }
@@ -514,23 +515,22 @@ static void  Usage
 //  invoke it.
 
   {
-   fprintf (stderr,
-           "USAGE:  %s [-d <DiagDiff>] [-f <DiagFactor>] [-l <MatchLen>]\n"
-           "        [-s <MaxSeparation>]\n"
-           "\n"
-           "Clusters MUMs based on diagonals and separation.\n"
-           "Input is from stdin in format produced by mummer.\n"
-           "Ouput goes to stdout.\n"
-           "\n"
-           "Options:\n"
-           "-C       Check that fasta header labels alternately have \"Reverse\"\n"
-           "-d num   Fixed diagonal difference to join matches\n"
-           "-e       Use extent of match (end - start) rather than sum of piece\n"
-           "         lengths to determine length of cluster\n"
-           "-f num   Fraction of separation for diagonal difference\n"
-           "-l num   Minimum length of cluster match\n"
-           "-s num   Maximum separation between matches in cluster\n",
-           command);
+    std::cerr <<
+      "USAGE:  " << command << " [-d <DiagDiff>] [-f <DiagFactor>] [-l <MatchLen>]\n"
+      "        [-s <MaxSeparation>]\n"
+      "\n"
+      "Clusters MUMs based on diagonals and separation.\n"
+      "Input is from stdin in format produced by mummer.\n"
+      "Ouput goes to stdout.\n"
+      "\n"
+      "Options:\n"
+      "-C       Check that fasta header labels alternately have \"Reverse\"\n"
+      "-d num   Fixed diagonal difference to join matches\n"
+      "-e       Use extent of match (end - start) rather than sum of piece\n"
+      "         lengths to determine length of cluster\n"
+      "-f num   Fraction of separation for diagonal difference\n"
+      "-l num   Minimum length of cluster match\n"
+      "-s num   Maximum separation between matches in cluster\n";
 
    return;
   }
@@ -576,7 +576,7 @@ static void  Parse_Command_Line
           break;
 
         case  '?' :
-          fprintf (stderr, "Unrecognized option -%c\n", optopt);
+          std::cerr << "Unrecognized option -" << optopt << '\n';
 
         default :
           errflg = TRUE;
@@ -593,6 +593,8 @@ static void  Parse_Command_Line
 
 
 int  main(int argc, char * argv []) {
+  std::ios::sync_with_stdio(false);
+
   std::string line, header;
   int  header_line_ct = 0;
   long int  S1, S2, Len;
@@ -609,7 +611,6 @@ int  main(int argc, char * argv []) {
     std::getline(std::cin, header); // Get header
     if(Check_Labels && (++ header_line_ct % 2 == 0))
       assert (strstr (header.c_str(), "Reverse") != NULL);
-    header += '\n';
     A.resize(1);
     for(c = std::cin.peek(); c != '>' && c != EOF; c = std::cin.peek()) {
       std::getline(std::cin, line);
