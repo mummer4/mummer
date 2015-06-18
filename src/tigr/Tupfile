@@ -8,7 +8,7 @@ CC = g++
 : combineMUMs.o tigrinc.o |> !lxxd |> $(BIN_DIR)/combineMUMs
 : delta-filter.o tigrinc.o delta.o |> !lxxd |> $(BIN_DIR)/delta-filter
 : gaps.o tigrinc.o |> !lxxd |> $(BIN_DIR)/gaps
-: mgaps.o tigrinc.o |> !lxxd |> $(BIN_DIR)/mgaps $(BIN_DIR)/<exec>
+: mgaps_main.o mgaps.o tigrinc.o |> !lxxd |> $(BIN_DIR)/mgaps $(BIN_DIR)/<exec>
 : postnuc.o tigrinc.o sw_align.o |> !lxxd |> $(BIN_DIR)/postnuc
 : postpro.o tigrinc.o sw_align.o translate.o |> !lxxd |> $(BIN_DIR)/postpro
 : prenuc.o tigrinc.o |> !lxxd |> $(BIN_DIR)/prenuc

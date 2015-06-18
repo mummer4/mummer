@@ -51,77 +51,77 @@ using namespace std;
 
 
 //------------------------------------------------------ Globals -------------//
-const signed char FORWARD_CHAR = 1;
-const signed char REVERSE_CHAR = -1;
+static const signed char FORWARD_CHAR = 1;
+static const signed char REVERSE_CHAR = -1;
 
 
-bool DO_DELTA = true;
-bool DO_EXTEND = true;
-bool TO_SEQEND = false;
+bool DO_DELTA   = true;
+bool DO_EXTEND  = true;
+bool TO_SEQEND  = false;
 bool DO_SHADOWS = false;
 
 
 //------------------------------------------------------ Type Definitions ----//
 enum LineType
-     //-- The type of input line from <stdin>
-{
-  NO_LINE, HEADER_LINE, MATCH_LINE
-};
+//-- The type of input line from <stdin>
+  {
+    NO_LINE, HEADER_LINE, MATCH_LINE
+  };
 
 
 struct FastaRecord
-     //-- The essential data of a sequence
+//-- The essential data of a sequence
 {
-  char * Id;                 // the fasta ID header tag
-  long int len;              // the length of the sequence
-  char * seq;                // the sequence data
+  char *   Id;                  // the fasta ID header tag
+  long int len;                 // the length of the sequence
+  char *   seq;                 // the sequence data
 };
 
 
 struct Match
-     //-- An exact match between two sequences A and B
+//-- An exact match between two sequences A and B
 {
   long int sA, sB, len;      // start coordinate in A, in B and the length
 };
 
 
 struct Cluster
-     //-- An ordered list of matches between two sequences A and B
+//-- An ordered list of matches between two sequences A and B
 {
-  bool wasFused;             // have the cluster matches been fused yet?
-  signed char dirB;          // the query sequence direction
-                             //      FORWARD_CHAR or REVERSE_CHAR
-  vector<Match> matches;     // the ordered set of matches in the cluster
+  bool          wasFused;       // have the cluster matches been fused yet?
+  signed char   dirB;           // the query sequence direction
+                                //      FORWARD_CHAR or REVERSE_CHAR
+  vector<Match> matches;        // the ordered set of matches in the cluster
 };
 
 
 struct Synteny
-     //-- An ordered list of clusters between two sequences A and B
+//-- An ordered list of clusters between two sequences A and B
 {
-  FastaRecord * AfP;         // a pointer to the reference sequence record
-  FastaRecord Bf;            // the query sequence record (w/o the sequence)
-  vector<Cluster> clusters;  // the ordered set of clusters between A and B
+  FastaRecord *   AfP;          // a pointer to the reference sequence record
+  FastaRecord     Bf;           // the query sequence record (w/o the sequence)
+  vector<Cluster> clusters;     // the ordered set of clusters between A and B
 };
 
 
 struct Alignment
-     //-- An alignment object between two sequences A and B
+//-- An alignment object between two sequences A and B
 {
-  signed char dirB;          // the query sequence direction
-  long int sA, sB, eA, eB;   // the start in A, B and the end in A, B
-  vector<long int> delta;         // the delta values, with NO zero at the end
-  long int deltaApos;        // sum of abs(deltas) - #of negative deltas
-                             //      trust me, it is a very helpful value
-  long int Errors, SimErrors, NonAlphas; // errors, similarity errors, nonalphas
+  signed char      dirB;        // the query sequence direction
+  long int         sA, sB, eA, eB; // the start in A, B and the end in A, B
+  vector<long int> delta;       // the delta values, with NO zero at the end
+  long int         deltaApos;   // sum of abs(deltas) - #of negative deltas
+                                //      trust me, it is a very helpful value
+  long int         Errors, SimErrors, NonAlphas; // errors, similarity errors, nonalphas
 };
 
 
 struct AscendingClusterSort
-     //-- For sorting clusters in ascending order of their sA coordinate
+//-- For sorting clusters in ascending order of their sA coordinate
 {
   bool operator() (const Cluster & pA, const Cluster & pB)
   {
-    return ( pA.matches.begin( )->sA < pB.matches.begin( )->sA );
+    return ( pA.matches.front().sA < pB.matches.front().sA );
   }
 };
 
@@ -130,71 +130,71 @@ struct AscendingClusterSort
 
 //------------------------------------------------- Function Declarations ----//
 void addNewAlignment
-     (vector<Alignment> & Alignments, vector<Cluster>::iterator Cp,
-      vector<Match>::iterator Mp);
+(vector<Alignment> & Alignments, vector<Cluster>::iterator Cp,
+ vector<Match>::iterator Mp);
 
 bool extendBackward
-     (vector<Alignment> & Alignments, vector<Alignment>::iterator CurrAp,
-      vector<Alignment>::iterator TargetAp, const char * A, const char * B);
+(vector<Alignment> & Alignments, vector<Alignment>::iterator CurrAp,
+ vector<Alignment>::iterator TargetAp, const char * A, const char * B);
 
 bool extendForward
-     (vector<Alignment>::iterator Ap, const char * A, long int targetA,
-      const char * B, long int targetB, unsigned int m_o);
+(vector<Alignment>::iterator Ap, const char * A, long int targetA,
+ const char * B, long int targetB, unsigned int m_o);
 
 void extendClusters
-     (vector<Cluster> & Clusters,
-      const FastaRecord * Af, const FastaRecord * Bf, FILE * DeltaFile);
+(vector<Cluster> & Clusters,
+ const FastaRecord * Af, const FastaRecord * Bf, FILE * DeltaFile);
 
 void flushAlignments
-     (vector<Alignment> & Alignments,
-      const FastaRecord * Af, const FastaRecord * Bf,
-      FILE * DeltaFile);
+(vector<Alignment> & Alignments,
+ const FastaRecord * Af, const FastaRecord * Bf,
+ FILE * DeltaFile);
 
 void flushSyntenys
-     (vector<Synteny> & Syntenys, FILE * ClusterFile);
+(vector<Synteny> & Syntenys, FILE * ClusterFile);
 
 vector<Cluster>::iterator getForwardTargetCluster
-     (vector<Cluster> & Clusters, vector<Cluster>::iterator CurrCp,
-      long int & targetA, long int & targetB);
+(vector<Cluster> & Clusters, vector<Cluster>::iterator CurrCp,
+ long int & targetA, long int & targetB);
 
 vector<Alignment>::iterator getReverseTargetAlignment
-     (vector<Alignment> & Alignments, vector<Alignment>::iterator CurrAp);
+(vector<Alignment> & Alignments, vector<Alignment>::iterator CurrAp);
 
 bool isShadowedCluster
-     (vector<Cluster>::iterator CurrCp,
-      vector<Alignment> & Alignments, vector<Alignment>::iterator Ap);
+(vector<Cluster>::iterator CurrCp,
+ vector<Alignment> & Alignments, vector<Alignment>::iterator Ap);
 
 void parseAbort
-     (const char *);
+(const char *);
 
 void parseDelta
-     (vector<Alignment> & Alignments,
-      const FastaRecord * Af, const FastaRecord *Bf);
+(vector<Alignment> & Alignments,
+ const FastaRecord * Af, const FastaRecord *Bf);
 
 void processSyntenys
-     (vector<Synteny> & Syntenys,
-      FastaRecord * Af, long int As,
-      FILE * QryFile, FILE * ClusterFile, FILE * DeltaFile);
+(vector<Synteny> & Syntenys,
+ FastaRecord * Af, long int As,
+ FILE * QryFile, FILE * ClusterFile, FILE * DeltaFile);
 
 inline long int revC
-     (long int Coord, long int Len);
+(long int Coord, long int Len);
 
 void printHelp
-     (const char *);
+(const char *);
 
 void printUsage
-     (const char *);
+(const char *);
 
 void validateData
-     (vector<Alignment> Alignments, vector<Cluster> Clusters,
-      const FastaRecord * Af, const FastaRecord * Bf);
+(vector<Alignment> Alignments, vector<Cluster> Clusters,
+ const FastaRecord * Af, const FastaRecord * Bf);
 
 
 
 
 //-------------------------------------------------- Function Definitions ----//
 int main
-     (int argc, char ** argv)
+(int argc, char ** argv)
 {
   FastaRecord * Af;           // array of all the reference sequences
 
@@ -238,44 +238,44 @@ int main
     int ch, errflg = 0;
     while ( !errflg  &&  ((ch = getopt (argc, argv, "dehB:b:st")) != EOF) )
       switch (ch)
-	{
-	case 'b' :
-	  setBreakLen( atoi (optarg) );
-	  break;
+        {
+        case 'b' :
+          setBreakLen( atoi (optarg) );
+          break;
 
         case 'B' :
           setBanding( atoi (optarg) );
           break;
 
-	case 'd' :
-	  DO_DELTA = false;
-	  break;
+        case 'd' :
+          DO_DELTA = false;
+          break;
 
-	case 'e' :
-	  DO_EXTEND = false;
-	  break;
+        case 'e' :
+          DO_EXTEND = false;
+          break;
 
-	case 'h' :
-	  printHelp (argv[0]);
-	  exit (EXIT_SUCCESS);
-	  break;
+        case 'h' :
+          printHelp (argv[0]);
+          exit (EXIT_SUCCESS);
+          break;
 
-	case 's' :
-	  DO_SHADOWS = true;
-	  break;
+        case 's' :
+          DO_SHADOWS = true;
+          break;
 
-	case 't' :
-	  TO_SEQEND = true;
-	  break;
+        case 't' :
+          TO_SEQEND = true;
+          break;
 
-	default :
-	  errflg ++;
-	}
+        default :
+          errflg ++;
+        }
     
     if ( errflg > 0 || argc - optind != 3 )
       {
-	printUsage (argv[0]);
-	exit (EXIT_FAILURE);
+        printUsage (argv[0]);
+        exit (EXIT_FAILURE);
       }
   }
 
@@ -319,10 +319,10 @@ int main
       Af[As].len = strlen (Af[As].seq + 1);
 
       if ( ++ As >= Ac )
-	{
-	  Ac *= 2;
-	  Af = (FastaRecord *) Safe_realloc ( Af, sizeof(FastaRecord) * Ac );
-	}
+        {
+          Ac *= 2;
+          Af = (FastaRecord *) Safe_realloc ( Af, sizeof(FastaRecord) * Ac );
+        }
 
       InitSize = INIT_SIZE;
       Af[As].seq = (char *) Safe_malloc ( sizeof(char) * InitSize );
@@ -338,145 +338,111 @@ int main
   IdA[0] = '\0';
   IdB[0] = '\0';
   CurrIdB[0] = '\0';
-  while ( fgets(Line, MAX_LINE, stdin) != NULL )
-    {
+  while ( fgets(Line, MAX_LINE, stdin) != NULL ) {
+    if ( Line[0] == '>' ) { //-- If the current line is a fasta HEADER_LINE
+      if ( sscanf (Line + 1, "%s", CurrIdB) != 1 )
+        parseAbort ("stdin");
+      DirB = strstr (Line," Reverse") == NULL ? FORWARD_CHAR : REVERSE_CHAR;
 
-      //-- If the current line is a fasta HEADER_LINE
-      if ( Line[0] == '>' )
-	{
-	  if ( sscanf (Line + 1, "%s", CurrIdB) != 1 )
-	    parseAbort ("stdin");
-	  DirB = strstr (Line," Reverse") == NULL ? FORWARD_CHAR : REVERSE_CHAR;
+      PrevLine = HEADER_LINE;
+    } else if ( Line[0] == '#' ) { //-- If the current line is a cluster HEADER_LINE
+      PrevLine = HEADER_LINE;
+    } else { //-- If the current line is a MATCH_LINE
+      if ( sscanf (Line, "%ld %ld %ld", &sA, &sB, &len) != 3 )
+        parseAbort ("stdin");
 
-	  PrevLine = HEADER_LINE;
-	}
-
-
-      //-- If the current line is a cluster HEADER_LINE
-      else if ( Line[0] == '#' )
-	{
-	  PrevLine = HEADER_LINE;
-	}
-
-
-      //-- If the current line is a MATCH_LINE
-      else
-	{
-	  if ( sscanf (Line, "%ld %ld %ld", &sA, &sB, &len) != 3 )
-	    parseAbort ("stdin");
-
-	  //-- Re-map the reference coordinate back to its original sequence
-	  for ( Seqi = 0; sA > Af[Seqi].len; Seqi ++ )
-	    sA -= Af[Seqi].len + 1; // extra +1 for the x at the end of each seq
-	  if ( Seqi >= As )
-	    {
-	      fprintf (stderr,
-		 "ERROR: A MUM was found with a start coordinate greater than\n"
+      //-- Re-map the reference coordinate back to its original sequence
+      for ( Seqi = 0; sA > Af[Seqi].len; Seqi ++ )
+        sA -= Af[Seqi].len + 1; // extra +1 for the x at the end of each seq
+      if ( Seqi >= As ) {
+        fprintf (stderr,
+                 "ERROR: A MUM was found with a start coordinate greater than\n"
                  "       the sequence length, a serious error has occured.\n"
-		 "       Please file a bug report\n");
-	      exit (EXIT_FAILURE);
-	    }
+                 "       Please file a bug report\n");
+        exit (EXIT_FAILURE);
+      }
 
-	  //-- If the match spans across a sequence boundry
-	  if ( sA + len - 1 > Af[Seqi].len || sA <= 0)
-	    {
-	      fprintf (stderr,
-		 "WARNING: A MUM was found extending beyond the boundry of:\n"
-		 "         Reference sequence '>%s'\n\n"
-		 "Please check that the '-n' option is activated on 'mummer2'\n"
-		 "and try again, or file a bug report\n"
-		 "Attempting to continue.\n", Af[Seqi].Id);
-	      continue;
-	    }
+      //-- If the match spans across a sequence boundry
+      if ( sA + len - 1 > Af[Seqi].len || sA <= 0) {
+        fprintf (stderr,
+                 "WARNING: A MUM was found extending beyond the boundry of:\n"
+                 "         Reference sequence '>%s'\n\n"
+                 "Please check that the '-n' option is activated on 'mummer2'\n"
+                 "and try again, or file a bug report\n"
+                 "Attempting to continue.\n", Af[Seqi].Id);
+        continue;
+      }
 
-	  //-- Check and update the current synteny region
-	  if ( strcmp (IdA, Af[Seqi].Id) != 0  ||  strcmp (IdB, CurrIdB) != 0 )
-	    {
-	      Found = false;
-	      if ( strcmp (IdB, CurrIdB) == 0 )
-		{
-		  //-- Has this header been seen before?
-		  for ( Sp = Syntenys.rbegin( ); Sp < Syntenys.rend( ); Sp ++ )
-		    {
-		      if ( strcmp (Sp->AfP->Id, Af[Seqi].Id) == 0 )
-			{
-			  if ( Sp->AfP->len != Af[Seqi].len )
-			    {
-			      fprintf (stderr,
-				 "ERROR: The reference file may contain"
-				 " sequences with non-unique\n"
-                                 "       header Ids, please check your input"
-				 " files and try again\n");
-			      exit (EXIT_FAILURE);
-			    }
-			  assert ( strcmp (Sp->Bf.Id, IdB) == 0 );
-			  CurrSp = Sp;
-			  Found = true;
-			  break;
-			}
-		    }
-		}
-	      else
-		{
-		  //-- New B sequence header, process all the old synteny's
-		  processSyntenys (Syntenys, Af, As,
-				   QryFile, ClusterFile, DeltaFile);
-		}
-	      
-	      strcpy (IdA, Af[Seqi].Id);
-	      strcpy (IdB, CurrIdB);
+      //-- Check and update the current synteny region
+      if ( strcmp (IdA, Af[Seqi].Id) != 0  ||  strcmp (IdB, CurrIdB) != 0 ) {
+        Found = false;
+        if ( strcmp (IdB, CurrIdB) == 0 ) { //-- Has this header been seen before?
+          for ( Sp = Syntenys.rbegin( ); Sp < Syntenys.rend( ); Sp ++ ) {
+            if ( strcmp (Sp->AfP->Id, Af[Seqi].Id) == 0 ) {
+              if ( Sp->AfP->len != Af[Seqi].len ) {
+                fprintf (stderr,
+                         "ERROR: The reference file may contain"
+                         " sequences with non-unique\n"
+                         "       header Ids, please check your input"
+                         " files and try again\n");
+                exit (EXIT_FAILURE);
+              }
+              assert ( strcmp (Sp->Bf.Id, IdB) == 0 );
+              CurrSp = Sp;
+              Found = true;
+              break;
+            }
+          }
+        } else { //-- New B sequence header, process all the old synteny's
+          processSyntenys (Syntenys, Af, As, QryFile, ClusterFile, DeltaFile);
+        }
 
-	      //-- If not seen yet, create a new synteny region
-	      if ( ! Found )   
-		{
-		  Asyn.AfP = Af + Seqi;
-		  Asyn.Bf.len = -1;
-		  Asyn.Bf.Id = (char *) Safe_malloc
-		    (sizeof(char) * (strlen(IdB) + 1));
-		  strcpy (Asyn.Bf.Id, IdB);
+        strcpy (IdA, Af[Seqi].Id);
+        strcpy (IdB, CurrIdB);
 
-		  Syntenys.push_back (Asyn);
-		  CurrSp = Syntenys.rbegin( );
-		}
+        if ( ! Found ) { //-- If not seen yet, create a new synteny region
+          Asyn.AfP = Af + Seqi;
+          Asyn.Bf.len = -1;
+          Asyn.Bf.Id = (char *) Safe_malloc(sizeof(char) * (strlen(IdB) + 1));
+          strcpy (Asyn.Bf.Id, IdB);
 
-	      //-- Add a new cluster to the current synteny
-              if ( !Syntenys.empty( ) && !CurrSp->clusters.empty( ) )
-		if ( CurrSp->clusters.rbegin( )->matches.empty( ) )
-		  CurrSp->clusters.pop_back( ); // hack to remove empties
-	      Aclu.wasFused = false;
-	      Aclu.dirB = DirB;
-	      CurrSp->clusters.push_back (Aclu);
-	    }
-	  else if ( PrevLine == HEADER_LINE )
-	    {
-	      //-- Add a new cluster to the current synteny
-              if ( !Syntenys.empty( ) && !CurrSp->clusters.empty( ) )
-		if ( CurrSp->clusters.rbegin( )->matches.empty( ) )
-		  CurrSp->clusters.pop_back( );
-	      Aclu.wasFused = false;
-	      Aclu.dirB = DirB;
-	      CurrSp->clusters.push_back (Aclu);
-	    }
+          Syntenys.push_back (Asyn);
+          CurrSp = Syntenys.rbegin( );
+        }
 
-	  //-- Add a new match to the current cluster
-	  if ( len > 1 )
-	    {
-	      Amat.sA = sA;
-	      Amat.sB = sB;
-	      Amat.len = len;
-	      CurrSp->clusters.rbegin( )->matches.push_back (Amat);
-	    }
+        //-- Add a new cluster to the current synteny
+        if ( !Syntenys.empty( ) && !CurrSp->clusters.empty( ) )
+          if ( CurrSp->clusters.rbegin( )->matches.empty( ) )
+            CurrSp->clusters.pop_back( ); // hack to remove empties
+        Aclu.wasFused = false;
+        Aclu.dirB = DirB;
+        CurrSp->clusters.push_back (Aclu);
+      } else if ( PrevLine == HEADER_LINE ) { //-- Add a new cluster to the current synteny
+        if ( !Syntenys.empty( ) && !CurrSp->clusters.empty( ) )
+          if ( CurrSp->clusters.rbegin( )->matches.empty( ) )
+            CurrSp->clusters.pop_back( );
+        Aclu.wasFused = false;
+        Aclu.dirB = DirB;
+        CurrSp->clusters.push_back (Aclu);
+      }
 
-	  PrevLine = MATCH_LINE;
-	}
+      if ( len > 1 ) { //-- Add a new match to the current cluster
+          Amat.sA = sA;
+          Amat.sB = sB;
+          Amat.len = len;
+          CurrSp->clusters.rbegin( )->matches.push_back (Amat);
+      }
+
+      PrevLine = MATCH_LINE;
     }
+  }
 
   //-- Process the left-over syntenys
   if ( !Syntenys.empty( ) && !CurrSp->clusters.empty( ) )
     if ( CurrSp->clusters.rbegin( )->matches.empty( ) )
       CurrSp->clusters.pop_back( );
-  
-  processSyntenys (Syntenys, Af, As, QryFile, ClusterFile, DeltaFile);
+
+  processSyntenys(Syntenys, Af, As, QryFile, ClusterFile, DeltaFile);
   fclose (QryFile);
 
   //-- Free the reference sequences
@@ -494,11 +460,11 @@ int main
 
 
 void addNewAlignment
-     (vector<Alignment> & Alignments, vector<Cluster>::iterator Cp,
-      vector<Match>::iterator Mp)
+(vector<Alignment> & Alignments, vector<Cluster>::iterator Cp,
+ vector<Match>::iterator Mp)
 
-     //  Create and add a new alignment object based on the current match
-     //  and cluster information pointed to by Cp and Mp.
+//  Create and add a new alignment object based on the current match
+//  and cluster information pointed to by Cp and Mp.
 
 {
   Alignment Align;
@@ -522,19 +488,19 @@ void addNewAlignment
 
 
 bool extendBackward
-     (vector<Alignment> & Alignments, vector<Alignment>::iterator CurrAp,
-      vector<Alignment>::iterator TargetAp, const char * A, const char * B)
+(vector<Alignment> & Alignments, vector<Alignment>::iterator CurrAp,
+ vector<Alignment>::iterator TargetAp, const char * A, const char * B)
 
-     //  Extend an alignment backwards off of the current alignment object.
-     //  The current alignment object must be freshly created and consist
-     //  only of an exact match (i.e. the delta vector MUST be empty).
-     //  If the TargetAp alignment object is reached by the extension, it will
-     //  be merged with CurrAp and CurrAp will be destroyed. If TargetAp is
-     //  NULL the function will extend as far as possible. It is a strange
-     //  and dangerous function because it can delete CurrAp, so edit with
-     //  caution. Returns true if TargetAp was reached and merged, else false
-     //  Designed only as a subroutine for extendClusters, should be used
-     //  nowhere else.
+//  Extend an alignment backwards off of the current alignment object.
+//  The current alignment object must be freshly created and consist
+//  only of an exact match (i.e. the delta vector MUST be empty).
+//  If the TargetAp alignment object is reached by the extension, it will
+//  be merged with CurrAp and CurrAp will be destroyed. If TargetAp is
+//  NULL the function will extend as far as possible. It is a strange
+//  and dangerous function because it can delete CurrAp, so edit with
+//  caution. Returns true if TargetAp was reached and merged, else false
+//  Designed only as a subroutine for extendClusters, should be used
+//  nowhere else.
 
 {
   bool target_reached = false;
@@ -572,9 +538,9 @@ bool extendBackward
     {
       targetB = CurrAp->sB - MAX_ALIGNMENT_LENGTH + 1;
       if ( overflow_flag )
-	double_flag = true;
+        double_flag = true;
       else
-	overflow_flag = true;
+        overflow_flag = true;
       m_o |= OPTIMAL_BIT;
     }
 
@@ -585,7 +551,7 @@ bool extendBackward
 
   //-- Attempt to reach the target
   target_reached = alignSearch (A, CurrAp->sA, targetA,
-				B, CurrAp->sB, targetB, m_o);
+                                B, CurrAp->sB, targetB, m_o);
 
   if ( overflow_flag  ||  TargetAp == Alignments.end( ) )
     target_reached = false;
@@ -594,7 +560,7 @@ bool extendBackward
     {
       //-- Merge the two alignment objects
       extendForward (TargetAp, A, CurrAp->sA,
-		               B, CurrAp->sB, FORCED_FORWARD_ALIGN);
+                     B, CurrAp->sB, FORCED_FORWARD_ALIGN);
       TargetAp->eA = CurrAp->eA;
       TargetAp->eB = CurrAp->eB;
       Alignments.pop_back( );
@@ -602,14 +568,14 @@ bool extendBackward
   else
     {
       alignTarget (A, targetA, CurrAp->sA,
-		   B, targetB, CurrAp->sB,
-		   CurrAp->delta, FORCED_FORWARD_ALIGN);
+                   B, targetB, CurrAp->sB,
+                   CurrAp->delta, FORCED_FORWARD_ALIGN);
       CurrAp->sA = targetA;
       CurrAp->sB = targetB;
 
       //-- Update the deltaApos value for the alignment object
       for ( Dp = CurrAp->delta.begin( ); Dp < CurrAp->delta.end( ); Dp ++ )
-	CurrAp->deltaApos += *Dp > 0 ? *Dp : labs(*Dp) - 1;
+        CurrAp->deltaApos += *Dp > 0 ? *Dp : labs(*Dp) - 1;
     }
 
   return target_reached;
@@ -619,13 +585,13 @@ bool extendBackward
 
 
 bool extendForward
-     (vector<Alignment>::iterator CurrAp, const char * A, long int targetA,
-      const char * B, long int targetB, unsigned int m_o)
+(vector<Alignment>::iterator CurrAp, const char * A, long int targetA,
+ const char * B, long int targetB, unsigned int m_o)
 
-     //  Extend an alignment forwards off the current alignment object until
-     //  target or end of sequence is reached, and merge the delta values of the
-     //  alignment object with the new delta values generated by the extension.
-     //  Return true if the target was reached, else false
+//  Extend an alignment forwards off the current alignment object until
+//  target or end of sequence is reached, and merge the delta values of the
+//  alignment object with the new delta values generated by the extension.
+//  Return true if the target was reached, else false
 
 {
   long int ValA;
@@ -654,9 +620,9 @@ bool extendForward
     {
       targetB = CurrAp->eB + MAX_ALIGNMENT_LENGTH - 1;
       if ( overflow_flag )
-	double_flag = true;
+        double_flag = true;
       else
-	overflow_flag = true;
+        overflow_flag = true;
       m_o |= OPTIMAL_BIT;
     }
 
@@ -664,8 +630,8 @@ bool extendForward
     m_o &= ~SEQEND_BIT;
 
   target_reached = alignTarget (A, CurrAp->eA, targetA,
-				B, CurrAp->eB, targetB,
-				CurrAp->delta, m_o);
+                                B, CurrAp->eB, targetB,
+                                CurrAp->delta, m_o);
 
   //-- Notify user if alignment was chopped short
   if ( target_reached  &&  overflow_flag )
@@ -678,17 +644,17 @@ bool extendForward
       ValA = (CurrAp->eA - CurrAp->sA + 1) - CurrAp->deltaApos - 1;
       CurrAp->delta[Di] += CurrAp->delta[Di] > 0 ? ValA : -(ValA);
       if ( CurrAp->delta[Di] == 0  ||  ValA < 0 )
-	{
-	  fprintf(stderr,
-		  "ERROR: failed to merge alignments at position %ld\n"
-		  "       Please file a bug report\n",
-		  CurrAp->eA);
-	  exit (EXIT_FAILURE);
-	}
+        {
+          fprintf(stderr,
+                  "ERROR: failed to merge alignments at position %ld\n"
+                  "       Please file a bug report\n",
+                  CurrAp->eA);
+          exit (EXIT_FAILURE);
+        }
 
       //-- Update the deltaApos
       for ( Dp = CurrAp->delta.begin( ) + Di; Dp < CurrAp->delta.end( ); Dp ++ )
-	CurrAp->deltaApos += *Dp > 0 ? *Dp : labs(*Dp) - 1;
+        CurrAp->deltaApos += *Dp > 0 ? *Dp : labs(*Dp) - 1;
     }
 
   //-- Set the alignment coordinates
@@ -702,16 +668,16 @@ bool extendForward
 
 
 void extendClusters
-     (vector<Cluster> & Clusters,
-      const FastaRecord * Af, const FastaRecord * Bf, FILE * DeltaFile)
+(vector<Cluster> & Clusters,
+ const FastaRecord * Af, const FastaRecord * Bf, FILE * DeltaFile)
 
-     //  Connect all the matches in every cluster between sequences A and B.
-     //  Also, extend alignments off of the front and back of each cluster to
-     //  expand total alignment coverage. When these extensions encounter an
-     //  adjacent cluster, fuse the two regions to create one single
-     //  encompassing region. This routine will create alignment objects from
-     //  these extensions and output the resulting delta information to the
-     //  delta output file.
+//  Connect all the matches in every cluster between sequences A and B.
+//  Also, extend alignments off of the front and back of each cluster to
+//  expand total alignment coverage. When these extensions encounter an
+//  adjacent cluster, fuse the two regions to create one single
+//  encompassing region. This routine will create alignment objects from
+//  these extensions and output the resulting delta information to the
+//  delta output file.
 
 {
   //-- Sort the clusters (ascending) by their start coordinate in sequence A
@@ -749,114 +715,114 @@ void extendClusters
   while ( CurrCp < Clusters.end( ) )
     {
       if ( DO_EXTEND )
-	{
-	  //-- Ignore if shadowed or already extended
-	  if ( ! target_reached )
-	    if ( CurrCp->wasFused
-		 ||
-		 (!DO_SHADOWS &&
-		  isShadowedCluster (CurrCp, Alignments, CurrAp)) )
-	      {
-		CurrCp->wasFused = true;
-		CurrCp = ++ PrevCp;
-		continue;
-	      }
-	}
+        {
+          //-- Ignore if shadowed or already extended
+          if ( ! target_reached )
+            if ( CurrCp->wasFused
+                 ||
+                 (!DO_SHADOWS &&
+                  isShadowedCluster (CurrCp, Alignments, CurrAp)) )
+              {
+                CurrCp->wasFused = true;
+                CurrCp = ++ PrevCp;
+                continue;
+              }
+        }
 
       //-- Pick the right directional sequence for B
       if ( CurrCp->dirB == FORWARD_CHAR )
-	B = Bf->seq;
+        B = Bf->seq;
       else if ( Brev != NULL )
-	B = Brev;
+        B = Brev;
       else
-	{
-	    Brev = (char *) Safe_malloc ( sizeof(char) * (Bf->len + 2) );
-	    strcpy ( Brev + 1, Bf->seq + 1 );
-	    Brev[0] = '\0';
-	    Reverse_Complement (Brev, 1, Bf->len);
-	    B = Brev;
-	}
+        {
+          Brev = (char *) Safe_malloc ( sizeof(char) * (Bf->len + 2) );
+          strcpy ( Brev + 1, Bf->seq + 1 );
+          Brev[0] = '\0';
+          Reverse_Complement (Brev, 1, Bf->len);
+          B = Brev;
+        }
 
       //-- Extend each match in the cluster
       for ( Mp = CurrCp->matches.begin( ); Mp < CurrCp->matches.end( ); Mp ++ )
-	{
-	  //-- Try to extend the current match backwards
-	  if ( target_reached )
-	    {
-	      //-- Merge with the previous match
-	      if ( CurrAp->eA != Mp->sA  ||  CurrAp->eB != Mp->sB )
-		{
-		  if ( Mp >= CurrCp->matches.end( ) - 1 )
-		    {
-		      fprintf (stderr,
-			 "ERROR: Target match does not exist, please\n"
-			 "       file a bug report\n");
-		      exit (EXIT_FAILURE);
-		    }
-		  continue;
-		}
-	      CurrAp->eA += Mp->len - 1;
-	      CurrAp->eB += Mp->len - 1;
-	    }
-	  else
-	    {
-	      //-- Create a new alignment object
-	      addNewAlignment (Alignments, CurrCp, Mp);
-	      CurrAp = Alignments.end( ) - 1;
+        {
+          //-- Try to extend the current match backwards
+          if ( target_reached )
+            {
+              //-- Merge with the previous match
+              if ( CurrAp->eA != Mp->sA  ||  CurrAp->eB != Mp->sB )
+                {
+                  if ( Mp >= CurrCp->matches.end( ) - 1 )
+                    {
+                      fprintf (stderr,
+                               "ERROR: Target match does not exist, please\n"
+                               "       file a bug report\n");
+                      exit (EXIT_FAILURE);
+                    }
+                  continue;
+                }
+              CurrAp->eA += Mp->len - 1;
+              CurrAp->eB += Mp->len - 1;
+            }
+          else
+            {
+              //-- Create a new alignment object
+              addNewAlignment (Alignments, CurrCp, Mp);
+              CurrAp = Alignments.end( ) - 1;
 
-	      if ( DO_EXTEND  ||  Mp != CurrCp->matches.begin ( ) )
-		{
-		  //-- Target the closest/best alignment object
-		  TargetAp = getReverseTargetAlignment (Alignments, CurrAp);
-		  
-		  //-- Extend the new alignment object backwards
-		  if ( extendBackward (Alignments, CurrAp, TargetAp, A, B) )
-		    CurrAp = TargetAp;
-		}
-	    }
-	  
-	  m_o = FORWARD_ALIGN;
+              if ( DO_EXTEND  ||  Mp != CurrCp->matches.begin ( ) )
+                {
+                  //-- Target the closest/best alignment object
+                  TargetAp = getReverseTargetAlignment (Alignments, CurrAp);
+                  
+                  //-- Extend the new alignment object backwards
+                  if ( extendBackward (Alignments, CurrAp, TargetAp, A, B) )
+                    CurrAp = TargetAp;
+                }
+            }
+          
+          m_o = FORWARD_ALIGN;
 
-	  //-- Try to extend the current match forwards
-	  if ( Mp < CurrCp->matches.end( ) - 1 )
-	    {
-	      //-- Target the next match in the cluster
-	      targetA = (Mp + 1)->sA;
-	      targetB = (Mp + 1)->sB;
+          //-- Try to extend the current match forwards
+          if ( Mp < CurrCp->matches.end( ) - 1 )
+            {
+              //-- Target the next match in the cluster
+              targetA = (Mp + 1)->sA;
+              targetB = (Mp + 1)->sB;
 
-	      //-- Extend the current alignment object forward
-	      target_reached = extendForward (CurrAp, A, targetA,
-					      B, targetB, m_o);
-	    }
-	  else if ( DO_EXTEND )
-	    {
-	      targetA = Af->len;
-	      targetB = Bf->len;
+              //-- Extend the current alignment object forward
+              target_reached = extendForward (CurrAp, A, targetA,
+                                              B, targetB, m_o);
+            }
+          else if ( DO_EXTEND )
+            {
+              targetA = Af->len;
+              targetB = Bf->len;
 
-	      //-- Target the closest/best match in a future cluster
-	      TargetCp = getForwardTargetCluster (Clusters, CurrCp,
-						  targetA, targetB);
-	      if ( TargetCp == Clusters.end( ) )
-		{
-		  m_o |= OPTIMAL_BIT;
-		  if ( TO_SEQEND )
-		    m_o |= SEQEND_BIT;
-		}
+              //-- Target the closest/best match in a future cluster
+              TargetCp = getForwardTargetCluster (Clusters, CurrCp,
+                                                  targetA, targetB);
+              if ( TargetCp == Clusters.end( ) )
+                {
+                  m_o |= OPTIMAL_BIT;
+                  if ( TO_SEQEND )
+                    m_o |= SEQEND_BIT;
+                }
 
-	      //-- Extend the current alignment object forward
-	      target_reached = extendForward (CurrAp, A, targetA,
-					      B, targetB, m_o);
-	    }
-	}
+              //-- Extend the current alignment object forward
+              target_reached = extendForward (CurrAp, A, targetA,
+                                              B, targetB, m_o);
+            }
+        }
       if ( TargetCp == Clusters.end( ) )
-	target_reached = false;
+        target_reached = false;
 
       CurrCp->wasFused = true;
 
       if ( target_reached == false )
-	CurrCp = ++ PrevCp;
+        CurrCp = ++ PrevCp;
       else
-	CurrCp = TargetCp;
+        CurrCp = TargetCp;
     }
 
 #ifdef _DEBUG_ASSERT
@@ -876,13 +842,13 @@ void extendClusters
 
 
 void flushAlignments
-     (vector<Alignment> & Alignments,
-      const FastaRecord * Af, const FastaRecord * Bf,
-      FILE * DeltaFile)
+(vector<Alignment> & Alignments,
+ const FastaRecord * Af, const FastaRecord * Bf,
+ FILE * DeltaFile)
 
-     //  Simply output the delta information stored in Alignments to the
-     //  given delta file. Free the memory used by Alignments once the
-     //  data is successfully output to the file.
+//  Simply output the delta information stored in Alignments to the
+//  given delta file. Free the memory used by Alignments once the
+//  data is successfully output to the file.
 
 {
   vector<Alignment>::iterator Ap;       // alignment pointer
@@ -896,18 +862,18 @@ void flushAlignments
   for ( Ap = Alignments.begin( ); Ap < Alignments.end( ); Ap ++ )
     {
       if ( Ap->dirB == FORWARD_CHAR )
-	fprintf (DeltaFile, "%ld %ld %ld %ld %ld %ld %ld\n",
-		 Ap->sA, Ap->eA,
-		 Ap->sB, Ap->eB,
-		 Ap->Errors, Ap->SimErrors, Ap->NonAlphas);
+        fprintf (DeltaFile, "%ld %ld %ld %ld %ld %ld %ld\n",
+                 Ap->sA, Ap->eA,
+                 Ap->sB, Ap->eB,
+                 Ap->Errors, Ap->SimErrors, Ap->NonAlphas);
       else
-	fprintf (DeltaFile, "%ld %ld %ld %ld %ld %ld %ld\n",
-		 Ap->sA, Ap->eA,
-		 revC (Ap->sB, Bf->len), revC (Ap->eB, Bf->len),
-		 Ap->Errors, Ap->SimErrors, Ap->NonAlphas);
+        fprintf (DeltaFile, "%ld %ld %ld %ld %ld %ld %ld\n",
+                 Ap->sA, Ap->eA,
+                 revC (Ap->sB, Bf->len), revC (Ap->eB, Bf->len),
+                 Ap->Errors, Ap->SimErrors, Ap->NonAlphas);
 
       for ( Dp = Ap->delta.begin( ); Dp < Ap->delta.end( ); Dp ++ )
-	fprintf (DeltaFile, "%ld\n", *Dp);
+        fprintf (DeltaFile, "%ld\n", *Dp);
       fprintf (DeltaFile, "0\n");
 
       Ap->delta.clear( );
@@ -922,13 +888,13 @@ void flushAlignments
 
 
 void flushSyntenys
-     (vector<Synteny> & Syntenys, FILE * ClusterFile)
+(vector<Synteny> & Syntenys, FILE * ClusterFile)
 
-     //  Simply output the synteny/cluster information generated by the mgaps
-     //  program. However, now the coordinates reference their appropriate
-     //  reference sequence, and the reference sequecne header is added to
-     //  the appropriate lines. Free the memory used by Syntenys once the
-     //  data is successfully output to the file.
+//  Simply output the synteny/cluster information generated by the mgaps
+//  program. However, now the coordinates reference their appropriate
+//  reference sequence, and the reference sequecne header is added to
+//  the appropriate lines. Free the memory used by Syntenys once the
+//  data is successfully output to the file.
 
 {
   vector<Synteny>::iterator Sp;         // synteny pointer 
@@ -985,19 +951,19 @@ void flushSyntenys
 
 
 vector<Cluster>::iterator getForwardTargetCluster
-     (vector<Cluster> & Clusters, vector<Cluster>::iterator CurrCp,
-      long int & targetA, long int & targetB)
+(vector<Cluster> & Clusters, vector<Cluster>::iterator CurrCp,
+ long int & targetA, long int & targetB)
 
-     //  Return the cluster that is most likely to successfully join (in a
-     //  forward direction) with the current cluster. The returned cluster
-     //  must contain 1 or more matches that are strictly greater than the end
-     //  of the current cluster. The targeted cluster must also be on a
-     //  diagonal close enough to the current cluster, so that a connection
-     //  could possibly be made by the alignment extender. Assumes clusters
-     //  have been sorted via AscendingClusterSort. Returns targeted cluster
-     //  and stores the target coordinates in targetA and targetB. If no
-     //  suitable cluster was found, the function will return NULL and target
-     //  A and targetB will remain unchanged.
+//  Return the cluster that is most likely to successfully join (in a
+//  forward direction) with the current cluster. The returned cluster
+//  must contain 1 or more matches that are strictly greater than the end
+//  of the current cluster. The targeted cluster must also be on a
+//  diagonal close enough to the current cluster, so that a connection
+//  could possibly be made by the alignment extender. Assumes clusters
+//  have been sorted via AscendingClusterSort. Returns targeted cluster
+//  and stores the target coordinates in targetA and targetB. If no
+//  suitable cluster was found, the function will return NULL and target
+//  A and targetB will remain unchanged.
 
 {
   vector<Match>::iterator Mip;               // match iteratrive pointer
@@ -1019,57 +985,57 @@ vector<Cluster>::iterator getForwardTargetCluster
     {
       //-- If the cluster is on the same direction
       if ( CurrCp->dirB == Cip->dirB )
-	{
-	  eA = Cip->matches.begin( )->sA;
-	  eB = Cip->matches.begin( )->sB;
+        {
+          eA = Cip->matches.begin( )->sA;
+          eB = Cip->matches.begin( )->sB;
 
-	  //-- If the cluster overlaps the current cluster, strip some matches
-	  if ( ( eA < sA  ||  eB < sB )  &&
-	      Cip->matches.rbegin( )->sA >= sA  &&
-	      Cip->matches.rbegin( )->sB >= sB )
-	    {
-	      for ( Mip = Cip->matches.begin( );
-		    Mip < Cip->matches.end( )  &&  ( eA < sA  ||  eB < sB );
-		    Mip ++ )
-		{
-		  eA = Mip->sA;
-		  eB = Mip->sB;
-		}
-	    }
+          //-- If the cluster overlaps the current cluster, strip some matches
+          if ( ( eA < sA  ||  eB < sB )  &&
+               Cip->matches.rbegin( )->sA >= sA  &&
+               Cip->matches.rbegin( )->sB >= sB )
+            {
+              for ( Mip = Cip->matches.begin( );
+                    Mip < Cip->matches.end( )  &&  ( eA < sA  ||  eB < sB );
+                    Mip ++ )
+                {
+                  eA = Mip->sA;
+                  eB = Mip->sB;
+                }
+            }
 
-	  //-- If the cluster is strictly greater than current cluster
-	  if ( eA >= sA  &&  eB >= sB )
-	    {
-	      if ( eA - sA > eB - sB )
-		{
-		  greater = eA - sA;
-		  lesser = eB - sB;
-		}
-	      else
-		{
-		  lesser = eA - sA;
-		  greater = eB - sB;
-		}
+          //-- If the cluster is strictly greater than current cluster
+          if ( eA >= sA  &&  eB >= sB )
+            {
+              if ( eA - sA > eB - sB )
+                {
+                  greater = eA - sA;
+                  lesser = eB - sB;
+                }
+              else
+                {
+                  lesser = eA - sA;
+                  greater = eB - sB;
+                }
 
-	      //-- If the cluster is close enough
-	      if ( greater < getBreakLen( )  ||
-		   (lesser) * GOOD_SCORE [getMatrixType( )] +
-		   (greater - lesser) * CONT_GAP_SCORE [getMatrixType( )] >= 0 )
-		{
-		  Cp = Cip;
-		  targetA = eA;
-		  targetB = eB;
-		  break;
-		}
-	      else if ( (greater << 1) - lesser < dist )
-		{
-		  Cp = Cip;
-		  targetA = eA;
-		  targetB = eB;
-		  dist = (greater << 1) - lesser;
-		}
-	    }
-	}
+              //-- If the cluster is close enough
+              if ( greater < getBreakLen( )  ||
+                   (lesser) * GOOD_SCORE [getMatrixType( )] +
+                   (greater - lesser) * CONT_GAP_SCORE [getMatrixType( )] >= 0 )
+                {
+                  Cp = Cip;
+                  targetA = eA;
+                  targetB = eB;
+                  break;
+                }
+              else if ( (greater << 1) - lesser < dist )
+                {
+                  Cp = Cip;
+                  targetA = eA;
+                  targetB = eB;
+                  dist = (greater << 1) - lesser;
+                }
+            }
+        }
     }
 
 
@@ -1080,15 +1046,15 @@ vector<Cluster>::iterator getForwardTargetCluster
 
 
 vector<Alignment>::iterator getReverseTargetAlignment
-     (vector<Alignment> & Alignments, vector<Alignment>::iterator CurrAp)
+(vector<Alignment> & Alignments, vector<Alignment>::iterator CurrAp)
 
-     //  Return the alignment that is most likely to successfully join (in a
-     //  reverse direction) with the current alignment. The returned alignment
-     //  must be strictly less than the current cluster and be on a diagonal
-     //  close enough to the current alignment, so that a connection
-     //  could possibly be made by the alignment extender. Assumes clusters
-     //  have been sorted via AscendingClusterSort and processed in order, so
-     //  therefore all alignments are in order by their start A coordinate.
+//  Return the alignment that is most likely to successfully join (in a
+//  reverse direction) with the current alignment. The returned alignment
+//  must be strictly less than the current cluster and be on a diagonal
+//  close enough to the current alignment, so that a connection
+//  could possibly be made by the alignment extender. Assumes clusters
+//  have been sorted via AscendingClusterSort and processed in order, so
+//  therefore all alignments are in order by their start A coordinate.
 
 {
   vector<Alignment>::iterator Ap;        // alignment pointer
@@ -1107,39 +1073,39 @@ vector<Alignment>::iterator getReverseTargetAlignment
     {
       //-- If the alignment is on the same direction
       if ( CurrAp->dirB == Aip->dirB )
-	{
-	  eA = Aip->eA;
-	  eB = Aip->eB;
+        {
+          eA = Aip->eA;
+          eB = Aip->eB;
 
-	  //-- If the alignment is strictly less than current cluster
-	  if ( eA <= sA  && eB <= sB )
-	    {
-	      if ( sA - eA > sB - eB )
-		{
-		  greater = sA - eA;
-		  lesser = sB - eB;
-		}
-	      else
-		{
-		  lesser = sA - eA;
-		  greater = sB - eB;
-		}
+          //-- If the alignment is strictly less than current cluster
+          if ( eA <= sA  && eB <= sB )
+            {
+              if ( sA - eA > sB - eB )
+                {
+                  greater = sA - eA;
+                  lesser = sB - eB;
+                }
+              else
+                {
+                  lesser = sA - eA;
+                  greater = sB - eB;
+                }
 
-	      //-- If the cluster is close enough
-	      if ( greater < getBreakLen( )  ||
-		   (lesser) * GOOD_SCORE [getMatrixType( )] +
-		   (greater - lesser) * CONT_GAP_SCORE [getMatrixType( )] >= 0 )
-		{
-		  Ap = Aip;
-		  break;
-		}
-	      else if ( (greater << 1) - lesser < dist )
-		{
-		  Ap = Aip;
-		  dist = (greater << 1) - lesser;
-		}
-	    }
-	}
+              //-- If the cluster is close enough
+              if ( greater < getBreakLen( )  ||
+                   (lesser) * GOOD_SCORE [getMatrixType( )] +
+                   (greater - lesser) * CONT_GAP_SCORE [getMatrixType( )] >= 0 )
+                {
+                  Ap = Aip;
+                  break;
+                }
+              else if ( (greater << 1) - lesser < dist )
+                {
+                  Ap = Aip;
+                  dist = (greater << 1) - lesser;
+                }
+            }
+        }
     }
 
 
@@ -1150,37 +1116,37 @@ vector<Alignment>::iterator getReverseTargetAlignment
 
 
 bool isShadowedCluster
-     (vector<Cluster>::iterator CurrCp,
-      vector<Alignment> & Alignments, vector<Alignment>::iterator Ap)
+(vector<Cluster>::iterator CurrCp,
+ vector<Alignment> & Alignments, vector<Alignment>::iterator Ap)
 
-     //  Check if the current cluster is shadowed by a previously produced
-     //  alignment region. Return true if it is, else false.
+//  Check if the current cluster is shadowed by a previously produced
+//  alignment region. Return true if it is, else false.
 
 {
   vector<Alignment>::iterator Aip;         // alignment pointer
 
   long int sA = CurrCp->matches.begin( )->sA;
   long int eA = CurrCp->matches.rbegin( )->sA +
-                CurrCp->matches.rbegin( )->len - 1;
+    CurrCp->matches.rbegin( )->len - 1;
   long int sB = CurrCp->matches.begin( )->sB;
   long int eB = CurrCp->matches.rbegin( )->sB +
-                CurrCp->matches.rbegin( )->len - 1;
+    CurrCp->matches.rbegin( )->len - 1;
 
   if ( ! Alignments.empty( ) )             // if there are alignments to use
     {
       //-- Look backwards in hope of finding a shadowing alignment
       for ( Aip = Ap; Aip >= Alignments.begin( ); Aip -- )
-	{
-	  //-- If in the same direction and shadowing the current cluster, break
-	  if ( Aip->dirB == CurrCp->dirB )
-	    if ( Aip->eA >= eA  &&  Aip->eB >= eB )
-	      if ( Aip->sA <= sA  &&  Aip->sB <= sB )
-		break;
-	}
+        {
+          //-- If in the same direction and shadowing the current cluster, break
+          if ( Aip->dirB == CurrCp->dirB )
+            if ( Aip->eA >= eA  &&  Aip->eB >= eB )
+              if ( Aip->sA <= sA  &&  Aip->sB <= sB )
+                break;
+        }
       
       //-- Return true if the loop was broken, i.e. shadow found
       if ( Aip >= Alignments.begin( ) )
-	return true;
+        return true;
     }
 
   //-- Return false if Alignments was empty or loop was not broken
@@ -1191,14 +1157,14 @@ bool isShadowedCluster
 
 
 void parseAbort
-     (const char * s)
+(const char * s)
 
-     //  Abort the program if there was an error in parsing file 's'
+//  Abort the program if there was an error in parsing file 's'
 
 {
   fprintf (stderr,
-	  "ERROR: Could not parse input from '%s'. \n"
-	  "Please check the filename and format, or file a bug report\n", s);
+           "ERROR: Could not parse input from '%s'. \n"
+           "Please check the filename and format, or file a bug report\n", s);
   exit (EXIT_FAILURE);
 }
 
@@ -1206,11 +1172,11 @@ void parseAbort
 
 
 void parseDelta
-     (vector<Alignment> & Alignments,
-      const FastaRecord * Af, const FastaRecord *Bf)
+(vector<Alignment> & Alignments,
+ const FastaRecord * Af, const FastaRecord *Bf)
 
-     // Use the delta information to generate the error counts for each
-     // alignment, and fill this information into the data type
+// Use the delta information to generate the error counts for each
+// alignment, and fill this information into the data type
 
 {
   char * A, * B, * Brev = NULL;
@@ -1230,17 +1196,17 @@ void parseDelta
       B = Bf->seq;
       
       if ( Ap->dirB == REVERSE_CHAR )
-	{
-	  if ( Brev == NULL )
-	    {
-	      Brev = (char *) Safe_malloc ( sizeof(char) * (Bf->len + 2) );
-	      strcpy ( Brev + 1, Bf->seq + 1 );
-	      Brev[0] = '\0';
-	      Reverse_Complement (Brev, 1, Bf->len);
-	      B = Brev;
-	    }
-	  B = Brev;
-	}
+        {
+          if ( Brev == NULL )
+            {
+              Brev = (char *) Safe_malloc ( sizeof(char) * (Bf->len + 2) );
+              strcpy ( Brev + 1, Bf->seq + 1 );
+              Brev[0] = '\0';
+              Reverse_Complement (Brev, 1, Bf->len);
+              B = Brev;
+            }
+          B = Brev;
+        }
 
       Apos = Ap->sA;
       Bpos = Ap->sB;
@@ -1253,84 +1219,84 @@ void parseDelta
 
       //-- For all delta's in this alignment
       for ( Dp = Ap->delta.begin( ); Dp < Ap->delta.end( ); Dp ++ )
-	{
-	  Delta = *Dp;
-	  Sign = Delta > 0 ? 1 : -1;
-	  Delta = labs ( Delta );
+        {
+          Delta = *Dp;
+          Sign = Delta > 0 ? 1 : -1;
+          Delta = labs ( Delta );
 
-	  //-- For all the bases before the next indel
-	  for ( i = 1; i < Delta; i ++ )
-	    {
-	      ch1 = A [Apos ++];
-	      ch2 = B [Bpos ++];
+          //-- For all the bases before the next indel
+          for ( i = 1; i < Delta; i ++ )
+            {
+              ch1 = A [Apos ++];
+              ch2 = B [Bpos ++];
 
-	      if ( !isalpha (ch1) )
-		{
-		  ch1 = STOP_CHAR;
-		  NonAlphas ++;
-		}
-	      if ( !isalpha (ch2) )
-		{
-		  ch2 = STOP_CHAR;
-		  NonAlphas ++;
-		}
-	      
-	      ch1 = toupper(ch1);
-	      ch2 = toupper(ch2);
-	      if ( 1 > MATCH_SCORE
-		   [getMatrixType( )]
-		   [ch1 - 'A']
-		   [ch2 - 'A'] )
-		SimErrors ++;
-	      if ( ch1 != ch2 )
-		Errors ++;      
-	    }
+              if ( !isalpha (ch1) )
+                {
+                  ch1 = STOP_CHAR;
+                  NonAlphas ++;
+                }
+              if ( !isalpha (ch2) )
+                {
+                  ch2 = STOP_CHAR;
+                  NonAlphas ++;
+                }
+              
+              ch1 = toupper(ch1);
+              ch2 = toupper(ch2);
+              if ( 1 > MATCH_SCORE
+                   [getMatrixType( )]
+                   [ch1 - 'A']
+                   [ch2 - 'A'] )
+                SimErrors ++;
+              if ( ch1 != ch2 )
+                Errors ++;      
+            }
 
-	  //-- Process the current indel
-	  Remain -= i - 1;
-	  Errors ++;
-	  SimErrors ++;
-	  
-	  if ( Sign == 1 )
-	    {
-	      Apos ++;
-	      Remain --;
-	    }
-	  else
-	    {
-	      Bpos ++;
-	      Total ++;
-	    }
-	}
+          //-- Process the current indel
+          Remain -= i - 1;
+          Errors ++;
+          SimErrors ++;
+          
+          if ( Sign == 1 )
+            {
+              Apos ++;
+              Remain --;
+            }
+          else
+            {
+              Bpos ++;
+              Total ++;
+            }
+        }
       
       //-- For all the bases after the final indel
       for ( i = 0; i < Remain; i ++ )
-	{
-	  //-- Score character match and update error counters
-	  ch1 = A [Apos ++];
-	  ch2 = B [Bpos ++];
-	  
-	  if ( !isalpha (ch1) )
-	    {
-	      ch1 = STOP_CHAR;
-	      NonAlphas ++;
-	    }
-	  if ( !isalpha (ch2) )
-	    {
-	      ch2 = STOP_CHAR;
-	      NonAlphas ++;
-	    }
-	  
-	  ch1 = toupper(ch1);
-	  ch2 = toupper(ch2);
-	  if ( 1 > MATCH_SCORE
-	       [getMatrixType( )]
-	       [ch1 - 'A']
-	       [ch2 - 'A'] )
-	    SimErrors ++;
-	  if ( ch1 != ch2 )
-	    Errors ++;
-	}
+        {
+          //-- Score character match and update error counters
+          ch1 = A [Apos ++];
+          ch2 = B [Bpos ++];
+          
+          if ( !isalpha (ch1) )
+            {
+              ch1 = STOP_CHAR;
+              NonAlphas ++;
+            }
+          if ( !isalpha (ch2) )
+            {
+              ch2 = STOP_CHAR;
+              NonAlphas ++;
+            }
+          
+          ch1 = toupper(ch1);
+          ch2 = toupper(ch2);
+          if ( 1 > MATCH_SCORE
+               [getMatrixType( )]
+               [ch1 - 'A']
+               [ch2 - 'A'] )
+            SimErrors ++;
+          if ( ch1 != ch2 )
+            Errors ++;
+        }
 
       Ap->Errors = Errors;
       Ap->SimErrors = SimErrors;
@@ -1347,15 +1313,15 @@ void parseDelta
 
 
 void processSyntenys
-     (vector<Synteny> & Syntenys, FastaRecord * Af, long int As,
-      FILE * QryFile, FILE * ClusterFile, FILE * DeltaFile)
+(vector<Synteny> & Syntenys, FastaRecord * Af, long int As,
+ FILE * QryFile, FILE * ClusterFile, FILE * DeltaFile)
 
-     //  For each syntenic region with clusters, read in the B sequence and
-     //  extend the clusters to expand total alignment coverage. Only should
-     //  be called once all the clusters for the contained syntenic regions have
-     //  been stored in the data structure. Frees the memory used by the
-     //  the syntenic regions once the output of extendClusters and
-     //  flushSyntenys has been produced.
+//  For each syntenic region with clusters, read in the B sequence and
+//  extend the clusters to expand total alignment coverage. Only should
+//  be called once all the clusters for the contained syntenic regions have
+//  been stored in the data structure. Frees the memory used by the
+//  the syntenic regions once the output of extendClusters and
+//  flushSyntenys has been produced.
 
 {
   FastaRecord Bf;                     // the current B sequence
@@ -1372,7 +1338,7 @@ void processSyntenys
     {
       //-- If no clusters, ignore
       if ( CurrSp->clusters.empty( ) )
-	continue;
+        continue;
 
       //-- If a B sequence not seen yet, read it in
       //-- IMPORTANT: The B sequences in the synteny object are assumed to be
@@ -1380,16 +1346,16 @@ void processSyntenys
       //      will fail. (All like tags must be adjacent and in the same order
       //      as the query file)
       if ( CurrSp == Syntenys.begin( )  ||
-	   strcmp (CurrSp->Bf.Id, (CurrSp-1)->Bf.Id) != 0 )
-	{
-	  //-- Read in the B sequence
-	  while ( Read_String (QryFile, Bf.seq, InitSize, Bf.Id, FALSE) )
-	    if ( strcmp (CurrSp->Bf.Id, Bf.Id) == 0 )
-	      break;
-	  if ( strcmp (CurrSp->Bf.Id, Bf.Id) != 0 )
-	    parseAbort ( "Query File" );
-	  Bf.len = strlen (Bf.seq + 1);
-	}
+           strcmp (CurrSp->Bf.Id, (CurrSp-1)->Bf.Id) != 0 )
+        {
+          //-- Read in the B sequence
+          while ( Read_String (QryFile, Bf.seq, InitSize, Bf.Id, FALSE) )
+            if ( strcmp (CurrSp->Bf.Id, Bf.Id) == 0 )
+              break;
+          if ( strcmp (CurrSp->Bf.Id, Bf.Id) != 0 )
+            parseAbort ( "Query File" );
+          Bf.len = strlen (Bf.seq + 1);
+        }
 
       //-- Extend clusters and create the alignment information
       CurrSp->Bf.len = Bf.len;
@@ -1409,9 +1375,9 @@ void processSyntenys
 
 
 inline long int revC
-     (long int Coord, long int Len)
+(long int Coord, long int Len)
 
-     //  Reverse complement the given coordinate for the given length.
+//  Reverse complement the given coordinate for the given length.
 
 {
   assert (Len - Coord + 1 > 0);
@@ -1422,31 +1388,31 @@ inline long int revC
 
 
 void printHelp
-     (const char * s)
+(const char * s)
 
-     //  Display the program's help information to stderr.
+//  Display the program's help information to stderr.
 
 {
   fprintf (stderr,
-    "\nUSAGE: %s  [options]  <reference>  <query>  <pfx>  <  <input>\n\n", s);
+           "\nUSAGE: %s  [options]  <reference>  <query>  <pfx>  <  <input>\n\n", s);
   fprintf (stderr,
-      "-b int  set the alignment break (give-up) length to int\n"
-      "-B int  set the diagonal banding for extension to int\n"
-      "-d      output only match clusters rather than extended alignments\n"
-      "-e      do not extend alignments outward from clusters\n"
-      "-h      display help information\n"
-      "-s      don't remove shadowed alignments, useful for aligning a\n"
-      "        sequence to itself to identify repeats\n"
-      "-t      force alignment to ends of sequence if within -b distance\n\n");
+           "-b int  set the alignment break (give-up) length to int\n"
+           "-B int  set the diagonal banding for extension to int\n"
+           "-d      output only match clusters rather than extended alignments\n"
+           "-e      do not extend alignments outward from clusters\n"
+           "-h      display help information\n"
+           "-s      don't remove shadowed alignments, useful for aligning a\n"
+           "        sequence to itself to identify repeats\n"
+           "-t      force alignment to ends of sequence if within -b distance\n\n");
   fprintf (stderr,
-	  "  Input is the output of the \"mgaps\" program from stdin, and\n"
-	  "the two original NUCmer sequence files passed on the command\n"
-	  "line. <pfx> is the prefix to be added to the front of the\n"
-	  "output file <pfx>.delta\n"
-          "  <pfx>.delta is the alignment object that catalogs the distance\n"
-          "between insertions and deletions. For further information\n"
-	  "regarding this file, please refer to the documentation under\n"
-	  "the .delta output description.\n\n");
+           "  Input is the output of the \"mgaps\" program from stdin, and\n"
+           "the two original NUCmer sequence files passed on the command\n"
+           "line. <pfx> is the prefix to be added to the front of the\n"
+           "output file <pfx>.delta\n"
+           "  <pfx>.delta is the alignment object that catalogs the distance\n"
+           "between insertions and deletions. For further information\n"
+           "regarding this file, please refer to the documentation under\n"
+           "the .delta output description.\n\n");
   return;
 }
 
@@ -1454,13 +1420,13 @@ void printHelp
 
 
 void printUsage
-     (const char * s)
+(const char * s)
 
-     //  Display the program's usage information to stderr.
+//  Display the program's usage information to stderr.
 
 {
   fprintf (stderr,
-    "\nUSAGE: %s  [options]  <reference>  <query>  <pfx>  <  <input>\n\n", s);
+           "\nUSAGE: %s  [options]  <reference>  <query>  <pfx>  <  <input>\n\n", s);
   fprintf (stderr, "Try '%s -h' for more information.\n", s);
   return;
 }
@@ -1469,11 +1435,11 @@ void printUsage
 
 
 void validateData
-     (vector<Alignment> Alignments, vector<Cluster> Clusters,
-      const FastaRecord * Af, const FastaRecord * Bf)
+(vector<Alignment> Alignments, vector<Cluster> Clusters,
+ const FastaRecord * Af, const FastaRecord * Bf)
 
-     //  Self test function to check that the cluster and alignment information
-     //  is valid
+//  Self test function to check that the cluster and alignment information
+//  is valid
 
 {
   char * Brev = NULL;
@@ -1492,61 +1458,61 @@ void validateData
       //-- Pick the right directional sequence for B
       if ( Cp->dirB == FORWARD_CHAR ) {
 #ifndef NDEBUG
-	B = Bf->seq;
+        B = Bf->seq;
 #endif
         ;
       }
 #ifndef NDEBUG
       else if ( Brev != NULL ) {
-	B = Brev;
+        B = Brev;
         ;
       }
 #endif
       else {
-	  Brev = (char *) Safe_malloc ( sizeof(char) * (Bf->len + 2) );
-	  strcpy ( Brev + 1, Bf->seq + 1 );
-	  Brev[0] = '\0';
-	  Reverse_Complement (Brev, 1, Bf->len);
+        Brev = (char *) Safe_malloc ( sizeof(char) * (Bf->len + 2) );
+        strcpy ( Brev + 1, Bf->seq + 1 );
+        Brev[0] = '\0';
+        Reverse_Complement (Brev, 1, Bf->len);
 #ifndef NDEBUG
-	  B = Brev;
+        B = Brev;
 #endif
       }
 
       for ( Mp = Cp->matches.begin( ); Mp < Cp->matches.end( ); Mp ++ )
-	{
-	  //-- assert for each match in cluster, it is indeed a match
+        {
+          //-- assert for each match in cluster, it is indeed a match
 #ifndef NDEBUG
-	  long int x = Mp->sA;
-	  long int y = Mp->sB;
-	  for (long int i = 0; i < Mp->len; i ++ )
-	    assert ( A[x ++] == B[y ++] );
+          long int x = Mp->sA;
+          long int y = Mp->sB;
+          for (long int i = 0; i < Mp->len; i ++ )
+            assert ( A[x ++] == B[y ++] );
 #endif
 
-	  //-- assert for each match in cluster, it is contained in an alignment
-	  for ( Ap = Alignments.begin( ); Ap < Alignments.end( ); Ap ++ )
-	    {
-	      if ( Ap->sA <= Mp->sA  &&  Ap->sB <= Mp->sB  &&
-		   Ap->eA >= Mp->sA + Mp->len - 1  &&
-		   Ap->eB >= Mp->sB + Mp->len - 1 )
-		break;
-	    }
-	  assert ( Ap < Alignments.end( ) );
-	}
+          //-- assert for each match in cluster, it is contained in an alignment
+          for ( Ap = Alignments.begin( ); Ap < Alignments.end( ); Ap ++ )
+            {
+              if ( Ap->sA <= Mp->sA  &&  Ap->sB <= Mp->sB  &&
+                   Ap->eA >= Mp->sA + Mp->len - 1  &&
+                   Ap->eB >= Mp->sB + Mp->len - 1 )
+                break;
+            }
+          assert ( Ap < Alignments.end( ) );
+        }
     }
 
   //-- assert alignments are optimal (quick check if first and last chars equal)
   for ( Ap = Alignments.begin( ); Ap < Alignments.end( ); Ap ++ )
     {
       if ( Ap->dirB == REVERSE_CHAR )
-	{
-	  assert (Brev != NULL);
+        {
+          assert (Brev != NULL);
 #ifndef NDEBUG
-	  B = Brev;
+          B = Brev;
 #endif
-	}
+        }
 #ifndef NDEBUG
       else
-	B = Bf->seq;
+        B = Bf->seq;
 #endif
       
       assert ( Ap->sA <= Ap->eA );
