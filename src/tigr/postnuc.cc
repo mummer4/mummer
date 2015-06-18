@@ -43,10 +43,12 @@
 //         mostly the alignment extension performance (sw_align.h)
 //#define _DEBUG_ASSERT       // self testing assert functions
 
-#include "tigrinc.hh"
-#include "sw_align.hh"
 #include <vector>
 #include <algorithm>
+#include <iostream>
+
+#include "tigrinc.hh"
+#include "sw_align.hh"
 using namespace std;
 
 
@@ -198,31 +200,31 @@ int main
 {
   FastaRecord * Af;           // array of all the reference sequences
 
-  vector<Synteny> Syntenys;                  // vector of all sets of clusters
-  vector<Synteny>::reverse_iterator CurrSp;  // current set of clusters
-  vector<Synteny>::reverse_iterator Sp;      // temporary synteny pointer
+  vector<Synteny>                   Syntenys; // vector of all sets of clusters
+  vector<Synteny>::reverse_iterator CurrSp; // current set of clusters
+  vector<Synteny>::reverse_iterator Sp; // temporary synteny pointer
 
-  Synteny Asyn;               // a single set of clusters
-  Cluster Aclu;               // a single cluster of matches
-  Match Amat;                 // a single match
+  Synteny Asyn;                 // a single set of clusters
+  Cluster Aclu;                 // a single cluster of matches
+  Match   Amat;                 // a single match
 
   LineType PrevLine;          // the current input line
 
   bool Found;                 // temporary search flag
 
-  char Line [MAX_LINE];       // a single line of input
-  char CurrIdB [MAX_LINE], IdA [MAX_LINE], IdB [MAX_LINE];   // fasta ID headers
+  string Line;         // a single line of input
+  char CurrIdB [MAX_LINE], IdA [MAX_LINE], IdB [MAX_LINE]; // fasta ID headers
   char ClusterFileName [MAX_LINE], DeltaFileName [MAX_LINE]; // file names
   char RefFileName [MAX_LINE], QryFileName [MAX_LINE];
 
   signed char DirB = FORWARD_CHAR;   // the current query strand direction
 
-  long int i;                        // temporary counter
-  long int Seqi;                     // current reference sequence index
-  long int InitSize;                 // initial sequence memory space
-  long int As = 0;                   // the size of the reference array
-  long int Ac = 100;                 // the capacity of the reference array
-  long int sA, sB, len;              // current match start in A, B and length
+  long int i;                   // temporary counter
+  long int Seqi;                // current reference sequence index
+  long int InitSize;            // initial sequence memory space
+  long int As = 0;              // the size of the reference array
+  long int Ac = 100;            // the capacity of the reference array
+  long int sA, sB, len;         // current match start in A, B and length
 
   FILE * RefFile, * QryFile;         // reference and query input files
   FILE * ClusterFile, * DeltaFile;   // cluster and delta output files
@@ -338,17 +340,17 @@ int main
   IdA[0] = '\0';
   IdB[0] = '\0';
   CurrIdB[0] = '\0';
-  while ( fgets(Line, MAX_LINE, stdin) != NULL ) {
+  while (std::getline(std::cin, Line)) {
     if ( Line[0] == '>' ) { //-- If the current line is a fasta HEADER_LINE
-      if ( sscanf (Line + 1, "%s", CurrIdB) != 1 )
+      if ( sscanf (Line.c_str() + 1, "%s", CurrIdB) != 1 )
         parseAbort ("stdin");
-      DirB = strstr (Line," Reverse") == NULL ? FORWARD_CHAR : REVERSE_CHAR;
+      DirB = Line.find(" Reverse") == string::npos ? FORWARD_CHAR : REVERSE_CHAR;
 
       PrevLine = HEADER_LINE;
     } else if ( Line[0] == '#' ) { //-- If the current line is a cluster HEADER_LINE
       PrevLine = HEADER_LINE;
     } else { //-- If the current line is a MATCH_LINE
-      if ( sscanf (Line, "%ld %ld %ld", &sA, &sB, &len) != 3 )
+      if ( sscanf (Line.c_str(), "%ld %ld %ld", &sA, &sB, &len) != 3 )
         parseAbort ("stdin");
 
       //-- Re-map the reference coordinate back to its original sequence

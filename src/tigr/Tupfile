@@ -9,7 +9,7 @@ CC = g++
 : delta-filter.o tigrinc.o delta.o |> !lxxd |> $(BIN_DIR)/delta-filter
 : gaps.o tigrinc.o |> !lxxd |> $(BIN_DIR)/gaps
 : mgaps_main.o mgaps.o tigrinc.o |> !lxxd |> $(BIN_DIR)/mgaps $(BIN_DIR)/<exec>
-: postnuc.o tigrinc.o sw_align.o |> !lxxd |> $(BIN_DIR)/postnuc
+: postnuc.o tigrinc.o sw_align.o |> !lxxd |> $(BIN_DIR)/postnuc  $(BIN_DIR)/<exec>
 : postpro.o tigrinc.o sw_align.o translate.o |> !lxxd |> $(BIN_DIR)/postpro
 : prenuc.o tigrinc.o |> !lxxd |> $(BIN_DIR)/prenuc
 : prepro.o tigrinc.o translate.o |> !lxxd |> $(BIN_DIR)/prepro
