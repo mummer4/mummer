@@ -1,0 +1,8 @@
+include_rules
+
+LDLIBS = -lpthread
+
+: foreach *.cpp |> !cxx |> {essamummer}
+: foreach *.c |> !cc |> {essamummer}
+
+: {essamummer} |> !lxxd |> essamummer
