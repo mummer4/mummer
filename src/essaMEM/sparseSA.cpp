@@ -10,6 +10,9 @@
 
 #include "sparseSA.hpp"
 
+namespace mummer {
+namespace mummer {
+
 // LS suffix sorter (integer alphabet). 
 extern "C" { void suffixsort(int *x, int *p, int n, int k, int l); };
 
@@ -915,7 +918,7 @@ void sparseSA::print_match(std::string meta, std::vector<match_t> &buf, bool rc)
 
 // Finds maximal almost-unique matches (MAMs) These can repeat in the
 // given query pattern P, but occur uniquely in the indexed reference S.
-void sparseSA::findMAM(std::string &P, std::vector<match_t> &matches, int min_len, long& currentCount, bool print) {
+void sparseSA::findMAM(std::string &P, std::vector<match_t> &matches, int min_len, long& currentCount, bool print)  {
   long Plength = P.length();
   memCount = 0;
   interval_t cur(0, N-1, 0);
@@ -1052,3 +1055,5 @@ void sparseSA::MEM(std::string &P, std::vector<match_t> &matches, int min_len, b
   }
 }
 
+} // namespace mummer
+} // namespace mummer

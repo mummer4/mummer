@@ -38,7 +38,7 @@ bool print_length = false;
 bool printSubstring = false;
 bool printRevCompForw = false;
 int K = 1, num_threads = 1, query_threads = 1;
-sparseSA *sa;
+mummer::mummer::sparseSA *sa;
 std::string query_fasta[32];
 int MAX_QUERY_FILES = 32;
 int numQueryFiles = 0;
@@ -55,7 +55,7 @@ void *query_thread(void *arg_) {
   std::string meta, line;
   std::ifstream data(query_fasta[arg->queryFile].c_str());
 
-  std::vector<match_t> matches;
+  std::vector<mummer::mummer::match_t> matches;
 
   bool print = arg->skip == 1;
 
@@ -312,7 +312,7 @@ int main(int argc, char* argv[]) {
   if(setRevComp)
       forward = false;
   
-  sa = new sparseSA(ref, refdescr, startpos, _4column, K, suflink, child, kmer>0, sparseMult, kmer, printSubstring, printRevCompForw, nucleotides_only);
+  sa = new mummer::mummer::sparseSA(ref, refdescr, startpos, _4column, K, suflink, child, kmer>0, sparseMult, kmer, printSubstring, printRevCompForw, nucleotides_only);
   if(!load.empty()){
       std::cerr << "attempting to load index " << load << std::endl;
       if(sa->load(load)){

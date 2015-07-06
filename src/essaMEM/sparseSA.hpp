@@ -9,7 +9,8 @@
 #include <limits.h>
 
 
-// using namespace std;
+namespace mummer {
+namespace mummer {
 
 static const unsigned int BITADD[256] = { UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,//0-9
                                          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,//10-19
@@ -276,6 +277,8 @@ struct sparseSA {
   void construct();
 };
 
+} // namespace mummer
+} // namespace mummer
 
 #endif // __sparseSA_hpp__
 
