@@ -21,23 +21,28 @@ void usage(std::string prog);
 
 enum mum_t { MUM, MAM, MEM };
 
-int min_len = 20;
-int sparseMult=1;
-mum_t type = MAM;
-bool rev_comp = false, _4column = false, nucleotides_only = false;
-bool forward = true;
-bool setRevComp = false;
-bool setBoth = false;
-bool automatic = true;
-bool automaticSkip = true;
-bool automaticKmer = true;
-bool suflink = true;
-bool child = false;
-int  kmer = 0;
-bool print_length = false;
-bool printSubstring = false;
-bool printRevCompForw = false;
-int K = 1, num_threads = 1, query_threads = 1;
+int   min_len          = 20;
+int   sparseMult       = 1;
+mum_t type             = MAM;
+bool  rev_comp         = false;
+bool  _4column         = false;
+bool  nucleotides_only = false;
+bool  forward          = true;
+bool  setRevComp       = false;
+bool  setBoth          = false;
+bool  automatic        = true;
+bool  automaticSkip    = true;
+bool  automaticKmer    = true;
+bool  suflink          = true;
+bool  child            = false;
+int   kmer             = 0;
+bool  print_length     = false;
+bool  printSubstring   = false;
+bool  printRevCompForw = false;
+int   K                = 1;
+int   num_threads      = 1;
+int   query_threads    = 1;
+
 mummer::mummer::sparseSA *sa;
 std::string query_fasta[32];
 int MAX_QUERY_FILES = 32;
@@ -91,29 +96,29 @@ void *query_thread(void *arg_) {
           // Process P.
           //   std::cerr << "# P.length()=" << P->length() << std::endl;
       if(forward){
-        if(print){ 
+        if(print){
           if(print_length) std::cout << "> " << meta << "\tLen = " << P->length() << '\n';
           else std::cout << "> " << meta << '\n';
         }
         if(type == MAM) sa->MAM(*P, matches, min_len, memCounter, true, print);
         else if(type == MUM) sa->MUM(*P, matches, min_len, memCounter, true, print);
         else if(type == MEM) sa->MEM(*P, matches, min_len, print, memCounter, true, num_threads);
-        if(!print) sa->print_match(meta, matches, false); 
+        if(!print) sa->print_match(meta, matches, false);
       }
 	  if(rev_comp) {
 	    reverse_complement(*P, nucleotides_only);
-	    if(print){ 
+	    if(print){
               if(print_length) std::cout << "> " << meta << " Reverse\tLen = " << P->length() << '\n';
               else std::cout << "> " << meta << " Reverse\n";
         }
 	    if(type == MAM) sa->MAM(*P, matches, min_len, memCounter, false, print);
         else if(type == MUM) sa->MUM(*P, matches, min_len, memCounter, false, print);
         else if(type == MEM) sa->MEM(*P, matches, min_len, print, memCounter, false, num_threads);
-	    if(!print) sa->print_match(meta, matches, true); 
+	    if(!print) sa->print_match(meta, matches, true);
 	  }
 	}
 	seq_cnt++;
-        delete P; P = new std::string; meta = ""; 
+        delete P; P = new std::string; meta = "";
       }
       start = 1;
       trim(line, start, end);
@@ -143,7 +148,7 @@ void *query_thread(void *arg_) {
     if(seq_cnt % arg->skip == arg->skip0) {
       //      std::cerr << "# P.length()=" << P->length() << std::endl;
       if(forward){
-        if(print){ 
+        if(print){
           if(print_length) std::cout << "> " << meta << "\tLen = " << P->length() << '\n';
           else std::cout << "> " << meta << '\n';
         }
@@ -151,18 +156,18 @@ void *query_thread(void *arg_) {
         if(type == MAM) sa->MAM(*P, matches, min_len, memCounter, true, print);
         else if(type == MUM) sa->MUM(*P, matches, min_len, memCounter, true, print);
         else if(type == MEM) sa->MEM(*P, matches, min_len, print, memCounter, true, num_threads);
-        if(!print) sa->print_match(meta, matches, false); 
+        if(!print) sa->print_match(meta, matches, false);
       }
       if(rev_comp) {
         reverse_complement(*P, nucleotides_only);
-        if(print){ 
+        if(print){
           if(print_length) std::cout << "> " << meta << " Reverse\tLen = " << P->length() << '\n';
           else std::cout << "> " << meta << " Reverse\n";
         }
         if(type == MAM) sa->MAM(*P, matches, min_len, memCounter, false, print);
         else if(type == MUM) sa->MUM(*P, matches, min_len, memCounter, false, print);
         else if(type == MEM) sa->MEM(*P, matches, min_len, print, memCounter, false, num_threads);
-        if(!print) sa->print_match(meta, matches, true); 
+        if(!print) sa->print_match(meta, matches, true);
       }
     }
   }
@@ -187,7 +192,7 @@ int main(int argc, char* argv[]) {
   std::string load = "";
 
   while (1) {
-    static struct option long_options[] = { 
+    static struct option long_options[] = {
       {"l", 1, 0, 0}, // 0
       {"mumreference", 0, 0, 0}, // 1
       {"b", 0, 0, 0}, // 2
@@ -209,18 +214,18 @@ int main(int argc, char* argv[]) {
       {"kmer", 1, 0, 0}, // 18
       {"save", 1, 0, 0}, // 19
       {"load", 1, 0, 0}, // 20
-      {0, 0, 0, 0} 
+      {0, 0, 0, 0}
     };
     int longindex = -1;
     int c = getopt_long_only(argc, argv, "", long_options, &longindex);
     if(c == -1) break; // Done parsing flags.
-    else if(c == '?') { // If the user entered junk, let him know. 
+    else if(c == '?') { // If the user entered junk, let him know.
       std::cerr << "Invalid parameters." << std::endl;
       usage(argv[0]);
     }
     else {
       // Branch on long options.
-      switch(longindex) { 
+      switch(longindex) {
       case 0: min_len = atol(optarg); break;
       case 1: type = MAM; break;
       case 2: setBoth = true;	break;
@@ -242,7 +247,7 @@ int main(int argc, char* argv[]) {
       case 18: kmer = atoi(optarg); automaticKmer = false; break;
       case 19: save = optarg; break;
       case 20: load = optarg; break;
-      default: break; 
+      default: break;
       }
     }
   }
@@ -261,8 +266,8 @@ int main(int argc, char* argv[]) {
   }
 
   std::string ref;
-  
-  std::vector<std::string> refdescr; 
+ 
+  std::vector<std::string> refdescr;
   std::vector<long> startpos;
 
   load_fasta(ref_fasta, ref, refdescr, startpos);
@@ -311,7 +316,7 @@ int main(int argc, char* argv[]) {
       rev_comp = true;
   if(setRevComp)
       forward = false;
-  
+ 
   sa = new mummer::mummer::sparseSA(ref, refdescr, startpos, _4column, K, suflink, child, kmer>0, sparseMult, kmer, printSubstring, printRevCompForw, nucleotides_only);
   if(!load.empty()){
       std::cerr << "attempting to load index " << load << std::endl;
@@ -339,7 +344,7 @@ int main(int argc, char* argv[]) {
                 std::cerr << " or " << ((int) (min_len-12)/sa->K) << " would be more appropriate" << std::endl;
             }
          }
-         sa->sparseMult = sparseMult;
+          sa->sparseMult = sparseMult;
          //update other fields
          suflink = sa->hasSufLink;
          child = sa->hasChild;
@@ -368,22 +373,22 @@ int main(int argc, char* argv[]) {
   pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
   for(int idx = 0; idx < numQueryFiles; idx++){
     std::vector<query_arg> args(query_threads);
-    std::vector<pthread_t> thread_ids(query_threads);  
+    std::vector<pthread_t> thread_ids(query_threads); 
 
     // Initialize additional thread data.
-    for(int i = 0; i < query_threads; i++) { 
+    for(int i = 0; i < query_threads; i++) {
         args[i].skip = query_threads;
         args[i].skip0 = i;
         args[i].queryFile = idx;
     }
 
     // Create joinable threads to find MEMs.
-    for(int i = 0; i < query_threads; i++) 
+    for(int i = 0; i < query_threads; i++)
         pthread_create(&thread_ids[i], &attr, query_thread, (void *)&args[i]);
 
     // Wait for all threads to terminate.
-    for(int i = 0; i < query_threads; i++) 
-        pthread_join(thread_ids[i], NULL);    
+    for(int i = 0; i < query_threads; i++)
+        pthread_join(thread_ids[i], NULL);   
   }
   clock_t end = clock();
   getrusage(RUSAGE_SELF, &m_ruse2);

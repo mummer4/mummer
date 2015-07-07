@@ -53,11 +53,11 @@ struct vec_uchar {
   std::vector<item_t> M;
   void resize(size_t N) { vec.resize(N); }
   // Vector X[i] notation to get LCP values.
-  int operator[] (size_t idx) {
-    if(vec[idx] == std::numeric_limits<unsigned char>::max()) 
+  int operator[] (size_t idx) const {
+    if(vec[idx] == std::numeric_limits<unsigned char>::max())
       return lower_bound(M.begin(), M.end(), item_t(idx,0))->val;
-    else 
-      return vec[idx]; 
+    else
+      return vec[idx];
   }
   // Actually set LCP values, distingushes large and small LCP
   // values.
@@ -71,8 +71,8 @@ struct vec_uchar {
   // Once all the values are set, call init. This will assure the
   // values >= 255 are sorted by index for fast retrieval.
   void init() { sort(M.begin(), M.end()); std::cerr << "M.size()=" << M.size() << std::endl; std::vector<item_t>(M).swap(M);}
-  
-  long index_size_in_bytes(){
+
+  long index_size_in_bytes() const {
       long indexSize = 0L;
       indexSize += sizeof(vec) + vec.capacity()*sizeof(unsigned char);
       indexSize += sizeof(M) + M.capacity()*(sizeof(size_t)+sizeof(int));
@@ -80,7 +80,7 @@ struct vec_uchar {
   }
 };
 
-// Match find by findMEM. 
+// Match find by findMEM.
 struct match_t {
   match_t() { ref = 0; query = 0, len = 0; }
   match_t(long r, long q, long l) { ref = r; query = q; len = l; }
@@ -96,7 +96,7 @@ struct saTuple_t {
     unsigned int right;
 };
 
-// depth : [start...end] 
+// depth : [start...end]
 struct interval_t {
   interval_t() { start = 1; end = 0; depth = -1; }
   interval_t(long s, long e, long d) { start = s; end = e; depth = d; }
@@ -106,37 +106,35 @@ struct interval_t {
 };
 
 struct sparseSA {
-  std::vector<std::string> &descr; // Descriptions of concatenated sequences.
-  std::vector<long> &startpos; // Lengths of concatenated sequences.
-  long maxdescrlen; // Maximum length of the sequence description, used for formatting.
-  bool _4column; // Use 4 column output format.
+  const std::vector<std::string>& descr; // Descriptions of concatenated sequences.
+  const std::vector<long>&        startpos; // Lengths of concatenated sequences.
+  const long                      maxdescrlen; // Maximum length of the sequence description, used for formatting.
+  const bool                      _4column; // Use 4 column output format.
 
-  long N; //!< Length of the sequence.
-  long logN; // ceil(log(N)) 
-  long NKm1; // N/K - 1
-  std::string &S; //!< Reference to sequence data.
-  std::vector<unsigned int> SA;  // Suffix array.
-  std::vector<int> ISA;  // Inverse suffix array.
-  vec_uchar LCP; // Simulates a vector<int> LCP.
-  std::vector<int> CHILD; //child table
-  std::vector<saTuple_t> KMR;
+  const long K;                 // suffix sampling, K = 1 every suffix, K = 2 every other suffix, K = 3, every 3rd sffix
+  const std::string               S;  //!< Reference to sequence data.
+  const long N;                       //!< Length of the sequence.
+  const long                      logN; // ceil(log(N))
+  const long                      NKm1; // N/K - 1
+  std::vector<unsigned int> SA; // Suffix array.
+  std::vector<int>          ISA; // Inverse suffix array.
+  vec_uchar                 LCP; // Simulates a vector<int> LCP.
+  std::vector<int>          CHILD; //child table
+  std::vector<saTuple_t>    KMR;
 
-  long K; // suffix sampling, K = 1 every suffix, K = 2 every other suffix, K = 3, every 3rd sffix
-  bool hasChild;
-  bool hasSufLink;
+  const bool hasChild;
+  const bool hasSufLink;
   //fields for lookup table of sa intervals to a certain small depth
-  bool hasKmer;
-  long kMerSize;
-  long kMerTableSize;
-  int sparseMult;
-  bool printSubstring;
-  bool printRevCompForw;
-  bool forward;
-  bool nucleotidesOnly;
-  
+  const bool hasKmer;
+  const long kMerSize;
+  long       kMerTableSize;
+  int        sparseMult;
+  const bool printSubstring;
+  const bool printRevCompForw;
+  const bool nucleotidesOnly;
+
   long index_size_in_bytes(){
       long indexSize = 0L;
-      indexSize += sizeof(forward);
       indexSize += sizeof(printRevCompForw);
       indexSize += sizeof(printSubstring);
       indexSize += sizeof(sparseMult);
@@ -167,18 +165,19 @@ struct sparseSA {
   }
 
   // Maps a hit in the concatenated sequence set to a position in that sequence.
-  void from_set(long hit, long &seq, long &seqpos) {
+  void from_set(long hit, long &seq, long &seqpos) const {
     // Use binary search to locate index of sequence and position
     // within sequence.
-    std::vector<long>::iterator it = upper_bound(startpos.begin(), startpos.end(), hit);   // SG: should use vector<long>::const_iterator
+    std::vector<long>::const_iterator it = upper_bound(startpos.begin(), startpos.end(), hit);   // SG: should use vector<long>::const_iterator
     seq = distance(startpos.begin(), it) - 1;
     it--;
     seqpos = hit - *it;
-  } 
+  }
 
-  // Constructor builds sparse suffix array. 
-  sparseSA(std::string &S_, std::vector<std::string> &descr_, std::vector<long> &startpos_, bool __4column, 
-  long K_, bool suflink_, bool child_, bool kmer_, int sparseMult_, int kMerSize_, bool printSubstring_, bool printRevCompForw_, bool nucleotidesOnly_);
+  // Constructor builds sparse suffix array.
+  sparseSA(const std::string& S_, const std::vector<std::string>& descr_, const std::vector<long>& startpos_, bool __4column,
+           long K_, bool suflink_, bool child_, bool kmer_, int sparseMult_, int kMerSize_, bool printSubstring_,
+           bool printRevCompForw_, bool nucleotidesOnly_);
 
   // Modified Kasai et all for LCP computation.
   void computeLCP();
@@ -191,45 +190,45 @@ struct sparseSA {
   void radixStep(int *t_new, int *SA, long &bucketNr, long *BucketBegin, long l, long r, long h);
 
   // Prints match to cout.
-  void print_match(match_t m);
-  void print_match(match_t m, std::vector<match_t> &buf); // buffered version
-  void print_match(std::string meta, std::vector<match_t> &buf, bool rc); // buffered version
+  void print_match(match_t m) const;
+  void print_match(match_t m, std::vector<match_t> &buf) const; // buffered version
+  void print_match(std::string meta, std::vector<match_t> &buf, bool rc) const; // buffered version
 
   // Binary search for left boundry of interval.
-  inline long bsearch_left(char c, long i, long s, long e);
+  inline long bsearch_left(char c, long i, long s, long e) const;
   // Binary search for right boundry of interval.
-  inline long bsearch_right(char c, long i, long s, long e);
+  inline long bsearch_right(char c, long i, long s, long e) const;
 
   // Simple suffix array search.
   inline bool search(std::string &P, long &start, long &end);
 
   // Simple top down traversal of a suffix array.
-  inline bool top_down(char c, long i, long &start, long &end);
-  inline bool top_down_faster(char c, long i, long &start, long &end);
-  inline bool top_down_child(char c, interval_t &cur);
+  inline bool top_down(char c, long i, long &start, long &end) const;
+  inline bool top_down_faster(char c, long i, long &start, long &end) const;
+  inline bool top_down_child(char c, interval_t &cur) const;
 
   // Traverse pattern P starting from a given prefix and interval
   // until mismatch or min_len characters reached.
-  inline void traverse(std::string &P, long prefix, interval_t &cur, int min_len);
-  inline void traverse_faster(const std::string &P,const long prefix, interval_t &cur, int min_len);
+  inline void traverse(std::string &P, long prefix, interval_t &cur, int min_len) const;
+  inline void traverse_faster(const std::string &P,const long prefix, interval_t &cur, int min_len) const;
 
   // Simulate a suffix link.
-  inline bool suffixlink(interval_t &m);
+  inline bool suffixlink(interval_t &m) const;
 
   // Expand ISA/LCP interval. Used to simulate suffix links.
-  inline bool expand_link(interval_t &link) {
+  inline bool expand_link(interval_t &link) const {
     long thresh = 2 * link.depth * logN, exp = 0; // Threshold link expansion.
     long start = link.start;
     long end = link.end;
-    while(LCP[start] >= link.depth) { 
-      exp++; 
+    while(LCP[start] >= link.depth) {
+      exp++;
       if(exp >= thresh) return false;
-      start--; 
+      start--;
     }
-    while(end < NKm1 && LCP[end+1] >= link.depth) { 
-      exp++; 
+    while(end < NKm1 && LCP[end+1] >= link.depth) {
+      exp++;
       if(exp >= thresh) return false;
-      end++; 
+      end++;
     }
     link.start = start; link.end = end;
     return true;
@@ -237,42 +236,45 @@ struct sparseSA {
 
   // Given a position i in S, finds a left maximal match of minimum
   // length within K steps.
-  inline void find_Lmaximal(std::string &P, long prefix, long i, long len, std::vector<match_t> &matches, int min_len, bool print);
+  inline void find_Lmaximal(std::string &P, long prefix, long i, long len, std::vector<match_t> &matches, int min_len, bool _forward, bool print) const;
 
   // Given an interval where the given prefix is matched up to a
   // mismatch, find all MEMs up to a minimum match depth.
-  void collectMEMs(std::string &P, long prefix, interval_t mli, interval_t xmi, std::vector<match_t> &matches, int min_len, bool print);
+  void collectMEMs(std::string &P, long prefix, interval_t mli, interval_t xmi, std::vector<match_t> &matches, int min_len, bool forward_, bool print) const;
 
   // Find all MEMs given a prefix pattern offset k.
-  void findMEM(long k, std::string &P, std::vector<match_t> &matches, int min_len, bool print);
+  void findMEM(long k, std::string &P, std::vector<match_t> &matches, int min_len, bool forward_, bool print) const;
 
   // NOTE: min_len must be > 1
-  void findMAM(std::string &P, std::vector<match_t> &matches, int min_len, long& memCount, bool print);
-  inline bool is_leftmaximal(std::string &P, long p1, long p2);
+  void findMAM(std::string &P, std::vector<match_t> &matches, int min_len, long& memCount, bool forward_, bool print) const;
+  // Returns true if the position p1 in the query pattern and p2 in
+  // the reference is left maximal.
+  inline bool is_leftmaximal(std::string &P, long p1, long p2) const {
+    return p1 == 0 || p2 == 0 || P[p1 - 1] != S[p2 - 1];
+  }
 
   // Maximal Almost-Unique Match (MAM). Match is unique in the indexed
   // sequence S. as computed by MUMmer version 2 by Salzberg
   // et. al. Note this is a "one-sided" query. It "streams" the query
   // P throught he index.  Consequently, repeats can occur in the
   // pattern P.
-  void MAM(std::string &P, std::vector<match_t> &matches, int min_len, long& memCount, bool forward_, bool print) { 
-    forward = forward_;
+  void MAM(std::string &P, std::vector<match_t> &matches, int min_len, long& memCount, bool forward_, bool print) const {
     if(K != 1) return;  // Only valid for full suffix array.
-    findMAM(P, matches, min_len, memCount, print);  
+    findMAM(P, matches, min_len, memCount, forward_, print);
   }
 
-  // Find Maximal Exact Matches (MEMs) 
-  void MEM(std::string &P, std::vector<match_t> &matches, int min_len, bool print, long& memCount, bool forward_, int num_threads = 1);
+  // Find Maximal Exact Matches (MEMs)
+  void MEM(std::string &P, std::vector<match_t> &matches, int min_len, bool print, long& memCount, bool forward_, int num_threads = 1)const ;
 
-  // Maximal Unique Match (MUM) 
-  void MUM(std::string &P, std::vector<match_t> &unique, int min_len, long& memCount, bool forward_, bool print);  
-  
+  // Maximal Unique Match (MUM)
+  void MUM(std::string &P, std::vector<match_t> &unique, int min_len, long& memCount, bool forward_, bool print) const;
+
   //save index to files
   void save(const std::string &prefix);
-  
+
   //load index from file
   bool load(const std::string &prefix);
-  
+
   //construct
   void construct();
 };
