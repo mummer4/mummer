@@ -102,9 +102,9 @@ void load_fasta(std::string filename, std::string &S, std::vector<std::string> &
     descr.push_back(meta);
   }  
   std::cerr << "# S.length=" << S.length() << std::endl;
-  for(long i = 0; i < (long)descr.size(); i++) {
-    std::cerr << "# " << descr[i] << " " << startpos[i] << std::endl;
-  }
+  // for(long i = 0; i < (long)descr.size(); i++) {
+  //   std::cerr << "# " << descr[i] << " " << startpos[i] << std::endl;
+  // }
 }
 
 

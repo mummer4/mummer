@@ -872,25 +872,23 @@ void sparseSA::find_Lmaximal(std::string &P, long prefix, long i, long len, std:
 void sparseSA::print_match(match_t m) {
   memCount++;
   if(_4column == false) {
-    std::cout << std::setw(8) << m.ref + 1 << "  "
-              << std::setw(8) << m.query + 1 << "  "
-              << std::setw(8) << m.len;
+    std::cout << std::setw(8) << (m.ref + 1) << "  "
+              << std::setw(8) << (m.query + 1) << "  "
+              << std::setw(8) << m.len << '\n';
   }
   else {
     long refseq=0, refpos=0;
     from_set(m.ref, refseq, refpos); // from_set is slow!!!
     // printf works faster than count... why? I don't know!!
     // Because one must disable C++ IO and stdio synchronization
-    std::cout << "  " << descr[refseq];
-    for(long j = 0; j < maxdescrlen - (long)descr[refseq].length() + 1; j++) putchar(' ');
-    std::cout << ' '
-              << std::setw(8) << refpos + 1 << "  "
-              << std::setw(8) << m.query + 1 << "  "
-              << std::setw(8) << m.len;
+    std::cout << "  " << std::left << std::setw(maxdescrlen + 1) << descr[refseq] << std::right << ' '
+              << std::setw(8) << (refpos + 1) << "  "
+              << std::setw(8) << (m.query + 1) << "  "
+              << std::setw(8) << m.len << '\n';
   }
   if(printSubstring){
     if(m.len > 53) std::cout << S.substr(m.ref, 53) << " . . .\n";
-    else std::cout << S.substr(m.ref, m.len) << '\n';
+    else std::cout << m.ref << '\n';
   }
 }
 

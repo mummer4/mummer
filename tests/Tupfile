@@ -1,5 +1,8 @@
 include_rules
 
+: | $(BIN_DIR)/<exec> |> $(BIN_DIR)/mummer -maxmatch -b pb20x-1000.fa superReadSequences.named-1000.fasta 2> %O.err.log | ufasta dsort /dev/stdin | ./test_md5 ae901384fc7b4b12d0a854027932001d > %o |> test_mummer.log | test_mummer.err.log
+: | $(BIN_DIR)/<exec> |> $(BIN_DIR)/essamummer -maxmatch -b pb20x-1000.fa superReadSequences.named-1000.fasta 2> %O.err.log | ufasta dsort /dev/stdin | ./test_md5 ae901384fc7b4b12d0a854027932001d > %o |> test_essamummer.log | test_essamummer.err.log
+
 : | $(BIN_DIR)/<exec> |> $(BIN_DIR)/mgaps -l 65 -s 90 -d 5 -f .12 < test.mums 2> %O.err.log | ./test_md5 c02b766e03d543b2a303cd1619f225d8 > %o |> test_mgaps.log | test_mgaps.err.log
 
 : | $(BIN_DIR)/<exec> |> ufasta head -n 10 test.mgaps | $(BIN_DIR)/postnuc -b 200 -B 5 pb20x.fa superReadSequences.named.fasta test |> test.delta

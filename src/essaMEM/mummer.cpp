@@ -74,7 +74,7 @@ void *query_thread(void *arg_) {
 	if( line[i] == ' ') break; // Behave like MUMmer 3 cut off meta after first space.
 	meta += line[i];
       }
-      std::cerr << "# " << meta << std::endl;
+      //      std::cerr << "# " << meta << std::endl;
       break;
     }
   }
@@ -87,9 +87,9 @@ void *query_thread(void *arg_) {
     // Collect meta data.
     if(line[0] == '>') {
       if(meta != "") {
-	if(seq_cnt % arg->skip == arg->skip0) {
-	  // Process P.
-	  std::cerr << "# P.length()=" << P->length() << std::endl;
+        if(seq_cnt % arg->skip == arg->skip0) {
+          // Process P.
+          //   std::cerr << "# P.length()=" << P->length() << std::endl;
       if(forward){
         if(print){ 
           if(print_length) std::cout << "> " << meta << "\tLen = " << P->length() << '\n';
@@ -121,7 +121,7 @@ void *query_thread(void *arg_) {
 	if(line[i] == ' ') break; // Behave like MUMmer 3 cut of meta after first space.
 	meta += line[i];
       }
-      std::cerr << "# " << meta << std::endl;
+      //      std::cerr << "# " << meta << std::endl;
     }
     else { // Collect sequence data.
       trim(line, start,end);
@@ -141,7 +141,7 @@ void *query_thread(void *arg_) {
   // Handle very last sequence.
   if(meta != "") {
     if(seq_cnt % arg->skip == arg->skip0) {
-      std::cerr << "# P.length()=" << P->length() << std::endl;
+      //      std::cerr << "# P.length()=" << P->length() << std::endl;
       if(forward){
         if(print){ 
           if(print_length) std::cout << "> " << meta << "\tLen = " << P->length() << '\n';
@@ -173,15 +173,15 @@ void *query_thread(void *arg_) {
 }
 
 // Added by Simon Gog for testing
-void write_lock(int i){
-  std::ofstream lockfile("lock.txt", std::ios_base::trunc);
-	lockfile<<i<<std::endl;
-	lockfile.close();
-}
+// void write_lock(int i){
+//   std::ofstream lockfile("lock.txt", std::ios_base::trunc);
+// 	lockfile<<i<<std::endl;
+// 	lockfile.close();
+// }
 
 int main(int argc, char* argv[]) {
   std::ios::sync_with_stdio(false);
-  write_lock(0);
+
   // Collect parameters from the command line.
   std::string save = "";
   std::string load = "";
@@ -360,7 +360,7 @@ int main(int argc, char* argv[]) {
       std::cerr << "saved index to " << save << std::endl;
   }
   std::cerr << "INDEX SIZE IN BYTES: " << sa->index_size_in_bytes() << std::endl;
-  write_lock(1);
+
   clock_t start = clock();
   rusage m_ruse1, m_ruse2;
   getrusage(RUSAGE_SELF, &m_ruse1);
@@ -399,7 +399,7 @@ int main(int argc, char* argv[]) {
   t2 = m_ruse2.ru_stime;
   double sys_time = ((double)(t2.tv_sec*1000000 + t2.tv_usec - (t1.tv_sec*1000000 + t1.tv_usec )))/1000.0;
   std::cerr << "time for mapping (sys time): " << sys_time << std::endl;
-  write_lock(0);
+
   delete sa;
 }
 

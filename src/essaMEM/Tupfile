@@ -5,4 +5,4 @@ LDLIBS = -lpthread
 : foreach *.cpp |> !cxx |> {essamummer}
 : foreach *.c |> !cc |> {essamummer}
 
-: {essamummer} |> !lxxd |> essamummer
+: {essamummer} |> !lxxd |> $(BIN_DIR)/essamummer $(BIN_DIR)/<exec>
