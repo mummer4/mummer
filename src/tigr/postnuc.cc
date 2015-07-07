@@ -39,6 +39,11 @@ bool Read_Sequence(std::istream& is, std::string& T, std::string& name) {
   return true;
 }
 
+bool Read_Sequence(std::istream& is, FastaRecord& record) {
+  if(!Read_Sequence(is, record.m_seq, record.m_Id)) return false;
+  record.m_len = record.m_seq.size() - 1;
+  return true;
+}
 
 void addNewAlignment
 (std::vector<Alignment> & Alignments, std::vector<Cluster>::iterator Cp,
@@ -285,7 +290,7 @@ void merge_syntenys::extendClusters(std::vector<Cluster> & Clusters,
 
 
   //-- Extend each cluster
-  A = Af->seq.c_str();
+  A = Af->seq();
   PrevCp = Clusters.begin( );
   CurrCp = Clusters.begin( );
   while ( CurrCp < Clusters.end( ) ) {
@@ -301,14 +306,14 @@ void merge_syntenys::extendClusters(std::vector<Cluster> & Clusters,
 
       //-- Pick the right directional sequence for B
       if ( CurrCp->dirB == FORWARD_CHAR )
-        B = Bf->seq.c_str();
+        B = Bf->seq();
       else if ( Brev != NULL )
         B = Brev;
       else {
-        Brev = (char *) Safe_malloc ( sizeof(char) * (Bf->len + 2) );
-        strcpy ( Brev + 1, Bf->seq.c_str() + 1 );
+        Brev = (char *) Safe_malloc ( sizeof(char) * (Bf->len() + 2) );
+        strcpy ( Brev + 1, Bf->seq() + 1 );
         Brev[0] = '\0';
-        Reverse_Complement (Brev, 1, Bf->len);
+        Reverse_Complement (Brev, 1, Bf->len());
         B = Brev;
       }
 
@@ -352,8 +357,8 @@ void merge_syntenys::extendClusters(std::vector<Cluster> & Clusters,
             //-- Extend the current alignment object forward
             target_reached = extendForward (CurrAp, A, targetA, B, targetB, m_o);
           } else if ( DO_EXTEND ) {
-            targetA = Af->len;
-            targetB = Bf->len;
+            targetA = Af->len();
+            targetB = Bf->len();
 
             //-- Target the closest/best match in a future cluster
             TargetCp = getForwardTargetCluster (Clusters, CurrCp, targetA, targetB);
@@ -407,7 +412,7 @@ void flushAlignments
   std::vector<Alignment>::iterator Ap;       // alignment pointer
   std::vector<long int>::iterator Dp;             // delta pointer
 
-  DeltaFile << '>' << Af->Id << ' ' << Bf->Id << ' ' << Af->len << ' ' << Bf->len << '\n';
+  DeltaFile << '>' << Af->Id() << ' ' << Bf->Id() << ' ' << Af->len() << ' ' << Bf->len() << '\n';
 
   //-- Generate the error counts
   parseDelta (Alignments, Af, Bf);
@@ -420,7 +425,7 @@ void flushAlignments
                 << '\n';
     else
       DeltaFile << Ap->sA << ' ' << Ap->eA << ' '
-                << revC(Ap->sB, Bf->len) << ' ' << revC(Ap->eB, Bf->len) << ' '
+                << revC(Ap->sB, Bf->len()) << ' ' << revC(Ap->eB, Bf->len()) << ' '
                 << Ap->Errors << ' ' << Ap->SimErrors << ' ' << Ap->NonAlphas
                 << '\n';
 
@@ -455,8 +460,8 @@ void flushSyntenys
 
   if ( ClusterFile ) {
     for ( Sp = Syntenys.begin( ); Sp < Syntenys.end( ); Sp ++ ) {
-      ClusterFile << '>' << Sp->AfP->Id << ' ' << Sp->Bf.Id << ' '
-                  << Sp->AfP->len << ' ' << Sp->Bf.len << '\n';
+      ClusterFile << '>' << Sp->AfP->Id() << ' ' << Sp->Bf.Id() << ' '
+                  << Sp->AfP->len() << ' ' << Sp->Bf.len() << '\n';
       for ( Cp = Sp->clusters.begin( ); Cp < Sp->clusters.end( ); Cp ++ ) {
         ClusterFile << setw(2) << FORWARD_CHAR << ' ' << setw(2) << Cp->dirB << '\n';
         for ( Mp = Cp->matches.begin( ); Mp < Cp->matches.end( ); Mp ++ ) {
@@ -464,7 +469,7 @@ void flushSyntenys
             ClusterFile << setw(8) << Mp->sA << ' ' << setw(8) << Mp->sB << ' '
                         << setw(6) << Mp->len;
           else
-            ClusterFile << setw(8) << Mp->sA << ' ' << setw(8) << revC(Mp->sB, Sp->Bf.len) << ' '
+            ClusterFile << setw(8) << Mp->sA << ' ' << setw(8) << revC(Mp->sB, Sp->Bf.len()) << ' '
                         << setw(6) << Mp->len;
           if ( Mp != Cp->matches.begin( ) )
             ClusterFile << setw(6) << (Mp->sA - (Mp - 1)->sA - (Mp - 1)->len) << ' '
@@ -729,15 +734,15 @@ void parseDelta
   std::vector<long int>::iterator Dp;
 
   for ( Ap = Alignments.begin( ); Ap != Alignments.end( ); ++Ap) {
-      A = Af->seq.c_str();
-      B = Bf->seq.c_str();
+      A = Af->seq();
+      B = Bf->seq();
 
       if ( Ap->dirB == REVERSE_CHAR ) {
         if ( Brev == NULL ) {
-          Brev = (char *) Safe_malloc ( sizeof(char) * (Bf->len + 2) );
-          strcpy ( Brev + 1, Bf->seq.c_str() + 1 );
+          Brev = (char *) Safe_malloc ( sizeof(char) * (Bf->len() + 2) );
+          strcpy ( Brev + 1, Bf->seq() + 1 );
           Brev[0] = '\0';
-          Reverse_Complement (Brev, 1, Bf->len);
+          Reverse_Complement (Brev, 1, Bf->len());
         }
         B = Brev;
       }
@@ -853,21 +858,19 @@ void merge_syntenys::processSyntenys(std::vector<Synteny> & Syntenys, FastaRecor
       //      will fail. (All like tags must be adjacent and in the same order
       //      as the query file)
       if(CurrSp == Syntenys.begin( )  ||
-         CurrSp->Bf.Id != (CurrSp-1)->Bf.Id) {
+         CurrSp->Bf.Id() != (CurrSp-1)->Bf.Id()) {
           //-- Read in the B sequence
-        while(Read_Sequence(QryFile, Bf.seq, Bf.Id))
-          if(CurrSp->Bf.Id == Bf.Id)
+        while(Read_Sequence(QryFile, Bf))
+          if(CurrSp->Bf.Id() == Bf.Id())
               break;
-        // if ( strcmp (CurrSp->Bf.Id, Bf.Id) != 0 )
-        if(CurrSp->Bf.Id != Bf.Id)
-          parseAbort ( "Query File " + CurrSp->Bf.Id + " != " + Bf.Id);
-        Bf.len = Bf.seq.size() - 1;
-        assert(Bf.seq.size() > 0);
+        if(CurrSp->Bf.Id() != Bf.Id())
+          parseAbort ( "Query File " + CurrSp->Bf.Id() + " != " + Bf.Id());
       }
 
       //-- Extend clusters and create the alignment information
-      CurrSp->Bf.len = Bf.len;
-      assert(CurrSp->Bf.len >= 0);
+      /// XXX: not setting CurrSp->Bf.len may not be correct XXX
+      CurrSp->Bf.len_w() = Bf.len();
+      assert(CurrSp->Bf.len() >= 0);
       extendClusters (CurrSp->clusters, CurrSp->AfP, &Bf, DeltaFile);
   }
 
@@ -908,21 +911,21 @@ void validateData
   std::vector<Cluster>::iterator   Cp;
   std::vector<Match>::iterator     Mp;
   std::vector<Alignment>::iterator Ap;
-  const char *                     A    = Af->seq.c_str(), * B;
+  const char *                     A    = Af->seq(), * B;
 
   for ( Cp = Clusters.begin( ); Cp < Clusters.end( ); Cp ++ ) {
     always_assert ( Cp->wasFused );
 
     //-- Pick the right directional sequence for B
     if ( Cp->dirB == FORWARD_CHAR ) {
-      B = Bf->seq.c_str();
+      B = Bf->seq();
     } else if ( Brev != NULL ) {
       B = Brev;
     } else {
-      Brev = (char *) Safe_malloc ( sizeof(char) * (Bf->len + 2) );
-      strcpy ( Brev + 1, Bf->seq.c_str() + 1 );
+      Brev = (char *) Safe_malloc ( sizeof(char) * (Bf->len() + 2) );
+      strcpy ( Brev + 1, Bf->seq() + 1 );
       Brev[0] = '\0';
-      Reverse_Complement (Brev, 1, Bf->len);
+      Reverse_Complement (Brev, 1, Bf->len());
       B = Brev;
     }
 
@@ -950,14 +953,14 @@ void validateData
       always_assert (Brev != NULL);
       B = Brev;
     } else
-      B = Bf->seq.c_str();
+      B = Bf->seq();
     always_assert ( Ap->sA <= Ap->eA );
     always_assert ( Ap->sB <= Ap->eB );
 
-    always_assert ( Ap->sA >= 1 && Ap->sA <= Af->len );
-    always_assert ( Ap->eA >= 1 && Ap->eA <= Af->len );
-    always_assert ( Ap->sB >= 1 && Ap->sB <= Bf->len );
-    always_assert ( Ap->eB >= 1 && Ap->eB <= Bf->len );
+    always_assert ( Ap->sA >= 1 && Ap->sA <= Af->len() );
+    always_assert ( Ap->eA >= 1 && Ap->eA <= Af->len() );
+    always_assert ( Ap->sB >= 1 && Ap->sB <= Bf->len() );
+    always_assert ( Ap->eB >= 1 && Ap->eB <= Bf->len() );
 
     char Xc = toupper(isalpha(A[Ap->sA]) ? A[Ap->sA] : STOP_CHAR);
     char Yc = toupper(isalpha(B[Ap->sB]) ? B[Ap->sB] : STOP_CHAR);

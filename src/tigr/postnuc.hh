@@ -20,12 +20,23 @@ enum LineType
   };
 
 
-struct FastaRecord
+class FastaRecord
 //-- The essential data of a sequence
 {
-  std::string Id;               // the fasta ID header tag
-  long int    len;              // the length of the sequence
-  std::string seq;              // the sequence data
+  std::string m_Id;               // the fasta ID header tag
+  long int    m_len;              // the length of the sequence
+  std::string m_seq;              // the sequence data
+
+public:
+  FastaRecord() = default;
+  const std::string& Id() const { return m_Id; }
+  long int len() const { return m_len; }
+  const char* seq() const { return m_seq.c_str(); }
+
+  long int& len_w() { return m_len; }
+  std::string& Id_w() { return m_Id; }
+
+  friend bool Read_Sequence(std::istream& is, FastaRecord& record);
 };
 
 
@@ -122,6 +133,7 @@ inline void ignore_line(std::istream& is) {
 
 //------------------------------------------------- Function Declarations ----//
 bool Read_Sequence(std::istream& is, std::string& T, std::string& name);
+bool Read_Sequence(std::istream& is, FastaRecord& record);
 
 void addNewAlignment
 (std::vector<Alignment> & Alignments, std::vector<Cluster>::iterator Cp,

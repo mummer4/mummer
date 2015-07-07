@@ -195,37 +195,19 @@ int main(int argc, char *argv[]) {
 
   //-- Generate the array of the reference sequences
   //  InitSize = INIT_SIZE;
-  //  Af = (FastaRecord *) Safe_malloc ( sizeof(FastaRecord) * Ac );
-  //  Af[As].seq = (char *) Safe_malloc ( sizeof(char) * InitSize );
-  string seq;
-  while(Read_Sequence(RefFile, seq, IdA)) {
+  Af.push_back(FastaRecord());
+  while(Read_Sequence(RefFile, Af.back()))
     Af.push_back(FastaRecord());
-    FastaRecord& record = Af.back();
-    swap(record.Id, IdA);
-      // Af[As].Id = (char *) Safe_malloc (sizeof(char) * (strlen(IdA) + 1));
-      // strcpy (Af[As].Id, IdA);
-
-    record.len = seq.size() - 1;
-    assert(record.len >= 0);
-      // Af[As].len = strlen (Af[As].seq + 1);
-    swap(record.seq, seq);
-    assert(record.seq.size() == (size_t)record.len + 1);
-  }
+  Af.resize(Af.size() - 1);
   RefFile.close();
 
   if(Af.empty())
     parseAbort(RefFileName.c_str());
-  //  As = Af.size();
-
-
 
   //-- Process the input from <stdin> line by line
   PrevLine = NO_LINE;
   for(int c = std::cin.peek(); c != EOF; c = std::cin.peek()) {
     if (c == '>' ) { //-- If the current line is a fasta HEADER_LINE
-      // CurrIdB = Line.substr(1, Line.find_first_of(" \t\n") - 1);
-      // if(CurrIdB.empty())
-      //   //        parseAbort ("stdin");
       std::cin.get();
       std::cin >> CurrIdB;
       if(CurrIdB.empty())
@@ -238,16 +220,13 @@ int main(int argc, char *argv[]) {
       PrevLine = HEADER_LINE;
     } else { //-- If the current line is a MATCH_LINE
       std::cin >> sA >> sB >> len;
-      if(!std::cin.good()) {
-        asm("int3");
-        //      if ( sscanf (Line.c_str(), "%ld %ld %ld", &sA, &sB, &len) != 3 )
+      if(!std::cin.good())
         parseAbort ("stdin" + to_string(cin.tellg()));
-      }
       ignore_line(cin); // Ignore rest of line
 
       //-- Re-map the reference coordinate back to its original sequence
-      for ( Seqi = 0; sA > Af[Seqi].len && (size_t)Seqi < Af.size(); ++Seqi)
-        sA -= Af[Seqi].len + 1; // extra +1 for the x at the end of each seq
+      for ( Seqi = 0; sA > Af[Seqi].len() && (size_t)Seqi < Af.size(); ++Seqi)
+        sA -= Af[Seqi].len() + 1; // extra +1 for the x at the end of each seq
       if ((size_t)Seqi >= Af.size()) {
         cerr << "ERROR: A MUM was found with a start coordinate greater than\n"
              << "       the sequence length, a serious error has occured.\n"
@@ -256,9 +235,9 @@ int main(int argc, char *argv[]) {
       }
 
       //-- If the match spans across a sequence boundry
-      if ( sA + len - 1 > Af[Seqi].len || sA <= 0) {
+      if ( sA + len - 1 > Af[Seqi].len() || sA <= 0) {
         cerr << "WARNING: A MUM was found extending beyond the boundry of:\n"
-             << "         Reference sequence '>" << Af[Seqi].Id << "'\n\n"
+             << "         Reference sequence '>" << Af[Seqi].Id() << "'\n\n"
              << "Please check that the '-n' option is activated on 'mummer2'\n"
              << "and try again, or file a bug report\n"
              << "Attempting to continue.\n";
@@ -266,19 +245,19 @@ int main(int argc, char *argv[]) {
       }
 
       //-- Check and update the current synteny region
-      if (IdA != Af[Seqi].Id || IdB != CurrIdB) {
+      if (IdA != Af[Seqi].Id() || IdB != CurrIdB) {
         Found = false;
         if (IdB == CurrIdB) { //-- Has this header been seen before?
           for ( Sp = Syntenys.rbegin( ); Sp < Syntenys.rend( ); Sp ++ ) {
-            if (Sp->AfP->Id == Af[Seqi].Id) {
-              if ( Sp->AfP->len != Af[Seqi].len ) {
+            if (Sp->AfP->Id() == Af[Seqi].Id()) {
+              if ( Sp->AfP->len() != Af[Seqi].len() ) {
                 cerr << "ERROR: The reference file may contain"
                      << " sequences with non-unique\n"
                      << "       header Ids, please check your input"
                      << " files and try again\n";
                 exit (EXIT_FAILURE);
               }
-              assert (Sp->Bf.Id == IdB);
+              assert (Sp->Bf.Id() == IdB);
               CurrSp = Sp;
               Found = true;
               break;
@@ -288,13 +267,13 @@ int main(int argc, char *argv[]) {
           merger.processSyntenys (Syntenys, Af.data(), QryFile, ClusterFile, DeltaFile);
         }
 
-        IdA = Af[Seqi].Id;
+        IdA = Af[Seqi].Id();
         IdB = CurrIdB;
 
         if ( ! Found ) { //-- If not seen yet, create a new synteny region
           Asyn.AfP    = &Af[Seqi];
-          Asyn.Bf.len = -1;
-          Asyn.Bf.Id  = IdB;
+          Asyn.Bf.len_w() = -1;
+          Asyn.Bf.Id_w()  = IdB;
 
           Syntenys.push_back (Asyn);
           CurrSp = Syntenys.rbegin( );
