@@ -83,7 +83,7 @@ void *query_thread(void *arg_) {
       break;
     }
   }
-  std::string *P = new std::string;
+  std::string P;
   while(!data.eof()) {
     getline(data, line); // Load one line at a time.
     if(line.length() == 0) continue;
@@ -91,34 +91,34 @@ void *query_thread(void *arg_) {
     // Meta tag line and start of a new sequence.
     // Collect meta data.
     if(line[0] == '>') {
-      if(meta != "") {
+      if(!meta.empty()) {
         if(seq_cnt % arg->skip == arg->skip0) {
           // Process P.
-          //   std::cerr << "# P.length()=" << P->length() << std::endl;
+          //   std::cerr << "# P.length()=" << P.length() << std::endl;
       if(forward){
         if(print){
-          if(print_length) std::cout << "> " << meta << "\tLen = " << P->length() << '\n';
+          if(print_length) std::cout << "> " << meta << "\tLen = " << P.length() << '\n';
           else std::cout << "> " << meta << '\n';
         }
-        if(type == MAM) sa->MAM(*P, matches, min_len, memCounter, true, print);
-        else if(type == MUM) sa->MUM(*P, matches, min_len, memCounter, true, print);
-        else if(type == MEM) sa->MEM(*P, matches, min_len, print, memCounter, true, num_threads);
+        if(type == MAM) sa->MAM(P, matches, min_len, memCounter, true, print);
+        else if(type == MUM) sa->MUM(P, matches, min_len, memCounter, true, print);
+        else if(type == MEM) sa->MEM(P, matches, min_len, print, memCounter, true, num_threads);
         if(!print) sa->print_match(meta, matches, false);
       }
 	  if(rev_comp) {
-	    reverse_complement(*P, nucleotides_only);
+	    reverse_complement(P, nucleotides_only);
 	    if(print){
-              if(print_length) std::cout << "> " << meta << " Reverse\tLen = " << P->length() << '\n';
+              if(print_length) std::cout << "> " << meta << " Reverse\tLen = " << P.length() << '\n';
               else std::cout << "> " << meta << " Reverse\n";
         }
-	    if(type == MAM) sa->MAM(*P, matches, min_len, memCounter, false, print);
-        else if(type == MUM) sa->MUM(*P, matches, min_len, memCounter, false, print);
-        else if(type == MEM) sa->MEM(*P, matches, min_len, print, memCounter, false, num_threads);
+	    if(type == MAM) sa->MAM(P, matches, min_len, memCounter, false, print);
+        else if(type == MUM) sa->MUM(P, matches, min_len, memCounter, false, print);
+        else if(type == MEM) sa->MEM(P, matches, min_len, print, memCounter, false, num_threads);
 	    if(!print) sa->print_match(meta, matches, true);
 	  }
 	}
 	seq_cnt++;
-        delete P; P = new std::string; meta = "";
+        P.clear(); meta.clear();
       }
       start = 1;
       trim(line, start, end);
@@ -139,39 +139,39 @@ void *query_thread(void *arg_) {
 	    			c = '~';
 	  		}
 		}
-		*P += c;
+		P += c;
       }
     }
   }
   // Handle very last sequence.
-  if(meta != "") {
+  if(!meta.empty()) {
     if(seq_cnt % arg->skip == arg->skip0) {
-      //      std::cerr << "# P.length()=" << P->length() << std::endl;
+      //      std::cerr << "# P.length()=" << P.length() << std::endl;
       if(forward){
         if(print){
-          if(print_length) std::cout << "> " << meta << "\tLen = " << P->length() << '\n';
+          if(print_length) std::cout << "> " << meta << "\tLen = " << P.length() << '\n';
           else std::cout << "> " << meta << '\n';
         }
 
-        if(type == MAM) sa->MAM(*P, matches, min_len, memCounter, true, print);
-        else if(type == MUM) sa->MUM(*P, matches, min_len, memCounter, true, print);
-        else if(type == MEM) sa->MEM(*P, matches, min_len, print, memCounter, true, num_threads);
+        if(type == MAM) sa->MAM(P, matches, min_len, memCounter, true, print);
+        else if(type == MUM) sa->MUM(P, matches, min_len, memCounter, true, print);
+        else if(type == MEM) sa->MEM(P, matches, min_len, print, memCounter, true, num_threads);
         if(!print) sa->print_match(meta, matches, false);
       }
       if(rev_comp) {
-        reverse_complement(*P, nucleotides_only);
+        reverse_complement(P, nucleotides_only);
         if(print){
-          if(print_length) std::cout << "> " << meta << " Reverse\tLen = " << P->length() << '\n';
+          if(print_length) std::cout << "> " << meta << " Reverse\tLen = " << P.length() << '\n';
           else std::cout << "> " << meta << " Reverse\n";
         }
-        if(type == MAM) sa->MAM(*P, matches, min_len, memCounter, false, print);
-        else if(type == MUM) sa->MUM(*P, matches, min_len, memCounter, false, print);
-        else if(type == MEM) sa->MEM(*P, matches, min_len, print, memCounter, false, num_threads);
+        if(type == MAM) sa->MAM(P, matches, min_len, memCounter, false, print);
+        else if(type == MUM) sa->MUM(P, matches, min_len, memCounter, false, print);
+        else if(type == MEM) sa->MEM(P, matches, min_len, print, memCounter, false, num_threads);
         if(!print) sa->print_match(meta, matches, true);
       }
     }
   }
-  delete P;
+  //  delete P;
   std::cerr << "number of M(E/A/U)Ms: " << memCounter << std::endl;
   pthread_exit(NULL);
   return 0;
@@ -188,8 +188,8 @@ int main(int argc, char* argv[]) {
   std::ios::sync_with_stdio(false);
 
   // Collect parameters from the command line.
-  std::string save = "";
-  std::string load = "";
+  std::string save;
+  std::string load;
 
   while (1) {
     static struct option long_options[] = {
