@@ -57,105 +57,65 @@ struct query_arg {
 void *query_thread(void *arg_) {
   query_arg *arg = (query_arg *)arg_;
   long memCounter = 0;
-  std::string meta, line;
   std::ifstream data(query_fasta[arg->queryFile].c_str());
 
   std::vector<mummer::mummer::match_t> matches;
 
-  bool print = arg->skip == 1;
+  const bool print = arg->skip == 1;
 
-  long seq_cnt = 0;
 
   if(!data.is_open()) { std::cerr << "unable to open " << query_fasta[arg->queryFile] << std::endl; exit(1); }
 
-  // Collect meta data.
-  while(!data.eof()) {
-    getline(data, line); // Load one line at a time.
-    if(line.length() == 0) continue;
-    if(line[0] == '>') {
-      long start = 1, end = line.length() - 1;
-      trim(line, start, end);
-      for(long i = start; i <= end; i++) {
-	if( line[i] == ' ') break; // Behave like MUMmer 3 cut off meta after first space.
-	meta += line[i];
-      }
-      //      std::cerr << "# " << meta << std::endl;
-      break;
-    }
+  int c = data.peek();
+  if(c != '>') {
+    std::cerr << "error, first character must be a '>', got '" << (char)c << "'" << std::endl;
+    exit(1);
   }
-  std::string P;
-  while(!data.eof()) {
-    getline(data, line); // Load one line at a time.
-    if(line.length() == 0) continue;
-    long start = 0, end = line.length() - 1;
-    // Meta tag line and start of a new sequence.
-    // Collect meta data.
-    if(line[0] == '>') {
-      if(!meta.empty()) {
-        if(seq_cnt % arg->skip == arg->skip0) {
-          // Process P.
-          //   std::cerr << "# P.length()=" << P.length() << std::endl;
-      if(forward){
-        if(print){
-          if(print_length) std::cout << "> " << meta << "\tLen = " << P.length() << '\n';
-          else std::cout << "> " << meta << '\n';
-        }
-        if(type == MAM) sa->MAM(P, matches, min_len, memCounter, true, print);
-        else if(type == MUM) sa->MUM(P, matches, min_len, memCounter, true, print);
-        else if(type == MEM) sa->MEM(P, matches, min_len, print, memCounter, true, num_threads);
-        if(!print) sa->print_match(meta, matches, false);
-      }
-	  if(rev_comp) {
-	    reverse_complement(P, nucleotides_only);
-	    if(print){
-              if(print_length) std::cout << "> " << meta << " Reverse\tLen = " << P.length() << '\n';
-              else std::cout << "> " << meta << " Reverse\n";
-        }
-	    if(type == MAM) sa->MAM(P, matches, min_len, memCounter, false, print);
-        else if(type == MUM) sa->MUM(P, matches, min_len, memCounter, false, print);
-        else if(type == MEM) sa->MEM(P, matches, min_len, print, memCounter, false, num_threads);
-	    if(!print) sa->print_match(meta, matches, true);
-	  }
-	}
-	seq_cnt++;
-        P.clear(); meta.clear();
-      }
-      start = 1;
-      trim(line, start, end);
-      for(long i = start; i <= end; i++) {
-	if(line[i] == ' ') break; // Behave like MUMmer 3 cut of meta after first space.
-	meta += line[i];
-      }
-      //      std::cerr << "# " << meta << std::endl;
+
+  std::string P, meta, line;
+  for(long seq_cnt = 0 ; c != EOF; seq_cnt++) {
+    P.clear(); meta.clear();
+
+    // Load metadata
+    getline(data, line);
+    size_t start = line.find_first_not_of(" ", 1);
+    if(start != std::string::npos) {
+      size_t end = line.find_first_of(" ", start);
+      meta = line.substr(start, std::min(end, line.size()) - start);
     }
-    else { // Collect sequence data.
+
+    // Load sequence
+    for(c = data.peek(); c != EOF && c != '>'; c = data.peek()) {
+      getline(data, line); // Load one line at a time.
+      long start = 0, end = line.length() - 1;
       trim(line, start,end);
       for(long i = start; i <= end; i++) {
-		char c = std::tolower(line[i]);
-		if(nucleotides_only) {
-	  		switch(c) {
-	  			case 'a': case 't': case 'g': case 'c': break;
-	  			default:
-	    			c = '~';
-	  		}
-		}
-		P += c;
+        char c = std::tolower(line[i]);
+        if(nucleotides_only) {
+          switch(c) {
+          case 'a': case 't': case 'g': case 'c': break;
+          default:
+            c = '~';
+          }
+        }
+        P += c;
       }
     }
-  }
-  // Handle very last sequence.
-  if(!meta.empty()) {
+
+    if(meta.empty()) continue;
     if(seq_cnt % arg->skip == arg->skip0) {
-      //      std::cerr << "# P.length()=" << P.length() << std::endl;
+      // Process P.
+      //   std::cerr << "# P.length()=" << P.length() << std::endl;
       if(forward){
         if(print){
           if(print_length) std::cout << "> " << meta << "\tLen = " << P.length() << '\n';
           else std::cout << "> " << meta << '\n';
         }
-
-        if(type == MAM) sa->MAM(P, matches, min_len, memCounter, true, print);
-        else if(type == MUM) sa->MUM(P, matches, min_len, memCounter, true, print);
-        else if(type == MEM) sa->MEM(P, matches, min_len, print, memCounter, true, num_threads);
+        switch(type) {
+        case MAM: sa->MAM(P, matches, min_len, memCounter, true, print); break;
+        case MUM: sa->MUM(P, matches, min_len, memCounter, true, print); break;
+        case MEM: sa->MEM(P, matches, min_len, print, memCounter, true, num_threads); break;
+        }
         if(!print) sa->print_match(meta, matches, false);
       }
       if(rev_comp) {
@@ -164,14 +124,16 @@ void *query_thread(void *arg_) {
           if(print_length) std::cout << "> " << meta << " Reverse\tLen = " << P.length() << '\n';
           else std::cout << "> " << meta << " Reverse\n";
         }
-        if(type == MAM) sa->MAM(P, matches, min_len, memCounter, false, print);
-        else if(type == MUM) sa->MUM(P, matches, min_len, memCounter, false, print);
-        else if(type == MEM) sa->MEM(P, matches, min_len, print, memCounter, false, num_threads);
+        switch(type) {
+        case MAM: sa->MAM(P, matches, min_len, memCounter, false, print); break;
+        case MUM: sa->MUM(P, matches, min_len, memCounter, false, print); break;
+        case MEM: sa->MEM(P, matches, min_len, print, memCounter, false, num_threads); break;
+        }
         if(!print) sa->print_match(meta, matches, true);
       }
     }
   }
-  //  delete P;
+
   std::cerr << "number of M(E/A/U)Ms: " << memCounter << std::endl;
   pthread_exit(NULL);
   return 0;
@@ -266,7 +228,7 @@ int main(int argc, char* argv[]) {
   }
 
   std::string ref;
- 
+
   std::vector<std::string> refdescr;
   std::vector<long> startpos;
 

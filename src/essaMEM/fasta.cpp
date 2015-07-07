@@ -2,6 +2,7 @@
 #include <iostream>
 #include <algorithm>
 #include <vector>
+#include <cassert>
 
 #include "fasta.hpp"
 
@@ -38,69 +39,49 @@ void reverse_complement(std::string &seq_rc, bool nucleotides_only) {
 // Trim a string, giving start and end in trimmed version.
 // NOTE: Assumes line.length() > 0!!!!
 void trim(std::string &line, long &start, long &end) {
-  // Trim leading spaces. 
-  for(long i = start; i < (int)line.length(); i++) { 
-    if(line[i] != ' ') { start = i; break; } 
-  }
+  // Trim leading spaces.
+  for( ; start < (long)line.length() && line[start] == ' '; ++start) ;
+
   // Trim trailing spaces.
-  for(long i = line.length() - 1; i >= 0; i--) { 
-    if(line[i] != ' ') { end = i; break; } 
-    if(i == 0) break;
-  }
+  for( ; end > 0 && line[end] == ' '; --end) ;
 }
 
 
 // Concatenate new sequences to set, keep track of lengths.
 // NOTE: Concatenation using the '`' character to separate strings!
-void load_fasta(std::string filename, std::string &S, std::vector<std::string> &descr, std::vector<long> &startpos) {
+void load_fasta(const std::string& filename, std::string &S, std::vector<std::string> &descr, std::vector<long> &startpos) {
   std::string meta, line;
-  long length = 0;
 
   // Everything starts at zero.
-  startpos.push_back(0);
-
   std::ifstream data(filename.c_str());
 
-  if(!data.is_open()) { std::cerr << "unable to open " << filename << std::endl; exit(1); } 
+  if(!data.is_open()) { std::cerr << "unable to open " << filename << std::endl; exit(1); }
+  int c = data.peek();
+  if(c != '>') { std::cerr << "first character must be a '>', got '" << (char)c << "'" << std::endl; exit(1); }
 
-  while(!data.eof()) {
-    getline(data, line); // Load one line at a time.
-    if(line.length() == 0) continue;
-    if(line[line.length()-1]=='\r'){
-        line.erase(--line.end());
-        std::cerr << "shouldn't happen" << std::endl;
-        exit(1);
+  while(c != EOF) {
+    std::getline(data, line); // Load one line at a time.
+    assert(line.back() != '\r');
+
+    // Read metadata
+    const size_t start = line.find_first_not_of(" ", 1);
+    if(start != std::string::npos) {
+      const size_t end = line.find_first_of(" ", start);
+      descr.push_back(line.substr(start, std::min(end, line.size()) - start));
     }
 
-    long start = 0, end = line.length() - 1;
-
-    // Meta tag line and start of a new sequence.
-    if(line[0] == '>') {
-      // Save previous sequence and meta data.
-      if(length > 0) {
-	descr.push_back(meta);
-	S += '`'; // ` character used to separate strings
-	startpos.push_back(S.length());
-	//lengths.push_back(length+1);
-      }
-      // Reset parser state.
-      start = 1; meta = ""; length = 0;
-    }
-    trim(line, start, end);
-    // Collect meta data.
-    if(line[0] == '>') {
-      for(long i = start; i <= end; i++) { if(line[i] == ' ') break; meta += line[i]; }
-    }
-    else { // Collect sequence data.
-      length += end - start + 1;
-      for(long i = start; i <= end; i++) { 
-	S += std::tolower(line[i]);
-      }
+    // Read sequence
+    if(!S.empty())
+      S += '`';
+    startpos.push_back(S.length());
+    for(c = data.peek(); c != EOF && c != '>'; c = data.peek()) {
+      std::getline(data, line);
+      const size_t start = line.find_first_not_of(" ");
+      const size_t end = std::min(line.size(), line.find_last_not_of(" "));
+      for(size_t i = start; i <= end; ++i)
+        S += std::tolower(line[i]);
     }
   }
-  if(length > 0) {
-    descr.push_back(meta);
-  }  
   std::cerr << "# S.length=" << S.length() << std::endl;
   // for(long i = 0; i < (long)descr.size(); i++) {
   //   std::cerr << "# " << descr[i] << " " << startpos[i] << std::endl;

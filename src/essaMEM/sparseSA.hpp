@@ -44,7 +44,7 @@ static const unsigned int BITADD[256] = { UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX
 // Simulates a vector<int> LCP;
 struct vec_uchar {
   struct item_t{
-    item_t(){}
+    item_t() = default;
     item_t(size_t i, int v) { idx = i; val = v; }
     size_t idx; int val;
     bool operator < (item_t t) const { return idx < t.idx;  }
@@ -82,8 +82,8 @@ struct vec_uchar {
 
 // Match find by findMEM.
 struct match_t {
-  match_t() { ref = 0; query = 0, len = 0; }
-  match_t(long r, long q, long l) { ref = r; query = q; len = l; }
+  match_t() : ref(0), query(0), len(0) { }
+  match_t(long r, long q, long l) : ref(r), query(q), len(l) { }
   long ref; // position in reference sequence
   long query; // position in query
   long len; // length of match
@@ -91,18 +91,18 @@ struct match_t {
 
 struct saTuple_t {
     saTuple_t(): left(0), right(0) {}
-    saTuple_t(unsigned int l, unsigned int r): left(l), right(r){}
+    saTuple_t(unsigned int l, unsigned int r): left(l), right(r) {}
     unsigned int left;
     unsigned int right;
 };
 
 // depth : [start...end]
 struct interval_t {
-  interval_t() { start = 1; end = 0; depth = -1; }
-  interval_t(long s, long e, long d) { start = s; end = e; depth = d; }
+  interval_t() : depth(-1), start(1), end(0) { }
+  interval_t(long s, long e, long d) : depth(d), start(s), end(e) { }
   void reset(long e) { start = 0; end = e; depth = 0; }
   long depth, start, end;
-  long size() { return end - start + 1; }
+  long size() const { return end - start + 1; }
 };
 
 struct sparseSA {
