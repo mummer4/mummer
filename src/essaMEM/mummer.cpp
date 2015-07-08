@@ -112,11 +112,11 @@ void *query_thread(void *arg_) {
           else std::cout << "> " << meta << '\n';
         }
         switch(type) {
-        case MAM: sa->MAM(P, matches, min_len, memCounter, true, print); break;
-        case MUM: sa->MUM(P, matches, min_len, memCounter, true, print); break;
-        case MEM: sa->MEM(P, matches, min_len, print, memCounter, true, num_threads); break;
+        case MAM: sa->MAM(P, min_len, memCounter, true, std::cout); break;
+        case MUM: sa->MUM(P, min_len, memCounter, true, std::cout); break;
+        case MEM: sa->MEM(P, min_len, memCounter, true, std::cout); break;
         }
-        if(!print) sa->print_match(meta, matches, false);
+        if(!print) sa->print_match(std::cout, meta, false);
       }
       if(rev_comp) {
         reverse_complement(P, nucleotides_only);
@@ -125,11 +125,11 @@ void *query_thread(void *arg_) {
           else std::cout << "> " << meta << " Reverse\n";
         }
         switch(type) {
-        case MAM: sa->MAM(P, matches, min_len, memCounter, false, print); break;
-        case MUM: sa->MUM(P, matches, min_len, memCounter, false, print); break;
-        case MEM: sa->MEM(P, matches, min_len, print, memCounter, false, num_threads); break;
+        case MAM: sa->MAM(P, min_len, memCounter, false, std::cout); break;
+        case MUM: sa->MUM(P, min_len, memCounter, false, std::cout); break;
+        case MEM: sa->MEM(P, min_len, memCounter, false, std::cout); break;
         }
-        if(!print) sa->print_match(meta, matches, true);
+        if(!print) sa->print_match(std::cout, meta, true);
       }
     }
   }

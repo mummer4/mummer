@@ -190,9 +190,9 @@ struct sparseSA {
   void radixStep(int *t_new, int *SA, long &bucketNr, long *BucketBegin, long l, long r, long h);
 
   // Prints match to cout.
-  void print_match(match_t m) const;
-  void print_match(match_t m, std::vector<match_t> &buf) const; // buffered version
-  void print_match(std::string meta, std::vector<match_t> &buf, bool rc) const; // buffered version
+  void print_match(std::ostream& os, match_t m) const;
+  //  void print_match(match_t m, std::vector<match_t> &buf) const; // buffered version
+  void print_match(std::ostream& os, std::string meta, bool rc) const; // buffered version
 
   // Binary search for left boundry of interval.
   inline long bsearch_left(char c, long i, long s, long e) const;
@@ -209,11 +209,11 @@ struct sparseSA {
 
   // Traverse pattern P starting from a given prefix and interval
   // until mismatch or min_len characters reached.
-  inline void traverse(std::string &P, long prefix, interval_t &cur, int min_len) const;
-  inline void traverse_faster(const std::string &P,const long prefix, interval_t &cur, int min_len) const;
+  void traverse(const std::string &P, long prefix, interval_t &cur, int min_len) const;
+  void traverse_faster(const std::string &P,const long prefix, interval_t &cur, int min_len) const;
 
   // Simulate a suffix link.
-  inline bool suffixlink(interval_t &m) const;
+  bool suffixlink(interval_t &m) const;
 
   // Expand ISA/LCP interval. Used to simulate suffix links.
   inline bool expand_link(interval_t &link) const {
@@ -236,20 +236,24 @@ struct sparseSA {
 
   // Given a position i in S, finds a left maximal match of minimum
   // length within K steps.
-  inline void find_Lmaximal(std::string &P, long prefix, long i, long len, std::vector<match_t> &matches, int min_len, bool _forward, bool print) const;
-
-  // Given an interval where the given prefix is matched up to a
-  // mismatch, find all MEMs up to a minimum match depth.
-  void collectMEMs(std::string &P, long prefix, interval_t mli, interval_t xmi, std::vector<match_t> &matches, int min_len, bool forward_, bool print) const;
-
-  // Find all MEMs given a prefix pattern offset k.
-  void findMEM(long k, std::string &P, std::vector<match_t> &matches, int min_len, bool forward_, bool print) const;
+  template<typename Output>
+  void find_Lmaximal(const std::string &P, long prefix, long i, long len, int min_len, bool _forward, Output out) const;
 
   // NOTE: min_len must be > 1
-  void findMAM(std::string &P, std::vector<match_t> &matches, int min_len, long& memCount, bool forward_, bool print) const;
+  template<typename Output>
+  void findMAM_each(const std::string &P, int min_len, long& memCount, bool forward_, Output out) const;
+
+  void findMAM(const std::string &P, int min_len, long& memCount, bool forward_, std::ostream& os) const {
+    findMAM_each(P, min_len, memCount, forward_, [&](const match_t& m) { print_match(os, m); });
+  }
+
+  void findMAM(const std::string &P, int min_len, long& memCount, bool forward_, std::vector<match_t>& matches) const {
+    findMAM_each(P, min_len, memCount, forward_, [&](const match_t& m) { matches.push_back(m); });
+  }
+
   // Returns true if the position p1 in the query pattern and p2 in
   // the reference is left maximal.
-  inline bool is_leftmaximal(std::string &P, long p1, long p2) const {
+  inline bool is_leftmaximal(const std::string &P, long p1, long p2) const {
     return p1 == 0 || p2 == 0 || P[p1 - 1] != S[p2 - 1];
   }
 
@@ -258,16 +262,54 @@ struct sparseSA {
   // et. al. Note this is a "one-sided" query. It "streams" the query
   // P throught he index.  Consequently, repeats can occur in the
   // pattern P.
-  void MAM(std::string &P, std::vector<match_t> &matches, int min_len, long& memCount, bool forward_, bool print) const {
+  void MAM(const std::string& P, int min_len, long& memCount, bool forward_, std::ostream& os) const {
     if(K != 1) return;  // Only valid for full suffix array.
-    findMAM(P, matches, min_len, memCount, forward_, print);
+    findMAM(P, min_len, memCount, forward_, os);
+  }
+  void MAM(const std::string& P, int min_len, long& memCount, bool forward_, std::vector<match_t>& matches) const {
+    if(K != 1) return;  // Only valid for full suffix array.
+    findMAM(P, min_len, memCount, forward_, matches);
   }
 
+
+  // Given an interval where the given prefix is matched up to a
+  // mismatch, find all MEMs up to a minimum match depth.
+  template<typename Output>
+  void collectMEMs_each(const std::string &P, long prefix, interval_t mli, interval_t xmi, int min_len, bool forward_,
+                        Output out) const;
+
+  // Find all MEMs given a prefix pattern offset k.
+  template<typename Output>
+  void findMEM_each(const std::string &P, long k, int min_len, bool forward_, Output out) const;
+
   // Find Maximal Exact Matches (MEMs)
-  void MEM(std::string &P, std::vector<match_t> &matches, int min_len, bool print, long& memCount, bool forward_, int num_threads = 1)const ;
+  template<typename Output>
+  void MEM_ks(const std::string &P, int min_len, long& memCount, bool forward_, Output out) const {
+    // memCount = 0;
+    for(int k = 0; k < K; k++)
+      findMEM_each(P, k, min_len, forward_, out);
+    //    currentCount += memCount;
+  }
+
+  void MEM(const std::string &P, int min_len, long& memCount, bool forward_, std::ostream& os) const {
+    MEM_ks(P, min_len, memCount, forward_, [&](const match_t& m) { print_match(os, m); });
+  }
+
+  void MEM(const std::string &P, int min_len, long& memCount, bool forward_, std::vector<match_t>& matches) const {
+    MEM_ks(P, min_len, memCount, forward_, [&](const match_t& m) { matches.push_back(m); });
+  }
 
   // Maximal Unique Match (MUM)
-  void MUM(std::string &P, std::vector<match_t> &unique, int min_len, long& memCount, bool forward_, bool print) const;
+  template<typename Output>
+  void findMUM_each(const std::string &P, int min_len, long& memCount, bool forward_, Output out) const;
+
+  void MUM(const std::string &P, int min_len, long& memCount, bool forward_, std::ostream& os) const {
+    findMUM_each(P, min_len, memCount, forward_, [&](const match_t& m) { print_match(os, m); });
+  }
+
+  void MUM(const std::string &P, int min_len, long& memCount, bool forward_, std::vector<match_t>& matches) const {
+    findMUM_each(P, min_len, memCount, forward_, [&](const match_t& m) { matches.push_back(m); });
+  }
 
   //save index to files
   void save(const std::string &prefix);
@@ -278,6 +320,197 @@ struct sparseSA {
   //construct
   void construct();
 };
+
+
+//
+// Implementation of templated methods
+//
+
+// Finds maximal almost-unique matches (MAMs) These can repeat in the
+// given query pattern P, but occur uniquely in the indexed reference S.
+template<typename Output>
+void sparseSA::findMAM_each(const std::string &P, int min_len, long& currentCount, bool forward_, Output out) const {
+  const long Plength = P.length();
+  interval_t cur(0, N-1, 0);
+  long       prefix  = 0;
+  //  memCount           = 0;
+
+  while(prefix < Plength) {
+    // Traverse SA top down until mismatch or full string is matched.
+    if(hasChild)
+        traverse_faster(P, prefix, cur, Plength);
+    else
+        traverse(P, prefix, cur, Plength);
+    if(cur.depth <= 1) { cur.depth = 0; cur.start = 0; cur.end = N-1; prefix++; continue; }
+    if(cur.size() == 1 && cur.depth >= min_len) {
+      if(is_leftmaximal(P, prefix, SA[cur.start])) {
+	// Yes, it's a MAM.
+	match_t m; m.ref = SA[cur.start]; m.query = prefix; m.len = cur.depth;
+        if(printRevCompForw && !forward_) m.query = Plength-1-prefix;
+        out(m);
+      }
+    }
+    do {
+      cur.depth = cur.depth-1;
+      cur.start = ISA[SA[cur.start] + 1];
+      cur.end   = ISA[SA[cur.end] + 1];
+      prefix++;
+      if( cur.depth == 0 || !expand_link(cur) ) { cur.depth = 0; cur.start = 0; cur.end = N-1; break; }
+    } while(cur.depth > 0 && cur.size() == 1);
+  }
+  //  currentCount = memCount;
+}
+
+// Maximal Unique Match (MUM)
+template<typename Output>
+void sparseSA::findMUM_each(const std::string &P, int min_len, long& currentCount, bool forward_, Output out) const {
+  // Find unique MEMs.
+  std::vector<match_t> matches;
+  MAM(P, min_len, currentCount, forward_, matches);
+  //  memCount=0;
+
+  struct by_ref {
+    bool operator() (const match_t &a, const match_t &b) const {
+      return (a.ref == b.ref) ? a.len > b.len : a.ref < b.ref;
+    }
+  };
+
+  // Adapted from Stephan Kurtz's code in cleanMUMcand.c in MUMMer v3.20.
+  long currentright, dbright         = 0;
+  bool ignorecurrent, ignoreprevious = false;
+  sort(matches.begin(), matches.end(), by_ref());
+  for(long i = 0; i < (long)matches.size(); i++) {
+    ignorecurrent = false;
+    currentright = matches[i].ref + matches[i].len - 1;
+    if(dbright > currentright)
+      ignorecurrent = true;
+    else {
+      if(dbright == currentright) {
+	ignorecurrent = true;
+	if(!ignoreprevious && matches[i-1].ref == matches[i].ref)
+	  ignoreprevious = true;
+      }
+      else {
+	dbright = currentright;
+      }
+    }
+    if(i > 0 && !ignoreprevious)
+      out(matches[i-1]);
+    ignoreprevious = ignorecurrent;
+  }
+  if(!ignoreprevious && !matches.empty())
+    out(matches.back());
+  //  currentCount = memCount;
+}
+
+// For a given offset in the prefix k, find all MEMs.
+template<typename Output>
+void sparseSA::findMEM_each(const std::string &P, long k, int min_len, bool forward_, Output out) const {
+  if(k < 0 || k >= K) { std::cerr << "Invalid k " << k << " [0, " << K << "]" << std::endl; return; }
+  // Offset all intervals at different start points.
+  long prefix = k;
+  interval_t mli(0,N/K-1,0); // min length interval
+  interval_t xmi(0,N/K-1,0); // max match interval
+
+  // Right-most match used to terminate search.
+  const int min_lenK = min_len - (sparseMult*K-1);
+
+  while( prefix <= (long)P.length() - min_lenK) {//BUGFIX: used to be "prefix <= (long)P.length() - (K-k0)"
+    if(hasChild)
+      traverse_faster(P, prefix, mli, min_lenK);    // Traverse until minimum length matched.
+    else
+      traverse(P, prefix, mli, min_lenK);    // Traverse until minimum length matched.
+
+    if(mli.depth > xmi.depth) xmi = mli;
+    if(mli.depth <= 1) { mli.reset(N/K-1); xmi.reset(N/K-1); prefix+=sparseMult*K; continue; }
+
+    if(mli.depth >= min_lenK) {
+      if(hasChild)
+        traverse_faster(P, prefix, xmi, P.length()); // Traverse until mismatch.
+      else
+        traverse(P, prefix, xmi, P.length()); // Traverse until mismatch.
+      collectMEMs_each(P, prefix, mli, xmi, min_len, forward_, out); // Using LCP info to find MEM length.
+      // When using ISA/LCP trick, depth = depth - K. prefix += K.
+      prefix+=sparseMult*K;
+      if( !hasSufLink ){ mli.reset(N/K-1); xmi.reset(N/K-1); continue; }
+      else{
+        int i = 0;
+        bool succes  = true;
+        while(i < sparseMult && (succes = suffixlink(mli))){
+          suffixlink(xmi);
+          i++;
+        }
+        if(!succes){
+          mli.reset(N/K-1); xmi.reset(N/K-1); continue;
+        }
+      }
+    }
+    else {
+      // When using ISA/LCP trick, depth = depth - K. prefix += K.
+      prefix+=sparseMult*K;
+      if( !hasSufLink) { mli.reset(N/K-1); xmi.reset(N/K-1); continue; }
+      else{
+        int i = 0;
+        bool succes  = true;
+        while(i < sparseMult && (succes = suffixlink(mli))){
+          i++;
+        }
+        if(!succes){
+          mli.reset(N/K-1); xmi.reset(N/K-1); continue;
+        }
+        xmi = mli;
+      }
+    }
+  }
+}
+
+// Use LCP information to locate right maximal matches. Test each for
+// left maximality.
+template<typename Output>
+void sparseSA::collectMEMs_each(const std::string &P, long prefix, interval_t mli, interval_t xmi, int min_len, bool forward_,
+                           Output out) const {
+  // All of the suffixes in xmi's interval are right maximal.
+  for(long i = xmi.start; i <= xmi.end; i++) find_Lmaximal(P, prefix, SA[i], xmi.depth, min_len, forward_, out);
+
+  if(mli.start == xmi.start && mli.end == xmi.end) return;
+
+
+  while(xmi.depth >= mli.depth) {
+    // Attempt to "unmatch" xmi using LCP information.
+    if(xmi.end+1 < N/K) xmi.depth = std::max(LCP[xmi.start], LCP[xmi.end+1]);
+    else xmi.depth = LCP[xmi.start];
+
+    // If unmatched XMI is > matched depth from mli, then examine rmems.
+    if(xmi.depth >= mli.depth) {
+      // Scan RMEMs to the left, check their left maximality..
+      while(LCP[xmi.start] >= xmi.depth) {
+	xmi.start--;
+	find_Lmaximal(P, prefix, SA[xmi.start], xmi.depth, min_len, forward_, out);
+      }
+      // Find RMEMs to the right, check their left maximality.
+      while(xmi.end+1 < N/K && LCP[xmi.end+1] >= xmi.depth) {
+	xmi.end++;
+	find_Lmaximal(P, prefix, SA[xmi.end], xmi.depth, min_len, forward_, out);
+      }
+    }
+  }
+}
+
+// Finds left maximal matches given a right maximal match at position i.
+template<typename Output>
+void sparseSA::find_Lmaximal(const std::string &P, long prefix, long i, long len, int min_len, bool forward_, Output out) const {
+  const long Plength = P.length();
+  // Advance to the left up to K steps.
+  for(long k = 0; k < sparseMult*K; k++) {
+    // If we reach the end or a mismatch, and the match is long enough, print.
+    if(prefix == 0 || i == 0 || P[prefix-1] != S[i-1]) {
+      if(len >= min_len)
+        out(match_t(i, (!printRevCompForw || forward_) ? prefix : Plength-1-prefix, len));
+      return; // Reached mismatch, done.
+    }
+    prefix--; i--; len++; // Continue matching.
+  }
+}
 
 } // namespace mummer
 } // namespace mummer

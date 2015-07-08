@@ -547,18 +547,18 @@ bool sparseSA::search(std::string &P, long &start, long &end) {
 
 // Traverse pattern P starting from a given prefix and interval
 // until mismatch or min_len characters reached.
-void sparseSA::traverse(std::string &P, long prefix, interval_t &cur, int min_len) const {
+void sparseSA::traverse(const std::string &P, long prefix, interval_t &cur, int min_len) const {
   if(hasKmer && cur.depth == 0 && min_len >= kMerSize){//free match first bases
     unsigned int index = 0;
     for(long i = 0; i < kMerSize; i++)
       index = (index << 2 ) | BITADD[(int)P[prefix + i]];
     if(index < kMerTableSize && KMR[index].right>0){
-        cur.depth = kMerSize;
-        cur.start = KMR[index].left;
-        cur.end = KMR[index].right;
+      cur.depth = kMerSize;
+      cur.start = KMR[index].left;
+      cur.end = KMR[index].right;
     }
     else if(index < kMerTableSize || nucleotidesOnly){
-        return;//this results in no found seeds where the first KMERSIZE bases contain a non-ACGT character
+      return;//this results in no found seeds where the first KMERSIZE bases contain a non-ACGT character
     }
   }
   if(cur.depth >= min_len) return;
@@ -578,94 +578,94 @@ void sparseSA::traverse(std::string &P, long prefix, interval_t &cur, int min_le
 // Traverse pattern P starting from a given prefix and interval
 // until mismatch or min_len characters reached.
 // Uses the child table for faster traversal
-void sparseSA::traverse_faster(const std::string &P,const long prefix, interval_t &cur, int min_len) const {
-        if(hasKmer && cur.depth == 0 && min_len >= kMerSize){//free match first bases
-            unsigned int index = 0;
-            for(long i = 0; i < kMerSize; i++)
-              index = (index << 2 ) | BITADD[(int)P[prefix + i]];
-            if(index < kMerTableSize && KMR[index].right>0){
-                cur.depth = kMerSize;
-                cur.start = KMR[index].left;
-                cur.end = KMR[index].right;
-            }
-            else if(index < kMerTableSize || nucleotidesOnly){
-                return;//this results in no found seeds where the first KMERSIZE bases contain a non-ACGT character
-            }
-        }
-        if(cur.depth >= min_len) return;
-        long c = prefix + cur.depth;
-        bool intervalFound = (size_t)c < P.length();
-        int curLCP;//check if this is correct for root interval (unlikely case)
-        if(cur.start < CHILD[cur.end] && CHILD[cur.end] <= cur.end)
-            curLCP = LCP[CHILD[cur.end]];
-        else
-            curLCP = LCP[CHILD[cur.start]];
-        if(intervalFound && cur.size() > 1 && curLCP == cur.depth)
-            intervalFound = top_down_child(P[c], cur);
-        else if(intervalFound)
-            intervalFound = P[c] == S[SA[cur.start]+cur.depth];
-        bool mismatchFound = false;
-        while(intervalFound && !mismatchFound &&
-              (size_t)c < P.length() && cur.depth < min_len){
-            c++;
-            cur.depth++;
-            if(cur.start != cur.end){
-                int childLCP;
-                //calculate LCP of child node, which is now cur. the LCP value
-                //of the parent is currently c - prefix
-                if(cur.start < CHILD[cur.end] && CHILD[cur.end] <= cur.end)
-                    childLCP = LCP[CHILD[cur.end]];
-                else
-                    childLCP = LCP[CHILD[cur.start]];
-                int minimum = std::min(childLCP,min_len);
-                //match along branch
-                while(!mismatchFound && (size_t)c < P.length() && cur.depth < minimum){
-                    mismatchFound = S[SA[cur.start]+cur.depth] != P[c];
-                    c++;
-                    cur.depth += !mismatchFound;
-                }
-                intervalFound = (size_t)c < P.length() && !mismatchFound &&
-                        cur.depth < min_len && top_down_child(P[c], cur);
-            }
-            else{
-              while(!mismatchFound && (size_t)c < P.length() && cur.depth < min_len){
-                mismatchFound = (size_t)(SA[cur.start]+cur.depth) >= S.length() ||
-                            S[SA[cur.start]+cur.depth] != P[c];
-                    c++;
-                    cur.depth += !mismatchFound;
-                }
-            }
-        }
+void sparseSA::traverse_faster(const std::string& P,const long prefix, interval_t &cur, int min_len) const {
+  if(hasKmer && cur.depth == 0 && min_len >= kMerSize){//free match first bases
+    unsigned int index = 0;
+    for(long i = 0; i < kMerSize; i++)
+      index = (index << 2 ) | BITADD[(int)P[prefix + i]];
+    if(index < kMerTableSize && KMR[index].right>0){
+      cur.depth = kMerSize;
+      cur.start = KMR[index].left;
+      cur.end = KMR[index].right;
+    }
+    else if(index < kMerTableSize || nucleotidesOnly){
+      return;//this results in no found seeds where the first KMERSIZE bases contain a non-ACGT character
+    }
+  }
+  if(cur.depth >= min_len) return;
+  long c = prefix + cur.depth;
+  bool intervalFound = (size_t)c < P.length();
+  int curLCP;//check if this is correct for root interval (unlikely case)
+  if(cur.start < CHILD[cur.end] && CHILD[cur.end] <= cur.end)
+    curLCP = LCP[CHILD[cur.end]];
+  else
+    curLCP = LCP[CHILD[cur.start]];
+  if(intervalFound && cur.size() > 1 && curLCP == cur.depth)
+    intervalFound = top_down_child(P[c], cur);
+  else if(intervalFound)
+    intervalFound = P[c] == S[SA[cur.start]+cur.depth];
+  bool mismatchFound = false;
+  while(intervalFound && !mismatchFound &&
+        (size_t)c < P.length() && cur.depth < min_len){
+    c++;
+    cur.depth++;
+    if(cur.start != cur.end){
+      int childLCP;
+      //calculate LCP of child node, which is now cur. the LCP value
+      //of the parent is currently c - prefix
+      if(cur.start < CHILD[cur.end] && CHILD[cur.end] <= cur.end)
+        childLCP = LCP[CHILD[cur.end]];
+      else
+        childLCP = LCP[CHILD[cur.start]];
+      int minimum = std::min(childLCP,min_len);
+      //match along branch
+      while(!mismatchFound && (size_t)c < P.length() && cur.depth < minimum){
+        mismatchFound = S[SA[cur.start]+cur.depth] != P[c];
+        c++;
+        cur.depth += !mismatchFound;
+      }
+      intervalFound = (size_t)c < P.length() && !mismatchFound &&
+                                  cur.depth < min_len && top_down_child(P[c], cur);
+    }
+    else{
+      while(!mismatchFound && (size_t)c < P.length() && cur.depth < min_len){
+        mismatchFound = (size_t)(SA[cur.start]+cur.depth) >= S.length() ||
+                                          S[SA[cur.start]+cur.depth] != P[c];
+        c++;
+        cur.depth += !mismatchFound;
+      }
+    }
+  }
 }
 //finds the child interval of cur that starts with character c
 //updates left and right bounds of cur to child interval if found, or returns
 //cur if not found (also returns true/false if found or not)
 bool sparseSA::top_down_child(char c, interval_t &cur) const {
-    long left = cur.start;
-    long right = CHILD[cur.end];
-    if(cur.start >= right || right > cur.end)
-        right = CHILD[cur.start];
-    //now left and right point to first child
-    if(S[SA[cur.start]+cur.depth] == c){
-        cur.end = right-1;
-        return true;
+  long left = cur.start;
+  long right = CHILD[cur.end];
+  if(cur.start >= right || right > cur.end)
+    right = CHILD[cur.start];
+  //now left and right point to first child
+  if(S[SA[cur.start]+cur.depth] == c){
+    cur.end = right-1;
+    return true;
+  }
+  left = right;
+  //while has next L-index
+  while(CHILD[right] > right && LCP[right] == LCP[CHILD[right]]){
+    right = CHILD[right];
+    if(S[SA[left]+cur.depth] == c){
+      cur.start = left; cur.end = right - 1;
+      return true;
     }
     left = right;
-    //while has next L-index
-    while(CHILD[right] > right && LCP[right] == LCP[CHILD[right]]){
-        right = CHILD[right];
-        if(S[SA[left]+cur.depth] == c){
-            cur.start = left; cur.end = right - 1;
-            return true;
-        }
-        left = right;
-    }
-    //last interval
-    if(S[SA[left]+cur.depth] == c){
-            cur.start = left;
-            return true;
-    }
-    return false;
+  }
+  //last interval
+  if(S[SA[left]+cur.depth] == c){
+    cur.start = left;
+    return true;
+  }
+  return false;
 }
 
 // Given SA interval apply binary search to match character c at
@@ -736,246 +736,34 @@ bool sparseSA::suffixlink(interval_t &m) const {
   return expand_link(m);
 }
 
-// For a given offset in the prefix k, find all MEMs.
-void sparseSA::findMEM(long k, std::string &P, std::vector<match_t> &matches, int min_len, bool forward_, bool print) const {
-  if(k < 0 || k >= K) { std::cerr << "Invalid k." << std::endl; return; }
-  // Offset all intervals at different start points.
-  long prefix = k;
-  interval_t mli(0,N/K-1,0); // min length interval
-  interval_t xmi(0,N/K-1,0); // max match interval
-
-  // Right-most match used to terminate search.
-  int min_lenK = min_len - (sparseMult*K-1);
-
-  while( prefix <= (long)P.length() - min_lenK) {//BUGFIX: used to be "prefix <= (long)P.length() - (K-k0)"
-#ifndef NDEBUG
-//      interval_t mliCopy(mli.start,mli.end,mli.depth);
-//      traverse(P, prefix, mliCopy, min_lenK);    // Traverse until minimum length matched.
-#endif
-    if(hasChild)
-        traverse_faster(P, prefix, mli, min_lenK);    // Traverse until minimum length matched.
-    else
-        traverse(P, prefix, mli, min_lenK);    // Traverse until minimum length matched.
-#ifndef NDEBUG
-//      assert(mli.start == mliCopy.start);
-//      assert(mli.end == mliCopy.end);
-//      assert(mli.depth == mliCopy.depth);
-#endif
-    if(mli.depth > xmi.depth) xmi = mli;
-    if(mli.depth <= 1) { mli.reset(N/K-1); xmi.reset(N/K-1); prefix+=sparseMult*K; continue; }
-
-    if(mli.depth >= min_lenK) {
-#ifndef NDEBUG
-//      interval_t xmiCopy(xmi.start,xmi.end,xmi.depth);
-//      traverse(P, prefix, xmiCopy, P.length());    // Traverse until mismatch.
-#endif
-      if(hasChild)
-        traverse_faster(P, prefix, xmi, P.length()); // Traverse until mismatch.
-      else
-        traverse(P, prefix, xmi, P.length()); // Traverse until mismatch.
-#ifndef NDEBUG
-//      assert(xmi.start == xmiCopy.start);
-//      assert(xmi.end == xmiCopy.end);
-//      assert(xmi.depth == xmiCopy.depth);
-#endif
-      collectMEMs(P, prefix, mli, xmi, matches, min_len, forward_, print); // Using LCP info to find MEM length.
-      // When using ISA/LCP trick, depth = depth - K. prefix += K.
-      prefix+=sparseMult*K;
-      if( !hasSufLink ){ mli.reset(N/K-1); xmi.reset(N/K-1); continue; }
-      else{
-          int i = 0;
-          bool succes  = true;
-          while(i < sparseMult && (succes = suffixlink(mli))){
-              suffixlink(xmi);
-              i++;
-          }
-          if(!succes){
-              mli.reset(N/K-1); xmi.reset(N/K-1); continue;
-          }
-      }
-    }
-    else {
-      // When using ISA/LCP trick, depth = depth - K. prefix += K.
-      prefix+=sparseMult*K;
-      if( !hasSufLink) { mli.reset(N/K-1); xmi.reset(N/K-1); continue; }
-      else{
-          int i = 0;
-          bool succes  = true;
-          while(i < sparseMult && (succes = suffixlink(mli))){
-              i++;
-          }
-          if(!succes){
-              mli.reset(N/K-1); xmi.reset(N/K-1); continue;
-          }
-          xmi = mli;
-      }
-    }
-  }
-}
-
-
-// Use LCP information to locate right maximal matches. Test each for
-// left maximality.
-void sparseSA::collectMEMs(std::string &P, long prefix, interval_t mli, interval_t xmi, std::vector<match_t> &matches, int min_len, bool forward_, bool print) const {
-  // All of the suffixes in xmi's interval are right maximal.
-  for(long i = xmi.start; i <= xmi.end; i++) find_Lmaximal(P, prefix, SA[i], xmi.depth, matches, min_len, forward_, print);
-
-  if(mli.start == xmi.start && mli.end == xmi.end) return;
-
-  while(xmi.depth >= mli.depth) {
-    // Attempt to "unmatch" xmi using LCP information.
-    if(xmi.end+1 < N/K) xmi.depth = std::max(LCP[xmi.start], LCP[xmi.end+1]);
-    else xmi.depth = LCP[xmi.start];
-
-    // If unmatched XMI is > matched depth from mli, then examine rmems.
-    if(xmi.depth >= mli.depth) {
-      // Scan RMEMs to the left, check their left maximality..
-      while(LCP[xmi.start] >= xmi.depth) {
-	xmi.start--;
-	find_Lmaximal(P, prefix, SA[xmi.start], xmi.depth, matches, min_len, forward_, print);
-      }
-      // Find RMEMs to the right, check their left maximality.
-      while(xmi.end+1 < N/K && LCP[xmi.end+1] >= xmi.depth) {
-	xmi.end++;
-	find_Lmaximal(P, prefix, SA[xmi.end], xmi.depth, matches, min_len, forward_, print);
-      }
-    }
-  }
-}
-
-
-// Finds left maximal matches given a right maximal match at position i.
-void sparseSA::find_Lmaximal(std::string &P, long prefix, long i, long len, std::vector<match_t> &matches, int min_len, bool forward_, bool print) const {
-  long Plength = P.length();
-  // Advance to the left up to K steps.
-  for(long k = 0; k < sparseMult*K; k++) {
-    // If we reach the end or a mismatch, and the match is long enough, print.
-    if(prefix == 0 || i == 0 || P[prefix-1] != S[i-1]) {
-      if(len >= min_len) {
-	if(print) print_match(match_t(i, (!printRevCompForw || forward_) ? prefix : Plength-1-prefix, len));
-	else matches.push_back(match_t(i, (!printRevCompForw || forward_) ? prefix : Plength-1-prefix, len));
-      }
-      return; // Reached mismatch, done.
-    }
-    prefix--; i--; len++; // Continue matching.
-  }
-}
-
-
 // Print results in format used by MUMmer v3.  Prints results
 // 1-indexed, instead of 0-indexed.
-void sparseSA::print_match(match_t m) const {
+void sparseSA::print_match(std::ostream& os, match_t m) const {
   memCount++;
   if(_4column == false) {
-    std::cout << std::setw(8) << (m.ref + 1) << "  "
-              << std::setw(8) << (m.query + 1) << "  "
-              << std::setw(8) << m.len << '\n';
+    os << std::setw(8) << (m.ref + 1) << "  "
+       << std::setw(8) << (m.query + 1) << "  "
+       << std::setw(8) << m.len << '\n';
   }
   else {
     long refseq=0, refpos=0;
     from_set(m.ref, refseq, refpos); // from_set is slow!!!
     // printf works faster than count... why? I don't know!!
     // Because one must disable C++ IO and stdio synchronization
-    std::cout << "  " << std::left << std::setw(maxdescrlen + 1) << descr[refseq] << std::right << ' '
-              << std::setw(8) << (refpos + 1) << "  "
-              << std::setw(8) << (m.query + 1) << "  "
-              << std::setw(8) << m.len << '\n';
+    os << "  " << std::left << std::setw(maxdescrlen + 1) << descr[refseq] << std::right << ' '
+       << std::setw(8) << (refpos + 1) << "  "
+       << std::setw(8) << (m.query + 1) << "  "
+       << std::setw(8) << m.len << '\n';
   }
   if(printSubstring){
-    if(m.len > 53) std::cout << S.substr(m.ref, 53) << " . . .\n";
-    else std::cout << m.ref << '\n';
+    if(m.len > 53) os << S.substr(m.ref, 53) << " . . .\n";
+    else os << m.ref << '\n';
   }
 }
 
-// This version of print match places m_new in a buffer. The buffer is
-// flushed if m_new.len <= 0 or it reaches 1000 entries.  Buffering
-// limits the number of locks on cout.
-// void sparseSA::print_match(match_t m_new, std::vector<match_t> &buf) const {
-//   print_match(m_new);
-// }
-
-void sparseSA::print_match(std::string meta, std::vector<match_t> &buf, bool rc) const {
-  if(!rc) std::cout << "> " << meta << '\n';
-  else std::cout << "> " << meta << " Reverse\n";
-}
-
-// Finds maximal almost-unique matches (MAMs) These can repeat in the
-// given query pattern P, but occur uniquely in the indexed reference S.
-void sparseSA::findMAM(std::string &P, std::vector<match_t> &matches, int min_len, long& currentCount, bool forward_, bool print) const {
-  long Plength = P.length();
-  memCount = 0;
-  interval_t cur(0, N-1, 0);
-  long prefix = 0;
-  while(prefix < (long)P.length()) {
-    // Traverse SA top down until mismatch or full string is matched.
-    if(hasChild)
-        traverse_faster(P, prefix, cur, P.length());
-    else
-        traverse(P, prefix, cur, P.length());
-    if(cur.depth <= 1) { cur.depth = 0; cur.start = 0; cur.end = N-1; prefix++; continue; }
-    if(cur.size() == 1 && cur.depth >= min_len) {
-      if(is_leftmaximal(P, prefix, SA[cur.start])) {
-	// Yes, it's a MAM.
-	match_t m; m.ref = SA[cur.start]; m.query = prefix; m.len = cur.depth;
-    if(printRevCompForw && !forward_) m.query = Plength-1-prefix;
-	if(print) print_match(m);
-	else  matches.push_back(m);
-      }
-    }
-    do {
-      cur.depth = cur.depth-1;
-      cur.start = ISA[SA[cur.start] + 1];
-      cur.end = ISA[SA[cur.end] + 1];
-      prefix++;
-      if( cur.depth == 0 || expand_link(cur) == false ) { cur.depth = 0; cur.start = 0; cur.end = N-1; break; }
-    } while(cur.depth > 0 && cur.size() == 1);
-  }
-  currentCount = memCount;
-}
-
-struct by_ref {
-  bool operator() (const match_t &a, const match_t &b) const {
-    return (a.ref == b.ref) ? a.len > b.len : a.ref < b.ref;
-  }
-};
-
-// Maximal Unique Match (MUM)
-void sparseSA::MUM(std::string &P, std::vector<match_t> &unique, int min_len, long& currentCount, bool forward_, bool print) const {
-  // Find unique MEMs.
-  std::vector<match_t> matches;
-  MAM(P, matches, min_len, currentCount, forward_, false);
-  memCount=0;
-
-  // Adapted from Stephan Kurtz's code in cleanMUMcand.c in MUMMer v3.20.
-  long currentright, dbright = 0;
-  bool ignorecurrent, ignoreprevious = false;
-  sort(matches.begin(), matches.end(), by_ref());
-  for(long i = 0; i < (long)matches.size(); i++) {
-    ignorecurrent = false;
-    currentright = matches[i].ref + matches[i].len - 1;
-    if(dbright > currentright)
-      ignorecurrent = true;
-    else {
-      if(dbright == currentright) {
-	ignorecurrent = true;
-	if(!ignoreprevious && matches[i-1].ref == matches[i].ref)
-	  ignoreprevious = true;
-      }
-      else {
-	dbright = currentright;
-      }
-    }
-    if(i > 0 && !ignoreprevious) {
-      if(print)	print_match(matches[i-1]);
-      else unique.push_back(matches[i-1]);
-    }
-    ignoreprevious = ignorecurrent;
-  }
-  if(!ignoreprevious && !matches.empty()) {
-    if(print) print_match(matches[matches.size()-1]);
-    else unique.push_back(matches[matches.size()-1]);
-  }
-  currentCount = memCount;
+void sparseSA::print_match(std::ostream& os, std::string meta, bool rc) const {
+  if(!rc) os << "> " << meta << '\n';
+  else os << "> " << meta << " Reverse\n";
 }
 
 struct thread_data {
@@ -986,57 +774,57 @@ struct thread_data {
   bool               forward_;
 };
 
-void *MEMthread(void *arg) {
-  thread_data       *data = (thread_data*)arg;
-  std::vector<long> &K    = data->Kvalues;
-  const sparseSA    *sa   = data->sa;
+// void *MEMthread(void *arg) {
+//   thread_data       *data = (thread_data*)arg;
+//   std::vector<long> &K    = data->Kvalues;
+//   const sparseSA    *sa   = data->sa;
 
-  // Find MEMs for all assigned offsets to this thread.
+//   // Find MEMs for all assigned offsets to this thread.
 
-  std::vector<match_t> matches; // place-holder
-  matches.reserve(2000);   // TODO: Use this as a buffer again!!!!!!
+//   std::vector<match_t> matches; // place-holder
+//   matches.reserve(2000);   // TODO: Use this as a buffer again!!!!!!
 
-  for(long k = 0; k < (long)K.size(); k++) {  sa->findMEM(K[k], *(data->P), matches, data->min_len, data->forward_, true); }
+//   for(long k = 0; k < (long)K.size(); k++) {  sa->findMEM(K[k], *(data->P), matches, data->min_len, data->forward_, true); }
 
-  pthread_exit(NULL);
-  return 0;
-}
+//   pthread_exit(NULL);
+//   return 0;
+// }
 
-void sparseSA::MEM(std::string &P, std::vector<match_t> &matches, int min_len, bool print, long& currentCount, bool forward_, int num_threads) const {
-  if(min_len < K) return;
-  memCount=0;
-  if(num_threads == 1) {
-    for(int k = 0; k < K; k++) { findMEM(k, P, matches, min_len, forward_, print); }
-    currentCount += memCount;
-  }
-  else if(num_threads > 1) {
-    std::vector<pthread_t> thread_ids(num_threads);
-    std::vector<thread_data> data(num_threads);
+// void sparseSA::MEM(std::string &P, std::vector<match_t> &matches, int min_len, bool print, long& currentCount, bool forward_, int num_threads) const {
+//   if(min_len < K) return;
+//   memCount=0;
+//   if(num_threads == 1) {
+//     for(int k = 0; k < K; k++) { findMEM(k, P, matches, min_len, forward_, print); }
+//     currentCount += memCount;
+//   }
+//   else if(num_threads > 1) {
+//     std::vector<pthread_t> thread_ids(num_threads);
+//     std::vector<thread_data> data(num_threads);
 
-    // Make sure all num_threads are joinable.
-    pthread_attr_t attr;  pthread_attr_init(&attr);
-    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+//     // Make sure all num_threads are joinable.
+//     pthread_attr_t attr;  pthread_attr_init(&attr);
+//     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
 
-    // Distribute K-values evenly between num_threads.
-    int t = 0;
-    for(int k = 0; k < K; k++) {
-      data[t].Kvalues.push_back(k);
-      t++;
-      if(t == num_threads) t = 0;
-    }
-    // Initialize additional thread data.
-    for(int i = 0; i < num_threads; i++) {
-      data[i].sa       = this;
-      data[i].min_len  = min_len;
-      data[i].P        = &P;
-      data[i].forward_ = forward_;
-    }
-    // Create joinable threads to find MEMs.
-    for(int i = 0; i < num_threads; i++) pthread_create(&thread_ids[i], &attr, MEMthread, (void *)&data[i]);
-    // Wait for all threads to terminate.
-    for(int i = 0; i < num_threads; i++) pthread_join(thread_ids[i], NULL);
-  }
-}
+//     // Distribute K-values evenly between num_threads.
+//     int t = 0;
+//     for(int k = 0; k < K; k++) {
+//       data[t].Kvalues.push_back(k);
+//       t++;
+//       if(t == num_threads) t = 0;
+//     }
+//     // Initialize additional thread data.
+//     for(int i = 0; i < num_threads; i++) {
+//       data[i].sa       = this;
+//       data[i].min_len  = min_len;
+//       data[i].P        = &P;
+//       data[i].forward_ = forward_;
+//     }
+//     // Create joinable threads to find MEMs.
+//     for(int i = 0; i < num_threads; i++) pthread_create(&thread_ids[i], &attr, MEMthread, (void *)&data[i]);
+//     // Wait for all threads to terminate.
+//     for(int i = 0; i < num_threads; i++) pthread_join(thread_ids[i], NULL);
+//   }
+// }
 
 } // namespace mummer
 } // namespace mummer
