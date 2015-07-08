@@ -16,8 +16,6 @@ namespace mummer {
 // LS suffix sorter (integer alphabet).
 extern "C" { void suffixsort(int *x, int *p, int n, int k, int l); };
 
-pthread_mutex_t cout_mutex = PTHREAD_MUTEX_INITIALIZER;
-
 long memCount = 0;
 
 // Get maximum query sequence description length.
@@ -813,7 +811,6 @@ void sparseSA::findMEM(long k, std::string &P, std::vector<match_t> &matches, in
       }
     }
   }
-  if(print) print_match(match_t(), matches);   // Clear buffered matches.
 }
 
 
@@ -852,18 +849,10 @@ void sparseSA::find_Lmaximal(std::string &P, long prefix, long i, long len, std:
   long Plength = P.length();
   // Advance to the left up to K steps.
   for(long k = 0; k < sparseMult*K; k++) {
-    // If we reach the end and the match is long enough, print.
-    if(prefix == 0 || i == 0) {
+    // If we reach the end or a mismatch, and the match is long enough, print.
+    if(prefix == 0 || i == 0 || P[prefix-1] != S[i-1]) {
       if(len >= min_len) {
-	if(print) print_match(match_t(i, (!printRevCompForw || forward_) ? prefix : Plength-1-prefix, len), matches);
-	else matches.push_back(match_t(i, (!printRevCompForw || forward_) ? prefix : Plength-1-prefix, len));
-      }
-      return; // Reached mismatch, done.
-    }
-    else if(P[prefix-1] != S[i-1]){
-      // If we reached a mismatch, print the match if it is long enough.
-      if(len >= min_len) {
-	if(print) print_match(match_t(i, (!printRevCompForw || forward_) ? prefix : Plength-1-prefix, len), matches);
+	if(print) print_match(match_t(i, (!printRevCompForw || forward_) ? prefix : Plength-1-prefix, len));
 	else matches.push_back(match_t(i, (!printRevCompForw || forward_) ? prefix : Plength-1-prefix, len));
       }
       return; // Reached mismatch, done.
@@ -901,23 +890,13 @@ void sparseSA::print_match(match_t m) const {
 // This version of print match places m_new in a buffer. The buffer is
 // flushed if m_new.len <= 0 or it reaches 1000 entries.  Buffering
 // limits the number of locks on cout.
-void sparseSA::print_match(match_t m_new, std::vector<match_t> &buf) const {
-  if(m_new.len > 0)  buf.push_back(m_new);
-  if(buf.size() > 1000 || m_new.len <= 0) {
-    pthread_mutex_lock(&cout_mutex);
-    for(long i = 0; i < (long)buf.size(); i++) print_match(buf[i]);
-    pthread_mutex_unlock(&cout_mutex);
-    buf.clear();
-  }
-}
+// void sparseSA::print_match(match_t m_new, std::vector<match_t> &buf) const {
+//   print_match(m_new);
+// }
 
 void sparseSA::print_match(std::string meta, std::vector<match_t> &buf, bool rc) const {
-  pthread_mutex_lock(&cout_mutex);
   if(!rc) std::cout << "> " << meta << '\n';
   else std::cout << "> " << meta << " Reverse\n";
-  for(long i = 0; i < (long)buf.size(); i++) print_match(buf[i]);
-  pthread_mutex_unlock(&cout_mutex);
-  buf.clear();
 }
 
 // Finds maximal almost-unique matches (MAMs) These can repeat in the
