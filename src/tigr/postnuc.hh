@@ -54,15 +54,19 @@ struct Cluster
   signed char   dirB;           // the query sequence direction
                                 //      FORWARD_CHAR or REVERSE_CHAR
   std::vector<Match> matches;        // the ordered set of matches in the cluster
+  Cluster() = default;
+  Cluster(char dir) : dirB(dir) { }
 };
 
 
 struct Synteny
 //-- An ordered list of clusters between two sequences A and B
 {
-  FastaRecord *   AfP;          // a pointer to the reference sequence record
-  FastaRecord     Bf;           // the query sequence record (w/o the sequence)
-  std::vector<Cluster> clusters;     // the ordered set of clusters between A and B
+  const FastaRecord*   AfP;     // a pointer to the reference sequence record
+  //  FastaRecord     Bf;           // the query sequence record (w/o the sequence)
+  std::vector<Cluster> clusters; // the ordered set of clusters between A and B
+  Synteny() = default;
+  Synteny(const FastaRecord* Af) : AfP(Af) { }
 };
 
 
@@ -100,9 +104,11 @@ struct merge_syntenys {
     , DO_SHADOWS(ds)
   { }
 
-  void processSyntenys(std::vector<Synteny> & Syntenys,
-                       FastaRecord * Af,
-                       std::istream& QryFile, std::ostream& ClusterFile, std::ostream& DeltaFile);
+  // void processSyntenys(std::vector<Synteny> & Syntenys,
+  //                      FastaRecord * Af,
+  //                      std::istream& QryFile, std::ostream& ClusterFile, std::ostream& DeltaFile);
+  void processSyntenys(std::vector<Synteny> & Syntenys, const FastaRecord& Bf,
+                       std::ostream& ClusterFile, std::ostream& DeltaFile);
   bool extendBackward(std::vector<Alignment> & Alignments, std::vector<Alignment>::iterator CurrAp,
                       std::vector<Alignment>::iterator TargetAp, const char * A, const char * B);
   void extendClusters(std::vector<Cluster> & Clusters,
@@ -149,7 +155,7 @@ void flushAlignments
  std::ostream& DeltaFile);
 
 void flushSyntenys
-(std::vector<Synteny> & Syntenys, std::ostream& ClusterFile);
+(std::vector<Synteny> & Syntenys, const FastaRecord& Bf, std::ostream& ClusterFile);
 
 std::vector<Cluster>::iterator getForwardTargetCluster
 (std::vector<Cluster> & Clusters, std::vector<Cluster>::iterator CurrCp,

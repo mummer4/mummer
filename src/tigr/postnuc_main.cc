@@ -140,23 +140,15 @@ int main(int argc, char *argv[]) {
   std::ios::sync_with_stdio(false);
 
   std::vector<FastaRecord> Af; // array of all the reference sequences
+  FastaRecord Bf;
 
   vector<Synteny>                   Syntenys; // vector of all sets of clusters
   vector<Synteny>::reverse_iterator CurrSp; // current set of clusters
-  vector<Synteny>::reverse_iterator Sp; // temporary synteny pointer
-
-  Synteny Asyn;                 // a single set of clusters
-  Cluster Aclu;                 // a single cluster of matches
-  Match   Amat;                 // a single match
-
-  LineType PrevLine;          // the current input line
-
-  bool Found;                 // temporary search flag
 
   string Line;                  // a single line of input
-  string CurrIdB, IdA, IdB;     // fasta ID headers
+  string CurrIdB, IdB;     // fasta ID headers
+  const string* IdA;
 
-  signed char DirB = FORWARD_CHAR;   // the current query strand direction
 
   long int Seqi;                // current reference sequence index
   long int sA, sB, len;         // current match start in A, B and length
@@ -205,113 +197,90 @@ int main(int argc, char *argv[]) {
     parseAbort(RefFileName.c_str());
 
   //-- Process the input from <stdin> line by line
-  PrevLine = NO_LINE;
-  for(int c = std::cin.peek(); c != EOF; c = std::cin.peek()) {
-    if (c == '>' ) { //-- If the current line is a fasta HEADER_LINE
-      std::cin.get();
-      std::cin >> CurrIdB;
-      if(CurrIdB.empty())
-        parseAbort(Line + " - " + CurrIdB);
-      std::getline(std::cin, Line);
-      DirB = Line.find(" Reverse") == string::npos ? FORWARD_CHAR : REVERSE_CHAR;
-      PrevLine = HEADER_LINE;
-    } else if ( c == '#' ) { //-- If the current line is a cluster HEADER_LINE
-      ignore_line(std::cin);
-      PrevLine = HEADER_LINE;
-    } else { //-- If the current line is a MATCH_LINE
-      std::cin >> sA >> sB >> len;
-      if(!std::cin.good())
-        parseAbort ("stdin" + to_string(cin.tellg()));
-      ignore_line(cin); // Ignore rest of line
+  int c = std::cin.peek();
+  if(c != '>' && c != EOF) {
+    std::cerr << "File must start with a '>'" << std::endl;
+    exit(1);
+  }
+  for( ; c != EOF; c = std::cin.peek()) {
+    // Read header
+    std::cin.get();
+    std::cin >> CurrIdB;
+    if(CurrIdB.empty())
+      parseAbort(Line + " - " + CurrIdB);
+    std::getline(std::cin, Line);
+    const char DirB = Line.find(" Reverse") == string::npos ? FORWARD_CHAR : REVERSE_CHAR; // the current query strand direction
 
-      //-- Re-map the reference coordinate back to its original sequence
-      for ( Seqi = 0; sA > Af[Seqi].len() && (size_t)Seqi < Af.size(); ++Seqi)
-        sA -= Af[Seqi].len() + 1; // extra +1 for the x at the end of each seq
-      if ((size_t)Seqi >= Af.size()) {
-        cerr << "ERROR: A MUM was found with a start coordinate greater than\n"
-             << "       the sequence length, a serious error has occured.\n"
-             << "       Please file a bug report\n";
-        exit (EXIT_FAILURE);
-      }
+    if(CurrIdB != Bf.Id() && !Syntenys.empty())
+      merger.processSyntenys(Syntenys, Bf, ClusterFile, DeltaFile);
 
-      //-- If the match spans across a sequence boundry
-      if ( sA + len - 1 > Af[Seqi].len() || sA <= 0) {
-        cerr << "WARNING: A MUM was found extending beyond the boundry of:\n"
-             << "         Reference sequence '>" << Af[Seqi].Id() << "'\n\n"
-             << "Please check that the '-n' option is activated on 'mummer2'\n"
-             << "and try again, or file a bug report\n"
-             << "Attempting to continue.\n";
-        continue;
-      }
+    // Read in query sequence if needed. Must in same order as for mummer
+    while(CurrIdB != Bf.Id() && Read_Sequence(QryFile, Bf)) ;
+    if(CurrIdB != Bf.Id())
+      parseAbort("Query File did not find '" + Bf.Id() + "'. It is missing or not in correct order.");
 
-      //-- Check and update the current synteny region
-      if (IdA != Af[Seqi].Id() || IdB != CurrIdB) {
-        Found = false;
-        if (IdB == CurrIdB) { //-- Has this header been seen before?
-          for ( Sp = Syntenys.rbegin( ); Sp < Syntenys.rend( ); Sp ++ ) {
-            if (Sp->AfP->Id() == Af[Seqi].Id()) {
-              if ( Sp->AfP->len() != Af[Seqi].len() ) {
+    // Collect clusters in each synteny (same Id for ref and query)
+    for(c = std::cin.peek(); c != '>' && c != EOF; c = std::cin.peek()) {
+      IdA = nullptr;
+      Cluster currCl(DirB);
+      for(c = std::cin.peek(); c != '#' && c != '>' && c != EOF; c = std::cin.peek()) {
+        std::cin >> sA >> sB >> len; // Read match line
+        if(!std::cin.good())
+          parseAbort ("stdin" + to_string(cin.tellg()));
+        ignore_line(std::cin); // Ignore rest of line
+
+        //-- Re-map the reference coordinate back to its original sequence
+        for ( Seqi = 0; sA > Af[Seqi].len() && (size_t)Seqi < Af.size(); ++Seqi)
+          sA -= Af[Seqi].len() + 1; // extra +1 for the x at the end of each seq
+        if ((size_t)Seqi >= Af.size()) {
+          cerr << "ERROR: A MUM was found with a start coordinate greater than\n"
+               << "       the sequence length, a serious error has occured.\n"
+               << "       Please file a bug report\n";
+          exit (EXIT_FAILURE);
+        }
+        //-- If the match spans across a sequence boundry
+        if ( sA + len - 1 > Af[Seqi].len() || sA <= 0) {
+          cerr << "WARNING: A MUM was found extending beyond the boundry of:\n"
+               << "         Reference sequence '>" << Af[Seqi].Id() << "'\n\n"
+               << "Please check that the '-n' option is activated on 'mummer2'\n"
+               << "and try again, or file a bug report\n"
+               << "Attempting to continue.\n";
+          continue;
+        }
+        if(!IdA) {
+          IdA = &Af[Seqi].Id();
+          for (CurrSp = Syntenys.rbegin( ); CurrSp != Syntenys.rend( ); ++CurrSp ) {
+            if (CurrSp->AfP->Id() == *IdA) {
+              if (CurrSp->AfP->len() != Af[Seqi].len() ) {
                 cerr << "ERROR: The reference file may contain"
                      << " sequences with non-unique\n"
                      << "       header Ids, please check your input"
                      << " files and try again\n";
                 exit (EXIT_FAILURE);
               }
-              assert (Sp->Bf.Id() == IdB);
-              CurrSp = Sp;
-              Found = true;
-              break;
             }
           }
-        } else { //-- New B sequence header, process all the old synteny's
-          merger.processSyntenys (Syntenys, Af.data(), QryFile, ClusterFile, DeltaFile);
+          if(CurrSp == Syntenys.rend()) { // Not seen yet, create new synteny region
+            Syntenys.push_back({ &Af[Seqi] });
+            CurrSp = Syntenys.rbegin();
+          }
         }
-
-        IdA = Af[Seqi].Id();
-        IdB = CurrIdB;
-
-        if ( ! Found ) { //-- If not seen yet, create a new synteny region
-          Asyn.AfP    = &Af[Seqi];
-          Asyn.Bf.len_w() = -1;
-          Asyn.Bf.Id_w()  = IdB;
-
-          Syntenys.push_back (Asyn);
-          CurrSp = Syntenys.rbegin( );
+        if(*IdA != Af[Seqi].Id()) {
+          cerr << "WARNING: A cluster was found straddling two reference sequences:\n"
+               << "1) " << IdA << "\nand\n2) " << Af[Seqi].Id() << '\n'
+               << "File a bug report\n";
+          exit(EXIT_FAILURE);
         }
-
-        //-- Add a new cluster to the current synteny
-        if ( !Syntenys.empty( ) && !CurrSp->clusters.empty( ) )
-          if ( CurrSp->clusters.rbegin( )->matches.empty( ) )
-            CurrSp->clusters.pop_back( ); // hack to remove empties
-        Aclu.wasFused = false;
-        Aclu.dirB = DirB;
-        CurrSp->clusters.push_back (Aclu);
-      } else if ( PrevLine == HEADER_LINE ) { //-- Add a new cluster to the current synteny
-        if ( !Syntenys.empty( ) && !CurrSp->clusters.empty( ) )
-          if ( CurrSp->clusters.rbegin( )->matches.empty( ) )
-            CurrSp->clusters.pop_back( );
-        Aclu.wasFused = false;
-        Aclu.dirB = DirB;
-        CurrSp->clusters.push_back (Aclu);
+        currCl.matches.push_back({ sA, sB, len });
       }
-
-      if ( len > 1 ) { //-- Add a new match to the current cluster
-          Amat.sA = sA;
-          Amat.sB = sB;
-          Amat.len = len;
-          CurrSp->clusters.rbegin( )->matches.push_back (Amat);
-      }
-
-      PrevLine = MATCH_LINE;
+      CurrSp->clusters.push_back(std::move(currCl));
+      if(c == '#')
+        ignore_line(std::cin);
     }
   }
+  if(!Syntenys.empty())
+    merger.processSyntenys(Syntenys, Bf, ClusterFile, DeltaFile);
 
-  //-- Process the left-over syntenys
-  if ( !Syntenys.empty( ) && !CurrSp->clusters.empty( ) )
-    if ( CurrSp->clusters.rbegin( )->matches.empty( ) )
-      CurrSp->clusters.pop_back( );
-
-  merger.processSyntenys(Syntenys, Af.data(), QryFile, ClusterFile, DeltaFile);
   QryFile.close();
 
   return EXIT_SUCCESS;

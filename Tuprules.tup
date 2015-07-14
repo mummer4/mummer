@@ -1,7 +1,7 @@
 !cc   = |> ^ CC    %f^ $(CC) $(T_CPPFLAGS) $(CPPFLAGS) $(T_CFLAGS) $(CFLAGS_%B) $(CFLAGS) -c -o %o %f |> %B.o
 !cxx  = |> ^ CXX   %f^ $(CXX) $(T_CPPFLAGS) $(CPPFLAGS) $(T_CXXFLAGS) $(CXXFLAGS_%B) $(CXXFLAGS) -c -o %o %f |> %B.o
 !ld   = |> ^ LD    %o^ $(CC) $(T_LDFLAGS) $(LDFLAGS) $(LDFLAGS_%B) $(LOADLIBES) $(LDLIBS) %f -o %o |>
-!lxxd = |> ^ LXX   %o^ $(CXX) $(T_LDFLAGS) $(LDFLAGS) $(LDFLAGS_%B) $(LOADLIBES) $(LDLIBS) %f -o %o |>
+!lxxd = |> ^ LXX   %o^ $(CXX) $(T_LDFLAGS) $(LDFLAGS) $(LDFLAGS_%B)  %f -o %o $(LOADLIBES) $(LDLIBS) |>
 !ar   = |> ^ AR    %o^ $(AR) sruv $(T_ARFLAGS) $(ARFLAGS) %o %f |>
 
 # : foreach *.c |> !cc |>
@@ -20,16 +20,15 @@ CXX = g++
 endif
 AR  = ar
 
-T_CPPFLAGS = -Wall @(CPPFLAGS)
-T_CFLAGS = @(CFLAGS)
-T_CXXFLAGS = @(CXXFLAGS) -std=c++0x
-T_LDFLAGS = @(LDFLAGS)
-T_ARFLAGS = @(ARFLAGS)
-
 ifdef BIN_DIR
 BIN_DIR = @(BIN_DIR)
 else
 BIN_DIR = $(TUP_CWD)/bin
+endif
+ifdef LIB_DIR
+LIB_DIR = @(LIB_DIR)
+else
+LIB_DIR = $(TUP_CWD)/lib
 endif
 ifdef AUX_BIN_DIR
 AUX_BIN_DIR = @(AUX_BIN_DIR)
@@ -46,6 +45,13 @@ BIN_PATH = @(BIN_PATH)
 else
 BIN_PATH = .
 endif
+
+T_CPPFLAGS = -Wall @(CPPFLAGS) -I$(TUP_CWD)/src
+T_CFLAGS = @(CFLAGS)
+T_CXXFLAGS = @(CXXFLAGS) -std=c++0x
+T_LDFLAGS = @(LDFLAGS) -L$(LIB_DIR)
+T_ARFLAGS = @(ARFLAGS)
+
 
 CSH = /bin/csh
 PERL = /usr/bin/perl
