@@ -55,15 +55,14 @@ struct Cluster
                                 //      FORWARD_CHAR or REVERSE_CHAR
   std::vector<Match> matches;        // the ordered set of matches in the cluster
   Cluster() = default;
-  Cluster(char dir) : dirB(dir) { }
+  Cluster(char dir) : wasFused(false), dirB(dir) { }
 };
 
 
 struct Synteny
-//-- An ordered list of clusters between two sequences A and B
+//-- An ordered list of clusters between two sequences A and B (B is fixed)
 {
   const FastaRecord*   AfP;     // a pointer to the reference sequence record
-  //  FastaRecord     Bf;           // the query sequence record (w/o the sequence)
   std::vector<Cluster> clusters; // the ordered set of clusters between A and B
   Synteny() = default;
   Synteny(const FastaRecord* Af) : AfP(Af) { }

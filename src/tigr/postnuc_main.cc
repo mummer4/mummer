@@ -42,6 +42,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <algorithm>
 #include "postnuc.hh"
 #include "tigrinc.hh"
 #include "sw_align.hh"
@@ -146,7 +147,7 @@ int main(int argc, char *argv[]) {
   vector<Synteny>::reverse_iterator CurrSp; // current set of clusters
 
   string Line;                  // a single line of input
-  string CurrIdB, IdB;     // fasta ID headers
+  string CurrIdB;     // fasta ID headers
   const string* IdA;
 
 
@@ -186,7 +187,6 @@ int main(int argc, char *argv[]) {
   }
 
   //-- Generate the array of the reference sequences
-  //  InitSize = INIT_SIZE;
   Af.push_back(FastaRecord());
   while(Read_Sequence(RefFile, Af.back()))
     Af.push_back(FastaRecord());
@@ -214,7 +214,7 @@ int main(int argc, char *argv[]) {
     if(CurrIdB != Bf.Id() && !Syntenys.empty())
       merger.processSyntenys(Syntenys, Bf, ClusterFile, DeltaFile);
 
-    // Read in query sequence if needed. Must in same order as for mummer
+    // Read in query sequence if needed. Must be in same order as for mummer
     while(CurrIdB != Bf.Id() && Read_Sequence(QryFile, Bf)) ;
     if(CurrIdB != Bf.Id())
       parseAbort("Query File did not find '" + Bf.Id() + "'. It is missing or not in correct order.");
@@ -223,7 +223,7 @@ int main(int argc, char *argv[]) {
     for(c = std::cin.peek(); c != '>' && c != EOF; c = std::cin.peek()) {
       IdA = nullptr;
       Cluster currCl(DirB);
-      for(c = std::cin.peek(); c != '#' && c != '>' && c != EOF; c = std::cin.peek()) {
+      for( ; c != '#' && c != '>' && c != EOF; c = std::cin.peek()) {
         std::cin >> sA >> sB >> len; // Read match line
         if(!std::cin.good())
           parseAbort ("stdin" + to_string(cin.tellg()));
@@ -249,20 +249,16 @@ int main(int argc, char *argv[]) {
         }
         if(!IdA) {
           IdA = &Af[Seqi].Id();
-          for (CurrSp = Syntenys.rbegin( ); CurrSp != Syntenys.rend( ); ++CurrSp ) {
-            if (CurrSp->AfP->Id() == *IdA) {
-              if (CurrSp->AfP->len() != Af[Seqi].len() ) {
-                cerr << "ERROR: The reference file may contain"
-                     << " sequences with non-unique\n"
-                     << "       header Ids, please check your input"
-                     << " files and try again\n";
-                exit (EXIT_FAILURE);
-              }
-            }
-          }
+          CurrSp = std::find_if(Syntenys.rbegin(), Syntenys.rend(), [=](const Synteny& s) { return s.AfP->Id() == *IdA; });
           if(CurrSp == Syntenys.rend()) { // Not seen yet, create new synteny region
             Syntenys.push_back({ &Af[Seqi] });
             CurrSp = Syntenys.rbegin();
+          } else if (CurrSp->AfP->len() != Af[Seqi].len() ) {
+            cerr << "ERROR: The reference file may contain"
+                 << " sequences with non-unique\n"
+                 << "       header Ids, please check your input"
+                 << " files and try again\n";
+            exit (EXIT_FAILURE);
           }
         }
         if(*IdA != Af[Seqi].Id()) {
@@ -271,7 +267,8 @@ int main(int argc, char *argv[]) {
                << "File a bug report\n";
           exit(EXIT_FAILURE);
         }
-        currCl.matches.push_back({ sA, sB, len });
+        if(len > 1)
+          currCl.matches.push_back({ sA, sB, len });
       }
       CurrSp->clusters.push_back(std::move(currCl));
       if(c == '#')
