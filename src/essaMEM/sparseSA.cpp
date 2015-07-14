@@ -16,8 +16,6 @@ namespace mummer {
 // LS suffix sorter (integer alphabet).
 extern "C" { void suffixsort(int *x, int *p, int n, int k, int l); };
 
-long memCount = 0;
-
 // Get maximum query sequence description length.
 static size_t max_len(const std::vector<std::string>& descr) {
   size_t res = 0;
@@ -59,6 +57,22 @@ sparseSA::sparseSA(const std::string& S_, const std::vector<std::string>& descr_
   , printRevCompForw(printRevCompForw_)
   , nucleotidesOnly(nucleotidesOnly_)
 { }
+
+sparseSA sparseSA::create_auto(const std::string& S, const std::vector<std::string>& descr_, const std::vector<long>& startpos_,
+                     int min_len, bool nucleotidesOnly_, int K) {
+  const bool suflink    = K < 4;
+  const bool child      = K >= 4;
+  int        sparseMult = 1;
+  if(!suflink || child) {
+    sparseMult = K >= 4
+      ? (int) std::max((min_len-10)/K,1)
+      : (int) std::max((min_len-12)/K,1);
+  }
+  const int kmer = std::max(0,std::min(10,min_len - sparseMult*K + 1));
+  return sparseSA(S, descr_, startpos_, true /* 4column */, K, suflink, child, kmer>0, sparseMult,
+                  kmer, false /* printSubstring */, false /* printRevCompForw */,
+                  nucleotidesOnly_);
+}
 
 // Uses the algorithm of Kasai et al 2001 which was described in
 // Manzini 2004 to compute the LCP array. Modified to handle sparse
@@ -739,7 +753,6 @@ bool sparseSA::suffixlink(interval_t &m) const {
 // Print results in format used by MUMmer v3.  Prints results
 // 1-indexed, instead of 0-indexed.
 void sparseSA::print_match(std::ostream& os, match_t m) const {
-  memCount++;
   if(_4column == false) {
     os << std::setw(8) << (m.ref + 1) << "  "
        << std::setw(8) << (m.query + 1) << "  "
@@ -773,58 +786,6 @@ struct thread_data {
   std::string       *P;         // Query string.
   bool               forward_;
 };
-
-// void *MEMthread(void *arg) {
-//   thread_data       *data = (thread_data*)arg;
-//   std::vector<long> &K    = data->Kvalues;
-//   const sparseSA    *sa   = data->sa;
-
-//   // Find MEMs for all assigned offsets to this thread.
-
-//   std::vector<match_t> matches; // place-holder
-//   matches.reserve(2000);   // TODO: Use this as a buffer again!!!!!!
-
-//   for(long k = 0; k < (long)K.size(); k++) {  sa->findMEM(K[k], *(data->P), matches, data->min_len, data->forward_, true); }
-
-//   pthread_exit(NULL);
-//   return 0;
-// }
-
-// void sparseSA::MEM(std::string &P, std::vector<match_t> &matches, int min_len, bool print, long& currentCount, bool forward_, int num_threads) const {
-//   if(min_len < K) return;
-//   memCount=0;
-//   if(num_threads == 1) {
-//     for(int k = 0; k < K; k++) { findMEM(k, P, matches, min_len, forward_, print); }
-//     currentCount += memCount;
-//   }
-//   else if(num_threads > 1) {
-//     std::vector<pthread_t> thread_ids(num_threads);
-//     std::vector<thread_data> data(num_threads);
-
-//     // Make sure all num_threads are joinable.
-//     pthread_attr_t attr;  pthread_attr_init(&attr);
-//     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
-
-//     // Distribute K-values evenly between num_threads.
-//     int t = 0;
-//     for(int k = 0; k < K; k++) {
-//       data[t].Kvalues.push_back(k);
-//       t++;
-//       if(t == num_threads) t = 0;
-//     }
-//     // Initialize additional thread data.
-//     for(int i = 0; i < num_threads; i++) {
-//       data[i].sa       = this;
-//       data[i].min_len  = min_len;
-//       data[i].P        = &P;
-//       data[i].forward_ = forward_;
-//     }
-//     // Create joinable threads to find MEMs.
-//     for(int i = 0; i < num_threads; i++) pthread_create(&thread_ids[i], &attr, MEMthread, (void *)&data[i]);
-//     // Wait for all threads to terminate.
-//     for(int i = 0; i < num_threads; i++) pthread_join(thread_ids[i], NULL);
-//   }
-// }
 
 } // namespace mummer
 } // namespace mummer

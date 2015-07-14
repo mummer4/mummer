@@ -1,8 +1,10 @@
 include_rules
 
 LDLIBS = -lpthread
+LIBOBJS = sparseSA.o qsufsort.o
 
 : foreach *.cpp |> !cxx |> {essamummer}
 : foreach *.c |> !cc |> {essamummer}
 
 : {essamummer} |> !lxxd |> $(BIN_DIR)/essamummer $(BIN_DIR)/<exec>
+: $(LIBOBJS) |> !ar |> $(LIB_DIR)/libessaMEM.a

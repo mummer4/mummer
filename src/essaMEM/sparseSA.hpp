@@ -12,32 +12,33 @@
 namespace mummer {
 namespace mummer {
 
-static const unsigned int BITADD[256] = { UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,//0-9
-                                         UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,//10-19
-                                         UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,//20-29
-                                         UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,//30-39
-                                         UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,//40-49
-                                         UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,//50-59
-                                         UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, 0,        UINT_MAX, 1,        UINT_MAX, UINT_MAX,//60-69 65:A, 67:C
-                                         UINT_MAX, 2,        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,//70-79 71:G
-                                         UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, 3,        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,//80-89 84:T
-                                         UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, 0,        UINT_MAX, 1,       //90-99 97:a, 99: c
-                                         UINT_MAX, UINT_MAX, UINT_MAX, 2,        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,//100-109 103:g
-                                         UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, 3,        UINT_MAX, UINT_MAX, UINT_MAX,//110-119 116:t
-                                         UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,//120-129
-                                         UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,//130-139
-                                         UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,//140-149
-                                         UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,//150-159
-                                         UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,//160-169
-                                         UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,//170-179
-                                         UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,//180-189
-                                         UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,//190-199
-                                         UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,//200-209
-                                         UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,//210-219
-                                         UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,//220-229
-                                         UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,//230-239
-                                         UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,//240-249
-                                         UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX };//250-255
+static const unsigned int BITADD[256] = {
+  UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,//0-9
+  UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,//10-19
+  UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,//20-29
+  UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,//30-39
+  UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,//40-49
+  UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,//50-59
+  UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, 0,        UINT_MAX, 1,        UINT_MAX, UINT_MAX,//60-69 65:A, 67:C
+  UINT_MAX, 2,        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,//70-79 71:G
+  UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, 3,        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,//80-89 84:T
+  UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, 0,        UINT_MAX, 1,       //90-99 97:a, 99: c
+  UINT_MAX, UINT_MAX, UINT_MAX, 2,        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,//100-109 103:g
+  UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, 3,        UINT_MAX, UINT_MAX, UINT_MAX,//110-119 116:t
+  UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,//120-129
+  UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,//130-139
+  UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,//140-149
+  UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,//150-159
+  UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,//160-169
+  UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,//170-179
+  UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,//180-189
+  UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,//190-199
+  UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,//200-209
+  UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,//210-219
+  UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,//220-229
+  UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,//230-239
+  UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,//240-249
+  UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX };//250-255
 
 // Stores the LCP array in an unsigned char (0-255).  Values larger
 // than or equal to 255 are stored in a sorted array.
@@ -179,6 +180,9 @@ struct sparseSA {
            long K_, bool suflink_, bool child_, bool kmer_, int sparseMult_, int kMerSize_, bool printSubstring_,
            bool printRevCompForw_, bool nucleotidesOnly_);
 
+  static sparseSA create_auto(const std::string& S, const std::vector<std::string>& descr_, const std::vector<long>& startpos_,
+                              int min_len, bool nucleotidesOnly_, int K = 1);
+
   // Modified Kasai et all for LCP computation.
   void computeLCP();
   //Modified Abouelhoda et all for CHILD Computation.
@@ -241,14 +245,14 @@ struct sparseSA {
 
   // NOTE: min_len must be > 1
   template<typename Output>
-  void findMAM_each(const std::string &P, int min_len, long& memCount, bool forward_, Output out) const;
+  void findMAM_each(const std::string &P, int min_len, bool forward_, Output out) const;
 
-  void findMAM(const std::string &P, int min_len, long& memCount, bool forward_, std::ostream& os) const {
-    findMAM_each(P, min_len, memCount, forward_, [&](const match_t& m) { print_match(os, m); });
+  void findMAM(const std::string &P, int min_len, bool forward_, std::ostream& os) const {
+    findMAM_each(P, min_len, forward_, [&](const match_t& m) { print_match(os, m); });
   }
 
-  void findMAM(const std::string &P, int min_len, long& memCount, bool forward_, std::vector<match_t>& matches) const {
-    findMAM_each(P, min_len, memCount, forward_, [&](const match_t& m) { matches.push_back(m); });
+  void findMAM(const std::string &P, int min_len, bool forward_, std::vector<match_t>& matches) const {
+    findMAM_each(P, min_len, forward_, [&](const match_t& m) { matches.push_back(m); });
   }
 
   // Returns true if the position p1 in the query pattern and p2 in
@@ -262,13 +266,13 @@ struct sparseSA {
   // et. al. Note this is a "one-sided" query. It "streams" the query
   // P throught he index.  Consequently, repeats can occur in the
   // pattern P.
-  void MAM(const std::string& P, int min_len, long& memCount, bool forward_, std::ostream& os) const {
+  void MAM(const std::string& P, int min_len, bool forward_, std::ostream& os) const {
     if(K != 1) return;  // Only valid for full suffix array.
-    findMAM(P, min_len, memCount, forward_, os);
+    findMAM(P, min_len, forward_, os);
   }
-  void MAM(const std::string& P, int min_len, long& memCount, bool forward_, std::vector<match_t>& matches) const {
+  void MAM(const std::string& P, int min_len, bool forward_, std::vector<match_t>& matches) const {
     if(K != 1) return;  // Only valid for full suffix array.
-    findMAM(P, min_len, memCount, forward_, matches);
+    findMAM(P, min_len, forward_, matches);
   }
 
 
@@ -280,35 +284,33 @@ struct sparseSA {
 
   // Find all MEMs given a prefix pattern offset k.
   template<typename Output>
-  void findMEM_each(const std::string &P, long k, int min_len, bool forward_, Output out) const;
+  void findMEM_k_each(const std::string &P, long k, int min_len, bool forward_, Output out) const;
 
   // Find Maximal Exact Matches (MEMs)
   template<typename Output>
-  void MEM_ks(const std::string &P, int min_len, long& memCount, bool forward_, Output out) const {
-    // memCount = 0;
+  void findMEM_each(const std::string &P, int min_len, bool forward_, Output out) const {
     for(int k = 0; k < K; k++)
-      findMEM_each(P, k, min_len, forward_, out);
-    //    currentCount += memCount;
+      findMEM_k_each(P, k, min_len, forward_, out);
   }
 
-  void MEM(const std::string &P, int min_len, long& memCount, bool forward_, std::ostream& os) const {
-    MEM_ks(P, min_len, memCount, forward_, [&](const match_t& m) { print_match(os, m); });
+  void MEM(const std::string &P, int min_len, bool forward_, std::ostream& os) const {
+    findMEM_each(P, min_len, forward_, [&](const match_t& m) { print_match(os, m); });
   }
 
-  void MEM(const std::string &P, int min_len, long& memCount, bool forward_, std::vector<match_t>& matches) const {
-    MEM_ks(P, min_len, memCount, forward_, [&](const match_t& m) { matches.push_back(m); });
+  void MEM(const std::string &P, int min_len, bool forward_, std::vector<match_t>& matches) const {
+    findMEM_each(P, min_len, forward_, [&](const match_t& m) { matches.push_back(m); });
   }
 
   // Maximal Unique Match (MUM)
   template<typename Output>
-  void findMUM_each(const std::string &P, int min_len, long& memCount, bool forward_, Output out) const;
+  void findMUM_each(const std::string &P, int min_len, bool forward_, Output out) const;
 
-  void MUM(const std::string &P, int min_len, long& memCount, bool forward_, std::ostream& os) const {
-    findMUM_each(P, min_len, memCount, forward_, [&](const match_t& m) { print_match(os, m); });
+  void MUM(const std::string &P, int min_len, bool forward_, std::ostream& os) const {
+    findMUM_each(P, min_len, forward_, [&](const match_t& m) { print_match(os, m); });
   }
 
-  void MUM(const std::string &P, int min_len, long& memCount, bool forward_, std::vector<match_t>& matches) const {
-    findMUM_each(P, min_len, memCount, forward_, [&](const match_t& m) { matches.push_back(m); });
+  void MUM(const std::string &P, int min_len, bool forward_, std::vector<match_t>& matches) const {
+    findMUM_each(P, min_len, forward_, [&](const match_t& m) { matches.push_back(m); });
   }
 
   //save index to files
@@ -329,11 +331,10 @@ struct sparseSA {
 // Finds maximal almost-unique matches (MAMs) These can repeat in the
 // given query pattern P, but occur uniquely in the indexed reference S.
 template<typename Output>
-void sparseSA::findMAM_each(const std::string &P, int min_len, long& currentCount, bool forward_, Output out) const {
+void sparseSA::findMAM_each(const std::string &P, int min_len, bool forward_, Output out) const {
   const long Plength = P.length();
   interval_t cur(0, N-1, 0);
   long       prefix  = 0;
-  //  memCount           = 0;
 
   while(prefix < Plength) {
     // Traverse SA top down until mismatch or full string is matched.
@@ -363,10 +364,10 @@ void sparseSA::findMAM_each(const std::string &P, int min_len, long& currentCoun
 
 // Maximal Unique Match (MUM)
 template<typename Output>
-void sparseSA::findMUM_each(const std::string &P, int min_len, long& currentCount, bool forward_, Output out) const {
+void sparseSA::findMUM_each(const std::string &P, int min_len, bool forward_, Output out) const {
   // Find unique MEMs.
   std::vector<match_t> matches;
-  MAM(P, min_len, currentCount, forward_, matches);
+  MAM(P, min_len, forward_, matches);
   //  memCount=0;
 
   struct by_ref {
@@ -400,12 +401,11 @@ void sparseSA::findMUM_each(const std::string &P, int min_len, long& currentCoun
   }
   if(!ignoreprevious && !matches.empty())
     out(matches.back());
-  //  currentCount = memCount;
 }
 
 // For a given offset in the prefix k, find all MEMs.
 template<typename Output>
-void sparseSA::findMEM_each(const std::string &P, long k, int min_len, bool forward_, Output out) const {
+void sparseSA::findMEM_k_each(const std::string &P, long k, int min_len, bool forward_, Output out) const {
   if(k < 0 || k >= K) { std::cerr << "Invalid k " << k << " [0, " << K << "]" << std::endl; return; }
   // Offset all intervals at different start points.
   long prefix = k;

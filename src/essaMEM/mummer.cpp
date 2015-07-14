@@ -56,7 +56,6 @@ struct query_arg {
 
 void *query_thread(void *arg_) {
   query_arg *arg = (query_arg *)arg_;
-  long memCounter = 0;
   std::ifstream data(query_fasta[arg->queryFile].c_str());
 
   std::vector<mummer::mummer::match_t> matches;
@@ -112,9 +111,9 @@ void *query_thread(void *arg_) {
           else std::cout << "> " << meta << '\n';
         }
         switch(type) {
-        case MAM: sa->MAM(P, min_len, memCounter, true, std::cout); break;
-        case MUM: sa->MUM(P, min_len, memCounter, true, std::cout); break;
-        case MEM: sa->MEM(P, min_len, memCounter, true, std::cout); break;
+        case MAM: sa->MAM(P, min_len, true, std::cout); break;
+        case MUM: sa->MUM(P, min_len, true, std::cout); break;
+        case MEM: sa->MEM(P, min_len, true, std::cout); break;
         }
         if(!print) sa->print_match(std::cout, meta, false);
       }
@@ -125,16 +124,16 @@ void *query_thread(void *arg_) {
           else std::cout << "> " << meta << " Reverse\n";
         }
         switch(type) {
-        case MAM: sa->MAM(P, min_len, memCounter, false, std::cout); break;
-        case MUM: sa->MUM(P, min_len, memCounter, false, std::cout); break;
-        case MEM: sa->MEM(P, min_len, memCounter, false, std::cout); break;
+        case MAM: sa->MAM(P, min_len, false, std::cout); break;
+        case MUM: sa->MUM(P, min_len, false, std::cout); break;
+        case MEM: sa->MEM(P, min_len, false, std::cout); break;
         }
         if(!print) sa->print_match(std::cout, meta, true);
       }
     }
   }
 
-  std::cerr << "number of M(E/A/U)Ms: " << memCounter << std::endl;
+  //  std::cerr << "number of M(E/A/U)Ms: " << memCounter << std::endl;
   pthread_exit(NULL);
   return 0;
 }
