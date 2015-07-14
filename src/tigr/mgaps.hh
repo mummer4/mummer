@@ -1,11 +1,14 @@
 #ifndef __MUMMER_MGAPS_H__
 #define __MUMMER_MGAPS_H__
 
+#include <iostream>
+#include <cassert>
+
 namespace mummer {
 namespace mgaps {
 // Represent a match
 struct  Match_t {
-  long int     Start1, Start2, Len;
+  long int     Start1, Start2, Len; // Start1 and Start2 are 1-based.
   long int     Simple_Score;
   long int     Simple_From;
   long int     Simple_Adj;
@@ -42,12 +45,151 @@ struct ClusterMatches {
     , Use_Extents(ue)
   { }
 
-  typedef std::vector<std::vector<Match_t>> clusters_type;
+  typedef std::vector<Match_t>      cluster_type;
+  typedef std::vector<cluster_type> clusters_type;
 
-  int  Process_Matches(Match_t * A, UnionFind& UF, int N, clusters_type& clusters);
-  int  Process_Cluster(Match_t * A, int N, clusters_type& cluster);
-  void Print_Cluster(const clusters_type& clusters, const char* label);
+  template<typename Output>
+  int Cluster_each(Match_t * A, UnionFind& UF, int N, Output out);
+
+  //  Process matches  A [1 .. N]  and append them to clusters
+  int  Process_Matches(Match_t * A, UnionFind& UF, int N, clusters_type& clusters) {
+    return Cluster_each(A, UF, N, [&](cluster_type&& cl) { clusters.push_back(std::move(cl)); });
+  }
+
+  static void Print_Cluster(const cluster_type& cluster, const char* label, std::ostream& os = std::cout);
+  static void Print_Clusters(const clusters_type& clusters, const char* label, std::ostream& os = std::cout);
+
+
+protected:
+  template<typename Output>
+  int  Process_Cluster(Match_t * A, int N, Output out);
+
+  //  Remove from  A [0 .. (N - 1)]  any matches that are internal to a repeat,
+  static int Filter_Matches(Match_t* A, const int N);
+
+  // Matches ordering
+  static inline bool By_Start2(const Match_t& A, const Match_t& B) {
+    return (A.Start2 < B.Start2) || (A.Start2 == B.Start2 && A.Start1 < B.Start1);
+  }
+
+  static bool By_Cluster(const Match_t& A, const Match_t& B) {
+    return (A.cluster_id < B.cluster_id) ||
+      (A.cluster_id == B.cluster_id && By_Start2(A, B));
+  }
 };
+
+//
+// Implementation of templated methods
+//
+
+template<typename Output>
+int ClusterMatches::Cluster_each(Match_t * A, UnionFind& UF, int N, Output out) {
+  //  Process matches  A [1 .. N]  and output them after
+  //  a line containing  label .
+
+  //  Use Union-Find to create connected-components based on
+  //  separation and similar diagonals between matches
+  UF.reset(N);
+
+  std::sort(A + 1, A + N + 1, By_Start2);
+  N = Filter_Matches (A + 1, N);
+
+  for  (int i = 1;  i < N;  i ++) {
+    long int i_end  = A [i] . Start2 + A [i] . Len;
+    long int i_diag = A [i] . Start2 - A [i] . Start1;
+
+    for  (int j = i + 1;  j <= N;  j ++) {
+      long int sep = A [j] . Start2 - i_end;
+      if  (sep > Max_Separation)
+        break;
+
+      long int diag_diff = std::abs ((A [j] . Start2 - A [j] . Start1) - i_diag);
+      if  (diag_diff <= std::max(Fixed_Separation, (int)(Separation_Factor * sep)))
+        UF.union_sets(UF.find(i), UF.find(j));
+    }
+  }
+
+  //  Set the cluster id of each match and reset Good flag
+  for  (int i = 1;  i <= N;  i ++) {
+    A [i] . cluster_id = UF.find (i);
+    assert(A[i].cluster_id > 0);
+    A[i].Good = false;
+  }
+  std::sort(A + 1, A + N + 1, By_Cluster);
+
+  // Determine and process clusters
+  int cluster_size, print_ct = 0;
+  for (int i = 1;  i <= N;  i += cluster_size) {
+    int j;
+    for  (j = i + 1;  j <= N && A [i] . cluster_id == A [j] . cluster_id;  j ++)
+      ;
+    cluster_size = j - i;
+    print_ct += Process_Cluster (A + i, cluster_size, out);
+  }
+  return print_ct;
+}
+
+template<typename Output>
+int ClusterMatches::Process_Cluster(Match_t * A, int N, Output out) {
+//  Process the cluster of matches in  A [0 .. (N - 1)]  and output them
+//  after a line containing  label .  Return the number of clusters
+//  printed.
+  int  count = 0;
+
+  while(N > 0) {
+    std::vector<Match_t> cluster; // Potential cluster
+
+    for  (int i = 0;  i < N;  i ++) {
+      A [i] . Simple_Score = A [i] . Len;
+      A [i] . Simple_Adj = 0;
+      A [i] . Simple_From = -1;
+      for  (int j = 0;  j < i;  j ++) {
+        const long int Olap1 = A [j] . Start1 + A [j] . Len - A [i] . Start1;
+        const long int Olap2 = A [j] . Start2 + A [j] . Len - A [i] . Start2;
+        const long int Olap = std::max(std::max((long)0, Olap1), Olap2);
+
+          // penalize off diagonal matches
+        const long int Pen = Olap + std::abs ( (A [i] . Start2 - A [i] . Start1) -
+                                               (A [j] . Start2 - A [j] . Start1) );
+
+        if  (A [j] . Simple_Score + A [i] . Len - Pen > A [i] . Simple_Score) {
+          A [i] . Simple_From = j;
+          A [i] . Simple_Score = A [j] . Simple_Score + A [i] . Len - Pen;
+          A [i] . Simple_Adj = Olap;
+        }
+      }
+    }
+
+    int best = 0;
+    for  (int i = 1;  i < N;  i ++)
+      if  (A [i] . Simple_Score > A [best] . Simple_Score)
+        best = i;
+    long int total = 0;
+    long int hi    = LONG_MIN;
+    long int lo    = LONG_MAX;
+    for  (int i = best;  i >= 0;  i = A [i] . Simple_From) {
+      A [i] . Good = true;
+      total += A [i] . Len;
+      hi = std::max(hi, A[i].Start1 + A[i].Len);
+      lo = std::min(lo, A[i].Start1);
+    }
+    const long int score = Use_Extents ? hi - lo : total;
+
+    if  (score >= Min_Output_Score) {
+      count ++;
+      for  (int i = 0;  i < N;  i ++)
+        if  (A [i] . Good)
+          cluster.push_back(A[i]);
+      out(std::move(cluster));
+    }
+
+    // Compact match array
+    const auto new_end = std::remove_if(A, A + N, [](const Match_t& m) { return m.Good; });
+    N = new_end - A;
+  }
+
+  return count;
+}
 
 
 } // namespace mgaps

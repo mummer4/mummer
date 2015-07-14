@@ -129,7 +129,6 @@ int  main(int argc, char * argv []) {
 
   std::vector<Match_t>          A(1);
   UnionFind                     UF;
-  ClusterMatches::clusters_type clusters;
 
   ClusterMatches clusterer(Fixed_Separation, Max_Separation, Min_Output_Score, Separation_Factor, Use_Extents);
 
@@ -146,9 +145,13 @@ int  main(int argc, char * argv []) {
       if  (sscanf (line.c_str(), "%ld %ld %ld", & S1, & S2, & Len) == 3)
         A.push_back(Match_t(S1, S2, Len));
     }
-    clusters.clear();
-    clusterer.Process_Matches(A.data(), UF, A.size() - 1, clusters);
-    clusterer.Print_Cluster(clusters, header.c_str());
+    const char* label = header.c_str();
+    clusterer.Cluster_each(A.data(), UF, A.size() - 1, [&](const ClusterMatches::cluster_type&& cl) {
+        clusterer.Print_Cluster(cl, label, std::cout);
+        label = "#";
+      });
+    if(label == header.c_str()) // Empty cluster, output empty header
+      std::cout << label << '\n';
   }
 
    return  0;
