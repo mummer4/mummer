@@ -1,0 +1,6 @@
+include_rules
+
+LDLIBS = -lpthread -lessaMEM
+
+: foreach nucmer.cc |> !cxx |> {umdmummer}
+# : {umdmummer} |> !lxxd |> $(BIN_DIR)/umdmummer $(BIN_DIR)/<exec>
