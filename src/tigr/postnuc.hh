@@ -5,6 +5,10 @@
 #include <vector>
 #include <iostream>
 #include <limits>
+#include <cstring>
+#include <memory>
+#include "tigrinc.hh"
+#include "sw_align.hh"
 
 
 namespace mummer {
@@ -78,6 +82,15 @@ struct Alignment
   long int         deltaApos;   // sum of abs(deltas) - #of negative deltas
                                 //      trust me, it is a very helpful value
   long int         Errors, SimErrors, NonAlphas; // errors, similarity errors, nonalphas
+
+  Alignment(const Match& m, const char dir)
+    : dirB(dir)
+    , sA(m.sA)
+    , sB(m.sB)
+    , eA(m.sA + m.len - 1)
+    , eB(m.sB + m.len - 1)
+    , deltaApos(0)
+  { }
 };
 
 
@@ -103,15 +116,15 @@ struct merge_syntenys {
     , DO_SHADOWS(ds)
   { }
 
-  // void processSyntenys(std::vector<Synteny> & Syntenys,
-  //                      FastaRecord * Af,
-  //                      std::istream& QryFile, std::ostream& ClusterFile, std::ostream& DeltaFile);
-  void processSyntenys(std::vector<Synteny> & Syntenys, const FastaRecord& Bf,
-                       std::ostream& ClusterFile, std::ostream& DeltaFile);
+  template<typename ClustersOut, typename MatchesOut>
+  void processSyntenys_each(std::vector<Synteny>& Syntenys, const FastaRecord& Bf,
+                            ClustersOut clusters, MatchesOut matches);
   bool extendBackward(std::vector<Alignment> & Alignments, std::vector<Alignment>::iterator CurrAp,
                       std::vector<Alignment>::iterator TargetAp, const char * A, const char * B);
+
+  template<typename MatchesOut>
   void extendClusters(std::vector<Cluster> & Clusters,
-                      const FastaRecord * Af, const FastaRecord * Bf, std::ostream& DeltaFile);
+                      const FastaRecord * Af, const FastaRecord * Bf, MatchesOut matches);
 };
 
 //-- Helper functions
@@ -140,9 +153,11 @@ inline void ignore_line(std::istream& is) {
 bool Read_Sequence(std::istream& is, std::string& T, std::string& name);
 bool Read_Sequence(std::istream& is, FastaRecord& record);
 
-void addNewAlignment
-(std::vector<Alignment> & Alignments, std::vector<Cluster>::iterator Cp,
- std::vector<Match>::iterator Mp);
+void printDeltaAlignments(const std::vector<Alignment> & Alignments,
+                          const FastaRecord * Af, const FastaRecord * Bf,
+                          std::ostream& DeltaFile);
+
+void printSyntenys(const std::vector<Synteny>& Syntenys, const FastaRecord& Bf, std::ostream& ClusterFile);
 
 bool extendForward
 (std::vector<Alignment>::iterator Ap, const char * A, long int targetA,
@@ -181,6 +196,181 @@ void parseDelta
 
 inline long int revC
 (long int Coord, long int Len);
+
+
+//
+// Implementation of templated methods
+//
+template<typename ClustersOut, typename MatchesOut>
+void merge_syntenys::processSyntenys_each(std::vector<Synteny>& Syntenys, const FastaRecord& Bf,
+                                          ClustersOut clusters, MatchesOut matches)
+
+//  For each syntenic region with clusters, extend the clusters to
+//  expand total alignment coverage. Only should be called once all
+//  the clusters for the contained syntenic regions have been stored
+//  in the data structure. Frees the memory used by the the syntenic
+//  regions once the output of extendClusters and flushSyntenys has
+//  been produced.
+
+{
+  //-- For all the contained syntenys
+  for(auto CurrSp : Syntenys) {
+      //-- If no clusters, ignore
+      if(CurrSp.clusters.empty()) continue;
+      //-- Extend clusters and create the alignment information
+      extendClusters (CurrSp.clusters, CurrSp.AfP, &Bf, matches);
+  }
+
+  //-- Create the cluster information
+  clusters(Syntenys, Bf);
+  Syntenys.clear();
+}
+
+template<typename MatchesOut>
+void merge_syntenys::extendClusters(std::vector<Cluster> & Clusters,
+                                    const FastaRecord * Af, const FastaRecord * Bf, MatchesOut matches)
+
+//  Connect all the matches in every cluster between sequences A and B.
+//  Also, extend alignments off of the front and back of each cluster to
+//  expand total alignment coverage. When these extensions encounter an
+//  adjacent cluster, fuse the two regions to create one single
+//  encompassing region. This routine will create alignment objects from
+//  these extensions and output the resulting delta information to the
+//  delta output file.
+
+{
+  //-- Sort the clusters (ascending) by their start coordinate in sequence A
+  sort (Clusters.begin( ), Clusters.end( ), AscendingClusterSort( ));
+
+
+  //-- If no delta file is requested
+  if ( ! DO_DELTA )
+    return;
+
+
+  bool target_reached = false;         // reached the adjacent match or cluster
+
+  const char * A, * B;                 // the sequences A and B
+  std::unique_ptr<char[]> Brev;          // the reverse complement of B
+
+  unsigned int m_o;
+  long int targetA, targetB;           // alignment extension targets in A and B
+
+  std::vector<Match>::iterator Mp;          // match pointer
+
+  std::vector<Cluster>::iterator PrevCp;    // where the extensions last left off
+  std::vector<Cluster>::iterator CurrCp;    // the current cluster being extended
+  std::vector<Cluster>::iterator TargetCp = Clusters.end( );  // the target cluster
+
+  std::vector<Alignment> Alignments;        // the vector of alignment objects
+  std::vector<Alignment>::iterator CurrAp = Alignments.begin( );   // current align
+  std::vector<Alignment>::iterator TargetAp;                // target align
+
+
+  //-- Extend each cluster
+  A = Af->seq();
+  PrevCp = Clusters.begin( );
+  CurrCp = Clusters.begin( );
+  while ( CurrCp < Clusters.end( ) ) {
+      if ( DO_EXTEND ) {
+        if ( ! target_reached ) //-- Ignore if shadowed or already extended
+          if ( CurrCp->wasFused ||
+               (!DO_SHADOWS && isShadowedCluster (CurrCp, Alignments, CurrAp)) ) {
+            CurrCp->wasFused = true;
+            CurrCp = ++ PrevCp;
+            continue;
+          }
+      }
+
+      //-- Pick the right directional sequence for B
+      if ( CurrCp->dirB == FORWARD_CHAR )
+        B = Bf->seq();
+      else if ( Brev )
+        B = Brev.get();
+      else {
+        Brev.reset(new char[Bf->len() + 2]);
+        strcpy ( Brev.get() + 1, Bf->seq() + 1 );
+        Brev[0] = '\0';
+        Reverse_Complement (Brev.get(), 1, Bf->len());
+        B = Brev.get();
+      }
+
+      //-- Extend each match in the cluster
+      for ( Mp = CurrCp->matches.begin( ); Mp < CurrCp->matches.end( ); Mp ++ ) {
+        //-- Try to extend the current match backwards
+        if ( target_reached ) {
+          //-- Merge with the previous match
+          if ( CurrAp->eA != Mp->sA  ||  CurrAp->eB != Mp->sB ) {
+            if ( Mp >= CurrCp->matches.end( ) - 1 ) {
+              std::cerr << "ERROR: Target match does not exist, please\n"
+                   << "       file a bug report\n";
+              exit (EXIT_FAILURE);
+            }
+            continue;
+          }
+          CurrAp->eA += Mp->len - 1;
+          CurrAp->eB += Mp->len - 1;
+        } else { //-- Create a new alignment object
+          Alignments.push_back({ *Mp, CurrCp->dirB } );
+          CurrAp = Alignments.end( ) - 1;
+
+          if ( DO_EXTEND  ||  Mp != CurrCp->matches.begin ( ) ) {
+            //-- Target the closest/best alignment object
+            TargetAp = getReverseTargetAlignment (Alignments, CurrAp);
+
+            //-- Extend the new alignment object backwards
+            if ( extendBackward (Alignments, CurrAp, TargetAp, A, B) )
+              CurrAp = TargetAp;
+          }
+        }
+
+          m_o = FORWARD_ALIGN;
+
+          //-- Try to extend the current match forwards
+          if ( Mp < CurrCp->matches.end( ) - 1 ) {
+            //-- Target the next match in the cluster
+            targetA = (Mp + 1)->sA;
+            targetB = (Mp + 1)->sB;
+
+            //-- Extend the current alignment object forward
+            target_reached = extendForward (CurrAp, A, targetA, B, targetB, m_o);
+          } else if ( DO_EXTEND ) {
+            targetA = Af->len();
+            targetB = Bf->len();
+
+            //-- Target the closest/best match in a future cluster
+            TargetCp = getForwardTargetCluster (Clusters, CurrCp, targetA, targetB);
+            if ( TargetCp == Clusters.end( ) ) {
+              m_o |= OPTIMAL_BIT;
+              if ( TO_SEQEND )
+                m_o |= SEQEND_BIT;
+            }
+
+            //-- Extend the current alignment object forward
+            target_reached = extendForward (CurrAp, A, targetA, B, targetB, m_o);
+          }
+      }
+      if ( TargetCp == Clusters.end( ) )
+        target_reached = false;
+
+      CurrCp->wasFused = true;
+
+      if ( target_reached == false )
+        CurrCp = ++ PrevCp;
+      else
+        CurrCp = TargetCp;
+    }
+
+#ifdef _DEBUG_ASSERT
+  validateData (Alignments, Clusters, Af, Bf);
+#endif
+
+  //-- Generate the error counts
+  parseDelta(Alignments, Af, Bf);
+  //-- Output the alignment data to the delta file
+  matches(Alignments, Af, Bf);
+  Alignments.clear( );
+}
 
 
 } // namespace postnuc

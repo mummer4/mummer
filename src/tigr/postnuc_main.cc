@@ -185,6 +185,13 @@ int main(int argc, char *argv[]) {
     open_ofstream(ClusterFile, ClusterFileName);
     ClusterFile << RefFileName << QryFileName << "\nNUCMER\n";
   }
+  auto print_delta = [&](const std::vector<Alignment>& Alignments,
+                         const FastaRecord* Af, const FastaRecord* Bf) {
+    printDeltaAlignments(Alignments, Af, Bf, DeltaFile);
+  };
+  auto print_clusters = [&](const std::vector<Synteny>& Syntenys, const FastaRecord& Bf) {
+    printSyntenys(Syntenys, Bf, ClusterFile);
+  };
 
   //-- Generate the array of the reference sequences
   Af.push_back(FastaRecord());
@@ -212,7 +219,7 @@ int main(int argc, char *argv[]) {
     const char DirB = Line.find(" Reverse") == string::npos ? FORWARD_CHAR : REVERSE_CHAR; // the current query strand direction
 
     if(CurrIdB != Bf.Id() && !Syntenys.empty())
-      merger.processSyntenys(Syntenys, Bf, ClusterFile, DeltaFile);
+      merger.processSyntenys_each(Syntenys, Bf, print_clusters, print_delta);
 
     // Read in query sequence if needed. Must be in same order as for mummer
     while(CurrIdB != Bf.Id() && Read_Sequence(QryFile, Bf)) ;
@@ -276,7 +283,7 @@ int main(int argc, char *argv[]) {
     }
   }
   if(!Syntenys.empty())
-    merger.processSyntenys(Syntenys, Bf, ClusterFile, DeltaFile);
+    merger.processSyntenys_each(Syntenys, Bf, print_clusters, print_delta);
 
   QryFile.close();
 
