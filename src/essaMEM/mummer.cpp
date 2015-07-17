@@ -232,7 +232,9 @@ int main(int argc, char* argv[]) {
   std::vector<long> startpos;
 
   load_fasta(ref_fasta, ref, refdescr, startpos);
-
+  for(auto s : startpos)
+    std::cerr << s << '\n';
+  
   // Automatically use 4 column format if there are multiple reference sequences.
   if(startpos.size() > 1) _4column = true;
   if(automatic){

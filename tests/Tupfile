@@ -11,5 +11,5 @@ include_rules
 
 : | $(BIN_DIR)/<exec> |> $(BIN_DIR)/mgaps -l 65 -s 90 -d 5 -f .12 < test.mums 2> %O.err.log | ./test_md5 c02b766e03d543b2a303cd1619f225d8 > %o |> test_mgaps.log | test_mgaps.err.log
 
-: | $(BIN_DIR)/<exec> |> ufasta head -n 10 test.mgaps | $(BIN_DIR)/postnuc -b 200 -B 5 pb20x.fa superReadSequences.named.fasta test > test_delta.log |> test.delta | test_delta.log
+: | $(BIN_DIR)/<exec> |> ufasta head -n 10 test.mgaps | $(BIN_DIR)/postnuc -b 200 -B 5 pb20x.fa superReadSequences.named.fasta test > test_delta.log 2>&1 |> test.delta | test_delta.log
 : test.delta |> ./test_md5 32a372874ccd33739cb2095b493ea053 < %f |>

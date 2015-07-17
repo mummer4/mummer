@@ -137,21 +137,52 @@ void parse_options(int argc, char* argv[]) {
   }
 }
 
+class FastaRecord
+//-- The essential data of a sequence. 1-based record. First character
+//-- of m_seq is always a '\0'. len() returns the length of the
+//-- sequence (i.e. without counting the initial (or terminating)
+//-- '\0'.
+{
+  std::string m_Id;               // the fasta ID header tag
+  std::string m_seq;              // the sequence data
+
+public:
+  FastaRecord() = default;
+  FastaRecord(const std::string& Id, const std::string& seq)
+    : m_Id(Id)
+    , m_seq(seq)
+  { }
+  FastaRecord(std::string&& Id, std::string&& seq)
+    : m_Id(std::move(Id))
+    , m_seq(std::move(seq))
+  { }
+  FastaRecord(FastaRecord&& rhs) noexcept : m_Id(std::move(rhs.m_Id)), m_seq(std::move(rhs.m_seq)) { }
+  const std::string& Id() const { return m_Id; }
+  long int len() const { return m_seq.size() - 1; }
+  const char* seq() const { return m_seq.c_str(); }
+
+  bool read_sequence(std::istream& is) {
+    return Read_Sequence(is, m_seq, m_Id);
+  }
+};
+
+
 int main(int argc, char *argv[]) {
   std::ios::sync_with_stdio(false);
 
-  std::vector<FastaRecord> Af; // array of all the reference sequences
-  FastaRecord Bf;
+  typedef Synteny<FastaRecord>      synteny_type;
+  typedef std::vector<synteny_type> synteny_list_type;
+  std::vector<FastaRecord>            Af; // array of all the reference sequences
+  synteny_list_type                   Syntenys; // vector of all sets of clusters
+  synteny_list_type::reverse_iterator CurrSp; // current set of clusters
 
-  vector<Synteny>                   Syntenys; // vector of all sets of clusters
-  vector<Synteny>::reverse_iterator CurrSp; // current set of clusters
-
-  string Line;                  // a single line of input
-  string CurrIdB;     // fasta ID headers
+  FastaRecord   Bf;             // Query sequence information
+  string        Line;           // a single line of input
+  string        CurrIdB;        // fasta ID headers
   const string* IdA;
 
 
-  long int Seqi;                // current reference sequence index
+  size_t   Seqi;                // current reference sequence index
   long int sA, sB, len;         // current match start in A, B and length
 
   //-- Set the alignment data type and break length (sw_align.h)
@@ -186,17 +217,17 @@ int main(int argc, char *argv[]) {
     ClusterFile << RefFileName << QryFileName << "\nNUCMER\n";
   }
   auto print_delta = [&](const std::vector<Alignment>& Alignments,
-                         const FastaRecord* Af, const FastaRecord* Bf) {
+                         const FastaRecord& Af, const FastaRecord& Bf) {
     printDeltaAlignments(Alignments, Af, Bf, DeltaFile);
   };
-  auto print_clusters = [&](const std::vector<Synteny>& Syntenys, const FastaRecord& Bf) {
+  auto print_clusters = [&](const synteny_list_type& Syntenys, const FastaRecord& Bf) {
     printSyntenys(Syntenys, Bf, ClusterFile);
   };
 
   //-- Generate the array of the reference sequences
-  Af.push_back(FastaRecord());
-  while(Read_Sequence(RefFile, Af.back()))
+  do {
     Af.push_back(FastaRecord());
+  } while(Af.back().read_sequence(RefFile));
   Af.resize(Af.size() - 1);
   RefFile.close();
 
@@ -222,7 +253,7 @@ int main(int argc, char *argv[]) {
       merger.processSyntenys_each(Syntenys, Bf, print_clusters, print_delta);
 
     // Read in query sequence if needed. Must be in same order as for mummer
-    while(CurrIdB != Bf.Id() && Read_Sequence(QryFile, Bf)) ;
+    while(CurrIdB != Bf.Id() && Bf.read_sequence(QryFile)) ;
     if(CurrIdB != Bf.Id())
       parseAbort("Query File did not find '" + Bf.Id() + "'. It is missing or not in correct order.");
 
@@ -237,7 +268,7 @@ int main(int argc, char *argv[]) {
         ignore_line(std::cin); // Ignore rest of line
 
         //-- Re-map the reference coordinate back to its original sequence
-        for ( Seqi = 0; sA > Af[Seqi].len() && (size_t)Seqi < Af.size(); ++Seqi)
+        for ( Seqi = 0;   Seqi < Af.size() && sA > Af[Seqi].len(); ++Seqi)
           sA -= Af[Seqi].len() + 1; // extra +1 for the x at the end of each seq
         if ((size_t)Seqi >= Af.size()) {
           cerr << "ERROR: A MUM was found with a start coordinate greater than\n"
@@ -256,7 +287,7 @@ int main(int argc, char *argv[]) {
         }
         if(!IdA) {
           IdA = &Af[Seqi].Id();
-          CurrSp = std::find_if(Syntenys.rbegin(), Syntenys.rend(), [=](const Synteny& s) { return s.AfP->Id() == *IdA; });
+          CurrSp = std::find_if(Syntenys.rbegin(), Syntenys.rend(), [=](const synteny_type& s) { return s.AfP->Id() == *IdA; });
           if(CurrSp == Syntenys.rend()) { // Not seen yet, create new synteny region
             Syntenys.push_back({ &Af[Seqi] });
             CurrSp = Syntenys.rbegin();
