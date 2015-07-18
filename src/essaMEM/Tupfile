@@ -7,4 +7,4 @@ LIBOBJS = sparseSA.o qsufsort.o
 : foreach *.c |> !cc |> {essamummer}
 
 : {essamummer} |> !lxxd |> $(BIN_DIR)/essamummer $(BIN_DIR)/<exec>
-: $(LIBOBJS) |> !ar |> $(LIB_DIR)/libessaMEM.a
+: $(LIBOBJS) |> !ar |> $(LIB_DIR)/libessaMEM.a $(LIB_DIR)/<lib>

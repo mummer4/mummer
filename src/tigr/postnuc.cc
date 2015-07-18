@@ -763,5 +763,29 @@ void validateData
   }
 }
 
+void printDeltaAlignments(const std::vector<Alignment>& Alignments,
+                          const std::string& AId, const long Alen,
+                          const std::string& BId, const long Blen,
+                          std::ostream& DeltaFile)
+//  Simply output the delta information stored in Alignments to the
+//  given delta file. Free the memory used by Alignments once the
+//  data is successfully output to the file.
+{
+  DeltaFile << '>' << AId << ' ' << BId << ' ' << Alen << ' ' << Blen << '\n';
+
+  for(const auto& A : Alignments) {
+    const bool fwd = A.dirB == FORWARD_CHAR;
+    DeltaFile << A.sA << ' ' << A.eA << ' '
+              << (fwd ? A.sB : revC(A.sB, Blen)) << ' '
+              << (fwd ? A.eB : revC(A.eB, Blen)) << ' '
+              << A.Errors << ' ' << A.SimErrors << ' ' << A.NonAlphas
+              << '\n';
+
+    for(const auto& D : A.delta)
+      DeltaFile << D << '\n';
+    DeltaFile << "0\n";
+  }
+}
+
 } // namespace postnuc
 } // namespace mummer

@@ -29,6 +29,8 @@ struct UnionFind {
   int  find(int a);             //  Return the id of the set containing  a  in  UF .
   void union_sets(int a, int b); //  Union the sets whose id's are  a  and  b  in  UF .
 };
+typedef std::vector<Match_t>      cluster_type;
+typedef std::vector<cluster_type> clusters_type;
 
 struct ClusterMatches {
   const int      Fixed_Separation;
@@ -45,14 +47,11 @@ struct ClusterMatches {
     , Use_Extents(ue)
   { }
 
-  typedef std::vector<Match_t>      cluster_type;
-  typedef std::vector<cluster_type> clusters_type;
-
   template<typename Output>
-  int Cluster_each(Match_t * A, UnionFind& UF, int N, Output out);
+  int Cluster_each(Match_t * A, UnionFind& UF, int N, Output out) const;
 
   //  Process matches  A [1 .. N]  and append them to clusters
-  int  Process_Matches(Match_t * A, UnionFind& UF, int N, clusters_type& clusters) {
+  int  Process_Matches(Match_t * A, UnionFind& UF, int N, clusters_type& clusters) const {
     return Cluster_each(A, UF, N, [&](cluster_type&& cl) { clusters.push_back(std::move(cl)); });
   }
 
@@ -62,7 +61,7 @@ struct ClusterMatches {
 
 protected:
   template<typename Output>
-  int  Process_Cluster(Match_t * A, int N, Output out);
+  int  Process_Cluster(Match_t * A, int N, Output out) const;
 
   //  Remove from  A [0 .. (N - 1)]  any matches that are internal to a repeat,
   static int Filter_Matches(Match_t* A, const int N);
@@ -83,7 +82,7 @@ protected:
 //
 
 template<typename Output>
-int ClusterMatches::Cluster_each(Match_t * A, UnionFind& UF, int N, Output out) {
+int ClusterMatches::Cluster_each(Match_t * A, UnionFind& UF, int N, Output out) const {
   //  Process matches  A [1 .. N]  and output them after
   //  a line containing  label .
 
@@ -130,7 +129,7 @@ int ClusterMatches::Cluster_each(Match_t * A, UnionFind& UF, int N, Output out) 
 }
 
 template<typename Output>
-int ClusterMatches::Process_Cluster(Match_t * A, int N, Output out) {
+int ClusterMatches::Process_Cluster(Match_t * A, int N, Output out) const {
 //  Process the cluster of matches in  A [0 .. (N - 1)]  and output them
 //  after a line containing  label .  Return the number of clusters
 //  printed.

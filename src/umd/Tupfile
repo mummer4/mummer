@@ -1,6 +1,12 @@
 include_rules
 
-LDLIBS = -lpthread -lessaMEM
+LDLIBS = -lpthread
 
 : foreach nucmer.cc |> !cxx |> {umdmummer}
+: {umdmummer} |> !ar |> $(LIB_DIR)/libumdmummer.a $(LIB_DIR)/<lib>
+
+LDLIBS += -lessaMEM -lumdmummer
+: simplenucmer.cc |> !cxx |> {simplenucmer}
+: {simplenucmer} | $(LIB_DIR)/<lib> |> !lxxd |> $(BIN_DIR)/simplenucmer
+
 # : {umdmummer} |> !lxxd |> $(BIN_DIR)/umdmummer $(BIN_DIR)/<exec>

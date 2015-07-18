@@ -146,7 +146,7 @@ int  main(int argc, char * argv []) {
         A.push_back(Match_t(S1, S2, Len));
     }
     const char* label = header.c_str();
-    clusterer.Cluster_each(A.data(), UF, A.size() - 1, [&](const ClusterMatches::cluster_type&& cl) {
+    clusterer.Cluster_each(A.data(), UF, A.size() - 1, [&](const cluster_type&& cl) {
         clusterer.Print_Cluster(cl, label, std::cout);
         label = "#";
       });

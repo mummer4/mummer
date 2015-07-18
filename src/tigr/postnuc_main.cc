@@ -81,6 +81,23 @@ void printHelp
        <<  "the .delta output description.\n\n";
 }
 
+//-- Helper functions
+template<typename stream_type>
+void open_stream(stream_type& st, const std::string& name) {
+  st.open(name);
+  if(!st.good()) {
+    std::cerr << "ERROR: Could not open file " << name << std::endl;
+    exit(EXIT_FAILURE);
+  }
+}
+
+inline void open_ofstream(std::ofstream& os, const std::string& name) {
+  open_stream<std::ofstream>(os, name);
+}
+
+inline void open_ifstream(std::ifstream& os, const std::string& name) {
+  open_stream<std::ifstream>(os, name);
+}
 
 
 

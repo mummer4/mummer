@@ -101,6 +101,12 @@ struct merge_syntenys {
   template<typename FastaRecord, typename ClustersOut, typename MatchesOut>
   void processSyntenys_each(std::vector<Synteny<FastaRecord> >& Syntenys, const FastaRecord& Bf,
                             ClustersOut clusters, MatchesOut matches);
+  template<typename FastaRecord, typename MatchesOut>
+  void processSyntenys_each(std::vector<Synteny<FastaRecord> >& Syntenys, const FastaRecord& Bf,
+                            MatchesOut matches) {
+    processSyntenys_each(Syntenys, Bf, [](const std::vector<Synteny<FastaRecord> >& s, const FastaRecord& Bf) { },
+                         matches);
+  }
   bool extendBackward(std::vector<Alignment> & Alignments, std::vector<Alignment>::iterator CurrAp,
                       std::vector<Alignment>::iterator TargetAp, const char * A, const char * B);
 
@@ -117,23 +123,6 @@ struct merge_syntenys {
 };
 
 //-- Helper functions
-template<typename stream_type>
-void open_stream(stream_type& st, const std::string& name) {
-  st.open(name);
-  if(!st.good()) {
-    std::cerr << "ERROR: Could not open file " << name << std::endl;
-    exit(EXIT_FAILURE);
-  }
-}
-
-inline void open_ofstream(std::ofstream& os, const std::string& name) {
-  open_stream<std::ofstream>(os, name);
-}
-
-inline void open_ifstream(std::ifstream& os, const std::string& name) {
-  open_stream<std::ifstream>(os, name);
-}
-
 inline void ignore_line(std::istream& is) {
   is.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 }
@@ -141,10 +130,18 @@ inline void ignore_line(std::istream& is) {
 //------------------------------------------------- Function Declarations ----//
 bool Read_Sequence(std::istream& is, std::string& T, std::string& name);
 
-template<typename FastaRecord>
 void printDeltaAlignments(const std::vector<Alignment>& Alignments,
-                          const FastaRecord& Af, const FastaRecord& Bf,
+                          const std::string& AId, const long Alen,
+                          const std::string& BId, const long Blen,
                           std::ostream& DeltaFile);
+
+template<typename FastaRecord>
+inline void printDeltaAlignments(const std::vector<Alignment>& Alignments,
+                          const FastaRecord& Af, const FastaRecord& Bf,
+                          std::ostream& DeltaFile) {
+  printDeltaAlignments(Alignments, Af.Id(), Af.len(), Bf.Id(), Bf.len(), DeltaFile);
+}
+
 
 template<typename FastaRecord>
 void printSyntenys(const std::vector<Synteny<FastaRecord> >& Syntenys, const FastaRecord& Bf, std::ostream& ClusterFile);
@@ -212,7 +209,7 @@ void merge_syntenys::processSyntenys_each(std::vector<Synteny<FastaRecord> >& Sy
       std::vector<Alignment> alignments;
       extendClusters (CurrSp.clusters, CurrSp.AfP->seq(), CurrSp.AfP->len(), Bf.seq(), Bf.len(), alignments);
       //-- Output the alignment data to the delta file
-      matches(alignments, *CurrSp.AfP, Bf);
+      matches(std::move(alignments), *CurrSp.AfP, Bf);
   }
 
   //-- Create the cluster information
@@ -250,32 +247,6 @@ void printSyntenys(const std::vector<Synteny<FastaRecord> > & Syntenys, const Fa
         }
       }
     }
-  }
-}
-
-template<typename FastaRecord>
-void printDeltaAlignments(const std::vector<Alignment> & Alignments,
-                          const FastaRecord& Af, const FastaRecord& Bf,
-                          std::ostream& DeltaFile)
-
-//  Simply output the delta information stored in Alignments to the
-//  given delta file. Free the memory used by Alignments once the
-//  data is successfully output to the file.
-
-{
-  DeltaFile << '>' << Af.Id() << ' ' << Bf.Id() << ' ' << Af.len() << ' ' << Bf.len() << '\n';
-
-  for(const auto& A : Alignments) {
-    const bool fwd = A.dirB == FORWARD_CHAR;
-    DeltaFile << A.sA << ' ' << A.eA << ' '
-              << (fwd ? A.sB : revC(A.sB, Bf.len())) << ' '
-              << (fwd ? A.eB : revC(A.eB, Bf.len())) << ' '
-              << A.Errors << ' ' << A.SimErrors << ' ' << A.NonAlphas
-              << '\n';
-
-    for(const auto& D : A.delta)
-      DeltaFile << D << '\n';
-    DeltaFile << "0\n";
   }
 }
 
