@@ -427,10 +427,10 @@ void sparseSA::construct(){
         suffixsort(&ISA[0], SAint , N-1, alphalast, 1);
     }
 
-    std::cerr << "N=" << N << std::endl;
+    //    std::cerr << "N=" << N << std::endl;
 
     LCP.resize(N/K);
-    std::cerr << "N/K=" << N/K << std::endl;
+    // std::cerr << "N/K=" << N/K << std::endl;
     // Use algorithm by Kasai et al to construct LCP array.
     computeLCP();  // SA + ISA -> LCP
     LCP.init();
@@ -448,7 +448,7 @@ void sparseSA::construct(){
     }
     if(hasKmer){
         kMerTableSize = 1 << (2*kMerSize);
-        std::cerr << "kmer table size: " << kMerTableSize << std::endl;
+        // std::cerr << "kmer table size: " << kMerTableSize << std::endl;
         KMR.resize(kMerTableSize, saTuple_t());
         //Use algorithm by Abouelhoda et al to construct CHILD array
         computeKmer();

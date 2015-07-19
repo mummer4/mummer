@@ -71,7 +71,7 @@ struct vec_uchar {
   }
   // Once all the values are set, call init. This will assure the
   // values >= 255 are sorted by index for fast retrieval.
-  void init() { sort(M.begin(), M.end()); std::cerr << "M.size()=" << M.size() << std::endl; std::vector<item_t>(M).swap(M);}
+  void init() { sort(M.begin(), M.end()); } // std::vector<item_t>(M).swap(M);}
 
   long index_size_in_bytes() const {
       long indexSize = 0L;

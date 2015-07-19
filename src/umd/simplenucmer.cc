@@ -22,7 +22,9 @@ int main(int argc, char *argv[]) {
   std::string ref = read_sequence(argv[1]);
   std::string qry = read_sequence(argv[2]);
 
-  auto aligments = mummer::nucmer::match(ref.c_str(), qry.c_str());
-  
+  const auto alignments = mummer::nucmer::match(ref.c_str(), qry.c_str());
+  mummer::postnuc::printDeltaAlignments(alignments,
+                                        "ref", ref.size(), "qry", qry.size(),
+                                        std::cout);
   return 0;
 }

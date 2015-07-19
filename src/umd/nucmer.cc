@@ -37,6 +37,7 @@ void match(const char* reference, const char* query, std::vector<postnuc::Alignm
   std::vector<std::string> descr    = { "ref" };
   std::vector<long>        startpos = { 0 };
   auto sa = mummer::sparseSA::create_auto(reference, descr, startpos, opts.min_len, true);
+  sa.construct();
   std::vector<mgaps::Match_t> fwd_matches, bwd_matches;
   FastaRecordSeq Ref(reference), Query(query);
   std::vector<synteny_type> syntenys;
@@ -63,13 +64,13 @@ void match(const char* reference, const char* query, std::vector<postnuc::Alignm
   }
 
   if(opts.orientation & REVERSE) {
-    auto append_matches = [&](const mummer::match_t& m) { fwd_matches.push_back({ m.ref + 1, m.query + 1, m.len }); };
+    auto append_matches = [&](const mummer::match_t& m) { bwd_matches.push_back({ m.ref + 1, m.query + 1, m.len }); };
     switch(opts.match) {
     case MUM: sa.findMUM_each(query, opts.min_len, true, append_matches); break;
     case MUMREFERENCE: sa.findMAM_each(query, opts.min_len, true, append_matches); break;
     case MAXMATCH: sa.findMEM_each(query, opts.min_len, true, append_matches); break;
     }
-    clusterer.Cluster_each(fwd_matches.data(), UF, fwd_matches.size(), [&](const mgaps::cluster_type& cluster) {
+    clusterer.Cluster_each(fwd_matches.data(), UF, bwd_matches.size(), [&](const mgaps::cluster_type& cluster) {
         postnuc::Cluster cl(postnuc::REVERSE_CHAR);
         for(const auto& m : cluster)
           cl.matches.push_back({ m.Start1, m.Start2, m.Len });
