@@ -11,21 +11,24 @@
 #ifndef __SW_ALIGNSCORE_HH
 #define __SW_ALIGNSCORE_HH
 
+namespace mummer {
+namespace sw_align {
+
 //-- * equals O for easy hashing
-const char STOP_CHAR = 'O';
+static const char STOP_CHAR = 'O';
 
 //-------------------------------------------------- Scoring Matrix Types ----//
-const int NUCLEOTIDE = 0;
-const int BLOSUM45 = 1;
-const int BLOSUM62 = 2;
-const int BLOSUM80 = 3;
+static const int NUCLEOTIDE = 0;
+static const int BLOSUM45 = 1;
+static const int BLOSUM62 = 2;
+static const int BLOSUM80 = 3;
 
 // dna scores 3,-7 m,mm by default. zero slope at 70% idy
 // substitute 7,-7 m,mm for zero slope at 50% idy
-const int GOOD_SCORE [4] = {3, 10, 8, 8};
-const int OPEN_GAP_SCORE [4] = {-10, -10, -10, -10};
-const int CONT_GAP_SCORE [4] = {-7, -1, -1, -1};
-const int MATCH_SCORE [4][26][26] =
+static const int GOOD_SCORE [4] = {3, 10, 8, 8};
+static const int OPEN_GAP_SCORE [4] = {-10, -10, -10, -10};
+static const int CONT_GAP_SCORE [4] = {-7, -1, -1, -1};
+static const int MATCH_SCORE [4][26][26] =
 {{
 //A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q  R  S  T  U  V  W  X  Y  Z
 {+3,-7,-7,-7,-7,-7,-7,-7,-7,-7,-7,-7,-7,-7,-7,-7,-7,-7,-7,-7,-7,-7,-7,-7,-7,-7},
@@ -139,5 +142,8 @@ const int MATCH_SCORE [4][26][26] =
 {-2,-3,-3,-4,-3, 3,-4, 2,-2,-2,-3,-2,-2,-3,-6,-4,-2,-3,-2,-2,-2,-2, 2,-2, 7,-3},
 {-1, 0,-4, 1, 4,-4,-3, 0,-4,-1, 1,-3,-2, 0,-6,-2, 3, 0, 0,-1,-1,-3,-4,-1,-3, 4}
 }};
+
+} // namespace sw_align
+} // namespace mummer
 
 #endif // #ifndef __SW_ALIGNSCORE_HH

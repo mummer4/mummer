@@ -78,7 +78,8 @@ void match(const char* reference, const char* query, std::vector<postnuc::Alignm
       });
   }
 
-  postnuc::merge_syntenys merger(opts.do_delta, opts.do_extend, opts.to_seqend, opts.do_shadows);
+  postnuc::merge_syntenys merger(opts.do_delta, opts.do_extend, opts.to_seqend, opts.do_shadows,
+                                 opts.break_len, opts.banding, sw_align::NUCLEOTIDE);
   merger.processSyntenys_each(syntenys, Query, [&](std::vector<postnuc::Alignment>&& als, const FastaRecordSeq& Af,
                                                    const FastaRecordSeq& Bf) {
       for(auto& al : als)

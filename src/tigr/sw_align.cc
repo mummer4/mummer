@@ -1,12 +1,8 @@
 #include "sw_align.hh"
 #include <math.h>
 
-
-//-- Number of bases to extend past global high score before giving up
-static const int DEFAULT_BREAK_LEN = 200;
-
-//-- Maximum diagonal banding for extension
-static const int DEFAULT_BANDING = 0; // no banding by default
+namespace mummer {
+namespace sw_align {
 
 //-- Characters used in creating the alignment edit matrix, DO NOT ALTER!
 static const int DELETE = 0;
@@ -15,29 +11,14 @@ static const int MATCH  = 2;
 static const int START  = 3;
 static const int NONE   = 4;
 
-
-int _break_len = DEFAULT_BREAK_LEN;
-int _banding = DEFAULT_BANDING;
-int _matrix_type = NUCLEOTIDE;
-
-
-
-
-
 //----------------------------------------- Private Function Declarations ----//
 static void generateDelta
      (const Diagonal * Diag, long int FinishCt, long int FinishCDi,
-      long int N, vector<long int> & Delta);
+      long int N, std::vector<long int> & Delta);
 
 
 static inline Score * maxScore
      (Score S[3]);
-
-
-static inline long int scoreMatch
-     (const Diagonal Diag, long int Dct, long int CDi, 
-      const char * A, const char * B, long int N, unsigned int m_o);
-
 
 static inline void scoreEdit
      (Score & curr, const long int del, const long int ins, const long int mat);
@@ -47,10 +28,10 @@ static inline void scoreEdit
 
 
 //------------------------------------------ Private Function Definitions ----//
-bool _alignEngine
+bool aligner::_alignEngine
      (const char * A0, long int Astart, long int & Aend,
       const char * B0, long int Bstart, long int & Bend,
-      vector<long int> & Delta, unsigned int m_o)
+      std::vector<long int> & Delta, unsigned int m_o) const
 
      //  A0 is a sequence such that A [1...\0]
      //  B0 is a sequence such that B [1...\0]
@@ -75,7 +56,7 @@ bool _alignEngine
   long int xhigh_score = min_score;               // non-optimal high score
 
                                                   // max score difference
-  long int max_diff = GOOD_SCORE [getMatrixType( )] * _break_len;
+  long int max_diff = good_score() * _break_len;
 
   long int CDi;              // conceptual diagonal index (not relating to mem)
   long int Dct, Di;          // diagonal counter, actual diagonal index
@@ -434,12 +415,50 @@ bool _alignEngine
   return TargetReached;
 }
 
+long int aligner::scoreMatch
+     (const Diagonal Diag, long int Dct, long int CDi,
+      const char * A, const char * B, long int N, unsigned int m_o) const
+
+     //  Diag is the single diagonal that contains the node to be scored
+     //  Dct is Diag's diagonal index in the edit matrix
+     //  CDi is the conceptual node to be scored in Diag
+     //  A and B are the alignment sequences
+     //  N is the alignment target index in A
+     //  m_o is the modus operandi of the alignment:
+     //      FORWARD_ALIGN, FORWARD_SEARCH, BACKWARD_SEARCH
+
+{
+  int Dir;
+  char Ac, Bc;
+
+  //-- 1 for forward, -1 for reverse
+  Dir = m_o & DIRECTION_BIT ? 1 : -1;
+
+  //-- Locate the characters that need to be compared
+  if ( Dct <= N )
+    {
+      Ac = *( A + ( (Dct - CDi) * Dir ) );
+      Bc = *( B + ( (CDi) * Dir ) );
+    }
+  else
+    {
+      Ac = *( A + ( (N - CDi) * Dir ) );
+      Bc = *( B + ( (Dct - N + CDi) * Dir ) );
+    }
+
+  if ( ! isalpha(Ac) )
+    Ac = STOP_CHAR;
+  if ( ! isalpha(Bc) )
+    Bc = STOP_CHAR;
+
+  return MATCH_SCORE [_matrix_type] [toupper(Ac) - 'A'] [toupper(Bc) - 'A'];
+}
 
 
 
 static void generateDelta
      (const Diagonal * Diag, long int FinishCt, long int FinishCDi,
-      long int N, vector<long int> & Delta)
+      long int N, std::vector<long int> & Delta)
 
      //  Diag is the list of diagonals that compose the edit matrix
      //  FinishCt is the diagonal that contains the finishing node
@@ -604,44 +623,5 @@ static inline void scoreEdit
   return;
 }
 
-
-
-
-static inline long int scoreMatch
-     (const Diagonal Diag, long int Dct, long int CDi, 
-      const char * A, const char * B, long int N, unsigned int m_o)
-
-     //  Diag is the single diagonal that contains the node to be scored
-     //  Dct is Diag's diagonal index in the edit matrix
-     //  CDi is the conceptual node to be scored in Diag
-     //  A and B are the alignment sequences
-     //  N is the alignment target index in A
-     //  m_o is the modus operandi of the alignment:
-     //      FORWARD_ALIGN, FORWARD_SEARCH, BACKWARD_SEARCH
-
-{
-  static int Dir;
-  static char Ac, Bc;
-
-  //-- 1 for forward, -1 for reverse
-  Dir = m_o & DIRECTION_BIT ? 1 : -1;
-
-  //-- Locate the characters that need to be compared
-  if ( Dct <= N )
-    {
-      Ac = *( A + ( (Dct - CDi) * Dir ) );
-      Bc = *( B + ( (CDi) * Dir ) );
-    }
-  else
-    {
-      Ac = *( A + ( (N - CDi) * Dir ) );
-      Bc = *( B + ( (Dct - N + CDi) * Dir ) );
-    }
-
-  if ( ! isalpha(Ac) )
-    Ac = STOP_CHAR;
-  if ( ! isalpha(Bc) )
-    Bc = STOP_CHAR;
-
-  return MATCH_SCORE [_matrix_type] [toupper(Ac) - 'A'] [toupper(Bc) - 'A'];
-}
+} // namespace sw_align
+} // namespace mummer

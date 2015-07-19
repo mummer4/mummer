@@ -86,16 +86,25 @@ struct AscendingClusterSort
 };
 
 struct merge_syntenys {
-  const bool DO_DELTA;
-  const bool DO_EXTEND;
-  const bool TO_SEQEND;
-  const bool DO_SHADOWS;
+  const bool              DO_DELTA;
+  const bool              DO_EXTEND;
+  const bool              TO_SEQEND;
+  const bool              DO_SHADOWS;
+  const sw_align::aligner aligner;
 
   merge_syntenys(bool dd, bool de, bool ts, bool ds)
     : DO_DELTA(dd)
     , DO_EXTEND(de)
     , TO_SEQEND(ts)
     , DO_SHADOWS(ds)
+  { }
+
+  merge_syntenys(bool dd, bool de, bool ts, bool ds, int break_len, bool banding, int matrix_type)
+    : DO_DELTA(dd)
+    , DO_EXTEND(de)
+    , TO_SEQEND(ts)
+    , DO_SHADOWS(ds)
+    , aligner(break_len, banding, matrix_type)
   { }
 
   template<typename FastaRecord, typename ClustersOut, typename MatchesOut>
@@ -120,6 +129,17 @@ struct merge_syntenys {
     extendClusters(Clusters, Aseq, Alen, Bseq, Blen, res);
     return res;
   }
+
+protected:
+  bool extendForward(std::vector<Alignment>::iterator Ap, const char * A, long int targetA,
+                     const char * B, long int targetB, unsigned int m_o) const;
+
+  std::vector<Cluster>::iterator getForwardTargetCluster(std::vector<Cluster> & Clusters, std::vector<Cluster>::iterator CurrCp,
+                                                         long int & targetA, long int & targetB) const;
+  std::vector<Alignment>::iterator getReverseTargetAlignment(std::vector<Alignment> & Alignments,
+                                                             std::vector<Alignment>::iterator CurrAp) const;
+  void parseDelta(std::vector<Alignment> & Alignments,
+                  const char* Aseq, const char* Bseq, const long Blen) const;
 };
 
 //-- Helper functions
@@ -146,17 +166,6 @@ inline void printDeltaAlignments(const std::vector<Alignment>& Alignments,
 template<typename FastaRecord>
 void printSyntenys(const std::vector<Synteny<FastaRecord> >& Syntenys, const FastaRecord& Bf, std::ostream& ClusterFile);
 
-bool extendForward
-(std::vector<Alignment>::iterator Ap, const char * A, long int targetA,
- const char * B, long int targetB, unsigned int m_o);
-
-std::vector<Cluster>::iterator getForwardTargetCluster
-(std::vector<Cluster> & Clusters, std::vector<Cluster>::iterator CurrCp,
- long int & targetA, long int & targetB);
-
-std::vector<Alignment>::iterator getReverseTargetAlignment
-(std::vector<Alignment> & Alignments, std::vector<Alignment>::iterator CurrAp);
-
 bool isShadowedCluster
 (std::vector<Cluster>::const_iterator CurrCp,
  const std::vector<Alignment> & Alignments, std::vector<Alignment>::const_iterator Ap);
@@ -168,9 +177,6 @@ inline void __parseAbort(const std::string& s, const char* file, size_t line) {
 }
 
 #define parseAbort(msg) __parseAbort(msg, __FILE__, __LINE__);
-
-void parseDelta(std::vector<Alignment> & Alignments,
-                const char* Aseq, const char* Bseq, const long Blen);
 
 inline long int revC
 (long int Coord, long int Len)

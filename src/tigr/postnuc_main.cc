@@ -51,10 +51,13 @@ using namespace std;
 using namespace mummer::postnuc;
 
 //------------------------------------------------------ Globals -------------//
-bool DO_DELTA   = true;
-bool DO_EXTEND  = true;
-bool TO_SEQEND  = false;
-bool DO_SHADOWS = false;
+bool DO_DELTA    = true;
+bool DO_EXTEND   = true;
+bool TO_SEQEND   = false;
+bool DO_SHADOWS  = false;
+int  break_len   = 200;
+int  banding     = 0;
+int  matrix_type = mummer::sw_align::NUCLEOTIDE;
 
 void printHelp
 (const char * s)
@@ -117,11 +120,11 @@ void parse_options(int argc, char* argv[]) {
   while ( !errflg  &&  ((ch = getopt (argc, argv, "dehB:b:st")) != EOF) ) {
     switch (ch) {
     case 'b' :
-      setBreakLen( atoi (optarg) );
+      break_len = atoi (optarg);
       break;
 
     case 'B' :
-      setBanding( atoi (optarg) );
+      banding = atoi (optarg);
       break;
 
     case 'd' :
@@ -202,15 +205,10 @@ int main(int argc, char *argv[]) {
   size_t   Seqi;                // current reference sequence index
   long int sA, sB, len;         // current match start in A, B and length
 
-  //-- Set the alignment data type and break length (sw_align.h)
-  setMatrixType ( NUCLEOTIDE );
-  setBreakLen ( 200 );
-  setBanding ( 0 );
-
   //-- Parse the command line arguments
   parse_options(argc, argv);
 
-  merge_syntenys merger(DO_DELTA, DO_EXTEND, TO_SEQEND, DO_SHADOWS);
+  merge_syntenys merger(DO_DELTA, DO_EXTEND, TO_SEQEND, DO_SHADOWS, break_len, banding, matrix_type);
 
   //-- Read and create the I/O file names
   string RefFileName(argv[optind ++]);

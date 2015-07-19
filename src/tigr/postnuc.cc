@@ -139,7 +139,7 @@ void merge_syntenys::extendClusters(std::vector<Cluster> & Clusters,
           }
         }
 
-          m_o = FORWARD_ALIGN;
+        m_o = sw_align::FORWARD_ALIGN;
 
           //-- Try to extend the current match forwards
           if ( Mp < CurrCp->matches.end( ) - 1 ) {
@@ -156,9 +156,9 @@ void merge_syntenys::extendClusters(std::vector<Cluster> & Clusters,
             //-- Target the closest/best match in a future cluster
             TargetCp = getForwardTargetCluster (Clusters, CurrCp, targetA, targetB);
             if ( TargetCp == Clusters.end( ) ) {
-              m_o |= OPTIMAL_BIT;
+              m_o |= sw_align::OPTIMAL_BIT;
               if ( TO_SEQEND )
-                m_o |= SEQEND_BIT;
+                m_o |= sw_align::SEQEND_BIT;
             }
 
             //-- Extend the current alignment object forward
@@ -208,7 +208,7 @@ bool merge_syntenys::extendBackward(std::vector<Alignment> & Alignments, std::ve
   unsigned int m_o;
   long int targetA, targetB;
 
-  m_o = BACKWARD_SEARCH;
+  m_o = sw_align::BACKWARD_SEARCH;
 
   //-- Set the target coordinates
   if ( TargetAp != Alignments.end( ) )
@@ -220,33 +220,33 @@ bool merge_syntenys::extendBackward(std::vector<Alignment> & Alignments, std::ve
     {
       targetA = 1;
       targetB = 1;
-      m_o |= OPTIMAL_BIT;
+      m_o |= sw_align::OPTIMAL_BIT;
     }
 
   //-- If alignment is too long, bring with bounds and set overflow_flag true
-  if ( CurrAp->sA - targetA + 1 > MAX_ALIGNMENT_LENGTH )
+  if ( CurrAp->sA - targetA + 1 > sw_align::MAX_ALIGNMENT_LENGTH )
     {
-      targetA = CurrAp->sA - MAX_ALIGNMENT_LENGTH + 1;
+      targetA = CurrAp->sA - sw_align::MAX_ALIGNMENT_LENGTH + 1;
       overflow_flag = true;
-      m_o |= OPTIMAL_BIT;
+      m_o |= sw_align::OPTIMAL_BIT;
     }
-  if ( CurrAp->sB - targetB + 1 > MAX_ALIGNMENT_LENGTH )
+  if ( CurrAp->sB - targetB + 1 > sw_align::MAX_ALIGNMENT_LENGTH )
     {
-      targetB = CurrAp->sB - MAX_ALIGNMENT_LENGTH + 1;
+      targetB = CurrAp->sB - sw_align::MAX_ALIGNMENT_LENGTH + 1;
       if ( overflow_flag )
         double_flag = true;
       else
         overflow_flag = true;
-      m_o |= OPTIMAL_BIT;
+      m_o |= sw_align::OPTIMAL_BIT;
     }
 
 
   if ( TO_SEQEND && !double_flag )
-    m_o |= SEQEND_BIT;
+    m_o |= sw_align::SEQEND_BIT;
 
 
   //-- Attempt to reach the target
-  target_reached = alignSearch (A, CurrAp->sA, targetA,
+  target_reached = aligner.alignSearch (A, CurrAp->sA, targetA,
                                 B, CurrAp->sB, targetB, m_o);
 
   if ( overflow_flag  ||  TargetAp == Alignments.end( ) )
@@ -256,16 +256,16 @@ bool merge_syntenys::extendBackward(std::vector<Alignment> & Alignments, std::ve
     {
       //-- Merge the two alignment objects
       extendForward (TargetAp, A, CurrAp->sA,
-                     B, CurrAp->sB, FORCED_FORWARD_ALIGN);
+                     B, CurrAp->sB, sw_align::FORCED_FORWARD_ALIGN);
       TargetAp->eA = CurrAp->eA;
       TargetAp->eB = CurrAp->eB;
       Alignments.pop_back( );
     }
   else
     {
-      alignTarget (A, targetA, CurrAp->sA,
-                   B, targetB, CurrAp->sB,
-                   CurrAp->delta, FORCED_FORWARD_ALIGN);
+      aligner.alignTarget (A, targetA, CurrAp->sA,
+                           B, targetB, CurrAp->sB,
+                           CurrAp->delta, sw_align::FORCED_FORWARD_ALIGN);
       CurrAp->sA = targetA;
       CurrAp->sB = targetB;
 
@@ -280,9 +280,8 @@ bool merge_syntenys::extendBackward(std::vector<Alignment> & Alignments, std::ve
 
 
 
-bool extendForward
-(std::vector<Alignment>::iterator CurrAp, const char * A, long int targetA,
- const char * B, long int targetB, unsigned int m_o)
+bool merge_syntenys::extendForward(std::vector<Alignment>::iterator CurrAp, const char * A, long int targetA,
+                                   const char * B, long int targetB, unsigned int m_o) const
 
 //  Extend an alignment forwards off the current alignment object until
 //  target or end of sequence is reached, and merge the delta values of the
@@ -306,28 +305,28 @@ bool extendForward
   ValB = targetB - CurrAp->eB + 1;
 
   //-- If the distance is too long, shrink it and set the overflow_flag
-  if ( ValA > MAX_ALIGNMENT_LENGTH )
+  if ( ValA > sw_align::MAX_ALIGNMENT_LENGTH )
     {
-      targetA = CurrAp->eA + MAX_ALIGNMENT_LENGTH - 1;
+      targetA = CurrAp->eA + sw_align::MAX_ALIGNMENT_LENGTH - 1;
       overflow_flag = true;
-      m_o |= OPTIMAL_BIT;
+      m_o |= sw_align::OPTIMAL_BIT;
     }
-  if ( ValB > MAX_ALIGNMENT_LENGTH )
+  if ( ValB > sw_align::MAX_ALIGNMENT_LENGTH )
     {
-      targetB = CurrAp->eB + MAX_ALIGNMENT_LENGTH - 1;
+      targetB = CurrAp->eB + sw_align::MAX_ALIGNMENT_LENGTH - 1;
       if ( overflow_flag )
         double_flag = true;
       else
         overflow_flag = true;
-      m_o |= OPTIMAL_BIT;
+      m_o |= sw_align::OPTIMAL_BIT;
     }
 
   if ( double_flag )
-    m_o &= ~SEQEND_BIT;
+    m_o &= ~sw_align::SEQEND_BIT;
 
-  target_reached = alignTarget (A, CurrAp->eA, targetA,
-                                B, CurrAp->eB, targetB,
-                                CurrAp->delta, m_o);
+  target_reached = aligner.alignTarget (A, CurrAp->eA, targetA,
+                                        B, CurrAp->eB, targetB,
+                                        CurrAp->delta, m_o);
 
   //-- Notify user if alignment was chopped short
   if ( target_reached  &&  overflow_flag )
@@ -340,7 +339,7 @@ bool extendForward
       ValA = (CurrAp->eA - CurrAp->sA + 1) - CurrAp->deltaApos - 1;
       CurrAp->delta[Di] += CurrAp->delta[Di] > 0 ? ValA : -(ValA);
       if ( CurrAp->delta[Di] == 0  ||  ValA < 0 ) {
-        cerr << "ERROR: failed to merge alignments at position " << CurrAp->eA << '\n'
+        std::cerr << "ERROR: failed to merge alignments at position " << CurrAp->eA << '\n'
              << "       Please file a bug report\n";
         exit (EXIT_FAILURE);
       }
@@ -357,9 +356,9 @@ bool extendForward
   return target_reached;
 }
 
-std::vector<Cluster>::iterator getForwardTargetCluster
+std::vector<Cluster>::iterator merge_syntenys::getForwardTargetCluster
 (std::vector<Cluster> & Clusters, std::vector<Cluster>::iterator CurrCp,
- long int & targetA, long int & targetB)
+ long int & targetA, long int & targetB) const
 
 //  Return the cluster that is most likely to successfully join (in a
 //  forward direction) with the current cluster. The returned cluster
@@ -379,7 +378,7 @@ std::vector<Cluster>::iterator getForwardTargetCluster
   long int eA, eB;                           // possible target
   long int greater, lesser;                  // gap sizes between two clusters
   long int sA = CurrCp->matches.rbegin( )->sA +
-    CurrCp->matches.rbegin( )->len - 1;      // the endA of the current cluster 
+    CurrCp->matches.rbegin( )->len - 1;      // the endA of the current cluster
   long int sB = CurrCp->matches.rbegin( )->sB +
     CurrCp->matches.rbegin( )->len - 1;      // the endB of the current cluster
 
@@ -425,9 +424,9 @@ std::vector<Cluster>::iterator getForwardTargetCluster
                 }
 
               //-- If the cluster is close enough
-              if ( greater < getBreakLen( )  ||
-                   (lesser) * GOOD_SCORE [getMatrixType( )] +
-                   (greater - lesser) * CONT_GAP_SCORE [getMatrixType( )] >= 0 )
+              if ( greater < aligner.breakLen( )  ||
+                   (lesser) * aligner.good_score() +
+                   (greater - lesser) * aligner.cont_gap_score() >= 0 )
                 {
                   Cp = Cip;
                   targetA = eA;
@@ -452,8 +451,8 @@ std::vector<Cluster>::iterator getForwardTargetCluster
 
 
 
-std::vector<Alignment>::iterator getReverseTargetAlignment
-(std::vector<Alignment> & Alignments, std::vector<Alignment>::iterator CurrAp)
+std::vector<Alignment>::iterator merge_syntenys::getReverseTargetAlignment
+(std::vector<Alignment> & Alignments, std::vector<Alignment>::iterator CurrAp) const
 
 //  Return the alignment that is most likely to successfully join (in a
 //  reverse direction) with the current alignment. The returned alignment
@@ -498,9 +497,9 @@ std::vector<Alignment>::iterator getReverseTargetAlignment
                 }
 
               //-- If the cluster is close enough
-              if ( greater < getBreakLen( )  ||
-                   (lesser) * GOOD_SCORE [getMatrixType( )] +
-                   (greater - lesser) * CONT_GAP_SCORE [getMatrixType( )] >= 0 )
+              if ( greater < aligner.breakLen( )  ||
+                   (lesser) * aligner.good_score() +
+                   (greater - lesser) * aligner.cont_gap_score() >= 0 )
                 {
                   Ap = Aip;
                   break;
@@ -565,9 +564,9 @@ void __parseAbort
   exit (EXIT_FAILURE);
 }
 
-void parseDelta
+void merge_syntenys::parseDelta
 (std::vector<Alignment> & Alignments,
- const char* const Aseq, const char* const Bseq, const long Blen)
+ const char* const Aseq, const char* const Bseq, const long Blen) const
 
 // Use the delta information to generate the error counts for each
 // alignment, and fill this information into the data type
@@ -620,17 +619,17 @@ void parseDelta
             ch2 = B [Bpos ++];
 
             if ( !isalpha (ch1) ) {
-              ch1 = STOP_CHAR;
+              ch1 = sw_align::STOP_CHAR;
               NonAlphas ++;
             }
             if ( !isalpha (ch2) ) {
-              ch2 = STOP_CHAR;
+              ch2 = sw_align::STOP_CHAR;
               NonAlphas ++;
             }
 
             ch1 = toupper(ch1);
             ch2 = toupper(ch2);
-            if (1 > MATCH_SCORE[getMatrixType( )][ch1 - 'A'][ch2 - 'A'] )
+            if (1 > aligner.match_score(ch1 - 'A', ch2 - 'A'))
               SimErrors ++;
             if ( ch1 != ch2 )
                 Errors ++;
@@ -657,17 +656,17 @@ void parseDelta
         ch2 = B [Bpos ++];
 
         if ( !isalpha (ch1) ) {
-          ch1 = STOP_CHAR;
+          ch1 = sw_align::STOP_CHAR;
           NonAlphas ++;
         }
         if ( !isalpha (ch2) ) {
-          ch2 = STOP_CHAR;
+          ch2 = sw_align::STOP_CHAR;
           NonAlphas ++;
         }
 
         ch1 = toupper(ch1);
         ch2 = toupper(ch2);
-        if ( 1 > MATCH_SCORE[getMatrixType( )][ch1 - 'A'][ch2 - 'A'] )
+        if ( 1 > aligner.match_score(ch1 - 'A', ch2 - 'A') ) // 
           SimErrors ++;
         if ( ch1 != ch2 )
           Errors ++;
@@ -753,13 +752,13 @@ void validateData
     always_assert ( Ap->sB >= 1 && Ap->sB <= Blen );
     always_assert ( Ap->eB >= 1 && Ap->eB <= Blen );
 
-    char Xc = toupper(isalpha(A[Ap->sA]) ? A[Ap->sA] : STOP_CHAR);
-    char Yc = toupper(isalpha(B[Ap->sB]) ? B[Ap->sB] : STOP_CHAR);
-    always_assert ( 0 <= MATCH_SCORE [0] [Xc - 'A'] [Yc - 'A'] );
+    char Xc = toupper(isalpha(A[Ap->sA]) ? A[Ap->sA] : sw_align::STOP_CHAR);
+    char Yc = toupper(isalpha(B[Ap->sB]) ? B[Ap->sB] : sw_align::STOP_CHAR);
+    always_assert ( 0 <= sw_align::MATCH_SCORE [0] [Xc - 'A'] [Yc - 'A'] );
 
-    Xc = toupper(isalpha(A[Ap->eA]) ? A[Ap->eA] : STOP_CHAR);
-    Yc = toupper(isalpha(B[Ap->eB]) ? B[Ap->eB] : STOP_CHAR);
-    always_assert ( 0 <= MATCH_SCORE [0] [Xc - 'A'] [Yc - 'A'] );
+    Xc = toupper(isalpha(A[Ap->eA]) ? A[Ap->eA] : sw_align::STOP_CHAR);
+    Yc = toupper(isalpha(B[Ap->eB]) ? B[Ap->eB] : sw_align::STOP_CHAR);
+    always_assert ( 0 <= sw_align::MATCH_SCORE [0] [Xc - 'A'] [Yc - 'A'] );
   }
 }
 

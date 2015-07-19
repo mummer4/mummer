@@ -17,15 +17,14 @@
 //#define _DEBUG_ASSERT      // performs assert functions to check validity
 //#define _DEBUG_VERBOSE     // outputs various alignment statistics and values
 
+#include <stdexcept>
+#include <vector>
 
 #include "sw_alignscore.hh"
 #include "tigrinc.hh"
-#include <vector>
-using namespace std;
 
-
-
-
+namespace mummer {
+namespace sw_align {
 
 //------------------------------------------------------------- Constants ----//
 //-- Modus operandi bit masks 00001, 00010, 00100, 01000, 10000
@@ -91,66 +90,128 @@ struct Diagonal
 };
 
 
+class aligner {
+  const int _break_len;
+  const bool _banding;
+  const int _matrix_type;
+
+public:
+  aligner()
+    : _break_len(200) // Number of bases to extend past global high score before giving up
+    , _banding(false) // No banding by default
+    , _matrix_type(NUCLEOTIDE)
+  { }
+
+  aligner(int break_len, int banding, int matrix_type)
+    : _break_len(break_len)
+    , _banding(banding)
+    , _matrix_type(matrix_type)
+  {
+    if(break_len < 1 || break_len > MAX_ALIGNMENT_LENGTH)
+      throw std::invalid_argument("Break length must be between 1 and MAX_ALIGNMENT_LENGTH included");
+    if(banding < 0)
+      throw std::invalid_argument("Banding must be >= 0");
+    if(matrix_type < 0 || matrix_type > 3)
+      throw std::invalid_argument("Matrix type must be between 0 and 3 included");
+  }
+
+  //------------------------------------------- Public Function Definitions ----//
+  //  PURPOSE: This function aligns the sequences A0 and B0, starting
+  //      at positions Astart and Bstart, as far as possible until the
+  //      cumulative score does not improve for 'break_len' bases, or Aend
+  //      and Bend are reached.  Aend and Bend are changed to reflect the
+  //      ending position of the alignment, or if reached they stay the same.
+  //      This function destroys the edit matrix as it goes along to save
+  //      memory, therefore it only calculates the positions at which the
+  //      alignment score falls off, it does not generate the alignment data
+  //      (like as in alignTarget).
+  //    INPUT: A0 and B0 are sequences such that A [1...N] and B [1...N].
+  //      Usually the '\0' character is placed at the zero and end index
+  //      of the arrays A and B. Astart and Bstart are the (inclusive)
+  //      starting positions of the alignment. Aend and Bend are the
+  //      (inclusive) target positions for the alignment. If the A / Bend
+  //      positions are not reached, they are changed to the positions where
+  //      the search terminated. These values are relative to the start of
+  //      the sequences A and B. m_o is the modus operandi of the function,
+  //      the m_o must be a Search, see beginning of file for descriptions.
+  //   RETURN: This function returns 'true' if the alignment reached the
+  //      target positions Aend and Bend, the function returns false if
+  //      otherwise. Aend and Bend are changed to reflect the termination
+  //      positions of the alignment.
+  //  CONDITIONS:  A0 and B0 must not be null, and have a sequence length
+  //      of atleast 1. Astart, Bstart, Aend and Bend must all be greater
+  //      than zero and less or equal to the lengths of A and B (depending
+  //      on which sequence they reference). If it is a forward extension
+  //      Aend must be greater than Astart, and if it is a backward extension
+  //      Astart must be greater than Aend. Astart must not equal Aend. The
+  //      same rules apply for Bstart and Bend.
+  inline bool alignSearch(const char * A0, long int Astart, long int & Aend,
+                          const char * B0, long int Bstart, long int & Bend,
+                          unsigned int m_o) const;
+
+  //  PURPOSE: This function aligns the sequences A0 and B0, starting
+  //      at positions Astart and Bstart, as far as possible until the
+  //      cumulative score does not improve for 'break_len' bases, or Aend
+  //      and Bend are reached.  Aend and Bend are changed to reflect the
+  //      ending position of the alignment, or if reached they stay the same.
+  //      This algorithm generates alignment data and does not destroy
+  //      the edit matrix (like as in alignSearch).
+  //    INPUT: A0 and B0 are sequences such that A [1...N] and B [1...N].
+  //      Usually the '\0' character is placed at the zero and end index
+  //      of the arrays A and B. Astart and Bstart are the (inclusive)
+  //      starting positions of the alignment. Aend and Bend are the
+  //      (inclusive) target positions for the alignment. If the A / Bend
+  //      positions are not reached, they are changed to the positions where
+  //      the search terminated. These values are relative to the start of
+  //      the sequences A and B. Delta is an integer vector. It does not
+  //      need to be empty, it will append the results to the end.
+  //      m_o is the modus operandi of the function, the m_o must not be
+  //      a search, and must be in the forward direction. See beginning of
+  //      file for descriptions.
+  //   RETURN: This function returns 'true' if the alignment reached the
+  //      target positions Aend and Bend, the function returns false if
+  //      otherwise. Aend and Bend are changed to reflect the termination
+  //      positions of the alignment. The delta encoded alignment data
+  //      is appended to the end of the Delta vector and terminated with
+  //      a zero integer.
+  //  CONDITIONS:  A0 and B0 must not be null, and have a sequence length
+  //      of atleast 1. Astart, Bstart, Aend and Bend must all be greater
+  //      than zero and less or equal to the lengths of A and B (depending
+  //      on which sequence they reference). Aend must be greater than
+  //      Astart. Astart must not equal Aend. The same rules apply for
+  //      Bstart and Bend.
+  inline bool alignTarget(const char * A0, long int Astart, long int & Aend,
+                          const char * B0, long int Bstart, long int & Bend,
+                          std::vector<long int> & Delta, unsigned int m_o) const;
+
+  int breakLen() const { return _break_len; }
+  int banding() const { return _banding; }
+  int matrixType() const { return _matrix_type; }
+
+  int good_score() const { return GOOD_SCORE[_matrix_type]; }
+  int cont_gap_score() const { return CONT_GAP_SCORE[_matrix_type]; }
+  int match_score(int i, int j) const { return MATCH_SCORE[_matrix_type][i][j]; }
+
+protected:
+  //----------------------------------------- Private Function Declarations ----//
+  bool _alignEngine(const char * A0, long int Astart, long int & Aend,
+                    const char * B0, long int Bstart, long int & Bend,
+                    std::vector<long int> & Delta, unsigned int m_o) const;
+
+  long int scoreMatch (const Diagonal Diag, long int Dct, long int CDi,
+                       const char * A, const char * B, long int N, unsigned int m_o) const;
+
+};
 
 
-//--------------------------------------------------------------- Externs ----//
-extern int _break_len;
-extern int _banding;
-extern int _matrix_type;
 
 
-
-
-
-//----------------------------------------- Private Function Declarations ----//
-bool _alignEngine
-     (const char * A0, long int Astart, long int & Aend,
-      const char * B0, long int Bstart, long int & Bend,
-      vector<long int> & Delta, unsigned int m_o);
-
-
-
-
-
-//------------------------------------------- Public Function Definitions ----//
-inline bool alignSearch
-     (const char * A0, long int Astart, long int & Aend,
-      const char * B0, long int Bstart, long int & Bend,
-      unsigned int m_o)
-
-     //  PURPOSE: This function aligns the sequences A0 and B0, starting
-     //      at positions Astart and Bstart, as far as possible until the
-     //      cumulative score does not improve for 'break_len' bases, or Aend
-     //      and Bend are reached.  Aend and Bend are changed to reflect the
-     //      ending position of the alignment, or if reached they stay the same.
-     //      This function destroys the edit matrix as it goes along to save
-     //      memory, therefore it only calculates the positions at which the
-     //      alignment score falls off, it does not generate the alignment data
-     //      (like as in alignTarget).
-     //    INPUT: A0 and B0 are sequences such that A [1...N] and B [1...N].
-     //      Usually the '\0' character is placed at the zero and end index
-     //      of the arrays A and B. Astart and Bstart are the (inclusive)
-     //      starting positions of the alignment. Aend and Bend are the
-     //      (inclusive) target positions for the alignment. If the A / Bend
-     //      positions are not reached, they are changed to the positions where
-     //      the search terminated. These values are relative to the start of
-     //      the sequences A and B. m_o is the modus operandi of the function,
-     //      the m_o must be a Search, see beginning of file for descriptions.
-     //   RETURN: This function returns 'true' if the alignment reached the
-     //      target positions Aend and Bend, the function returns false if
-     //      otherwise. Aend and Bend are changed to reflect the termination
-     //      positions of the alignment.
-     //  CONDITIONS:  A0 and B0 must not be null, and have a sequence length
-     //      of atleast 1. Astart, Bstart, Aend and Bend must all be greater
-     //      than zero and less or equal to the lengths of A and B (depending
-     //      on which sequence they reference). If it is a forward extension
-     //      Aend must be greater than Astart, and if it is a backward extension
-     //      Astart must be greater than Aend. Astart must not equal Aend. The
-     //      same rules apply for Bstart and Bend.
-
+bool aligner::alignSearch(const char * A0, long int Astart, long int & Aend,
+                          const char * B0, long int Bstart, long int & Bend,
+                          unsigned int m_o) const
 {
-  bool rv;
-  vector<long int> n_v;
+  bool                  rv;
+  std::vector<long int> n_v;
 
 #ifdef _DEBUG_VERBOSE
   fprintf(stderr,"Running alignment search...\n");
@@ -199,45 +260,9 @@ inline bool alignSearch
 }
 
 
-
-
-inline bool alignTarget
-     (const char * A0, long int Astart, long int & Aend,
-      const char * B0, long int Bstart, long int & Bend,
-      vector<long int> & Delta, unsigned int m_o)
-
-     //  PURPOSE: This function aligns the sequences A0 and B0, starting
-     //      at positions Astart and Bstart, as far as possible until the
-     //      cumulative score does not improve for 'break_len' bases, or Aend
-     //      and Bend are reached.  Aend and Bend are changed to reflect the
-     //      ending position of the alignment, or if reached they stay the same.
-     //      This algorithm generates alignment data and does not destroy
-     //      the edit matrix (like as in alignSearch).
-     //    INPUT: A0 and B0 are sequences such that A [1...N] and B [1...N].
-     //      Usually the '\0' character is placed at the zero and end index
-     //      of the arrays A and B. Astart and Bstart are the (inclusive)
-     //      starting positions of the alignment. Aend and Bend are the
-     //      (inclusive) target positions for the alignment. If the A / Bend
-     //      positions are not reached, they are changed to the positions where
-     //      the search terminated. These values are relative to the start of
-     //      the sequences A and B. Delta is an integer vector. It does not
-     //      need to be empty, it will append the results to the end.
-     //      m_o is the modus operandi of the function, the m_o must not be
-     //      a search, and must be in the forward direction. See beginning of
-     //      file for descriptions.
-     //   RETURN: This function returns 'true' if the alignment reached the
-     //      target positions Aend and Bend, the function returns false if
-     //      otherwise. Aend and Bend are changed to reflect the termination
-     //      positions of the alignment. The delta encoded alignment data
-     //      is appended to the end of the Delta vector and terminated with
-     //      a zero integer.
-     //  CONDITIONS:  A0 and B0 must not be null, and have a sequence length
-     //      of atleast 1. Astart, Bstart, Aend and Bend must all be greater
-     //      than zero and less or equal to the lengths of A and B (depending
-     //      on which sequence they reference). Aend must be greater than
-     //      Astart. Astart must not equal Aend. The same rules apply for
-     //      Bstart and Bend.
-
+bool aligner::alignTarget(const char * A0, long int Astart, long int & Aend,
+                          const char * B0, long int Bstart, long int & Bend,
+                          std::vector<long int> & Delta, unsigned int m_o) const
 {
   bool rv;
 
@@ -278,73 +303,8 @@ inline bool alignTarget
   return rv;
 }
 
-
-
-
-inline int getBreakLen
-     ( )
-
-     //  Returns the current value of _break_len
-
-{
-  return _break_len;
-}
-
-inline int getBanding()
-{ return _banding; }
-
-
-
-inline int getMatrixType
-     ( )
-
-     //  Returns the current value of _matrix_type
-
-{
-  return _matrix_type;
-}
-
-
-
-
-inline void setBreakLen
-     (const int Break_Len)
-
-     //  Resets the break length (see comments on DEFAULT_BREAK_LEN above)
-
-{
-  if ( Break_Len < 1  ||  Break_Len > MAX_ALIGNMENT_LENGTH )
-    fprintf (stderr, "WARNING: Invalid break length %d, ignoring\n", Break_Len);
-  else
-    _break_len = Break_Len;
-  return;
-}
-
-inline void setBanding(const int Banding)
-{
-  if ( Banding < 0 )
-    fprintf (stderr, "WARNING: Invalid banding %d, ignoring\n", Banding);
-  else
-    _banding = Banding;
-  return;
-}
-
-
-
-inline void setMatrixType
-     (const int Matrix_Type)
-
-     //  Resets the _matrix_type
-
-{
-  if ( Matrix_Type < 0 || Matrix_Type > 3 )
-    fprintf (stderr,
-	     "WARNING: Invalid matrix type %d, ignoring\n", Matrix_Type);
-  else
-    _matrix_type = Matrix_Type;
-  return;
-}
-
+} // namespace sw_align
+} // namespace mummer
 
 
 #endif // #ifndef __SW_ALIGN_HH

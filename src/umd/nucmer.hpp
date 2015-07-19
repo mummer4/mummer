@@ -17,11 +17,13 @@ struct options_type {
     , max_separation(90)
     , min_output_score(65)
     , separation_factor(0.12)
-    , use_extent(true)
+    , use_extent(false)
     , do_delta(true)
     , do_extend(true)
     , to_seqend(false)
     , do_shadows(false)
+    , break_len(200)
+    , banding(0)
   { }
 
   // Options for mummer
@@ -41,6 +43,8 @@ struct options_type {
   bool do_extend;
   bool to_seqend;
   bool do_shadows;
+  int  break_len;
+  int  banding;
 };
 
 // Match a single DNA sequence <query> against a single DNA sequence <reference>.
