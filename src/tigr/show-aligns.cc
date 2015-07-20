@@ -86,7 +86,7 @@ bool isSortByQuery = false;              // -q option
 bool isSortByReference = false;          // -r option
 
 int DATA_TYPE = NUCMER_DATA;
-int MATRIX_TYPE = BLOSUM62;
+int MATRIX_TYPE = mummer::sw_align::BLOSUM62;
 
 char InputFileName [MAX_LINE];
 char RefFileName [MAX_LINE], QryFileName [MAX_LINE];
@@ -170,7 +170,7 @@ int main
 	      fprintf(stderr,
 		      "WARNING: invalid matrix type %d, using default\n",
 		      MATRIX_TYPE);
-	      MATRIX_TYPE = BLOSUM62;
+	      MATRIX_TYPE = mummer::sw_align::BLOSUM62;
 	    }
 	  break;
 
@@ -473,7 +473,7 @@ void printAlignments
 	      else if ( A[Ai][Apos] == B[Bi][Bpos] )
 		Buff3[Pos] = A[Ai][Apos];
 	      else
-		Buff3[Pos] = MATCH_SCORE
+		Buff3[Pos] = mummer::sw_align::MATCH_SCORE
 		  [MATRIX_TYPE]
 		  [toupper(A[Ai][Apos]) - 'A']
 		  [toupper(B[Bi][Bpos]) - 'A'] > 0 ?
@@ -542,7 +542,7 @@ void printAlignments
 	  else if ( A[Ai][Apos] == B[Bi][Bpos] )
 	    Buff3[Pos] = A[Ai][Apos];
 	  else
-	    Buff3[Pos] = MATCH_SCORE
+	    Buff3[Pos] = mummer::sw_align::MATCH_SCORE
 	      [MATRIX_TYPE]
 	      [toupper(A[Ai][Apos]) - 'A']
 	      [toupper(B[Bi][Bpos]) - 'A'] > 0 ?

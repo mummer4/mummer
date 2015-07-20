@@ -50,6 +50,13 @@
 #include <algorithm>
 using namespace std;
 
+using mummer::sw_align::OPTIMAL_BIT;
+using mummer::sw_align::BACKWARD_SEARCH;
+using mummer::sw_align::MAX_ALIGNMENT_LENGTH;
+using mummer::sw_align::SEQEND_BIT;
+using mummer::sw_align::STOP_CHAR;
+using mummer::sw_align::FORCED_FORWARD_ALIGN;
+using mummer::sw_align::FORWARD_ALIGN;
 
 
 
@@ -134,19 +141,22 @@ void addNewAlignment
       vector<Match>::iterator Mp);
 
 bool extendBackward
-     (vector<Alignment> & Alignments, vector<Alignment>::iterator CurrAp,
+     (const mummer::sw_align::aligner& aligner,
+      vector<Alignment> & Alignments, vector<Alignment>::iterator CurrAp,
       vector<Alignment>::iterator TargetAp, const char * A, const char * B);
 
 bool extendForward
-     (vector<Alignment>::iterator Ap, const char * A, long int targetA,
+     (const mummer::sw_align::aligner& aligner,
+      vector<Alignment>::iterator Ap, const char * A, long int targetA,
       const char * B, long int targetB, unsigned int m_o);
 
 void extendClusters
-     (vector<Cluster> & Clusters,
+     (const mummer::sw_align::aligner& aligner,  vector<Cluster> & Clusters,
       const FastaRecord * A, const FastaRecord * B, FILE * DeltaFile);
 
 void flushAlignments
-     (vector<Alignment> & Alignments,
+     (const mummer::sw_align::aligner& aligner,
+      vector<Alignment> & Alignments,
       const FastaRecord * Af, const FastaRecord * Bf,
       FILE * DeltaFile);
 
@@ -154,11 +164,13 @@ void flushSyntenys
      (vector<Synteny> & Syntenys, FILE * ClusterFile);
 
 vector<Cluster>::iterator getForwardTargetCluster
-     (vector<Cluster> & Clusters, vector<Cluster>::iterator CurrCp,
+     (const mummer::sw_align::aligner& aligner,
+      vector<Cluster> & Clusters, vector<Cluster>::iterator CurrCp,
       long int & targetA, long int & targetB);
 
 vector<Alignment>::iterator getReverseTargetAlignment
-     (vector<Alignment> & Alignments, vector<Alignment>::iterator CurrAp);
+     (const mummer::sw_align::aligner& aligner,
+      vector<Alignment> & Alignments, vector<Alignment>::iterator CurrAp);
 
 bool isShadowedCluster
      (vector<Cluster>::iterator CurrCp,
@@ -168,11 +180,13 @@ void parseAbort
      (const char *);
 
 void parseDelta
-     (vector<Alignment> & Alignments,
+     (const mummer::sw_align::aligner& aligner,
+      vector<Alignment> & Alignments,
       const FastaRecord * Af, const FastaRecord *Bf);
 
 void processSyntenys
-     (vector<Synteny> & Syntenys,
+     (const mummer::sw_align::aligner& aligner,
+      vector<Synteny> & Syntenys,
       FastaRecord * Af, long int As,
       FILE * QryFile, FILE * ClusterFile, FILE * DeltaFile);
 
@@ -233,9 +247,9 @@ int main
   FILE * RefFile, * QryFile;         // reference and query input files
   FILE * ClusterFile, * DeltaFile;   // cluster and delta output files
 
-  //-- Set the alignment data type and break length (sw_align.h)
-  setMatrixType ( BLOSUM62 );
-  setBreakLen ( 60 );
+  //-- Alignment data type and break length (sw_align.h)
+  int break_len = 60;
+  int matrix_type = mummer::sw_align::BLOSUM62;
 
   //-- Parse the command line arguments
   {
@@ -245,7 +259,7 @@ int main
       switch (ch)
         {
         case 'b' :
-          setBreakLen (atoi (optarg));
+          break_len = (atoi (optarg));
           break;
 
 	case 'd' :
@@ -266,25 +280,26 @@ int main
 	  break;
 
 	case 'x' :
-	  setMatrixType ( atoi (optarg) );
-	  if ( getMatrixType( ) == NUCLEOTIDE )
+          matrix_type = atoi(optarg);
+	  if ( matrix_type == mummer::sw_align::NUCLEOTIDE || matrix_type < 0 || matrix_type > 3 )
 	    {
 	      fprintf (stderr, "WARNING: invalid matrix type %d, ignoring\n",
-		       getMatrixType( ));
-	      setMatrixType ( BLOSUM62 );
+		       matrix_type);
+	      matrix_type = mummer::sw_align::BLOSUM62;
 	    }
 	  break;
 
         default :
           errflg ++;
         }
-    
+
     if ( errflg > 0 || argc - optind != 3 )
       {
         printUsage (argv[0]);
         exit (EXIT_FAILURE);
       }
   }
+  mummer::sw_align::aligner aligner(break_len, 0, matrix_type);
 
   //-- Read and create the I/O file names
   strcpy (RefFileName, argv[optind ++]);
@@ -439,7 +454,7 @@ int main
               else
                 {
                   //-- New B sequence header, process all the old synteny's
-                  processSyntenys (Syntenys, Af, As,
+                  processSyntenys (aligner, Syntenys, Af, As,
                                    QryFile, ClusterFile, DeltaFile);
 
                 }
@@ -502,7 +517,7 @@ int main
   if ( !Syntenys.empty( ) && !CurrSp->clusters.empty( ) )
     if ( CurrSp->clusters.rbegin( )->matches.empty( ) )
       CurrSp->clusters.pop_back( );
-  processSyntenys (Syntenys, Af, As, QryFile, ClusterFile, DeltaFile);
+  processSyntenys (aligner, Syntenys, Af, As, QryFile, ClusterFile, DeltaFile);
   fclose (QryFile);
 
   //-- Free the reference sequences
@@ -549,7 +564,8 @@ void addNewAlignment
 
 
 bool extendBackward
-     (vector<Alignment> & Alignments, vector<Alignment>::iterator CurrAp,
+     (const mummer::sw_align::aligner& aligner,
+      vector<Alignment> & Alignments, vector<Alignment>::iterator CurrAp,
       vector<Alignment>::iterator TargetAp, const char * A, const char * B)
 
      //  Extend an alignment backwards off of the current alignment object.
@@ -611,8 +627,8 @@ bool extendBackward
 
 
   //-- Attempt to reach the target
-  target_reached = alignSearch (A, CurrAp->sA, targetA,
-                                B, CurrAp->sB, targetB, m_o);
+  target_reached = aligner.alignSearch (A, CurrAp->sA, targetA,
+                                        B, CurrAp->sB, targetB, m_o);
 
   if ( overflow_flag  ||  TargetAp == Alignments.end( ) )
     target_reached = false;
@@ -624,7 +640,7 @@ bool extendBackward
       assert ( CurrAp == Alignments.end( ) - 1 );
 
       //-- Merge the two alignment objects
-      extendForward (TargetAp, A, CurrAp->sA,
+      extendForward (aligner, TargetAp, A, CurrAp->sA,
                                B, CurrAp->sB, FORCED_FORWARD_ALIGN);
       TargetAp->eA = CurrAp->eA;
       TargetAp->eB = CurrAp->eB;
@@ -632,9 +648,9 @@ bool extendBackward
     }
   else
     {
-      alignTarget (A, targetA, CurrAp->sA,
-                   B, targetB, CurrAp->sB,
-                   CurrAp->delta, FORCED_FORWARD_ALIGN);
+      aligner.alignTarget (A, targetA, CurrAp->sA,
+                           B, targetB, CurrAp->sB,
+                           CurrAp->delta, FORCED_FORWARD_ALIGN);
       CurrAp->sA = targetA;
       CurrAp->sB = targetB;
 
@@ -650,7 +666,8 @@ bool extendBackward
 
 
 bool extendForward
-     (vector<Alignment>::iterator CurrAp, const char * A, long int targetA,
+     (const mummer::sw_align::aligner& aligner,
+      vector<Alignment>::iterator CurrAp, const char * A, long int targetA,
       const char * B, long int targetB, unsigned int m_o)
 
      //  Extend an alignment forwards off the current alignment object until
@@ -694,9 +711,9 @@ bool extendForward
   if ( double_flag )
     m_o &= ~SEQEND_BIT;
 
-  target_reached = alignTarget (A, CurrAp->eA, targetA,
-                                B, CurrAp->eB, targetB,
-                                CurrAp->delta, m_o);
+  target_reached = aligner.alignTarget (A, CurrAp->eA, targetA,
+                                        B, CurrAp->eB, targetB,
+                                        CurrAp->delta, m_o);
 
   //-- Notify user if alignment was chopped short
   if ( target_reached  &&  overflow_flag )
@@ -731,9 +748,8 @@ bool extendForward
 
 
 
-
 void extendClusters
-     (vector<Cluster> & Clusters,
+     (const mummer::sw_align::aligner& aligner,  vector<Cluster> & Clusters,
       const FastaRecord * Af, const FastaRecord * Bf, FILE * DeltaFile)
 
      //  Connect all the matches in every cluster between sequences A and B.
@@ -845,10 +861,10 @@ void extendClusters
 	      if ( DO_EXTEND  ||  Mp != CurrCp->matches.begin ( ) )
 		{
 		  //-- Target the closest/best alignment object
-		  TargetAp = getReverseTargetAlignment (Alignments, CurrAp);
+		  TargetAp = getReverseTargetAlignment (aligner, Alignments, CurrAp);
 		  
 		  //-- Extend the new alignment object backwards
-		  if ( extendBackward (Alignments, CurrAp, TargetAp,
+		  if ( extendBackward (aligner, Alignments, CurrAp, TargetAp,
 				       A [CurrCp->frameA], B [CurrCp->frameB]) )
 		    CurrAp = TargetAp;
 		}
@@ -864,7 +880,7 @@ void extendClusters
               targetB = (Mp + 1)->sB;
 
 	      //-- Extend the current alignment object forward
-	      target_reached = extendForward (CurrAp,
+	      target_reached = extendForward (aligner, CurrAp,
 					      A [CurrCp->frameA], targetA,
 					      B [CurrCp->frameB], targetB, m_o);
             }
@@ -874,7 +890,7 @@ void extendClusters
               targetB = Blen [CurrCp->frameB];
 
               //-- Target the closest/best match in a future cluster
-              TargetCp = getForwardTargetCluster (Clusters, CurrCp,
+              TargetCp = getForwardTargetCluster (aligner, Clusters, CurrCp,
                                                   targetA, targetB);
 
 	      if ( TargetCp == Clusters.end( ) )
@@ -885,7 +901,7 @@ void extendClusters
 		}
 
 	      //-- Extend the current alignment object forward
-	      target_reached = extendForward (CurrAp,
+	      target_reached = extendForward (aligner, CurrAp,
 					      A [CurrCp->frameA], targetA,
 					      B [CurrCp->frameB], targetB, m_o);
             }
@@ -907,7 +923,7 @@ void extendClusters
 #endif
 
   //-- Output the alignment data to the delta file
-  flushAlignments (Alignments, Af, Bf, DeltaFile);
+  flushAlignments (aligner, Alignments, Af, Bf, DeltaFile);
 
   for ( i = 0; i < 7; i ++ )
     {
@@ -924,7 +940,8 @@ void extendClusters
 
 
 void flushAlignments
-     (vector<Alignment> & Alignments,
+     (const mummer::sw_align::aligner& aligner,
+      vector<Alignment> & Alignments,
       const FastaRecord * Af, const FastaRecord * Bf,
       FILE * DeltaFile)
 
@@ -939,7 +956,7 @@ void flushAlignments
   fprintf (DeltaFile, ">%s %s %ld %ld\n", Af->Id, Bf->Id, Af->len, Bf->len);
 
   //-- Generate the error counts
-  parseDelta (Alignments, Af, Bf);
+  parseDelta (aligner, Alignments, Af, Bf);
 
   for ( Ap = Alignments.begin( ); Ap < Alignments.end( ); Ap ++ )
     {
@@ -1031,7 +1048,8 @@ void flushSyntenys
 
 
 vector<Cluster>::iterator getForwardTargetCluster
-     (vector<Cluster> & Clusters, vector<Cluster>::iterator CurrCp,
+     (const mummer::sw_align::aligner& aligner,
+      vector<Cluster> & Clusters, vector<Cluster>::iterator CurrCp,
       long int & targetA, long int & targetB)
 
      //  Return the cluster that is most likely to successfully join (in a
@@ -1099,9 +1117,9 @@ vector<Cluster>::iterator getForwardTargetCluster
                 }
 
               //-- If the cluster is close enough
-              if ( greater <= getBreakLen( )  ||
-                   (lesser) * GOOD_SCORE [getMatrixType( )] +
-                   (greater - lesser) * CONT_GAP_SCORE [getMatrixType( )] > 0 )
+              if ( greater <= aligner.breakLen( )  ||
+                   (lesser) * aligner.good_score() +
+                   (greater - lesser) * aligner.cont_gap_score() > 0 )
                 {
                   Cp = Cip;
                   targetA = eA;
@@ -1128,7 +1146,8 @@ vector<Cluster>::iterator getForwardTargetCluster
 
 
 vector<Alignment>::iterator getReverseTargetAlignment
-     (vector<Alignment> & Alignments, vector<Alignment>::iterator CurrAp)
+     (const mummer::sw_align::aligner& aligner,
+      vector<Alignment> & Alignments, vector<Alignment>::iterator CurrAp)
 
      //  Return the alignment that is most likely to successfully join (in a
      //  reverse direction) with the current alignment. The returned alignment
@@ -1176,9 +1195,9 @@ vector<Alignment>::iterator getReverseTargetAlignment
                 }
 
               //-- If the cluster is close enough
-              if ( greater <= getBreakLen( )  ||
-                   (lesser) * GOOD_SCORE [getMatrixType( )] +
-                   (greater - lesser) * CONT_GAP_SCORE [getMatrixType( )] > 0 )
+              if ( greater <= aligner.breakLen( )  ||
+                   (lesser) * aligner.good_score() +
+                   (greater - lesser) * aligner.cont_gap_score() > 0 )
                 {
                   Ap = Aip;
                   break;
@@ -1259,7 +1278,8 @@ void parseAbort
 
 
 void parseDelta
-     (vector<Alignment> & Alignments,
+     (const mummer::sw_align::aligner& aligner,
+      vector<Alignment> & Alignments,
       const FastaRecord * Af, const FastaRecord *Bf)
 
      // Use the delta information to generate the error counts for each
@@ -1332,10 +1352,7 @@ void parseDelta
 	      
 	      ch1 = toupper(ch1);
 	      ch2 = toupper(ch2);
-	      if ( 1 > MATCH_SCORE
-		   [getMatrixType( )]
-		   [ch1 - 'A']
-		   [ch2 - 'A'] )
+	      if ( 1 > aligner.match_score(ch1 - 'A', ch2 - 'A'))
 		SimErrors ++;
 	      if ( ch1 != ch2 )
 		Errors ++;      
@@ -1380,10 +1397,7 @@ void parseDelta
 	  
 	  ch1 = toupper(ch1);
 	  ch2 = toupper(ch2);
-	  if ( 1 > MATCH_SCORE
-	       [getMatrixType( )]
-	       [ch1 - 'A']
-	       [ch2 - 'A'] )
+	  if ( 1 > aligner.match_score(ch1 - 'A', ch2 - 'A'))
 	    SimErrors ++;
 	  if ( ch1 != ch2 )
 	    Errors ++;
@@ -1410,9 +1424,10 @@ void parseDelta
 
 
 
-
 void processSyntenys
-     (vector<Synteny> & Syntenys, FastaRecord * Af, long int As,
+     (const mummer::sw_align::aligner& aligner,
+      vector<Synteny> & Syntenys,
+      FastaRecord * Af, long int As,
       FILE * QryFile, FILE * ClusterFile, FILE * DeltaFile)
 
      //  For each syntenic region with clusters, read in the B sequence and
@@ -1463,7 +1478,7 @@ void processSyntenys
 
       //-- Extend clusters and create the alignment information
       CurrSp->Bf.len = Bf.len;
-      extendClusters (CurrSp->clusters, CurrSp->AfP, &Bf, DeltaFile);
+      extendClusters (aligner, CurrSp->clusters, CurrSp->AfP, &Bf, DeltaFile);
     }
 
   //-- Create the cluster information and clear the Synteny structure
