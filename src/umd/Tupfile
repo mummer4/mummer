@@ -5,7 +5,7 @@ LDLIBS = -lpthread
 : foreach nucmer.cc |> !cxx |> {umdmummer}
 : {umdmummer} |> !ar |> $(LIB_DIR)/libumdmummer.a $(LIB_DIR)/<lib>
 
-LDLIBS += -lessaMEM -lumdmummer
+LDLIBS += -lumdmummer -lessaMEM -ltigr
 : simplenucmer.cc |> !cxx |> {simplenucmer}
 : {simplenucmer} | $(LIB_DIR)/<lib> |> !lxxd |> $(BIN_DIR)/simplenucmer
 

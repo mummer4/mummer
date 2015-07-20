@@ -20,3 +20,5 @@ CXXFLAGS = -std=c++11
 : show-tiling.o tigrinc.o delta.o |> !lxxd |> $(BIN_DIR)/show-tiling
 : show-snps.o tigrinc.o translate.o delta.o |> !lxxd |> $(BIN_DIR)/show-snps
 : show-diff.o tigrinc.o delta.o |> !lxxd |> $(BIN_DIR)/show-diff
+
+: mgaps.o postnuc.o sw_align.o tigrinc.o |> !ar |> $(LIB_DIR)/libtigr.a $(LIB_DIR)/<lib>

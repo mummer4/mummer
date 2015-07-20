@@ -99,7 +99,7 @@ struct merge_syntenys {
     , DO_SHADOWS(ds)
   { }
 
-  merge_syntenys(bool dd, bool de, bool ts, bool ds, int break_len, bool banding, int matrix_type)
+  merge_syntenys(bool dd, bool de, bool ts, bool ds, int break_len, int banding, int matrix_type)
     : DO_DELTA(dd)
     , DO_EXTEND(de)
     , TO_SEQEND(ts)

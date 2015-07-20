@@ -92,13 +92,13 @@ struct Diagonal
 
 class aligner {
   const int _break_len;
-  const bool _banding;
+  const int _banding;
   const int _matrix_type;
 
 public:
   aligner()
     : _break_len(200) // Number of bases to extend past global high score before giving up
-    , _banding(false) // No banding by default
+    , _banding(0) // No banding by default
     , _matrix_type(NUCLEOTIDE)
   { }
 

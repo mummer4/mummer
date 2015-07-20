@@ -206,7 +206,8 @@ void printUsage
      (const char *);
 
 void validateData
-     (vector<Alignment> Alignments, vector<Cluster> Clusters,
+     (const mummer::sw_align::aligner& aligner,
+      vector<Alignment> Alignments, vector<Cluster> Clusters,
       const FastaRecord * Af, const FastaRecord * Bf);
 
 
@@ -919,7 +920,7 @@ void extendClusters
     }
 
 #ifdef _DEBUG_ASSERT
-  validateData (Alignments, Clusters, Af, Bf);
+  validateData (aligner, Alignments, Clusters, Af, Bf);
 #endif
 
   //-- Output the alignment data to the delta file
@@ -1585,7 +1586,8 @@ void printUsage
 
 
 void validateData
-     (vector<Alignment> Alignments, vector<Cluster> Clusters,
+     (const mummer::sw_align::aligner& aligner,
+      vector<Alignment> Alignments, vector<Cluster> Clusters,
       const FastaRecord * Af, const FastaRecord * Bf)
 
      //  Self test function to check that the cluster and alignment information
@@ -1664,13 +1666,13 @@ void validateData
 		   A[Ap->frameA][Ap->sA] : STOP_CHAR);
       char Yc = toupper(isalpha(B[Ap->frameB][Ap->sB]) ?
 		   B[Ap->frameB][Ap->sB] : STOP_CHAR);
-      assert ( 0 <= MATCH_SCORE [getMatrixType( )] [Xc - 'A'] [Yc - 'A'] );
+      assert ( 0 <= aligner.match_score(Xc - 'A', Yc - 'A') );
       
       Xc = toupper(isalpha(A[Ap->frameA][Ap->eA]) ?
 		   A[Ap->frameA][Ap->eA] : STOP_CHAR);
       Yc = toupper(isalpha(B[Ap->frameB][Ap->eB]) ?
 		   B[Ap->frameB][Ap->eB] : STOP_CHAR);
-      assert ( 0 <= MATCH_SCORE [getMatrixType( )] [Xc - 'A'] [Yc - 'A'] );
+      assert ( 0 <= aligner.match_score(Xc - 'A', Yc - 'A') );
 #endif
     }
 
