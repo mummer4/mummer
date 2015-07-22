@@ -41,7 +41,7 @@ bool Read_Sequence(std::istream& is, std::string& T, std::string& name) {
 
 void merge_syntenys::extendClusters(std::vector<Cluster> & Clusters,
                                     const char* Aseq, const long Alen, const char* Bseq, const long Blen,
-                                    std::vector<Alignment>& Alignments /* the vector of alignment objects */)
+                                    std::vector<Alignment>& Alignments /* the vector of alignment objects */) const
 
 //  Connect all the matches in every cluster between sequences A and B.
 //  Also, extend alignments off of the front and back of each cluster to
@@ -185,7 +185,7 @@ void merge_syntenys::extendClusters(std::vector<Cluster> & Clusters,
 }
 
 bool merge_syntenys::extendBackward(std::vector<Alignment> & Alignments, std::vector<Alignment>::iterator CurrAp,
-                                    std::vector<Alignment>::iterator TargetAp, const char * A, const char * B)
+                                    std::vector<Alignment>::iterator TargetAp, const char * A, const char * B) const
 
 //  Extend an alignment backwards off of the current alignment object.
 //  The current alignment object must be freshly created and consist

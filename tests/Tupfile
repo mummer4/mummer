@@ -1,5 +1,8 @@
 include_rules
 
+LDLIBS += -lumdmummer -lessaMEM -ltigr
+: test_sequence_align.cc | $(LIB_DIR)/<lib> |> !cxxld |>
+
 : | $(BIN_DIR)/<exec> |> $(BIN_DIR)/mummer -maxmatch -b pb20x-1000.fa superReadSequences.named-1000.fasta 2> %O.err.log | ufasta dsort /dev/stdin | ./test_md5 ae901384fc7b4b12d0a854027932001d > %o |> test_mummer_max.log | test_mummer_max.err.log
 : | $(BIN_DIR)/<exec> |> $(BIN_DIR)/essamummer -maxmatch -b pb20x-1000.fa superReadSequences.named-1000.fasta 2> %O.err.log | ufasta dsort /dev/stdin | ./test_md5 ae901384fc7b4b12d0a854027932001d > %o |> test_essamummer_max.log | test_essamummer_max.err.log
 

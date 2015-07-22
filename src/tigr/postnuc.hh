@@ -109,22 +109,22 @@ struct merge_syntenys {
 
   template<typename FastaRecord, typename ClustersOut, typename MatchesOut>
   void processSyntenys_each(std::vector<Synteny<FastaRecord> >& Syntenys, const FastaRecord& Bf,
-                            ClustersOut clusters, MatchesOut matches);
+                            ClustersOut clusters, MatchesOut matches) const;
   template<typename FastaRecord, typename MatchesOut>
   void processSyntenys_each(std::vector<Synteny<FastaRecord> >& Syntenys, const FastaRecord& Bf,
-                            MatchesOut matches) {
+                            MatchesOut matches) const {
     processSyntenys_each(Syntenys, Bf, [](const std::vector<Synteny<FastaRecord> >& s, const FastaRecord& Bf) { },
                          matches);
   }
   bool extendBackward(std::vector<Alignment> & Alignments, std::vector<Alignment>::iterator CurrAp,
-                      std::vector<Alignment>::iterator TargetAp, const char * A, const char * B);
+                      std::vector<Alignment>::iterator TargetAp, const char * A, const char * B) const;
 
   void extendClusters(std::vector<Cluster> & Clusters,
                       const char* Aseq, const long Alen, const char* Bseq, const long Blen,
-                      std::vector<Alignment>& Alignments);
+                      std::vector<Alignment>& Alignments) const;
 
   std::vector<Alignment> extendClusters(std::vector<Cluster> & Clusters,
-                                        const char* Aseq, const long Alen, const char* Bseq, const long Blen) {
+                                        const char* Aseq, const long Alen, const char* Bseq, const long Blen) const {
     std::vector<Alignment> res;
     extendClusters(Clusters, Aseq, Alen, Bseq, Blen, res);
     return res;
@@ -194,7 +194,7 @@ inline long int revC
 //
 template<typename FastaRecord, typename ClustersOut, typename MatchesOut>
 void merge_syntenys::processSyntenys_each(std::vector<Synteny<FastaRecord> >& Syntenys, const FastaRecord& Bf,
-                                          ClustersOut clusters, MatchesOut matches)
+                                          ClustersOut clusters, MatchesOut matches) const
 
 //  For each syntenic region with clusters, extend the clusters to
 //  expand total alignment coverage. Only should be called once all

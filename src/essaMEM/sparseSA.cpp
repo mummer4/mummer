@@ -69,9 +69,11 @@ sparseSA sparseSA::create_auto(const std::string& S, const std::vector<std::stri
       : (int) std::max((min_len-12)/K,1);
   }
   const int kmer = std::max(0,std::min(10,min_len - sparseMult*K + 1));
-  return sparseSA(S, descr_, startpos_, true /* 4column */, K, suflink, child, kmer>0, sparseMult,
-                  kmer, false /* printSubstring */, false /* printRevCompForw */,
-                  nucleotidesOnly_);
+  sparseSA res(S, descr_, startpos_, true /* 4column */, K, suflink, child, kmer>0, sparseMult,
+               kmer, false /* printSubstring */, false /* printRevCompForw */,
+               nucleotidesOnly_);
+  res.construct();
+  return res;
 }
 
 // Uses the algorithm of Kasai et al 2001 which was described in
