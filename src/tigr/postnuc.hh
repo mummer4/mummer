@@ -73,6 +73,28 @@ struct Alignment
     , deltaApos(0)
   { }
   Alignment(Alignment&& rhs) = default;
+
+  // Number of bases in alignment (in reference), counting deletions.
+  long total() const {
+    return std::abs(eA - sA) + 1 + std::count_if(delta.cbegin(), delta.cend(), [](long x) { return x < 0; });
+  }
+
+  inline double identity(const long t) const { return (double)(t - Errors) / t; }
+  inline double identity() const { return identity(total()); }
+  inline double similarity(const long t) const { return (double)(t - SimErrors) / t; }
+  inline double similartiy() const { return similarity(total()); }
+  inline double stopity(const long t) const { return (double)NonAlphas / (2 * t); }
+  inline double stopity() const { return stopity(total()); }
+
+  struct stats_type {
+    double identity;
+    double similarity;
+    double stopity;
+  };
+  stats_type stats() const {
+    const long t = total();
+    return { identity(t), similarity(t), stopity(t) };
+  }
 };
 
 
