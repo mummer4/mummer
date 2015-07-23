@@ -3,8 +3,8 @@
 #include <fstream>
 #include <vector>
 
-#include "sparseSA.hpp"
-#include "fasta.hpp"
+#include <mummer/sparseSA.hpp>
+#include <mummer/fasta.hpp>
 
 #include <getopt.h>
 #include <time.h>

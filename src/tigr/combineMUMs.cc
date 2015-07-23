@@ -8,7 +8,7 @@
 */
 
 
-#include  "tigrinc.hh"
+#include <mummer/tigrinc.hh>
 #include  <string>
 using namespace std;
 

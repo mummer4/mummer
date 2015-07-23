@@ -4,7 +4,7 @@
 #include <vector>
 #include <cassert>
 
-#include "fasta.hpp"
+#include <mummer/fasta.hpp>
 
 // Return the reverse complement of sequence. This allows searching
 // the plus strand of instances on the minus strand.

@@ -43,9 +43,9 @@
 #include <iostream>
 #include <fstream>
 #include <algorithm>
-#include "postnuc.hh"
-#include "tigrinc.hh"
-#include "sw_align.hh"
+#include <mummer/postnuc.hh>
+#include <mummer/tigrinc.hh>
+#include <mummer/sw_align.hh>
 
 using namespace std;
 using namespace mummer::postnuc;

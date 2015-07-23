@@ -8,7 +8,7 @@
 */
 
 
-#include  "tigrinc.hh"
+#include <mummer/tigrinc.hh>
 
 
 #define  SHOW_TREE 0

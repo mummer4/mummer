@@ -9,7 +9,7 @@
 *  complemented.
 */
 
-#include "tigrinc.hh"
+#include <mummer/tigrinc.hh>
 #include <vector>
 using namespace std;
 

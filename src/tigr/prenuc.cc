@@ -18,7 +18,7 @@
 //
 //------------------------------------------------------------------------------
 
-#include "tigrinc.hh"
+#include <mummer/tigrinc.hh>
 
 //-- Output this many sequence characters per line
 #define CHARS_PER_LINE 60

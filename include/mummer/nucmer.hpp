@@ -2,9 +2,9 @@
 #define __NUCMER_H__
 
 #include <vector>
-#include <essaMEM/sparseSA.hpp>
-#include <tigr/mgaps.hh>
-#include <tigr/postnuc.hh>
+#include <mummer/sparseSA.hpp>
+#include <mummer/mgaps.hh>
+#include <mummer/postnuc.hh>
 
 namespace mummer {
 namespace nucmer {

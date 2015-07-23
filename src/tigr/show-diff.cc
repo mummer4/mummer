@@ -8,8 +8,8 @@
 //
 //-----------------------------------------------------------------------------
 
-#include "delta.hh"
-#include "tigrinc.hh"
+#include <mummer/delta.hh>
+#include <mummer/tigrinc.hh>
 #include <string>
 #include <cstdlib>
 #include <cassert>

@@ -14,10 +14,10 @@
 //
 //------------------------------------------------------------------------------
 
-#include "delta.hh"
-#include "tigrinc.hh"
-#include "translate.hh"
-#include "sw_alignscore.hh"
+#include <mummer/delta.hh>
+#include <mummer/tigrinc.hh>
+#include <mummer/translate.hh>
+#include <mummer/sw_alignscore.hh>
 #include <vector>
 #include <algorithm>
 using namespace std;

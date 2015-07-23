@@ -43,9 +43,9 @@
 //         mostly the alignment extension performance (sw_align.h)
 //#define _DEBUG_ASSERT       // self testing assert functions
 
-#include "tigrinc.hh"
-#include "sw_align.hh"
-#include "translate.hh"
+#include <mummer/tigrinc.hh>
+#include <mummer/sw_align.hh>
+#include <mummer/translate.hh>
 #include <vector>
 #include <algorithm>
 using namespace std;

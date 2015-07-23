@@ -8,7 +8,7 @@
 #include <fstream>
 #include <iomanip>
 
-#include "sparseSA.hpp"
+#include <mummer/sparseSA.hpp>
 
 namespace mummer {
 namespace mummer {

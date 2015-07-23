@@ -11,9 +11,9 @@
 #include <limits>
 #include <memory>
 
-#include "postnuc.hh"
-#include "tigrinc.hh"
-#include "sw_align.hh"
+#include <mummer/postnuc.hh>
+#include <mummer/tigrinc.hh>
+#include <mummer/sw_align.hh>
 
 namespace mummer {
 namespace postnuc {

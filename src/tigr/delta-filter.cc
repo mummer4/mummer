@@ -14,8 +14,8 @@
 //
 //------------------------------------------------------------------------------
 
-#include "delta.hh"
-#include "tigrinc.hh"
+#include <mummer/delta.hh>
+#include <mummer/tigrinc.hh>
 #include <map>
 #include <vector>
 #include <string>

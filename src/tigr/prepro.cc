@@ -31,8 +31,8 @@
 //
 //------------------------------------------------------------------------------
 
-#include "tigrinc.hh"
-#include "translate.hh"
+#include <mummer/tigrinc.hh>
+#include <mummer/translate.hh>
 
 //-- Output this many sequence characters per line
 #define CHARS_PER_LINE 60

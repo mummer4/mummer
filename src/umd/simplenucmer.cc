@@ -1,6 +1,6 @@
 #include <iostream>
 #include <fstream>
-#include <umd/nucmer.hpp>
+#include <mummer/nucmer.hpp>
 
 std::string read_sequence(const char* file, std::string& header) {
   std::string res;

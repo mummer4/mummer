@@ -8,7 +8,7 @@
 //! \see delta.hh
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "delta.hh"
+#include <mummer/delta.hh>
 #include <map>
 #include <vector>
 #include <cmath>

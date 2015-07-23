@@ -1,4 +1,4 @@
-#include "tigrinc.hh"
+#include <mummer/tigrinc.hh>
 
 
 FILE *  File_Open  (const char * Filename, const char * Mode)

@@ -14,8 +14,8 @@
 #include <iomanip>
 #include <string>
 
-#include  "tigrinc.hh"
-#include "mgaps.hh"
+#include <mummer/tigrinc.hh>
+#include <mummer/mgaps.hh>
 
 
 using namespace mummer::mgaps;

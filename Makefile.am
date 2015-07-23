@@ -1,7 +1,7 @@
 SUBDIRS = . $(MAYBE_SWIG)
 ACLOCAL_AMFLAGS = -I m4
 
-AM_CPPFLAGS = -Wall -I$(srcdir)/src
+AM_CPPFLAGS = -Wall -I$(srcdir)/include
 AM_LDFLAGS = -lpthread
 
 bin_PROGRAMS =
@@ -14,6 +14,13 @@ LDADD = libumdmummer.la
 libumdmummer_la_SOURCES  = src/essaMEM/sparseSA.cpp src/essaMEM/qsufsort.c
 libumdmummer_la_SOURCES += src/tigr/mgaps.cc src/tigr/postnuc.cc src/tigr/sw_align.cc src/tigr/tigrinc.cc
 libumdmummer_la_SOURCES += src/umd/nucmer.cc
+include_HEADERS = include/mummer/sparseSA.hpp				\
+                  include/mummer/fasta.hpp include/mummer/postnuc.hh	\
+                  include/mummer/translate.hh				\
+                  include/mummer/sw_align.hh				\
+                  include/mummer/tigrinc.hh include/mummer/nucmer.hpp	\
+                  include/mummer/mgaps.hh include/mummer/delta.hh	\
+                  include/mummer/sw_alignscore.hh
 
 
 

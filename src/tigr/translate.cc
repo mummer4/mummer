@@ -1,4 +1,4 @@
-#include "translate.hh"
+#include <mummer/translate.hh>
 
 
 long int Translate_DNA

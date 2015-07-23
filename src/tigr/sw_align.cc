@@ -1,4 +1,4 @@
-#include "sw_align.hh"
+#include <mummer/sw_align.hh>
 #include <math.h>
 
 namespace mummer {

@@ -6,7 +6,7 @@
 *  then all the other matches.
 */
 
-#include "tigrinc.hh"
+#include <mummer/tigrinc.hh>
 
 const bool  ALLOW_WRAPAROUND = false;
 
