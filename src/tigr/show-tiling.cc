@@ -836,7 +836,7 @@ void outputPseudoMolecule
 
   //-- Read in the needed query contig sequences
   A = (char *) Safe_malloc ( sizeof(char) * InitSize );
-  while ( Read_String (QryFile, A, InitSize, Line, FALSE) )
+  while ( Read_String (QryFile, A, InitSize, Line, false) )
     {
       for ( Cp = Contigs.begin( ); Cp < Contigs.end( ); Cp ++ )
 	if ( Cp->TileLevel == USED_TILE_LEVEL )

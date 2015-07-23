@@ -334,7 +334,7 @@ int main
   InitSize = INIT_SIZE;
   Af = (FastaRecord *) Safe_malloc ( sizeof(FastaRecord) * Ac );
   Af[As].seq = (char *) Safe_malloc ( sizeof(char) * InitSize );
-  while ( Read_String (RefFile, Af[As].seq, InitSize, IdA, FALSE) )
+  while ( Read_String (RefFile, Af[As].seq, InitSize, IdA, false) )
     {
       Af[As].Id = (char *) Safe_malloc (sizeof(char) * (strlen(IdA) + 1));
       strcpy (Af[As].Id, IdA);
@@ -1466,7 +1466,7 @@ void processSyntenys
 	   strcmp (CurrSp->Bf.Id, (CurrSp-1)->Bf.Id) != 0 )
 	{
 	  //-- Read in the B sequence
-	  while ( Read_String (QryFile, Bf.seq, InitSize, Bf.Id, FALSE) )
+	  while ( Read_String (QryFile, Bf.seq, InitSize, Bf.Id, false) )
 	    if ( strcmp (CurrSp->Bf.Id, Bf.Id) == 0 )
 	      break;
 	  if ( strcmp (CurrSp->Bf.Id, Bf.Id) != 0 )

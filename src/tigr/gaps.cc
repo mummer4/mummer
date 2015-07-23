@@ -8,7 +8,7 @@
 
 #include "tigrinc.hh"
 
-const int  ALLOW_WRAPAROUND = FALSE;
+const bool  ALLOW_WRAPAROUND = false;
 
 
 struct  Match
@@ -75,8 +75,8 @@ int main  (int argc, char * argv [])
       A [N] . Start1 = S1;
       A [N] . Start2 = S2;
       A [N] . Len = Len;
-      A [N] . Good = FALSE;
-      A [N] . Wrap_Here = FALSE;
+      A [N] . Good = false;
+      A [N] . Wrap_Here = false;
       N ++;
      }
 
@@ -96,7 +96,7 @@ int main  (int argc, char * argv [])
               A [i] . Wrap_From = j;
               A [i] . Wrap_Score = A [j] . Simple_Score + A [i] . Len - Olap;
               A [i] . Wrap_Adj = Olap;
-              A [i] . Wrap_Here = TRUE;
+              A [i] . Wrap_Here = true;
              }
          Olap1 = A [j] . Start1 + A [j] . Len - A [i] . Start1;
          Olap = Max (Olap, Olap1);
@@ -111,7 +111,7 @@ int main  (int argc, char * argv [])
               A [i] . Wrap_From = j;
               A [i] . Wrap_Score = A [j] . Wrap_Score + A [i] . Len - Olap;
               A [i] . Wrap_Adj = Olap;
-              A [i] . Wrap_Here = FALSE;
+              A [i] . Wrap_Here = false;
              }
         }
      }
@@ -122,19 +122,19 @@ int main  (int argc, char * argv [])
         for  (i = 1;  i < N;  i ++)
           if  (A [i] . Wrap_Score > A [Best] . Wrap_Score)
               Best = i;
-        Used_Wrap = FALSE;
+        Used_Wrap = false;
         for  (i = Best;  i >= 0;  i = Next)
           {
-           A [i] . Good = TRUE;
+           A [i] . Good = true;
            if  (Used_Wrap)
                {
                 Next = A [i] . Simple_From;
-                A [i] . Wrap_Here = FALSE;
+                A [i] . Wrap_Here = false;
                }
              else
                Next = A [i] . Wrap_From;
            if  (A [i] . Wrap_Here)
-               Used_Wrap = TRUE;
+               Used_Wrap = true;
           }
        }
      else
@@ -144,7 +144,7 @@ int main  (int argc, char * argv [])
           if  (A [i] . Simple_Score > A [Best] . Simple_Score)
               Best = i;
         for  (i = Best;  i >= 0;  i = A [i] . Simple_From)
-          A [i] . Good = TRUE;
+          A [i] . Good = true;
        }
 
    printf ("> %s %s Consistent matches\n", File_Name,

@@ -1254,7 +1254,7 @@ void DeltaGraph_t::loadSequences ()
   reffile = File_Open (refpath.c_str(), "r");
   initsize = INIT_SIZE;
   R = (char *) Safe_malloc (initsize);
-  while ( Read_String (reffile, R, initsize, id, FALSE) )
+  while ( Read_String (reffile, R, initsize, id, false) )
     if ( (mi = refnodes.find (id)) != refnodes.end() )
       {
         len = strlen (R + 1);
@@ -1274,7 +1274,7 @@ void DeltaGraph_t::loadSequences ()
   qryfile = File_Open (qrypath.c_str(), "r");
   initsize = INIT_SIZE;
   Q = (char *) Safe_malloc (initsize);
-  while ( Read_String (qryfile, Q, initsize, id, FALSE) )
+  while ( Read_String (qryfile, Q, initsize, id, false) )
     if ( (mi = qrynodes.find (id)) != qrynodes.end() )
       {
         len = strlen (Q + 1);

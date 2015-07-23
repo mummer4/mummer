@@ -311,12 +311,12 @@ bool CompareIUPAC (char x, char y)
 }
 
 
-int Read_String  (FILE * fp, char * & T, long int & Size, char Name [],
-		  int Partial)
+bool Read_String  (FILE * fp, char * & T, long int & Size, char Name [],
+                   bool Partial)
 
 /* Read next string from  fp  (assuming FASTA format) into  T [1 ..]
 *  which has  Size  characters.  Allocate extra memory if needed
-*  and adjust  Size  accordingly.  Return  TRUE  if successful,  FALSE
+*  and adjust  Size  accordingly.  Return  TRUE  if successful,  false
 *  otherwise (e.g., EOF).  Partial indicates if first line has
 *  numbers indicating a subrange of characters to read.
 */
@@ -330,7 +330,7 @@ int Read_String  (FILE * fp, char * & T, long int & Size, char Name [],
      ;
 
    if  (Ch == EOF)
-       return  FALSE;
+       return  false;
 
    fgets (Line, MAX_LINE, fp);
    Len = strlen (Line);
@@ -387,7 +387,7 @@ int Read_String  (FILE * fp, char * & T, long int & Size, char Name [],
    if  (Ch == '>')
        ungetc (Ch, fp);
 
-   return  TRUE;
+   return  true;
   }
 
 

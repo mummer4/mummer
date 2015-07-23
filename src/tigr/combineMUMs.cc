@@ -115,15 +115,15 @@ char  * Gaps_File_Path = NULL;
 char  * Match_File_Path = NULL;
     // Name of multifasta file of sequences to compare against the reference
     // sequence
-int UserScoring = FALSE;
+bool UserScoring = false;
     // If TRUE, then user specified a percent ID cutoff and scoring
     // is adjusted to enforce this in extensions
-int  Nucleotides_Only = FALSE;
+bool  Nucleotides_Only = false;
     // If  TRUE , then only acgt's can match
 bool  Only_Difference_Positions = false;
     // If  true , then output just positions of difference instead of
     // alignments between exact matches
-int  Output_Cover_Files = TRUE;
+bool  Output_Cover_Files = true;
     // If  TRUE , output files showing coverage of each genome.
 double  Percent_ID;
     // Desired identity rate of matches to be found
@@ -144,9 +144,9 @@ long int  Ref_Size;
     // The size of the reference sequence buffer
 const char  * Ref_Suffix = "Ref";
     // Suffix for reference tag
-int  Show_Differences = FALSE;
+bool  Show_Differences = false;
     // If  TRUE  then show differences in all alignments
-int  Tag_From_Fasta_Line = FALSE;
+bool  Tag_From_Fasta_Line = false;
     // If  TRUE  then use fasta tag from ref & query sequences as
     // 1st & 2nd column, resp., on match line to identify matches
 int  Verbose = 0;
@@ -190,7 +190,7 @@ int  Prefix_Edit_Dist
     (char A [], int m, char T [], int n, int Error_Limit,
      int * A_End, int * T_End, int * Match_To_End,
      int Delta [MAX_ERRORS], int * Delta_Len, int extending);
-int  Read_String
+bool  Read_String
     (FILE * fp, char * * T, long int * Size, char header []);
 void  Rev_Complement
     (char * s);
@@ -237,8 +237,8 @@ int  main
    long int  total_errors = 0;
    int  match_ct = 0;
    double  match_total = 0.0;
-   int  is_forward = FALSE;
-   int  first_match = TRUE;
+   bool  is_forward = false;
+   int  first_match = true;
    Cover_t  * ref_cover_list = NULL;
    Cover_t  * query_cover_list = NULL;
    char  * p;
@@ -392,7 +392,7 @@ int  main
                }
              else
                Rev_Complement (Query + 1);
-           first_match = TRUE;
+           first_match = true;
            printf ("%s", line);
            fprintf (error_fp, "%s", line);
           }
@@ -423,7 +423,7 @@ int  main
                     Add_Coverage (& query_cover_list, 1 + Query_Len - query_hi,
                                   1 + Query_Len - query_lo);
                }
-           first_match = TRUE;
+           first_match = true;
            printf ("%s", line);
            fprintf (error_fp, "%s", line);
           }
@@ -459,7 +459,7 @@ int  main
                            (Ref + ref_hi + 1, a_len,
                             Query + query_hi + 1, b_len,
                             MAX_ERRORS - 1, & a_end, & b_end,
-                            & match_to_end, delta, & delta_len, FALSE);
+                            & match_to_end, delta, & delta_len, false);
                 if  (Show_Differences)
                     Show_Diffs (Ref + ref_hi + 1, a_end,
                                 Query + query_hi + 1, b_end,
@@ -552,7 +552,7 @@ int  main
            ref_hi = ref_pos + match_len - 1;
            query_hi = query_pos + match_len - 1;
            prior_match_len = match_len;
-           first_match = FALSE;
+           first_match = false;
           }
      }
 
@@ -1020,7 +1020,7 @@ int  Extend_Backward
                  (Ref + (* ref_lo) - 1, a_len,
                   Query + (* query_lo) - 1, b_len,
                   MAX_ERRORS - 1, & a_end, & b_end,
-                  & match_to_end, delta, & delta_len, TRUE);
+                  & match_to_end, delta, & delta_len, true);
       if  (Show_Differences)
           Rev_Show_Diffs
               (Ref + (* ref_lo - 1), a_end,
@@ -1073,7 +1073,7 @@ int  Extend_Forward
                  (Ref + (* ref_hi) + 1, a_len,
                   Query + (* query_hi) + 1, b_len,
                   MAX_ERRORS - 1, & a_end, & b_end,
-                  & match_to_end, delta, & delta_len, TRUE);
+                  & match_to_end, delta, & delta_len, true);
       if  (Show_Differences)
           Show_Diffs (Ref + (* ref_hi) + 1, a_end,
                       Query + (* query_hi) + 1, b_end,
@@ -1194,7 +1194,8 @@ void  Parse_Command_Line
 //  arguments in  argv [0 .. (argc - 1)] .
 
   {
-   int  ch, errflg = FALSE;
+    int  ch;
+    bool errflg = false;
 
    optarg = NULL;
 
@@ -1208,11 +1209,11 @@ void  Parse_Command_Line
 
         case 'e' : 
 	  Percent_ID = 1.0 - atof (optarg);
-	  UserScoring = TRUE;
+	  UserScoring = true;
 	  break;
 
         case  'n' :
-          Nucleotides_Only = TRUE;
+          Nucleotides_Only = true;
           break;
 
         case  'N' :
@@ -1228,11 +1229,11 @@ void  Parse_Command_Line
           break;
 
         case  'S' :
-          Show_Differences = TRUE;
+          Show_Differences = true;
           break;
 
         case  't' :
-          Tag_From_Fasta_Line = TRUE;
+          Tag_From_Fasta_Line = true;
           break;
 
         case  'v' :
@@ -1240,7 +1241,7 @@ void  Parse_Command_Line
           break;
 
         case  'x' :
-          Output_Cover_Files = FALSE;
+          Output_Cover_Files = false;
           break;
 
         case  'W' :
@@ -1251,7 +1252,7 @@ void  Parse_Command_Line
           fprintf (stderr, "Unrecognized option -%c\n", optopt);
 
         default :
-          errflg = TRUE;
+          errflg = true;
        }
 
    if  (errflg || optind != argc - 3)
@@ -1322,7 +1323,7 @@ int  Prefix_Edit_Dist
         if  (ct >= Consec_Non_ACGT)
             {
              m = i - ct;
-             extending = TRUE;
+             extending = true;
             }
         
         for  (i = ct = 0;  i < n && ct < Consec_Non_ACGT;  i ++)
@@ -1342,7 +1343,7 @@ int  Prefix_Edit_Dist
         if  (ct >= Consec_Non_ACGT)
             {
              n = i - ct;
-             extending = TRUE;
+             extending = true;
             }
        }
 
@@ -1407,7 +1408,7 @@ int  Prefix_Edit_Dist
                         (* T_End) = Max_Score_Len + Max_Score_Best_d;
                         Set_Deltas (Delta, Delta_Len, Max_Score_Len,
                                     Max_Score_Best_d, Max_Score_Best_e);
-                        (* Match_To_End) = FALSE;
+                        (* Match_To_End) = false;
                         return  Max_Score_Best_e;
                        }
                   }
@@ -1455,14 +1456,14 @@ int  Prefix_Edit_Dist
    (* A_End) = Max_Score_Len;
    (* T_End) = Max_Score_Len + Max_Score_Best_d;
    Set_Deltas (Delta, Delta_Len, Max_Score_Len, Max_Score_Best_d, Max_Score_Best_e);
-   (* Match_To_End) = FALSE;
+   (* Match_To_End) = false;
 
    return  Max_Score_Best_e;
   }
 
 
 
-int  Read_String
+bool  Read_String
     (FILE * fp, char * * T, long int * Size, char header [])
 
 /* Read next string from  fp  (assuming FASTA format) into  (* T) [1 ..]
@@ -1477,13 +1478,13 @@ int  Read_String
    int  Ch, Ct;
 
    if  (feof (fp))
-       return  FALSE;
+       return  false;
 
    while  ((Ch = fgetc (fp)) != EOF && Ch != '>')
      ;
 
    if  (Ch != '>')
-       return  FALSE;
+       return  false;
 
    fgets (Line, MAX_LINE, fp);
    Len = strlen (Line);
@@ -1520,7 +1521,7 @@ int  Read_String
    if  (Ch == '>')
        ungetc (Ch, fp);
 
-   return  TRUE;
+   return  true;
   }
 
 
@@ -1694,7 +1695,7 @@ int  Rev_Prefix_Edit_Dist
         if  (ct >= Consec_Non_ACGT)
             {
              m = i - ct;
-             extending = TRUE;
+             extending = true;
             }
         
         for  (i = ct = 0;  i < n && ct < Consec_Non_ACGT;  i ++)
@@ -1714,7 +1715,7 @@ int  Rev_Prefix_Edit_Dist
         if  (ct >= Consec_Non_ACGT)
             {
              n = i - ct;
-             extending = TRUE;
+             extending = true;
             }
        }
 
@@ -1779,7 +1780,7 @@ int  Rev_Prefix_Edit_Dist
                         (* T_End) = Max_Score_Len + Max_Score_Best_d;
                         Set_Deltas (Delta, Delta_Len, Max_Score_Len,
                                     Max_Score_Best_d, Max_Score_Best_e);
-                        (* Match_To_End) = FALSE;
+                        (* Match_To_End) = false;
                         return  Max_Score_Best_e;
                        }
                   }
@@ -1827,7 +1828,7 @@ int  Rev_Prefix_Edit_Dist
    (* A_End) = Max_Score_Len;
    (* T_End) = Max_Score_Len + Max_Score_Best_d;
    Set_Deltas (Delta, Delta_Len, Max_Score_Len, Max_Score_Best_d, Max_Score_Best_e);
-   (* Match_To_End) = FALSE;
+   (* Match_To_End) = false;
 
    return  Max_Score_Best_e;
   }

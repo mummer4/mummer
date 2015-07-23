@@ -67,7 +67,7 @@ int main
   ct = 0;
 
   printf(">allcontigs %s\n", argv[1]);
-  while ( Read_String (RefFile, A, InitSize, Id, FALSE) )
+  while ( Read_String (RefFile, A, InitSize, Id, false) )
     {
       SizeA = strlen(A + 1);
 

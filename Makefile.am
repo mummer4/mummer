@@ -1,3 +1,4 @@
+SUBDIRS = . $(MAYBE_SWIG)
 ACLOCAL_AMFLAGS = -I m4
 
 AM_CPPFLAGS = -Wall -I$(srcdir)/src

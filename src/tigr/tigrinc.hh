@@ -15,8 +15,6 @@
 #include  <unistd.h>
 
 
-#define  TRUE  1
-#define  FALSE  0
 #ifndef  EXIT_FAILURE
   #define  EXIT_FAILURE  -1
 #endif
@@ -36,7 +34,7 @@ void *  Safe_malloc  (size_t);
 void *  Safe_realloc  (void *, size_t);
 char  Complement  (char);
 bool CompareIUPAC (char, char);
-int  Read_String  (FILE *, char * &, long int &, char [], int);
+bool  Read_String  (FILE *, char * &, long int &, char [], bool);
 void  Reverse_Complement (char S [], long int Lo, long int Hi);
 
 #endif

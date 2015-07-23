@@ -200,7 +200,7 @@ int main
   RefFile = File_Open (RefFileName, "r");
   InitSize = INIT_SIZE;
   R = (char *) Safe_malloc ( sizeof(char) * InitSize );
-  while ( Read_String (RefFile, R, InitSize, Id, FALSE) )
+  while ( Read_String (RefFile, R, InitSize, Id, false) )
     if ( strcmp (Id, IdR) == 0 )
       break;
   fclose (RefFile);
@@ -215,7 +215,7 @@ int main
   QryFile = File_Open (QryFileName, "r");
   InitSize = INIT_SIZE;
   Q = (char *) Safe_malloc ( sizeof(char) * InitSize );
-  while ( Read_String (QryFile, Q, InitSize, Id, FALSE) )
+  while ( Read_String (QryFile, Q, InitSize, Id, false) )
     if ( strcmp (Id, IdQ) == 0 )
       break;
   fclose (QryFile);

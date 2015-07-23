@@ -62,7 +62,7 @@ int main  (int argc, char * argv [])
 
    Gaps_With_Errors_File = File_Open ("witherrors.gaps", "w");
 
-   Read_String (Data_File, Data2, Input_Size, Name, FALSE);
+   Read_String (Data_File, Data2, Input_Size, Name, false);
    fclose (Data_File);
    Data_File = NULL;
    Len2 = strlen (Data2 + 1);
@@ -85,7 +85,7 @@ int main  (int argc, char * argv [])
 	     continue;
 
            Data_File = File_Open (Name, "r");
-           Read_String (Data_File, Data1, Input_Size, Name, FALSE);
+           Read_String (Data_File, Data1, Input_Size, Name, false);
            fclose (Data_File);
 
            //           Len1 = strlen (Data1 + 1);

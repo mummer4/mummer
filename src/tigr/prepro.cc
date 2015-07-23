@@ -133,7 +133,7 @@ int main
   ct = 0;
   if ( isReference )
     printf (">allcontigs %s\n", InputFileName);
-  while ( Read_String (InputFile, A, InitSize, Id, FALSE) )
+  while ( Read_String (InputFile, A, InitSize, Id, false) )
     {
       LenA = strlen(A + 1);
 
