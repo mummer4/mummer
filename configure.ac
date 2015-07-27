@@ -5,7 +5,7 @@ AM_INIT_AUTOMAKE([subdir-objects foreign parallel-tests color-tests])
 AM_SILENT_RULES([yes])
 AC_CONFIG_SRCDIR([.])
 AC_CONFIG_HEADERS([config.h])
-AC_PROG_LIBTOOL
+AC_PROG_LIBTOOL()
 
 # Change default compilation flags
 AC_SUBST([ALL_CXXFLAGS], [-std=c++0x])
@@ -13,6 +13,7 @@ CXXFLAGS="-std=c++0x $CXXFLAGS"
 AC_LANG(C++)
 AC_PROG_CXX
 AC_PROG_CC
+AC_PATH_PROG(ENV_PROG, [env])
 
 #
 # SWIG and bindings

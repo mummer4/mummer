@@ -72,7 +72,10 @@ struct Alignment
     , eB(m.sB + m.len - 1)
     , deltaApos(0)
   { }
+  Alignment() = default;
+  Alignment(const Alignment& rhs) = default;
   Alignment(Alignment&& rhs) = default;
+  Alignment& operator=(const Alignment& rhs) = default;
 
   // Number of bases in alignment (in reference), counting deletions.
   long total() const {
@@ -82,7 +85,7 @@ struct Alignment
   inline double identity(const long t) const { return (double)(t - Errors) / t; }
   inline double identity() const { return identity(total()); }
   inline double similarity(const long t) const { return (double)(t - SimErrors) / t; }
-  inline double similartiy() const { return similarity(total()); }
+  inline double similarity() const { return similarity(total()); }
   inline double stopity(const long t) const { return (double)NonAlphas / (2 * t); }
   inline double stopity() const { return stopity(total()); }
 

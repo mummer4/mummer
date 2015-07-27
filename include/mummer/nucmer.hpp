@@ -10,8 +10,8 @@ namespace mummer {
 namespace nucmer {
 enum match_type { MUM, MUMREFERENCE, MAXMATCH };
 enum ori_type { FORWARD = 1, REVERSE = 2, BOTH = 3 };
-struct options_type {
-  options_type()
+struct Options {
+  Options()
     : match(MUMREFERENCE)
     , min_len(20)
     , orientation(BOTH)
@@ -27,6 +27,28 @@ struct options_type {
     , break_len(200)
     , banding(0)
   { }
+
+  // Setters corresponding to nucmer.pl switches
+  Options& mum() { match = MUM; return *this; }
+  Options& mumcand() { return mumreference(); }
+  Options& mumreference() { match = MUMREFERENCE; return *this; }
+  Options& maxmatch() { match = MAXMATCH; return *this; }
+  Options& breaklen(long l) { break_len = l; return *this; }
+  Options& banded() { banding = 1; return *this; }
+  Options& nobanded() { banding = 0; return *this; }
+  Options& mincluster(long m) { min_output_score = m; return *this; }
+  Options& diagdiff(long d) { fixed_separation = d; return *this; }
+  Options& diagfactor(double f) { separation_factor = f; return *this; }
+  Options& extend() { do_extend = true; return *this; }
+  Options& noextend() { do_extend = false; return *this; }
+  Options& forward() { orientation = FORWARD; return *this; }
+  Options& maxgap(long m) { max_separation = m; return *this; }
+  Options& minmatch(long m) { min_len = m; return *this; }
+  Options& optimize() { to_seqend = false; return *this; }
+  Options& nooptimize() { to_seqend = true; return *this; }
+  Options& reverse() { orientation = REVERSE; return *this; }
+  Options& simplify() { do_shadows = false; return *this; }
+  Options& nosimplify() { do_shadows = true; return *this; }
 
   // Options for mummer
   match_type match;
@@ -80,10 +102,10 @@ class SequenceAligner {
   const mgaps::ClusterMatches   clusterer;
   const postnuc::merge_syntenys merger;
   const FastaRecordSeq          Ref;
-  const options_type            options;
+  const Options                 options;
 
 public:
-  SequenceAligner(const char* reference, options_type opts = options_type())
+  SequenceAligner(const char* reference, Options opts = Options())
     : sa(mummer::sparseSA::create_auto(reference, descr, startpos, opts.min_len, true))
     , clusterer(opts.fixed_separation, opts.max_separation,
                 opts.min_output_score, opts.separation_factor,
@@ -105,13 +127,13 @@ public:
 };
 
 inline void align_sequences(const char* reference, const char* query, std::vector<postnuc::Alignment>& alignments,
-                            options_type opts = options_type()) {
+                            Options opts = Options()) {
   SequenceAligner aligner(reference, opts);
   aligner.align(query, alignments);
 }
 
 inline std::vector<postnuc::Alignment> align_sequences(const char* reference, const char* query,
-                                                       options_type opts = options_type()) {
+                                                       Options opts = Options()) {
   SequenceAligner aligner(reference, opts);
   return aligner.align(query);
 }

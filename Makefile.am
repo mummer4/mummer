@@ -5,6 +5,7 @@ AM_CPPFLAGS = -Wall -I$(srcdir)/include
 AM_LDFLAGS = -lpthread
 
 bin_PROGRAMS =
+EXTRA_DIST =
 
 ###########
 # library #
@@ -42,3 +43,15 @@ postnuc_SOURCES = src/tigr/postnuc_main.cc
 #######
 bin_PROGRAMS += simplenucmer
 simplenucmer_SOURCES = src/umd/simplenucmer.cc
+
+#########
+# Tests #
+#########
+TEST_EXTENSIONS =
+TESTS =
+
+EXTRA_DIST += $(TESTS)
+clean-local: clean-local-check
+.PHONY: clean-local-check
+clean-local-check:
+	-cd tests; rm -f *

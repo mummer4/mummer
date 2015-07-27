@@ -1,8 +1,10 @@
 # SWIG
 BUILT_SOURCES =
 CLEANFILES =
-EXTRA_DIST =
+EXTRA_DIST = $(TESTS)
 SWIG_SRC = mummer.i nucmer.i
+TESTS =
+TEST_EXTENSIONS =
 
 ALL_CPPFLAGS = -I$(srcdir)/../include
 
@@ -38,6 +40,12 @@ pythonc_v_GEN_0 = @echo "  PYTHONC " $@;
 	$(PYTHONC_V_GEN)$(PYTHON) -c 'import py_compile, sys; py_compile.compile(sys.argv[1], sys.argv[2])' $< $@
 python/mummer.py: python/swig_wrap.cpp
 EXTRA_DIST += python/mummer.py
+
+# Tests
+TEST_EXTENSIONS += .py
+PY_LOG_COMPILER = $(ENV_PROG)
+AM_PY_LOG_FLAGS = PYTHONPATH=$(builddir)/python:$(builddir)/python/.libs $(PYTHON)
+TESTS += python/test_nucmer.py
 endif
 
 # Ruby support
@@ -51,6 +59,12 @@ ruby_mummer_la_CPPFLAGS = $(RUBY_EXT_CFLAGS) $(ALL_CPPFLAGS)
 ruby_mummer_la_LDFLAGS = -module $(RUBY_EXT_LIBS)
 ruby_mummer_la_LIBADD = ../libumdmummer.la
 CLEANFILES += $(RUBY_BUILT)
+
+# Tests
+TEST_EXTENSIONS += .rb
+RB_LOG_COMPILER = $(RUBY)
+AM_RB_LOG_FLAGS = -I$(builddir)/ruby/.libs
+TESTS += ruby/test_nucmer.rb
 endif
 
 # Perl5 support
@@ -67,4 +81,10 @@ perl5_mummer_la_LIBADD = ../libumdmummer.la
 CLEANFILES += $(PERL5_BUILT) perl5/mummer.pm
 perl5/mummer.pm: perl5/swig_wrap.cpp
 EXTRA_DIST += perl5/mummer.pm
+
+# Tests
+TEST_EXTENSIONS += .pl
+PL_LOG_COMPILER = $(PERL)
+AM_PL_LOG_FLAGS = -I$(builddir)/perl5 -I$(builddir)/perl5/.libs
+TESTS += perl5/test_nucmer.pl
 endif
