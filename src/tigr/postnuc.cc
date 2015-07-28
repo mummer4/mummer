@@ -17,6 +17,17 @@
 
 namespace mummer {
 namespace postnuc {
+std::ostream& operator<<(std::ostream& os, const Alignment& al) {
+  os << '<' << al.sA << '-' << al.eA
+     << " | " << al.sB << '-' << al.eB
+     << " | " << al.Errors
+     << " |";
+  for(long x : al.delta)
+    os << ' ' << x;
+  return os << '>';
+}
+
+
 // Read one sequence from fasta stream into T (starting at index 1, 0
 // is unused), store its name and returns true if successful.
 bool Read_Sequence(std::istream& is, std::string& T, std::string& name) {

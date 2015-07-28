@@ -100,6 +100,7 @@ struct Alignment
   }
 };
 
+std::ostream& operator<<(std::ostream& os, const Alignment& al);
 
 struct AscendingClusterSort
 //-- For sorting clusters in ascending order of their sA coordinate

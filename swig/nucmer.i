@@ -1,3 +1,7 @@
+%{
+#include <sstream>
+%}
+
 %template(LongVector) ::std::vector<long>;
 
 namespace mummer {
@@ -13,6 +17,14 @@ struct Alignment   {
   double identity() const;
   double similarity() const;
   double stopity() const;
+  %extend {
+    %feature("autodoc", "Return string representation of alignment");
+    std::string __str__() {
+      std::ostringstream os;
+      os << *$self;
+      return os.str();
+    }
+  }
 };
 %template(AlignmentVector) ::std::vector<mummer::postnuc::Alignment>;
 } // namespace postnuc

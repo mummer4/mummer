@@ -47,7 +47,17 @@ void SequenceAligner::align(const char* query, std::vector<postnuc::Alignment>& 
   syntenys.push_back(&Ref);
   synteny_type&               synteny = syntenys.front();
   mgaps::UnionFind            UF;
+  char                        cluster_dir;
 
+  auto append_cluster = [&](const mgaps::cluster_type& cluster) {
+    postnuc::Cluster cl(cluster_dir);
+    cl.matches.push_back({ cluster[0].Start1, cluster[0].Start2, cluster[0].Len });
+    for(size_t i = 1; i < cluster.size(); ++i) {
+      const auto& m = cluster[i];
+      cl.matches.push_back({ m.Start1 + m.Simple_Adj, m.Start2 + m.Simple_Adj, m.Len - m.Simple_Adj });
+    }
+    synteny.clusters.push_back(std::move(cl));
+  };
   if(options.orientation & FORWARD) {
     auto append_matches = [&](const mummer::match_t& m) { fwd_matches.push_back({ m.ref + 1, m.query + 1, m.len }); };
     switch(options.match) {
@@ -55,12 +65,8 @@ void SequenceAligner::align(const char* query, std::vector<postnuc::Alignment>& 
     case MUMREFERENCE: sa.findMAM_each(query, options.min_len, true, append_matches); break;
     case MAXMATCH: sa.findMEM_each(query, options.min_len, true, append_matches); break;
     }
-    clusterer.Cluster_each(fwd_matches.data(), UF, fwd_matches.size() - 1, [&](const mgaps::cluster_type& cluster) {
-        postnuc::Cluster cl(postnuc::FORWARD_CHAR);
-        for(const auto& m : cluster)
-          cl.matches.push_back({ m.Start1, m.Start2, m.Len });
-        synteny.clusters.push_back(std::move(cl));
-      });
+    cluster_dir = postnuc::FORWARD_CHAR;
+    clusterer.Cluster_each(fwd_matches.data(), UF, fwd_matches.size() - 1, append_cluster);
   }
 
   if(options.orientation & REVERSE) {
@@ -72,12 +78,8 @@ void SequenceAligner::align(const char* query, std::vector<postnuc::Alignment>& 
     case MUMREFERENCE: sa.findMAM_each(rquery, options.min_len, true, append_matches); break;
     case MAXMATCH: sa.findMEM_each(rquery, options.min_len, true, append_matches); break;
     }
-    clusterer.Cluster_each(bwd_matches.data(), UF, bwd_matches.size() - 1, [&](const mgaps::cluster_type& cluster) {
-        postnuc::Cluster cl(postnuc::REVERSE_CHAR);
-        for(const auto& m : cluster)
-          cl.matches.push_back({ m.Start1, m.Start2, m.Len });
-        synteny.clusters.push_back(std::move(cl));
-      });
+    cluster_dir = postnuc::REVERSE_CHAR;
+    clusterer.Cluster_each(bwd_matches.data(), UF, bwd_matches.size() - 1, append_cluster);
   }
 
   merger.processSyntenys_each(syntenys, Query,

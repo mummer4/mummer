@@ -8,6 +8,10 @@ def seq n
   s
 end
 
+def comp x
+  x.tr("ACGTacgt", "TGCAtgca")
+end
+
 class TestNucmer < Minitest::Unit::TestCase
   def test_exact_pair
     s1 = seq(100)
@@ -15,16 +19,80 @@ class TestNucmer < Minitest::Unit::TestCase
     o = Mummer::Options.new.minmatch(10).mincluster(10)
     a = Mummer::align_sequences(s1, s2, o)
 
-    assert_equal 1, a.size
-    assert_equal 1, a[0].dirB
-    assert_equal 81, a[0].sA
-    assert_equal 100, a[0].eA
-    assert_equal 1, a[0].sB
-    assert_equal 20, a[0].eB
-    assert_equal 0, a[0].Errors
-    assert_equal 0, a[0].SimErrors
-    assert_equal 0, a[0].delta.size
-    assert_equal 1.0, a[0].identity
-    assert_equal 1.0, a[0].similarity
+    assert(1 <= a.size)
+    a.each { |al|
+      if al.sA == 81 && al.eA == 100
+        assert_equal 1, al.dirB
+        assert_equal 81, al.sA
+        assert_equal 100, al.eA
+        assert_equal 1, al.sB
+        assert_equal 20, al.eB
+        assert_equal 0, al.Errors
+        assert_equal 0, al.SimErrors
+        assert_equal 0, al.delta.size
+        assert_equal 1.0, al.identity
+        assert_equal 1.0, al.similarity
+        return
+      end
+    }
+    flunk("Did not find an appropriate match")
   end
+
+  def test_pair
+    s1 = seq(1000)
+    s2 = s1[900..-1] + seq(900)
+    s1[950] = ""
+    s2[75] = ""
+    s2[25] = s2[25] == "A" ? "C" : "A"
+    assert_equal 999, s1.size
+    assert_equal 999, s2.size
+    o = Mummer::Options.new.minmatch(10).mincluster(10)
+    a = Mummer::align_sequences(s1, s2, o)
+
+    assert(1 <= a.size)
+    al = a.find { |x| x.sA == 901 && x.eA == 999 }
+    refute_nil al
+    assert_equal 901, al.sA
+    assert_equal 999, al.eA
+    assert_equal 1, al.sB
+    assert_equal 99, al.eB
+    assert_equal 1, al.dirB
+    assert_equal 3, al.Errors
+    assert_equal 3, al.SimErrors
+    assert_equal 2, al.delta.size
+
+    a.each { |al|
+      errors = 0
+      i, j = al.sA, (al.dirB == 1 ? al.sB : (s2.size - al.sB - 1))
+      ni = i - 1
+      ni += al.delta[0].abs - 1 unless al.delta.empty?
+      k = 0
+
+      while(i < al.eA) do
+        b2 = al.dirB == 1 ? s2[j] : comp(s2[j])
+        if i == ni && k < al.delta.size
+          while i == ni && k < al.delta.size do
+            if al.delta[k] > 0
+              i += 1
+            else
+              j += al.dirB
+            end
+            errors += 1
+            k += 1
+            oni, ni = ni, i
+            ni += al.delta[k].abs - 1 if k < al.delta.size
+          end
+        else
+          errors += 1 if s1[i] != b2
+          i += 1
+          j += al.dirB
+        end
+      end
+      assert_equal(al.eA, i)
+      assert_equal(al.dirB == 1 ? al.eB : (s2.size - al.eB - 1), j)
+      assert_equal(al.delta.size, k)
+      assert_equal(al.SimErrors, errors)
+    }
+  end
+
 end
