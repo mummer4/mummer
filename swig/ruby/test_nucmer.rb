@@ -20,22 +20,18 @@ class TestNucmer < Minitest::Unit::TestCase
     a = Mummer::align_sequences(s1, s2, o)
 
     assert(1 <= a.size)
-    a.each { |al|
-      if al.sA == 81 && al.eA == 100
-        assert_equal 1, al.dirB
-        assert_equal 81, al.sA
-        assert_equal 100, al.eA
-        assert_equal 1, al.sB
-        assert_equal 20, al.eB
-        assert_equal 0, al.Errors
-        assert_equal 0, al.SimErrors
-        assert_equal 0, al.delta.size
-        assert_equal 1.0, al.identity
-        assert_equal 1.0, al.similarity
-        return
-      end
-    }
-    flunk("Did not find an appropriate match")
+    al = a.find { |x| x.sA == 81 && x.eA == 100 }
+    refute_nil(al)
+    assert_equal 1, al.dirB
+    assert_equal 81, al.sA
+    assert_equal 100, al.eA
+    assert_equal 1, al.sB
+    assert_equal 20, al.eB
+    assert_equal 0, al.Errors
+    assert_equal 0, al.SimErrors
+    assert_equal 0, al.delta.size
+    assert_equal 1.0, al.identity
+    assert_equal 1.0, al.similarity
   end
 
   def test_pair

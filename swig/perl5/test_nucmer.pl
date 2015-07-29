@@ -23,16 +23,18 @@ sub seq {
   $o->mincluster(10);
   my $a = mummer::align_sequences($s1, $s2, $o);
 
-  ok(@$a == 1, "nb matches");
-  ok($$a[0]{dirB} == 1, "direction of match");
-  ok($$a[0]{sA} == 81, "sA");
-  ok($$a[0]{eA} == 100, "eA");
-  ok($$a[0]{sB} == 1, "sB");
-  ok($$a[0]{eB} == 20, "eB");
-  ok($$a[0]{Errors} == 0, "Errors");
-  ok($$a[0]{SimErrors} == 0, "SimErrors");
-  ok($$a[0]->identity == 1.0, "Identity");
-  ok($$a[0]->similarity == 1.0, "Similarity");
+  ok(@$a >= 1, "nb matches");
+  my @b = grep { $$_{sA} == 81 && $$_{eA} == 100 } @$a;
+  ok(@b == 1, "one perfect match");
+  ok($b[0]{dirB} == 1, "direction of match");
+  ok($b[0]{sA} == 81, "sA");
+  ok($b[0]{eA} == 100, "eA");
+  ok($b[0]{sB} == 1, "sB");
+  ok($b[0]{eB} == 20, "eB");
+  ok($b[0]{Errors} == 0, "Errors");
+  ok($b[0]{SimErrors} == 0, "SimErrors");
+  ok($b[0]->identity == 1.0, "Identity");
+  ok($b[0]->similarity == 1.0, "Similarity");
 }
 
 done_testing;
