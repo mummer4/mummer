@@ -43,7 +43,7 @@ int   K                = 1;
 int   num_threads      = 1;
 int   query_threads    = 1;
 
-mummer::mummer::sparseSA *sa;
+mummer::mummer::sparseSAMatch *sa;
 std::string query_fasta[32];
 int MAX_QUERY_FILES = 32;
 int numQueryFiles = 0;
@@ -111,9 +111,9 @@ void *query_thread(void *arg_) {
           else std::cout << "> " << meta << '\n';
         }
         switch(type) {
-        case MAM: sa->MAM(P, min_len, true, std::cout); break;
-        case MUM: sa->MUM(P, min_len, true, std::cout); break;
-        case MEM: sa->MEM(P, min_len, true, std::cout); break;
+        case MAM: sa->MAM(P, min_len, false, std::cout); break;
+        case MUM: sa->MUM(P, min_len, false, std::cout); break;
+        case MEM: sa->MEM(P, min_len, false, std::cout); break;
         }
         if(!print) sa->print_match(std::cout, meta, false);
       }
@@ -124,9 +124,9 @@ void *query_thread(void *arg_) {
           else std::cout << "> " << meta << " Reverse\n";
         }
         switch(type) {
-        case MAM: sa->MAM(P, min_len, false, std::cout); break;
-        case MUM: sa->MUM(P, min_len, false, std::cout); break;
-        case MEM: sa->MEM(P, min_len, false, std::cout); break;
+        case MAM: sa->MAM(P, min_len, printRevCompForw, std::cout); break;
+        case MUM: sa->MUM(P, min_len, printRevCompForw, std::cout); break;
+        case MEM: sa->MEM(P, min_len, printRevCompForw, std::cout); break;
         }
         if(!print) sa->print_match(std::cout, meta, true);
       }
@@ -234,7 +234,7 @@ int main(int argc, char* argv[]) {
   load_fasta(ref_fasta, ref, refdescr, startpos);
   for(auto s : startpos)
     std::cerr << s << '\n';
-  
+
   // Automatically use 4 column format if there are multiple reference sequences.
   if(startpos.size() > 1) _4column = true;
   if(automatic){
@@ -280,7 +280,7 @@ int main(int argc, char* argv[]) {
   if(setRevComp)
       forward = false;
  
-  sa = new mummer::mummer::sparseSA(ref, refdescr, startpos, _4column, K, suflink, child, kmer>0, sparseMult, kmer, printSubstring, printRevCompForw, nucleotides_only);
+  sa = new mummer::mummer::sparseSAMatch(ref, refdescr, startpos, _4column, K, suflink, child, kmer>0, sparseMult, kmer, printSubstring, nucleotides_only);
   if(!load.empty()){
       std::cerr << "attempting to load index " << load << std::endl;
       if(sa->load(load)){

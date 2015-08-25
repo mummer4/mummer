@@ -132,12 +132,11 @@ struct bounded_string {
     pos = std::min(pos, al_);
     return std::string(std::min(pos, al_), std::min(len, al_ - pos));
   }
+
+  const char* operator+(size_t offset) const { return s_ + offset; }
 };
 
 struct sparseSA {
-  const std::vector<std::string>& descr; // Descriptions of concatenated sequences.
-  const std::vector<long>&        startpos; // Lengths of concatenated sequences.
-  const long                      maxdescrlen; // Maximum length of the sequence description, used for formatting.
   const bool                      _4column; // Use 4 column output format.
 
   const long                K;  // suffix sampling, K = 1 every suffix, K = 2 every other suffix, K = 3, every 3rd sffix
@@ -158,58 +157,15 @@ struct sparseSA {
   const long kMerSize;
   long       kMerTableSize;
   int        sparseMult;
-  const bool printSubstring;
-  const bool printRevCompForw;
   const bool nucleotidesOnly;
 
-  long index_size_in_bytes(){
-      long indexSize = 0L;
-      indexSize += sizeof(printRevCompForw);
-      indexSize += sizeof(printSubstring);
-      indexSize += sizeof(sparseMult);
-      indexSize += sizeof(hasSufLink);
-      indexSize += sizeof(hasChild);
-      indexSize += sizeof(K);
-      indexSize += sizeof(NKm1);
-      indexSize += sizeof(logN);
-      indexSize += sizeof(N);
-      indexSize += sizeof(_4column);
-      indexSize += sizeof(maxdescrlen);
-      indexSize += sizeof(descr);
-      indexSize += sizeof(hasKmer);
-      indexSize += sizeof(kMerSize);
-      indexSize += sizeof(kMerTableSize);
-      indexSize += sizeof(nucleotidesOnly);
-      for(size_t i = 0; i < descr.size(); i++){
-          indexSize += descr[i].capacity();
-      }
-      indexSize += sizeof(startpos) + startpos.capacity()*sizeof(long);
-      indexSize += S.capacity();
-      indexSize += sizeof(SA) + SA.capacity()*sizeof(unsigned int);
-      indexSize += sizeof(ISA) + ISA.capacity()*sizeof(int);
-      indexSize += sizeof(CHILD) + CHILD.capacity()*sizeof(int);
-      indexSize += sizeof(KMR) + KMR.capacity()*(2*sizeof(unsigned int));
-      indexSize += LCP.index_size_in_bytes();
-      return indexSize;
-  }
-
-  // Maps a hit in the concatenated sequence set to a position in that sequence.
-  void from_set(long hit, long &seq, long &seqpos) const {
-    // Use binary search to locate index of sequence and position
-    // within sequence.
-    std::vector<long>::const_iterator it = upper_bound(startpos.begin(), startpos.end(), hit);   // SG: should use vector<long>::const_iterator
-    seq = distance(startpos.begin(), it) - 1;
-    it--;
-    seqpos = hit - *it;
-  }
+  long index_size_in_bytes() const ;
 
   // Constructor builds sparse suffix array.
-  sparseSA(const std::string& S_, const std::vector<std::string>& descr_, const std::vector<long>& startpos_, bool __4column,
-           long K_, bool suflink_, bool child_, bool kmer_, int sparseMult_, int kMerSize_, bool printSubstring_,
-           bool printRevCompForw_, bool nucleotidesOnly_);
+  sparseSA(const std::string& S_, bool __4column, long K_, bool suflink_, bool child_, bool kmer_,
+           int sparseMult_, int kMerSize_, bool nucleotidesOnly_);
 
-  static sparseSA create_auto(const std::string& S, const std::vector<std::string>& descr_, const std::vector<long>& startpos_,
-                              int min_len, bool nucleotidesOnly_, int K = 1);
+  static sparseSA create_auto(const std::string& S, int min_len, bool nucleotidesOnly_, int K = 1);
 
   // Modified Kasai et all for LCP computation.
   void computeLCP();
@@ -220,11 +176,6 @@ struct sparseSA {
 
   // Radix sort required to construct transformed text for sparse SA construction.
   void radixStep(int *t_new, int *SA, long &bucketNr, long *BucketBegin, long l, long r, long h);
-
-  // Prints match to cout.
-  void print_match(std::ostream& os, match_t m) const;
-  //  void print_match(match_t m, std::vector<match_t> &buf) const; // buffered version
-  void print_match(std::ostream& os, std::string meta, bool rc) const; // buffered version
 
   // Binary search for left boundry of interval.
   inline long bsearch_left(char c, long i, long s, long e) const;
@@ -267,20 +218,17 @@ struct sparseSA {
   }
 
   // Given a position i in S, finds a left maximal match of minimum
-  // length within K steps.
+  // length within K steps. When flip_forward is true, the match
+  // coordinates are flipped (presumably P is reversed complemented)
   template<typename Output>
-  void find_Lmaximal(const std::string &P, long prefix, long i, long len, int min_len, bool _forward, Output out) const;
+  void find_Lmaximal(const std::string &P, long prefix, long i, long len, int min_len, bool flip_forward, Output out) const;
 
   // NOTE: min_len must be > 1
   template<typename Output>
-  void findMAM_each(const std::string &P, int min_len, bool forward_, Output out) const;
+  void findMAM_each(const std::string &P, int min_len, bool flip_forward, Output out) const;
 
-  void findMAM(const std::string &P, int min_len, bool forward_, std::ostream& os) const {
-    findMAM_each(P, min_len, forward_, [&](const match_t& m) { print_match(os, m); });
-  }
-
-  void findMAM(const std::string &P, int min_len, bool forward_, std::vector<match_t>& matches) const {
-    findMAM_each(P, min_len, forward_, [&](const match_t& m) { matches.push_back(m); });
+  void findMAM(const std::string &P, int min_len, bool flip_forward, std::vector<match_t>& matches) const {
+    findMAM_each(P, min_len, flip_forward, [&](const match_t& m) { matches.push_back(m); });
   }
 
   // Returns true if the position p1 in the query pattern and p2 in
@@ -294,51 +242,39 @@ struct sparseSA {
   // et. al. Note this is a "one-sided" query. It "streams" the query
   // P throught he index.  Consequently, repeats can occur in the
   // pattern P.
-  void MAM(const std::string& P, int min_len, bool forward_, std::ostream& os) const {
+  void MAM(const std::string& P, int min_len, bool flip_forward, std::vector<match_t>& matches) const {
     if(K != 1) return;  // Only valid for full suffix array.
-    findMAM(P, min_len, forward_, os);
-  }
-  void MAM(const std::string& P, int min_len, bool forward_, std::vector<match_t>& matches) const {
-    if(K != 1) return;  // Only valid for full suffix array.
-    findMAM(P, min_len, forward_, matches);
+    findMAM(P, min_len, flip_forward, matches);
   }
 
 
   // Given an interval where the given prefix is matched up to a
   // mismatch, find all MEMs up to a minimum match depth.
   template<typename Output>
-  void collectMEMs_each(const std::string &P, long prefix, interval_t mli, interval_t xmi, int min_len, bool forward_,
+  void collectMEMs_each(const std::string &P, long prefix, interval_t mli, interval_t xmi, int min_len, bool flip_forward,
                         Output out) const;
 
   // Find all MEMs given a prefix pattern offset k.
   template<typename Output>
-  void findMEM_k_each(const std::string &P, long k, int min_len, bool forward_, Output out) const;
+  void findMEM_k_each(const std::string &P, long k, int min_len, bool flip_forward, Output out) const;
 
   // Find Maximal Exact Matches (MEMs)
   template<typename Output>
-  void findMEM_each(const std::string &P, int min_len, bool forward_, Output out) const {
+  void findMEM_each(const std::string &P, int min_len, bool flip_forward, Output out) const {
     for(int k = 0; k < K; k++)
-      findMEM_k_each(P, k, min_len, forward_, out);
+      findMEM_k_each(P, k, min_len, flip_forward, out);
   }
 
-  void MEM(const std::string &P, int min_len, bool forward_, std::ostream& os) const {
-    findMEM_each(P, min_len, forward_, [&](const match_t& m) { print_match(os, m); });
-  }
-
-  void MEM(const std::string &P, int min_len, bool forward_, std::vector<match_t>& matches) const {
-    findMEM_each(P, min_len, forward_, [&](const match_t& m) { matches.push_back(m); });
+  void MEM(const std::string &P, int min_len, bool flip_forward, std::vector<match_t>& matches) const {
+    findMEM_each(P, min_len, flip_forward, [&](const match_t& m) { matches.push_back(m); });
   }
 
   // Maximal Unique Match (MUM)
   template<typename Output>
-  void findMUM_each(const std::string &P, int min_len, bool forward_, Output out) const;
+  void findMUM_each(const std::string &P, int min_len, bool flip_forward, Output out) const;
 
-  void MUM(const std::string &P, int min_len, bool forward_, std::ostream& os) const {
-    findMUM_each(P, min_len, forward_, [&](const match_t& m) { print_match(os, m); });
-  }
-
-  void MUM(const std::string &P, int min_len, bool forward_, std::vector<match_t>& matches) const {
-    findMUM_each(P, min_len, forward_, [&](const match_t& m) { matches.push_back(m); });
+  void MUM(const std::string &P, int min_len, bool flip_forward, std::vector<match_t>& matches) const {
+    findMUM_each(P, min_len, flip_forward, [&](const match_t& m) { matches.push_back(m); });
   }
 
   //save index to files
@@ -351,6 +287,52 @@ struct sparseSA {
   void construct();
 };
 
+// Like the sparseSA, but also know the position of the sub-sequences
+// and can print a proper match.
+class sparseSAMatch : public sparseSA {
+  const std::vector<std::string>& descr; // Descriptions of concatenated sequences.
+  const std::vector<long>&        startpos; // Lengths of concatenated sequences.
+  const long                      maxdescrlen; // Maximum length of the sequence description, used for formatting.
+  const bool                      printSubstring;
+  //  const bool                      printRevCompForw;
+
+
+public:
+    sparseSAMatch(const std::string& S_, const std::vector<std::string>& descr_, const std::vector<long>& startpos_, bool __4column,
+                  long K_, bool suflink_, bool child_, bool kmer_, int sparseMult_, int kMerSize_, bool printSubstring_,
+                  bool nucleotidesOnly_);
+
+  long index_size_in_bytes() const;
+
+  // Maps a hit in the concatenated sequence set to a position in that sequence.
+  void from_set(long hit, long &seq, long &seqpos) const;
+
+  // Prints match to cout.
+  void print_match(std::ostream& os, match_t m) const;
+  //  void print_match(match_t m, std::vector<match_t> &buf) const; // buffered version
+  void print_match(std::ostream& os, std::string meta, bool rc) const; // buffered version
+
+  // Print MAMs
+  void findMAM(const std::string &P, int min_len, bool flip_forward, std::ostream& os) const {
+    findMAM_each(P, min_len, flip_forward, [&](const match_t& m) { print_match(os, m); });
+  }
+  void MAM(const std::string& P, int min_len, bool flip_forward, std::ostream& os) const {
+    if(sparseSA::K != 1) return;  // Only valid for full suffix array.
+    findMAM(P, min_len, flip_forward, os);
+  }
+
+  // Print MEMs
+  void MEM(const std::string &P, int min_len, bool flip_forward, std::ostream& os) const {
+    findMEM_each(P, min_len, flip_forward, [&](const match_t& m) { print_match(os, m); });
+  }
+
+  // Print MUMs
+  void MUM(const std::string &P, int min_len, bool flip_forward, std::ostream& os) const {
+    findMUM_each(P, min_len, flip_forward, [&](const match_t& m) { print_match(os, m); });
+  }
+};
+
+
 
 //
 // Implementation of templated methods
@@ -359,7 +341,7 @@ struct sparseSA {
 // Finds maximal almost-unique matches (MAMs) These can repeat in the
 // given query pattern P, but occur uniquely in the indexed reference S.
 template<typename Output>
-void sparseSA::findMAM_each(const std::string &P, int min_len, bool forward_, Output out) const {
+void sparseSA::findMAM_each(const std::string &P, int min_len, bool flip_forward, Output out) const {
   const long Plength = P.length();
   interval_t cur(0, N-1, 0);
   long       prefix  = 0;
@@ -375,7 +357,7 @@ void sparseSA::findMAM_each(const std::string &P, int min_len, bool forward_, Ou
       if(is_leftmaximal(P, prefix, SA[cur.start])) {
 	// Yes, it's a MAM.
 	match_t m; m.ref = SA[cur.start]; m.query = prefix; m.len = cur.depth;
-        if(printRevCompForw && !forward_) m.query = Plength-1-prefix;
+        if(flip_forward) m.query = Plength-1-prefix;
         out(m);
       }
     }
@@ -392,10 +374,10 @@ void sparseSA::findMAM_each(const std::string &P, int min_len, bool forward_, Ou
 
 // Maximal Unique Match (MUM)
 template<typename Output>
-void sparseSA::findMUM_each(const std::string &P, int min_len, bool forward_, Output out) const {
+void sparseSA::findMUM_each(const std::string &P, int min_len, bool flip_forward, Output out) const {
   // Find unique MEMs.
   std::vector<match_t> matches;
-  MAM(P, min_len, forward_, matches);
+  MAM(P, min_len, flip_forward, matches);
   //  memCount=0;
 
   struct by_ref {
@@ -433,7 +415,7 @@ void sparseSA::findMUM_each(const std::string &P, int min_len, bool forward_, Ou
 
 // For a given offset in the prefix k, find all MEMs.
 template<typename Output>
-void sparseSA::findMEM_k_each(const std::string &P, long k, int min_len, bool forward_, Output out) const {
+void sparseSA::findMEM_k_each(const std::string &P, long k, int min_len, bool flip_forward, Output out) const {
   if(k < 0 || k >= K) { std::cerr << "Invalid k " << k << " [0, " << K << "]" << std::endl; return; }
   // Offset all intervals at different start points.
   long prefix = k;
@@ -457,7 +439,7 @@ void sparseSA::findMEM_k_each(const std::string &P, long k, int min_len, bool fo
         traverse_faster(P, prefix, xmi, P.length()); // Traverse until mismatch.
       else
         traverse(P, prefix, xmi, P.length()); // Traverse until mismatch.
-      collectMEMs_each(P, prefix, mli, xmi, min_len, forward_, out); // Using LCP info to find MEM length.
+      collectMEMs_each(P, prefix, mli, xmi, min_len, flip_forward, out); // Using LCP info to find MEM length.
       // When using ISA/LCP trick, depth = depth - K. prefix += K.
       prefix+=sparseMult*K;
       if( !hasSufLink ){ mli.reset(N/K-1); xmi.reset(N/K-1); continue; }
@@ -495,10 +477,10 @@ void sparseSA::findMEM_k_each(const std::string &P, long k, int min_len, bool fo
 // Use LCP information to locate right maximal matches. Test each for
 // left maximality.
 template<typename Output>
-void sparseSA::collectMEMs_each(const std::string &P, long prefix, interval_t mli, interval_t xmi, int min_len, bool forward_,
+void sparseSA::collectMEMs_each(const std::string &P, long prefix, interval_t mli, interval_t xmi, int min_len, bool flip_forward,
                            Output out) const {
   // All of the suffixes in xmi's interval are right maximal.
-  for(long i = xmi.start; i <= xmi.end; i++) find_Lmaximal(P, prefix, SA[i], xmi.depth, min_len, forward_, out);
+  for(long i = xmi.start; i <= xmi.end; i++) find_Lmaximal(P, prefix, SA[i], xmi.depth, min_len, flip_forward, out);
 
   if(mli.start == xmi.start && mli.end == xmi.end) return;
 
@@ -513,12 +495,12 @@ void sparseSA::collectMEMs_each(const std::string &P, long prefix, interval_t ml
       // Scan RMEMs to the left, check their left maximality..
       while(LCP[xmi.start] >= xmi.depth) {
 	xmi.start--;
-	find_Lmaximal(P, prefix, SA[xmi.start], xmi.depth, min_len, forward_, out);
+	find_Lmaximal(P, prefix, SA[xmi.start], xmi.depth, min_len, flip_forward, out);
       }
       // Find RMEMs to the right, check their left maximality.
       while(xmi.end+1 < N/K && LCP[xmi.end+1] >= xmi.depth) {
 	xmi.end++;
-	find_Lmaximal(P, prefix, SA[xmi.end], xmi.depth, min_len, forward_, out);
+	find_Lmaximal(P, prefix, SA[xmi.end], xmi.depth, min_len, flip_forward, out);
       }
     }
   }
@@ -526,14 +508,14 @@ void sparseSA::collectMEMs_each(const std::string &P, long prefix, interval_t ml
 
 // Finds left maximal matches given a right maximal match at position i.
 template<typename Output>
-void sparseSA::find_Lmaximal(const std::string &P, long prefix, long i, long len, int min_len, bool forward_, Output out) const {
+void sparseSA::find_Lmaximal(const std::string &P, long prefix, long i, long len, int min_len, bool flip_forward, Output out) const {
   const long Plength = P.length();
   // Advance to the left up to K steps.
   for(long k = 0; k < sparseMult*K; k++) {
     // If we reach the end or a mismatch, and the match is long enough, print.
     if(prefix == 0 || i == 0 || P[prefix-1] != S[i-1]) {
       if(len >= min_len)
-        out(match_t(i, (!printRevCompForw || forward_) ? prefix : Plength-1-prefix, len));
+        out(match_t(i, !flip_forward ? prefix : Plength-1-prefix, len));
       return; // Reached mismatch, done.
     }
     prefix--; i--; len++; // Continue matching.

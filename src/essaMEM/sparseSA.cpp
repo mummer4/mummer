@@ -36,13 +36,10 @@ static size_t max_len(const std::vector<std::string>& descr) {
 //   return S;
 // }
 
-sparseSA::sparseSA(const std::string& S_, const std::vector<std::string>& descr_, const std::vector<long> &startpos_,
+sparseSA::sparseSA(const std::string& S_,
                    bool __4column, long K_, bool suflink_, bool child_, bool kmer_, int sparseMult_,
-                   int kMerSize_, bool printSubstring_, bool printRevCompForw_, bool nucleotidesOnly_)
-  : descr(descr_)
-  , startpos(startpos_)
-  , maxdescrlen(max_len(descr))
-  , _4column(__4column)
+                   int kMerSize_, bool nucleotidesOnly_)
+  : _4column(__4column)
   , K(K_)
   , S(S_, K_)
   , N(S.length())
@@ -53,13 +50,10 @@ sparseSA::sparseSA(const std::string& S_, const std::vector<std::string>& descr_
   , hasKmer(kmer_)
   , kMerSize(kMerSize_)
   , sparseMult(sparseMult_)
-  , printSubstring(printSubstring_)
-  , printRevCompForw(printRevCompForw_)
   , nucleotidesOnly(nucleotidesOnly_)
 { }
 
-sparseSA sparseSA::create_auto(const std::string& S, const std::vector<std::string>& descr_, const std::vector<long>& startpos_,
-                     int min_len, bool nucleotidesOnly_, int K) {
+sparseSA sparseSA::create_auto(const std::string& S, int min_len, bool nucleotidesOnly_, int K) {
   const bool suflink    = K < 4;
   const bool child      = K >= 4;
   int        sparseMult = 1;
@@ -69,11 +63,33 @@ sparseSA sparseSA::create_auto(const std::string& S, const std::vector<std::stri
       : (int) std::max((min_len-12)/K,1);
   }
   const int kmer = std::max(0,std::min(10,min_len - sparseMult*K + 1));
-  sparseSA res(S, descr_, startpos_, true /* 4column */, K, suflink, child, kmer>0, sparseMult,
-               kmer, false /* printSubstring */, false /* printRevCompForw */,
-               nucleotidesOnly_);
+  sparseSA res(S, true /* 4column */, K, suflink, child, kmer>0, sparseMult,
+               kmer, nucleotidesOnly_);
   res.construct();
   return res;
+}
+
+long sparseSA::index_size_in_bytes() const {
+      long indexSize = 0L;
+      indexSize += sizeof(sparseMult);
+      indexSize += sizeof(hasSufLink);
+      indexSize += sizeof(hasChild);
+      indexSize += sizeof(K);
+      indexSize += sizeof(NKm1);
+      indexSize += sizeof(logN);
+      indexSize += sizeof(N);
+      indexSize += sizeof(_4column);
+      indexSize += sizeof(hasKmer);
+      indexSize += sizeof(kMerSize);
+      indexSize += sizeof(kMerTableSize);
+      indexSize += sizeof(nucleotidesOnly);
+      indexSize += S.capacity();
+      indexSize += sizeof(SA) + SA.capacity()*sizeof(unsigned int);
+      indexSize += sizeof(ISA) + ISA.capacity()*sizeof(int);
+      indexSize += sizeof(CHILD) + CHILD.capacity()*sizeof(int);
+      indexSize += sizeof(KMR) + KMR.capacity()*(2*sizeof(unsigned int));
+      indexSize += LCP.index_size_in_bytes();
+      return indexSize;
 }
 
 // Uses the algorithm of Kasai et al 2001 which was described in
@@ -752,9 +768,47 @@ bool sparseSA::suffixlink(interval_t &m) const {
   return expand_link(m);
 }
 
+
+///////////////////
+// sparseSAMatch //
+///////////////////
+sparseSAMatch::sparseSAMatch(const std::string& S_, const std::vector<std::string>& descr_, const std::vector<long>& startpos_,
+                             bool __4column, long K_, bool suflink_, bool child_, bool kmer_,
+                             int sparseMult_, int kMerSize_, bool printSubstring_,
+                             bool nucleotidesOnly_)
+  : sparseSA(S_, __4column, K_, suflink_, child_, kmer_, sparseMult_, kMerSize_, nucleotidesOnly_)
+  , descr(descr_)
+  , startpos(startpos_)
+  , maxdescrlen(max_len(descr_))
+  , printSubstring(printSubstring_)
+{ }
+
+long sparseSAMatch::index_size_in_bytes() const {
+  long indexSize = sparseSA::index_size_in_bytes();
+  indexSize += sizeof(maxdescrlen);
+  indexSize += sizeof(descr);
+  for(size_t i = 0; i < descr.size(); i++){
+    indexSize += descr[i].capacity();
+  }
+  indexSize += sizeof(startpos) + startpos.capacity()*sizeof(long);
+  //  indexSize += sizeof(printRevCompForw);
+  indexSize += sizeof(printSubstring);
+
+  return indexSize;
+}
+
+void sparseSAMatch::from_set(long hit, long &seq, long &seqpos) const {
+  // Use binary search to locate index of sequence and position
+  // within sequence.
+  std::vector<long>::const_iterator it = upper_bound(startpos.begin(), startpos.end(), hit);   // SG: should use vector<long>::const_iterator
+  seq = distance(startpos.begin(), it) - 1;
+  it--;
+  seqpos = hit - *it;
+}
+
 // Print results in format used by MUMmer v3.  Prints results
 // 1-indexed, instead of 0-indexed.
-void sparseSA::print_match(std::ostream& os, match_t m) const {
+void sparseSAMatch::print_match(std::ostream& os, match_t m) const {
   if(_4column == false) {
     os << std::setw(8) << (m.ref + 1) << "  "
        << std::setw(8) << (m.query + 1) << "  "
@@ -776,7 +830,7 @@ void sparseSA::print_match(std::ostream& os, match_t m) const {
   }
 }
 
-void sparseSA::print_match(std::ostream& os, std::string meta, bool rc) const {
+void sparseSAMatch::print_match(std::ostream& os, std::string meta, bool rc) const {
   if(!rc) os << "> " << meta << '\n';
   else os << "> " << meta << " Reverse\n";
 }
