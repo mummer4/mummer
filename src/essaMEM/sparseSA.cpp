@@ -24,17 +24,17 @@ static size_t max_len(const std::vector<std::string>& descr) {
   return res;
 }
 
-static std::string prepare_sequence(std::string S, long K) {
-  // Increase string length so divisible by K.
-  // Don't forget to count $ termination character.
-  if(S.length() % K != 0) {
-    const long appendK = K - S.length() % K ;
-    for(long i = 0; i < appendK; i++) S += '$';
-  }
-  // Make sure last K-sampled characeter is this special character as well!!
-  for(long i = 0; i < K; i++) S += '$'; // Append "special" end character. Note: It must be lexicographically less.
-  return S;
-}
+// static std::string prepare_sequence(std::string S, long K) {
+//   // Increase string length so divisible by K.
+//   // Don't forget to count $ termination character.
+//   if(S.length() % K != 0) {
+//     const long appendK = K - S.length() % K ;
+//     for(long i = 0; i < appendK; i++) S += '$';
+//   }
+//   // Make sure last K-sampled characeter is this special character as well!!
+//   for(long i = 0; i < K; i++) S += '$'; // Append "special" end character. Note: It must be lexicographically less.
+//   return S;
+// }
 
 sparseSA::sparseSA(const std::string& S_, const std::vector<std::string>& descr_, const std::vector<long> &startpos_,
                    bool __4column, long K_, bool suflink_, bool child_, bool kmer_, int sparseMult_,
@@ -44,7 +44,7 @@ sparseSA::sparseSA(const std::string& S_, const std::vector<std::string>& descr_
   , maxdescrlen(max_len(descr))
   , _4column(__4column)
   , K(K_)
-  , S(prepare_sequence(S_, K_))
+  , S(S_, K_)
   , N(S.length())
   , logN((long)ceil(log(N/K) / log(2.0)))
   , NKm1(N/K-1)

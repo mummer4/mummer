@@ -6,6 +6,7 @@
 #include <iostream>
 #include <algorithm>
 #include <limits>
+#include <type_traits>
 #include <limits.h>
 
 
@@ -46,12 +47,12 @@ static const unsigned int BITADD[256] = {
 struct vec_uchar {
   struct item_t{
     item_t() = default;
-    item_t(size_t i, int v) { idx = i; val = v; }
+    item_t(size_t i, int v) : idx(i), val(v) { }
     size_t idx; int val;
     bool operator < (item_t t) const { return idx < t.idx;  }
   };
-  std::vector<unsigned char> vec;  // LCP values from 0-65534
-  std::vector<item_t> M;
+  std::vector<unsigned char> vec; // LCP values from 0-65534
+  std::vector<item_t>        M;
   void resize(size_t N) { vec.resize(N); }
   // Vector X[i] notation to get LCP values.
   int operator[] (size_t idx) const {
@@ -90,6 +91,7 @@ struct match_t {
   long len; // length of match
 };
 
+
 struct saTuple_t {
     saTuple_t(): left(0), right(0) {}
     saTuple_t(unsigned int l, unsigned int r): left(l), right(r) {}
@@ -106,17 +108,43 @@ struct interval_t {
   long size() const { return end - start + 1; }
 };
 
+struct bounded_string {
+  const char* const s_;
+  const size_t      al_; // actual length
+  const size_t      l_;  // length rounded to K
+
+  bounded_string(const char* s, size_t l, long K) :
+    s_(s),
+    al_(l),
+    l_(l + K + (l % K != 0 ? K - (l % K) : 0))
+  { }
+  bounded_string(const std::string s, long K) : bounded_string(s.c_str(), s.size(), K) { }
+
+  char operator[](size_t i) const {
+    if(__builtin_expect(i < al_, 1))
+      return s_[i];
+    return '$';
+  }
+  size_t size() const noexcept { return l_; }
+  size_t length() const noexcept { return l_; }
+  size_t capacity() const noexcept { return l_; }
+  std::string substr (size_t pos = 0, size_t len = std::string::npos) const {
+    pos = std::min(pos, al_);
+    return std::string(std::min(pos, al_), std::min(len, al_ - pos));
+  }
+};
+
 struct sparseSA {
   const std::vector<std::string>& descr; // Descriptions of concatenated sequences.
   const std::vector<long>&        startpos; // Lengths of concatenated sequences.
   const long                      maxdescrlen; // Maximum length of the sequence description, used for formatting.
   const bool                      _4column; // Use 4 column output format.
 
-  const long K;                 // suffix sampling, K = 1 every suffix, K = 2 every other suffix, K = 3, every 3rd sffix
-  const std::string               S;  //!< Reference to sequence data.
-  const long N;                       //!< Length of the sequence.
-  const long                      logN; // ceil(log(N))
-  const long                      NKm1; // N/K - 1
+  const long                K;  // suffix sampling, K = 1 every suffix, K = 2 every other suffix, K = 3, every 3rd sffix
+  const bounded_string      S;  //!< Reference to sequence data.
+  const long                N;  //!< Length of the sequence.
+  const long                logN; // ceil(log(N))
+  const long                NKm1; // N/K - 1
   std::vector<unsigned int> SA; // Suffix array.
   std::vector<int>          ISA; // Inverse suffix array.
   vec_uchar                 LCP; // Simulates a vector<int> LCP.

@@ -47,10 +47,11 @@ else
 BIN_PATH = .
 endif
 
-T_CPPFLAGS = -Wall @(CPPFLAGS) -I$(TUP_CWD)/src
+export PKG_CONFIG_PATH
+T_CPPFLAGS = -Wall @(CPPFLAGS) -I$(TUP_CWD)/include `pkg-config --cflags jellyfish-2.0`
 T_CFLAGS = @(CFLAGS)
 T_CXXFLAGS = @(CXXFLAGS) -std=c++0x
-T_LDFLAGS = @(LDFLAGS) -L$(LIB_DIR)
+T_LDFLAGS = @(LDFLAGS) -L$(LIB_DIR) `pkg-config --libs jellyfish-2.0` `pkg-config --libs-only-L jellyfish-2.0 | sed -e 's/-L/-Wl,--rpath,/g'`
 T_ARFLAGS = @(ARFLAGS)
 
 

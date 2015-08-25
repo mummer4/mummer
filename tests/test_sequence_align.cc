@@ -1,7 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include <umd/nucmer.hpp>
+#include <mummer/nucmer.hpp>
 
 std::string read_sequence(std::istream& is, std::string& header) {
   std::string res;
