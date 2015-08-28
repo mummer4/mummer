@@ -1,5 +1,7 @@
 #include <cstring>
 #include <fstream>
+#include <functional>
+#include <unordered_map>
 #include <mummer/nucmer.hpp>
 #include <mummer/sparseSA.hpp>
 #include <mummer/mgaps.hh>
@@ -9,6 +11,7 @@
 namespace mummer {
 namespace nucmer {
 
+const std::string FastaRecordSeq::empty_string;
 typedef postnuc::Synteny<FastaRecordSeq> synteny_type;
 
 static inline char rc(const char c) {
@@ -24,7 +27,7 @@ static inline char rc(const char c) {
   }
   return 'n';
 }
-static void reverse_complement(std::string& s) {
+void reverse_complement(std::string& s) {
   auto st = s.begin();
   auto en = s.end() - 1;
 
@@ -37,17 +40,14 @@ static void reverse_complement(std::string& s) {
     *st = rc(*st);
 }
 
-const std::vector<std::string> SequenceAligner::descr { "" };
-const std::vector<long> SequenceAligner::startpos { 0 };
-
 void SequenceAligner::align(const char* query, std::vector<postnuc::Alignment>& alignments) {
-  std::vector<mgaps::Match_t> fwd_matches(1), bwd_matches(1);
-  FastaRecordSeq              Query(query);
-  std::vector<synteny_type>   syntenys;
+  std::vector<mgaps::Match_t>        fwd_matches(1), bwd_matches(1);
+  FastaRecordSeq                     Query(query);
+  std::vector<synteny_type>          syntenys;
   syntenys.push_back(&Ref);
   synteny_type&               synteny = syntenys.front();
-  mgaps::UnionFind            UF;
-  char                        cluster_dir;
+  mgaps::UnionFind                   UF;
+  char                               cluster_dir;
 
   auto append_cluster = [&](const mgaps::cluster_type& cluster) {
     postnuc::Cluster cl(cluster_dir);
@@ -86,5 +86,51 @@ void SequenceAligner::align(const char* query, std::vector<postnuc::Alignment>& 
                               [&](std::vector<postnuc::Alignment>&& als, const FastaRecordSeq& Af,
                                   const FastaRecordSeq& Bf) { for(auto& al : als) alignments.push_back(std::move(al)); });
 }
+
+sequence_info::sequence_info(const char* path)  {
+  std::string meta, line;
+
+
+  // TODO: should not write to cerr, but return an error, somehow.
+  std::ifstream data(path);
+  if(!data.is_open()) { std::cerr << "unable to open " << path << std::endl; exit(1); }
+  int c = data.peek();
+  if(c != '>') { std::cerr << "first character must be a '>', got '" << (char)c << "'" << std::endl; exit(1); }
+
+  while(c != EOF) {
+    std::getline(data, line); // Load one line at a time.
+
+    // Read metadata
+    const size_t header_offset = headers.size();
+    const size_t start = line.find_first_not_of(" \t", 1);
+    if(start != std::string::npos) {
+      const size_t end = line.find_first_of(" \t", start);
+      headers += line.substr(start, end);
+    }
+    headers += '\0';
+
+    // Read sequence
+    sequence += '`';
+    const size_t sequence_offset = sequence.size();
+    for(c = data.peek(); c != EOF && c != '>'; c = data.peek()) {
+      std::getline(data, line);
+      const size_t start = line.find_first_not_of(" ");
+      const size_t end = std::min(line.size(), line.find_last_not_of(" \t"));
+      for(size_t i = start; i <= end; ++i)
+        sequence += std::tolower(line[i]);
+    }
+
+    records.push_back({ sequence_offset, header_offset });
+  }
+  sequence += '`';
+  records.push_back({ sequence.size(), headers.size() });
+}
+
+FastaRecordPtr sequence_info::find(size_t pos) const {
+  auto rec_it = std::upper_bound(records.cbegin(), records.cend(),
+                                 pos, [](size_t pos, const record& b) { return pos < b.seq; });
+  return FastaRecordPtr(*this, rec_it - records.cbegin() - 1);
+}
+
 } // namespace nucmer
 } // namespace mummer

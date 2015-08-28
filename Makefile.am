@@ -1,8 +1,8 @@
 SUBDIRS = . $(MAYBE_SWIG)
 ACLOCAL_AMFLAGS = -I m4
 
-AM_CPPFLAGS = -Wall -I$(srcdir)/include
-AM_LDFLAGS = -lpthread
+AM_CPPFLAGS = -Wall -I$(srcdir)/include $(JELLYFISH2_0_CFLAGS)
+AM_LDFLAGS = -lpthread $(JELLYFISH2_0_LIBS)
 
 bin_PROGRAMS =
 EXTRA_DIST =

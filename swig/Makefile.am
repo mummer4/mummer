@@ -6,7 +6,8 @@ SWIG_SRC = mummer.i nucmer.i
 TESTS =
 TEST_EXTENSIONS =
 
-ALL_CPPFLAGS = -I$(srcdir)/../include
+ALL_CPPFLAGS = -I$(srcdir)/../include $(JELLYFISH2_0_CFLAGS)
+ALL_LDFLAGS = $(JELLYFISH2_0_LIBS)
 
 if HAVE_SWIG
 SWIG_V_GEN = $(swig_v_GEN_$(V))
@@ -30,7 +31,7 @@ pythonext_SCRIPTS = python/__init__.pyc
 pythonext_LTLIBRARIES = python/_mummer.la
 python__mummer_la_SOURCES = python/swig_wrap.cpp $(SWIG_SRC)
 python__mummer_la_CPPFLAGS = $(PYTHON_CPPFLAGS) $(ALL_CPPFLAGS)
-python__mummer_la_LDFLAGS = -module $(PYTHON_LDFLAGS)
+python__mummer_la_LDFLAGS = -module $(PYTHON_LDFLAGS) $(ALL_LDFLAGS)
 python__mummer_la_LIBADD = ../libumdmummer.la
 CLEANFILES += $(PYTHON_BUILT) $(dist_pythonext_DATA) python/mummer.py
 PYTHONC_V_GEN = $(pythonc_v_GEN_$(V))
@@ -56,7 +57,7 @@ rubyextdir = $(RUBY_EXT_LIB)
 rubyext_LTLIBRARIES = ruby/mummer.la
 ruby_mummer_la_SOURCES = ruby/swig_wrap.cpp $(SWIG_SRC)
 ruby_mummer_la_CPPFLAGS = $(RUBY_EXT_CFLAGS) $(ALL_CPPFLAGS)
-ruby_mummer_la_LDFLAGS = -module $(RUBY_EXT_LIBS)
+ruby_mummer_la_LDFLAGS = -module $(RUBY_EXT_LIBS)  $(ALL_LDFLAGS)
 ruby_mummer_la_LIBADD = ../libumdmummer.la
 CLEANFILES += $(RUBY_BUILT)
 
@@ -76,7 +77,7 @@ perlext_SCRIPTS = perl5/mummer.pm
 perlext_LTLIBRARIES = perl5/mummer.la
 perl5_mummer_la_SOURCES = perl5/swig_wrap.cpp $(SWIG_SRC)
 perl5_mummer_la_CPPFLAGS = $(PERL_EXT_CPPFLAGS) -I$(PERL_EXT_INC) $(ALL_CPPFLAGS)
-perl5_mummer_la_LDFLAGS = -module $(PERL5_EXT_LDFLAGS)
+perl5_mummer_la_LDFLAGS = -module $(PERL5_EXT_LDFLAGS) $(ALL_LDFLAGS)
 perl5_mummer_la_LIBADD = ../libumdmummer.la
 CLEANFILES += $(PERL5_BUILT) perl5/mummer.pm
 perl5/mummer.pm: perl5/swig_wrap.cpp

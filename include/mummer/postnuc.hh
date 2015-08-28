@@ -133,13 +133,13 @@ struct merge_syntenys {
     , aligner(break_len, banding, matrix_type)
   { }
 
-  template<typename FastaRecord, typename ClustersOut, typename MatchesOut>
-  void processSyntenys_each(std::vector<Synteny<FastaRecord> >& Syntenys, const FastaRecord& Bf,
+  template<typename FR1, typename FR2, typename ClustersOut, typename MatchesOut>
+  void processSyntenys_each(std::vector<Synteny<FR1> >& Syntenys, const FR2& Bf,
                             ClustersOut clusters, MatchesOut matches) const;
-  template<typename FastaRecord, typename MatchesOut>
-  void processSyntenys_each(std::vector<Synteny<FastaRecord> >& Syntenys, const FastaRecord& Bf,
+  template<typename FR1, typename FR2, typename MatchesOut>
+  void processSyntenys_each(std::vector<Synteny<FR1> >& Syntenys, const FR2& Bf,
                             MatchesOut matches) const {
-    processSyntenys_each(Syntenys, Bf, [](const std::vector<Synteny<FastaRecord> >& s, const FastaRecord& Bf) { },
+    processSyntenys_each(Syntenys, Bf, [](const std::vector<Synteny<FR1> >& s, const FR2& Bf) { },
                          matches);
   }
   bool extendBackward(std::vector<Alignment> & Alignments, std::vector<Alignment>::iterator CurrAp,
@@ -218,8 +218,8 @@ inline long int revC
 //
 // Implementation of templated methods
 //
-template<typename FastaRecord, typename ClustersOut, typename MatchesOut>
-void merge_syntenys::processSyntenys_each(std::vector<Synteny<FastaRecord> >& Syntenys, const FastaRecord& Bf,
+template<typename FR1, typename FR2, typename ClustersOut, typename MatchesOut>
+void merge_syntenys::processSyntenys_each(std::vector<Synteny<FR1> >& Syntenys, const FR2& Bf,
                                           ClustersOut clusters, MatchesOut matches) const
 
 //  For each syntenic region with clusters, extend the clusters to
@@ -233,7 +233,7 @@ void merge_syntenys::processSyntenys_each(std::vector<Synteny<FastaRecord> >& Sy
   //  std::vector<Alignment> alignments;
 
   //-- For all the contained syntenys
-  for(auto CurrSp : Syntenys) {
+  for(auto& CurrSp : Syntenys) {
       //-- If no clusters, ignore
       if(CurrSp.clusters.empty()) continue;
       //-- Extend clusters and create the alignment information

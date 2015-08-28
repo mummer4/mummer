@@ -20,13 +20,16 @@ int main(int argc, char *argv[]) {
     exit(1);
   }
 
-  std::string ref_header, qry_header;
-  std::string ref = read_sequence(argv[1], ref_header);
+  std::string qry_header;
   std::string qry = read_sequence(argv[2], qry_header);
 
-  const auto alignments = mummer::nucmer::align_sequences(ref.c_str(), qry.c_str());
-  mummer::postnuc::printDeltaAlignments(alignments,
-                                        ref_header, ref.size(), qry_header, qry.size(),
-                                        std::cout);
+  mummer::nucmer::FileAligner aligner(argv[1], mummer::nucmer::Options().mincluster(20).minmatch(10));
+  aligner.align(qry.c_str(),
+                [&](std::vector<mummer::postnuc::Alignment>&& als,
+                   const mummer::nucmer::FastaRecordPtr& Af, const mummer::nucmer::FastaRecordSeq & Bf) {
+                  //  const auto alignments = mummer::nucmer::align_sequences(ref.c_str(), qry.c_str());
+                  mummer::postnuc::printDeltaAlignments(als, Af.Id(), Af.len(), qry_header, qry.size(),
+                                                        std::cout);
+                });
   return 0;
 }

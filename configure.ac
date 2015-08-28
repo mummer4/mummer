@@ -15,6 +15,9 @@ AC_PROG_CXX
 AC_PROG_CC
 AC_PATH_PROG(ENV_PROG, [env])
 
+# Jellyfish modul
+PKG_CHECK_MODULES([JELLYFISH2_0], [jellyfish-2.0])
+
 #
 # SWIG and bindings
 #
