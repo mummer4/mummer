@@ -356,7 +356,7 @@ void sparseSA::findMAM_each(const std::string &P, int min_len, bool flip_forward
     if(cur.size() == 1 && cur.depth >= min_len) {
       if(is_leftmaximal(P, prefix, SA[cur.start])) {
 	// Yes, it's a MAM.
-	match_t m; m.ref = SA[cur.start]; m.query = prefix; m.len = cur.depth;
+	match_t m(SA[cur.start], prefix, cur.depth);
         if(flip_forward) m.query = Plength-1-prefix;
         out(m);
       }
