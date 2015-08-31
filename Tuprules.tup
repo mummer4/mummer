@@ -4,6 +4,7 @@
 !lxxd  = |> ^ LXX   %o^ $(CXX) $(T_LDFLAGS) $(LDFLAGS) $(LDFLAGS_%B)  %f -o %o $(LOADLIBES) $(LDLIBS) |>
 !cxxld = |> ^ CXXLD %o^ $(CXX) $(T_CPPFLAGS) $(CPPFLAGS) $(T_CXXFLAGS) $(CXXFLAGS_%B) $(CXXFLAGS) $(T_LDFLAGS) $(LDFLAGS) $(LDFLAGS_%B) %f -o %o $(LOADLIBES) $(LDLIBS) |> %B
 !ar    = |> ^ AR    %o^ $(AR) sruv $(T_ARFLAGS) $(ARFLAGS) %o %f |>
+!yaggo = |> ^ YAGGO %f^ $(YAGGO) %f |> %B.hpp
 
 # : foreach *.c |> !cc |>
 # : foreach *.cc |> !cxx |>
@@ -20,6 +21,11 @@ else
 CXX = g++
 endif
 AR  = ar
+ifdef YAGGO
+  YAGGO = @(YAGGO)
+else
+  YAGGO = yaggo
+endif
 
 ifdef BIN_DIR
 BIN_DIR = @(BIN_DIR)
@@ -48,7 +54,7 @@ BIN_PATH = .
 endif
 
 export PKG_CONFIG_PATH
-T_CPPFLAGS = -Wall @(CPPFLAGS) -I$(TUP_CWD)/include `pkg-config --cflags jellyfish-2.0`
+T_CPPFLAGS = -Wall @(CPPFLAGS) -I$(TUP_CWD)/include -I$(TUP_CWD) `pkg-config --cflags jellyfish-2.0`
 T_CFLAGS = @(CFLAGS)
 T_CXXFLAGS = @(CXXFLAGS) -std=c++0x
 T_LDFLAGS = @(LDFLAGS) -L$(LIB_DIR) `pkg-config --libs jellyfish-2.0` `pkg-config --libs-only-L jellyfish-2.0 | sed -e 's/-L/-Wl,--rpath,/g'`

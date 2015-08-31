@@ -1,0 +1,63 @@
+description "nucmer generates nucleotide alignments between two mutli-FASTA input
+files. The out.delta output file lists the distance between insertions
+and deletions that produce maximal scoring alignments between each
+sequence. The show-* utilities know how to read this format.
+
+By default, nucmer uses anchor matches that are unique in in the
+reference but not necessarily unique in the query. See --mum and
+--maxmatch for different bevahiors."
+
+option("mum") {
+  description "Use anchor matches that are unique in both the reference and query"
+  off }
+option("maxmatch") {
+  description "Use all anchor matches regardless of their uniqueness"
+  off; conflict "mum" }
+option("b", "breaklen") {
+  description "Set the distance an alignment extension will attempt to extend poor scoring regions before giving up"
+  uint32; default 200 }
+option("c", "mincluster") {
+  description "Sets the minimum length of a cluster of matches"
+  uint32; default 65 }
+option("D", "diagdiff") {
+  description "Set the maximum diagonal difference between two adjacent anchors in a cluster"
+  uint32; default 5 }
+option("d", "diagfactor") {
+  description "Set the maximum diagonal difference between two adjacent anchors in a cluster as a differential fraction of the gap length"
+  double; default 0.12 }
+option("noextend") {
+  description "Do not perform cluster extension step"
+  off }
+option("f", "forward") {
+  description "Use only the forward strand of the Query sequences"
+  off }
+option("g", "maxgap") {
+  description "Set the maximum gap between two adjacent matches in a cluster"
+  uint32; default 90 }
+option("l", "minmatch") {
+  description "Set the minimum length of a single match"
+  uint32; default 20 }
+option("nooptimize") {
+  description "No alignment score optimization, i.e. if an alignment extension reaches the end of a sequence, it will not backtrack to optimize the alignment score and instead terminate the alignment at the end of the sequence"
+  off }
+option("r", "reverse") {
+  description "Use only the reverse complement of the Query sequences"
+  off; conflict "forward" }
+option("nosimplify") {
+  description "Don't simplify alignments by removing shadowed clusters. Use this option when aligning a sequence to itself to look for repeats"
+  off }
+option("delta") {
+  description "Output delta file"
+  c_string; default "stdout" }
+
+# Hidden / experimental options
+option("banded") {
+  description "Enforce absolute banding of dynamic programming matrix based on diagdiff parameter"
+  off; hidden }
+
+arg("ref") {
+  description "Reference sequence file"
+  c_string; typestr "path" }
+arg("qry") {
+  description "Query sequence file"
+  c_string; typestr "path" }

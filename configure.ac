@@ -15,8 +15,12 @@ AC_PROG_CXX
 AC_PROG_CC
 AC_PATH_PROG(ENV_PROG, [env])
 
-# Jellyfish modul
+# Jellyfish module
 PKG_CHECK_MODULES([JELLYFISH2_0], [jellyfish-2.0])
+
+# Check for yaggo
+AC_ARG_VAR([YAGGO], [Yaggo switch parser generator])
+AS_IF([test "x$YAGGO" = "x"], [AC_PATH_PROG([YAGGO], [yaggo], [false])])
 
 #
 # SWIG and bindings
