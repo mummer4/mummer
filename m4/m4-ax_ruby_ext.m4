@@ -88,7 +88,7 @@ AC_DEFUN([AX_RUBY_EXT],[
                 #
                 AC_MSG_CHECKING([for Ruby include directory])
                 AS_IF([test -z "$RUBY_EXT_CFLAGS"],
-                      [RUBY_EXT_CFLAGS="-I`$RUBY -rrbconfig -e 'print RbConfig::expand(RbConfig::CONFIG.fetch("rubyhdrdir"))'` -I`$RUBY -rrbconfig -e 'print RbConfig::expand(RbConfig::CONFIG.fetch("rubyarchhdrdir"))'`"])
+                      [RUBY_EXT_CFLAGS=`$RUBY -rrbconfig -e '%w(rubyhdrdir rubyarchhdrdir).each { |k| (v = RbConfig::CONFIG.fetch(k, nil)) and print(" -I", RbConfig::expand(v)) }'`])
                 AC_MSG_RESULT([$RUBY_EXT_CFLAGS])
                 AC_SUBST(RUBY_EXT_CFLAGS)
 
@@ -97,13 +97,14 @@ AC_DEFUN([AX_RUBY_EXT],[
                 #
                 AC_MSG_CHECKING([for Ruby libs])
                 AS_IF([test -z "$RUBY_EXT_LIBS"],
-                      [RUBY_EXT_LIBS="`$RUBY -rrbconfig -e 'print RbConfig::expand(RbConfig::CONFIG.fetch("LIBRUBYARG_SHARED"))'` `$RUBY -rrbconfig -e 'print RbConfig::expand(RbConfig::CONFIG.fetch("LIBS"))'`"])
+                      [RUBY_EXT_LIBS=`$RUBY -rrbconfig -e '%w(LIBRUBYARG_SHARED LIBS).each { |k| (v = RbConfig::CONFIG.fetch(k, nil)) and print(" ", RbConfig::expand(v)) }'`])
                 AC_MSG_RESULT([$RUBY_EXT_LIBS])
                 AC_SUBST(RUBY_EXT_LIBS)
 
 
                 # Fix LDFLAGS for OS X.  We don't want any -arch flags here, otherwise
                 # linking might fail.  We also including the proper flags to create a bundle.
+                AC_MSG_CHECKING([for Ruby extra ldflags])
                 case "$host" in
                 *darwin*)
                         RUBY_EXT_LDFLAGS=`echo ${RUBY_EXT_LDFLAGS} | sed -e "s,-arch [[^ ]]*,,g"`

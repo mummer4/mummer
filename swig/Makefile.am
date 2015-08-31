@@ -4,7 +4,16 @@ CLEANFILES =
 EXTRA_DIST = $(TESTS)
 SWIG_SRC = mummer.i nucmer.i
 TESTS =
-TEST_EXTENSIONS =
+
+# Definitions of test runners
+TEST_EXTENSIONS = .py .rb .pl
+PY_LOG_COMPILER = $(ENV_PROG)
+AM_PY_LOG_FLAGS = PYTHONPATH=$(builddir)/python:$(builddir)/python/.libs $(PYTHON)
+RB_LOG_COMPILER = $(RUBY)
+AM_RB_LOG_FLAGS = -I$(builddir)/ruby/.libs
+PL_LOG_COMPILER = $(PERL)
+AM_PL_LOG_FLAGS = -I$(builddir)/perl5 -I$(builddir)/perl5/.libs
+
 
 ALL_CPPFLAGS = -I$(srcdir)/../include $(JELLYFISH2_0_CFLAGS)
 ALL_LDFLAGS = $(JELLYFISH2_0_LIBS)
@@ -43,9 +52,6 @@ python/mummer.py: python/swig_wrap.cpp
 EXTRA_DIST += python/mummer.py
 
 # Tests
-TEST_EXTENSIONS += .py
-PY_LOG_COMPILER = $(ENV_PROG)
-AM_PY_LOG_FLAGS = PYTHONPATH=$(builddir)/python:$(builddir)/python/.libs $(PYTHON)
 TESTS += python/test_nucmer.py
 endif
 
@@ -62,9 +68,6 @@ ruby_mummer_la_LIBADD = ../libumdmummer.la
 CLEANFILES += $(RUBY_BUILT)
 
 # Tests
-TEST_EXTENSIONS += .rb
-RB_LOG_COMPILER = $(RUBY)
-AM_RB_LOG_FLAGS = -I$(builddir)/ruby/.libs
 TESTS += ruby/test_nucmer.rb
 endif
 
@@ -84,8 +87,5 @@ perl5/mummer.pm: perl5/swig_wrap.cpp
 EXTRA_DIST += perl5/mummer.pm
 
 # Tests
-TEST_EXTENSIONS += .pl
-PL_LOG_COMPILER = $(PERL)
-AM_PL_LOG_FLAGS = -I$(builddir)/perl5 -I$(builddir)/perl5/.libs
 TESTS += perl5/test_nucmer.pl
 endif
