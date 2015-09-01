@@ -17,38 +17,38 @@ def rev_comp s
 end
 
 def assert_good_alignment(a, s1, s2)
-      a.each { |al|
-      errors = 0
-      i, j = al.sA, (al.dirB == 1 ? al.sB : (s2.size - al.sB - 1))
-      ni = i - 1
-      ni += al.delta[0].abs - 1 unless al.delta.empty?
-      k = 0
+  a.each { |al|
+    errors = 0
+    i, j = al.sA, (al.dirB == 1 ? al.sB : (s2.size - al.sB - 1))
+    ni = i - 1
+    ni += al.delta[0].abs - 1 unless al.delta.empty?
+    k = 0
 
-      while(i < al.eA) do
-        b2 = al.dirB == 1 ? s2[j] : comp(s2[j])
-        if i == ni && k < al.delta.size
-          while i == ni && k < al.delta.size do
-            if al.delta[k] > 0
-              i += 1
-            else
-              j += al.dirB
-            end
-            errors += 1
-            k += 1
-            oni, ni = ni, i
-            ni += al.delta[k].abs - 1 if k < al.delta.size
+    while(i < al.eA) do
+      b2 = al.dirB == 1 ? s2[j] : comp(s2[j])
+      if i == ni && k < al.delta.size
+        while i == ni && k < al.delta.size do
+          if al.delta[k] > 0
+            i += 1
+          else
+            j += al.dirB
           end
-        else
-          errors += 1 if s1[i] != b2
-          i += 1
-          j += al.dirB
+          errors += 1
+          k += 1
+          oni, ni = ni, i
+          ni += al.delta[k].abs - 1 if k < al.delta.size
         end
+      else
+        errors += 1 if s1[i] != b2
+        i += 1
+        j += al.dirB
       end
-      assert_equal(al.eA, i)
-      assert_equal(al.dirB == 1 ? al.eB : (s2.size - al.eB - 1), j)
-      assert_equal(al.delta.size, k)
-      assert_equal(al.SimErrors, errors)
-    }
+    end
+    assert_equal(al.eA, i)
+    assert_equal(al.dirB == 1 ? al.eB : (s2.size - al.eB - 1), j)
+    assert_equal(al.delta.size, k)
+    assert_equal(al.SimErrors, errors)
+  }
 end
 
 class TestNucmer < MiniTest::Unit::TestCase
@@ -84,7 +84,7 @@ class TestNucmer < MiniTest::Unit::TestCase
     assert_equal 999, s1.size
     assert_equal 999, s2.size
     o = Mummer::Options.new.minmatch(10).mincluster(10)
-
+    p o.break_len
 
     a = Mummer::align_sequences(s1, s2, o)
     assert(1 <= a.size)
@@ -115,6 +115,7 @@ class TestNucmer < MiniTest::Unit::TestCase
     assert_good_alignment(a, s1, rs2)
 
     a = Mummer::align_sequences(rs1, s2, o)
+    p a.size
     assert(1 <= a.size)
     al = a.find { |x| x.sA == 1 && x.eA == 99 }
     refute_nil al

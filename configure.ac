@@ -73,5 +73,5 @@ AS_IF([test -n "$maybe_swig"],
       [AC_CONFIG_FILES([swig/Makefile])])
 
 
-AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([Makefile tests/Makefile])
 AC_OUTPUT

@@ -113,8 +113,8 @@ class SequenceAligner {
   const Options                  options;
 
 public:
-  explicit SequenceAligner(const char* reference, Options opts = Options())
-    : sa(mummer::sparseSA::create_auto(reference, opts.min_len, true))
+  SequenceAligner(const char* reference, size_t reference_len, const Options opts = Options())
+    : sa(mummer::sparseSA::create_auto(reference, reference_len, opts.min_len, true))
     , clusterer(opts.fixed_separation, opts.max_separation,
                 opts.min_output_score, opts.separation_factor,
                 opts.use_extent)
@@ -123,27 +123,33 @@ public:
     , Ref(reference)
     , options(opts)
   { }
+  explicit SequenceAligner(const std::string& reference, const Options opts = Options())
+    : SequenceAligner(reference.c_str(), reference.length(), opts)
+  { }
 
   // Align a single DNA sequence <query> against a single DNA sequence <reference>.
-  void align(const char* query, std::vector<postnuc::Alignment>& alignments);
+  void align(const char* query, size_t query_len, std::vector<postnuc::Alignment>& alignments);
 
-  inline std::vector<postnuc::Alignment> align(const char* query) {
+  inline std::vector<postnuc::Alignment> align(const char* query, size_t query_len) {
     std::vector<postnuc::Alignment> alignments;
-    align(query, alignments);
+    align(query, query_len, alignments);
     return alignments;
   }
 };
 
-inline void align_sequences(const char* reference, const char* query, std::vector<postnuc::Alignment>& alignments,
+inline void align_sequences(const char* reference, size_t reference_len,
+                            const char* query,  size_t query_len,
+                            std::vector<postnuc::Alignment>& alignments,
                             Options opts = Options()) {
-  SequenceAligner aligner(reference, opts);
-  aligner.align(query, alignments);
+  SequenceAligner aligner(reference, reference_len, opts);
+  aligner.align(query, query_len, alignments);
 }
 
-inline std::vector<postnuc::Alignment> align_sequences(const char* reference, const char* query,
-                                                       Options opts = Options()) {
-  SequenceAligner aligner(reference, opts);
-  return aligner.align(query);
+inline std::vector<postnuc::Alignment> align_sequences(const char* reference, size_t reference_len,
+                                                       const char* query,  size_t query_len,
+                                                       const Options opts = Options()) {
+  SequenceAligner aligner(reference, reference_len, opts);
+  return aligner.align(query, query_len);
 }
 
 
@@ -204,7 +210,7 @@ class FileAligner {
 public:
   FileAligner(const char* reference_path, Options opts = Options())
     : reference_info(reference_path)
-    , sa(mummer::sparseSA::create_auto(reference_info.sequence, opts.min_len, true))
+    , sa(mummer::sparseSA::create_auto(reference_info.sequence.c_str(), reference_info.sequence.length(), opts.min_len, true))
     , clusterer(opts.fixed_separation, opts.max_separation,
                 opts.min_output_score, opts.separation_factor,
                 opts.use_extent)
@@ -215,14 +221,18 @@ public:
 
   // Align the sequence query against the references
   template<typename AlignmentOut>
-  void align(const char* query, AlignmentOut alignments);
+  void align(const char* query, size_t query_len, AlignmentOut alignments) const;
+  template<typename AlignmentOut>
+  void align(const std::string& query, AlignmentOut alignments) const {
+    align(query.c_str(), query.length(), alignments);
+  }
 };
 
 //
 // Implementation of templated methods
 //
 template<typename AlignmentOut>
-void FileAligner::align(const char* query, AlignmentOut alignments) {
+void FileAligner::align(const char* query, size_t query_len, AlignmentOut alignments) const {
   typedef postnuc::Synteny<FastaRecordPtr> synteny_type;
   std::vector<mgaps::Match_t>       fwd_matches(1), bwd_matches(1);
   FastaRecordSeq                    Query(query);
@@ -261,16 +271,16 @@ void FileAligner::align(const char* query, AlignmentOut alignments) {
   if(options.orientation & FORWARD) {
     auto append_matches = [&](const mummer::match_t& m) { fwd_matches.push_back({ m.ref + 1, m.query + 1, m.len }); };
     switch(options.match) {
-    case MUM: sa.findMUM_each(query, options.min_len, true, append_matches); break;
-    case MUMREFERENCE: sa.findMAM_each(query, options.min_len, true, append_matches); break;
-    case MAXMATCH: sa.findMEM_each(query, options.min_len, true, append_matches); break;
+    case MUM: sa.findMUM_each(query, query_len, options.min_len, true, append_matches); break;
+    case MUMREFERENCE: sa.findMAM_each(query, query_len, options.min_len, true, append_matches); break;
+    case MAXMATCH: sa.findMEM_each(query, query_len, options.min_len, true, append_matches); break;
     }
     cluster_dir = postnuc::FORWARD_CHAR;
     clusterer.Cluster_each(fwd_matches.data(), UF, fwd_matches.size() - 1, append_cluster);
   }
 
   if(options.orientation & REVERSE) {
-    std::string rquery(query);
+    std::string rquery(query, query_len);
     reverse_complement(rquery);
     auto append_matches = [&](const mummer::match_t& m) { bwd_matches.push_back({ m.ref + 1, m.query + 1, m.len }); };
     switch(options.match) {

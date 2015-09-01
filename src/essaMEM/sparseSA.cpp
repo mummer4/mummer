@@ -36,13 +36,13 @@ static size_t max_len(const std::vector<std::string>& descr) {
 //   return S;
 // }
 
-sparseSA::sparseSA(const std::string& S_,
+sparseSA::sparseSA(const char* S_, size_t Slen,
                    bool __4column, long K_, bool suflink_, bool child_, bool kmer_, int sparseMult_,
                    int kMerSize_, bool nucleotidesOnly_)
   : _4column(__4column)
   , K(K_)
-  , S(S_, K_)
-  , N(S.length())
+  , S(S_, Slen, K_)
+  , N(Slen)
   , logN((long)ceil(log(N/K) / log(2.0)))
   , NKm1(N/K-1)
   , hasChild(child_)
@@ -53,7 +53,7 @@ sparseSA::sparseSA(const std::string& S_,
   , nucleotidesOnly(nucleotidesOnly_)
 { }
 
-sparseSA sparseSA::create_auto(const std::string& S, int min_len, bool nucleotidesOnly_, int K) {
+sparseSA sparseSA::create_auto(const char* S, size_t Slen, int min_len, bool nucleotidesOnly_, int K) {
   const bool suflink    = K < 4;
   const bool child      = K >= 4;
   int        sparseMult = 1;
@@ -63,7 +63,7 @@ sparseSA sparseSA::create_auto(const std::string& S, int min_len, bool nucleotid
       : (int) std::max((min_len-12)/K,1);
   }
   const int kmer = std::max(0,std::min(10,min_len - sparseMult*K + 1));
-  sparseSA res(S, true /* 4column */, K, suflink, child, kmer>0, sparseMult,
+  sparseSA res(S, Slen, true /* 4column */, K, suflink, child, kmer>0, sparseMult,
                kmer, nucleotidesOnly_);
   res.construct();
   return res;
@@ -564,10 +564,10 @@ bool sparseSA::top_down(char c, long i, long &start, long &end) const {
 
 // Top down traversal of the suffix array to match a pattern.  NOTE:
 // NO childtab as in the enhanced suffix array (ESA).
-bool sparseSA::search(std::string &P, long &start, long &end) {
+bool sparseSA::search(const char* P, size_t Plen, long &start, long &end) const {
   start = 0; end = N/K - 1;
   long i = 0;
-  while(i < (long)P.length()) {
+  while(i < (long)Plen) {
     if(top_down(P[i], i, start, end) == false) {
       return false;
     }
@@ -579,7 +579,7 @@ bool sparseSA::search(std::string &P, long &start, long &end) {
 
 // Traverse pattern P starting from a given prefix and interval
 // until mismatch or min_len characters reached.
-void sparseSA::traverse(const std::string &P, long prefix, interval_t &cur, int min_len) const {
+void sparseSA::traverse(const char* P, size_t Plen, long prefix, interval_t &cur, int min_len) const {
   if(hasKmer && cur.depth == 0 && min_len >= kMerSize){//free match first bases
     unsigned int index = 0;
     for(long i = 0; i < kMerSize; i++)
@@ -594,7 +594,7 @@ void sparseSA::traverse(const std::string &P, long prefix, interval_t &cur, int 
     }
   }
   if(cur.depth >= min_len) return;
-  while(prefix+cur.depth < (long)P.length()) {
+  while(prefix+cur.depth < (long)Plen) {
     long start = cur.start; long end = cur.end;
     // If we reach a mismatch, stop.
     if(top_down_faster(P[prefix+cur.depth], cur.depth, start, end) == false) return;
@@ -610,7 +610,7 @@ void sparseSA::traverse(const std::string &P, long prefix, interval_t &cur, int 
 // Traverse pattern P starting from a given prefix and interval
 // until mismatch or min_len characters reached.
 // Uses the child table for faster traversal
-void sparseSA::traverse_faster(const std::string& P,const long prefix, interval_t &cur, int min_len) const {
+void sparseSA::traverse_faster(const char* P, size_t Plen, const long prefix, interval_t &cur, int min_len) const {
   if(hasKmer && cur.depth == 0 && min_len >= kMerSize){//free match first bases
     unsigned int index = 0;
     for(long i = 0; i < kMerSize; i++)
@@ -626,7 +626,7 @@ void sparseSA::traverse_faster(const std::string& P,const long prefix, interval_
   }
   if(cur.depth >= min_len) return;
   long c = prefix + cur.depth;
-  bool intervalFound = (size_t)c < P.length();
+  bool intervalFound = (size_t)c < Plen;
   int curLCP;//check if this is correct for root interval (unlikely case)
   if(cur.start < CHILD[cur.end] && CHILD[cur.end] <= cur.end)
     curLCP = LCP[CHILD[cur.end]];
@@ -638,7 +638,7 @@ void sparseSA::traverse_faster(const std::string& P,const long prefix, interval_
     intervalFound = P[c] == S[SA[cur.start]+cur.depth];
   bool mismatchFound = false;
   while(intervalFound && !mismatchFound &&
-        (size_t)c < P.length() && cur.depth < min_len){
+        (size_t)c < Plen && cur.depth < min_len){
     c++;
     cur.depth++;
     if(cur.start != cur.end){
@@ -651,16 +651,16 @@ void sparseSA::traverse_faster(const std::string& P,const long prefix, interval_
         childLCP = LCP[CHILD[cur.start]];
       int minimum = std::min(childLCP,min_len);
       //match along branch
-      while(!mismatchFound && (size_t)c < P.length() && cur.depth < minimum){
+      while(!mismatchFound && (size_t)c < Plen && cur.depth < minimum){
         mismatchFound = S[SA[cur.start]+cur.depth] != P[c];
         c++;
         cur.depth += !mismatchFound;
       }
-      intervalFound = (size_t)c < P.length() && !mismatchFound &&
+      intervalFound = (size_t)c < Plen && !mismatchFound &&
                                   cur.depth < min_len && top_down_child(P[c], cur);
     }
     else{
-      while(!mismatchFound && (size_t)c < P.length() && cur.depth < min_len){
+      while(!mismatchFound && (size_t)c < Plen && cur.depth < min_len){
         mismatchFound = (size_t)(SA[cur.start]+cur.depth) >= S.length() ||
                                           S[SA[cur.start]+cur.depth] != P[c];
         c++;

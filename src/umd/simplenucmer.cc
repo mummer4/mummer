@@ -48,7 +48,7 @@ int main(int argc, char *argv[]) {
   std::string qry = read_sequence(args.qry_arg, qry_header);
 
   mummer::nucmer::FileAligner aligner(args.ref_arg, opts);
-  aligner.align(qry.c_str(),
+  aligner.align(qry,
                 [&](std::vector<mummer::postnuc::Alignment>&& als,
                    const mummer::nucmer::FastaRecordPtr& Af, const mummer::nucmer::FastaRecordSeq & Bf) {
                   //  const auto alignments = mummer::nucmer::align_sequences(ref.c_str(), qry.c_str());

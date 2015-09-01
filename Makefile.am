@@ -1,4 +1,4 @@
-SUBDIRS = . $(MAYBE_SWIG)
+SUBDIRS = . tests $(MAYBE_SWIG)
 ACLOCAL_AMFLAGS = -I m4
 
 AM_CPPFLAGS = -Wall -I$(srcdir)/include $(JELLYFISH2_0_CFLAGS)
@@ -55,15 +55,3 @@ postnuc_SOURCES = src/tigr/postnuc_main.cc
 bin_PROGRAMS += simplenucmer
 YAGGO_BUILT += src/umd/simplenucmer_cmdline.hpp
 simplenucmer_SOURCES = src/umd/simplenucmer.cc
-
-#########
-# Tests #
-#########
-TEST_EXTENSIONS =
-TESTS =
-
-EXTRA_DIST += $(TESTS)
-clean-local: clean-local-check
-.PHONY: clean-local-check
-clean-local-check:
-	-cd tests; rm -f *

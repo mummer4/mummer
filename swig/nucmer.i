@@ -51,8 +51,31 @@ struct Options {
   mummer::nucmer::Options& reverse();
   mummer::nucmer::Options& simplify();
   mummer::nucmer::Options& nosimplify();
+
+  // Options for mummer
+  //  match_type match;
+  int        min_len;
+  //  ori_type   orientation;
+
+  // Options for mgaps
+  long   fixed_separation;
+  long   max_separation;
+  long   min_output_score;
+  double separation_factor;
+  bool   use_extent;
+
+  // Options for postnuc
+  bool do_delta;
+  bool do_extend;
+  bool to_seqend;
+  bool do_shadows;
+  int  break_len;
+  int  banding;
 };
-::std::vector<mummer::postnuc::Alignment> align_sequences(const char* reference, const char* query,
+%apply (const char* STRING, size_t LENGTH) { (const char* reference, size_t reference_len) };
+%apply (const char* STRING, size_t LENGTH) { (const char* query, size_t query_len) };
+::std::vector<mummer::postnuc::Alignment> align_sequences(const char* reference, size_t reference_len,
+                                                          const char* query, size_t query_len,
                                                           mummer::nucmer::Options opts = mummer::nucmer::Options());
 } // namespace nucmer
 } // namespace mummer

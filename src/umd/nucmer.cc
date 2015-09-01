@@ -40,9 +40,9 @@ void reverse_complement(std::string& s) {
     *st = rc(*st);
 }
 
-void SequenceAligner::align(const char* query, std::vector<postnuc::Alignment>& alignments) {
+void SequenceAligner::align(const char* query, size_t query_len, std::vector<postnuc::Alignment>& alignments) {
   std::vector<mgaps::Match_t>        fwd_matches(1), bwd_matches(1);
-  FastaRecordSeq                     Query(query);
+  FastaRecordSeq                     Query(query, query_len);
   std::vector<synteny_type>          syntenys;
   syntenys.push_back(&Ref);
   synteny_type&               synteny = syntenys.front();
@@ -61,9 +61,9 @@ void SequenceAligner::align(const char* query, std::vector<postnuc::Alignment>& 
   if(options.orientation & FORWARD) {
     auto append_matches = [&](const mummer::match_t& m) { fwd_matches.push_back({ m.ref + 1, m.query + 1, m.len }); };
     switch(options.match) {
-    case MUM: sa.findMUM_each(query, options.min_len, false, append_matches); break;
-    case MUMREFERENCE: sa.findMAM_each(query, options.min_len, false, append_matches); break;
-    case MAXMATCH: sa.findMEM_each(query, options.min_len, false, append_matches); break;
+    case MUM: sa.findMUM_each(query, query_len, options.min_len, false, append_matches); break;
+    case MUMREFERENCE: sa.findMAM_each(query, query_len, options.min_len, false, append_matches); break;
+    case MAXMATCH: sa.findMEM_each(query, query_len, options.min_len, false, append_matches); break;
     }
     cluster_dir = postnuc::FORWARD_CHAR;
     clusterer.Cluster_each(fwd_matches.data(), UF, fwd_matches.size() - 1, append_cluster);
