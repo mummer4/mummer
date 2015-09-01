@@ -42,7 +42,7 @@ sparseSA::sparseSA(const char* S_, size_t Slen,
   : _4column(__4column)
   , K(K_)
   , S(S_, Slen, K_)
-  , N(Slen)
+  , N(S.length())
   , logN((long)ceil(log(N/K) / log(2.0)))
   , NKm1(N/K-1)
   , hasChild(child_)
