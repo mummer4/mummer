@@ -27,6 +27,38 @@ std::ostream& operator<<(std::ostream& os, const Alignment& al) {
   return os << '>';
 }
 
+error_iterator_type& error_iterator_type::operator++()  {
+  while(m_error.posA < m_endA) {
+    if(m_k >= m_al.delta.size() || m_i != std::abs(m_al.delta[m_k])) { // not at an indel
+      m_error.baseA       = *m_ref;
+      m_error.baseB       = m_al.dirB == 1 ? *m_qry : comp(*m_qry);
+      const bool mismatch = m_error.baseA != m_error.baseB;
+      ++m_i;
+      ++m_ref;
+      m_qry        += m_al.dirB;
+      ++m_error.posA;
+      m_error.posB += m_al.dirB;
+      if(mismatch) {
+        m_error.type = MISMATCH;
+        break;
+      }
+    } else { // indel
+      if(m_al.delta[m_k] > 0) { // insertion in reference
+        m_error.type = INSERTION;
+        ++m_error.posA;
+        ++m_ref;
+      } else {
+        m_error.type  = DELETION;
+        m_error.posB += m_al.dirB;
+        m_qry        += m_al.dirB;
+      }
+      m_i = 1;
+      ++m_k;
+      break;
+    }
+  }
+  return *this;
+}
 
 // Read one sequence from fasta stream into T (starting at index 1, 0
 // is unused), store its name and returns true if successful.

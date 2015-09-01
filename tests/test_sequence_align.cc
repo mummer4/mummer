@@ -40,7 +40,7 @@ int main(int argc, char *argv[]) {
     mummer::nucmer::SequenceAligner aligner(seq.c_str());
     for(size_t i = 0; i < qry_sequences.size(); ++i) {
       std::cout << i << std::endl;
-      mummer::postnuc::printDeltaAlignments(aligner.align(qry_sequences[i].c_str()),
+      mummer::postnuc::printDeltaAlignments(aligner.align(qry_sequences[i].c_str(), qry_sequences[i].size()),
                                             header, seq.size(), qry_headers[i], qry_sequences[i].size(),
                                             std::cout);
       std::cout << std::flush;

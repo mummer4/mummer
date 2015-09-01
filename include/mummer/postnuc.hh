@@ -100,6 +100,72 @@ struct Alignment
   }
 };
 
+// Iterator over the error
+
+// The type of error. INSERTION and DELETION apply to the
+// reference. INSERTION means an there is an extra base in the
+// reference., DELETION means there is one less base in the reference.
+enum error_type { NONE, INSERTION, DELETION, MISMATCH };
+struct error_description_type {
+  error_type type;              // The type of the error
+  long       posA, posB;        // Position (0-based) in ref and qry of the error.
+  char       baseA, baseB;      // These are equal to ref[posA] and
+                                // qry[posB], or comp(qry[posB]) if
+                                // dirB == -1.
+   // char*      ptrA; // ptr into reference and query
+   // char*      ptrB; // if type == MISMATCH, *ptrA != *ptrB
+};
+class error_iterator_type : public std::iterator<std::input_iterator_tag, error_description_type> {
+  const Alignment&       m_al;
+  error_description_type m_error;
+  const long             m_endA;
+  const char*            m_ref;
+  const char*            m_qry;
+  size_t                 m_k;   // index in delta
+  long                   m_i;   // relative index in reference, in between indels
+public:
+  // Create an iterator at beginning of error
+  error_iterator_type(const Alignment& al, const char* ref, const char* qry, size_t qry_len)
+    : m_al(al)
+    , m_error{ NONE, al.sA - 2, al.dirB == 1 ? al.sB - 2 : (long)qry_len - al.sB + 1}
+    , m_endA(al.eA - 1)
+    , m_ref(ref + al.sA - 1)
+    , m_qry(qry + (al.dirB == 1 ? al.sB - 1 : qry_len - al.sB))
+    , m_k(0)
+    , m_i(1)
+  { ++*this; }
+  // Create an iterator at end
+  error_iterator_type(const Alignment& al, const char* ref)
+    : m_al(al)
+    , m_error{NONE, 0, 0}
+    , m_endA(1)
+    , m_ref(ref + al.eA)
+    , m_qry(nullptr)
+    , m_k(0)
+    , m_i(1)
+  { }
+  static char comp(char b) {
+    switch(b) {
+    case 'a': return 't'; case 'A': return 'T';
+    case 'c': return 'g'; case 'C': return 'G';
+    case 'g': return 'c'; case 'G': return 'C';
+    case 't': return 'a'; case 'T': return 'A';
+    default: return 'n';
+    }
+  }
+
+  bool operator==(const error_iterator_type& rhs) const { return m_ref == rhs.m_ref; }
+  bool operator!=(const error_iterator_type& rhs) const { return m_ref != rhs.m_ref; }
+  const error_description_type& operator*() const { return m_error; }
+  const error_description_type* operator->() const { return &m_error; }
+  error_iterator_type& operator++();
+  error_iterator_type operator++(int) {
+    error_iterator_type res(*this);
+    ++*this;
+    return res;
+  }
+};
+
 std::ostream& operator<<(std::ostream& os, const Alignment& al);
 
 struct AscendingClusterSort
