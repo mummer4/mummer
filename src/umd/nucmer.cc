@@ -70,13 +70,13 @@ void SequenceAligner::align(const char* query, size_t query_len, std::vector<pos
   }
 
   if(options.orientation & REVERSE) {
-    std::string rquery(query);
+    std::string rquery(query, query_len);
     reverse_complement(rquery);
     auto append_matches = [&](const mummer::match_t& m) { bwd_matches.push_back({ m.ref + 1, m.query + 1, m.len }); };
     switch(options.match) {
-    case MUM: sa.findMUM_each(rquery, options.min_len, false, append_matches); break;
-    case MUMREFERENCE: sa.findMAM_each(rquery, options.min_len, false, append_matches); break;
-    case MAXMATCH: sa.findMEM_each(rquery, options.min_len, false, append_matches); break;
+    case MUM: sa.findMUM_each(rquery.c_str(), query_len, options.min_len, false, append_matches); break;
+    case MUMREFERENCE: sa.findMAM_each(rquery.c_str(), query_len, options.min_len, false, append_matches); break;
+    case MAXMATCH: sa.findMEM_each(rquery.c_str(), query_len, options.min_len, false, append_matches); break;
     }
     cluster_dir = postnuc::REVERSE_CHAR;
     clusterer.Cluster_each(bwd_matches.data(), UF, bwd_matches.size() - 1, append_cluster);
