@@ -366,6 +366,10 @@ void FileAligner::thread_align_file(sequence_parser& parser, AlignmentOut alignm
       for(char& c : j->data[i].seq)
         c = std::tolower(c);
       FastaRecordSeq Query(j->data[i].seq.c_str(), j->data[i].seq.length(), j->data[i].header.c_str());
+      fwd_matches.resize(1);
+      bwd_matches.resize(1);
+      syntenys.clear();
+      records.clear();
       assert(fwd_matches.size() == 1);
       assert(bwd_matches.size() == 1);
       assert(syntenys.empty());
