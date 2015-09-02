@@ -1,3 +1,4 @@
+package "nucmer"
 description "nucmer generates nucleotide alignments between two mutli-FASTA input
 files. The out.delta output file lists the distance between insertions
 and deletions that produce maximal scoring alignments between each

@@ -5,7 +5,7 @@
 #include <thread>
 #include <mutex>
 #include <mummer/nucmer.hpp>
-#include <src/umd/simplenucmer_cmdline.hpp>
+#include <src/umd/nucmer_cmdline.hpp>
 
 struct getrealpath {
   const char *path, *res;
@@ -18,7 +18,7 @@ std::string read_sequence(const char* file, std::string& header) {
   std::string res;
   std::ifstream is(file);
   if(!is.good())
-    simplenucmer_cmdline::error() << "Failed to open file '" << file << '\'';
+    nucmer_cmdline::error() << "Failed to open file '" << file << '\'';
   std::string line;
 
   std::getline(is, line);
@@ -35,7 +35,7 @@ std::string read_sequence(const char* file, std::string& header) {
 }
 
 int main(int argc, char *argv[]) {
-  simplenucmer_cmdline args(argc, argv);
+  nucmer_cmdline args(argc, argv);
   mummer::nucmer::Options opts;
   opts.breaklen(args.breaklen_arg)
     .mincluster(args.mincluster_arg)
@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
   if(args.delta_given) {
     delta.open(args.delta_arg);
     if(!delta.good())
-      simplenucmer_cmdline::error() << "Failed to open output delta file '" << args.delta_arg << '\'';
+      nucmer_cmdline::error() << "Failed to open output delta file '" << args.delta_arg << '\'';
     os.rdbuf(delta.rdbuf());
   }
   getrealpath real_ref(args.ref_arg), real_qry(args.qry_arg);
@@ -68,7 +68,7 @@ int main(int argc, char *argv[]) {
     std::lock_guard<std::mutex> lock (os_mutex);
     mummer::postnuc::printDeltaAlignments(als, Af.Id(), Af.len(), Bf.Id(), Bf.len(), os);
     if(!os.good())
-      simplenucmer_cmdline::error() << "Error while writing to output delta file '" << args.delta_arg << '\'';
+      nucmer_cmdline::error() << "Error while writing to output delta file '" << args.delta_arg << '\'';
   };
   os << std::flush;
 

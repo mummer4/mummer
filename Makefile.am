@@ -52,6 +52,6 @@ postnuc_SOURCES = src/tigr/postnuc_main.cc
 #######
 # umd #
 #######
-bin_PROGRAMS += simplenucmer
-YAGGO_BUILT += src/umd/simplenucmer_cmdline.hpp
-simplenucmer_SOURCES = src/umd/simplenucmer.cc
+bin_PROGRAMS += nucmer
+YAGGO_BUILT += src/umd/nucmer_cmdline.hpp
+nucmer_SOURCES = src/umd/nucmer_main.cc
