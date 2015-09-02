@@ -1,0 +1,15 @@
+*~
+*.in
+config.*
+build-*
+lt*.m4
+libtool.m4
+aclocal.m4
+.tup
+install-sh
+ltmain.sh
+configure
+depcomp
+missing
+autom4te.cache
+compile
