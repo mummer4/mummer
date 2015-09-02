@@ -6,8 +6,8 @@ LDLIBS = -lpthread
 : {umdmummer} |> !ar |> $(LIB_DIR)/libumdmummer.a $(LIB_DIR)/<lib>
 
 LDLIBS += -lumdmummer -lessaMEM -ltigr
-: simplenucmer_cmdline.yaggo |> !yaggo |>
-: simplenucmer.cc | simplenucmer_cmdline.hpp |> !cxx |> {simplenucmer}
-: {simplenucmer} | $(LIB_DIR)/<lib> |> !lxxd |> $(BIN_DIR)/simplenucmer
+: nucmer_cmdline.yaggo |> !yaggo |>
+: nucmer_main.cc | nucmer_cmdline.hpp |> !cxx |> {nucmer}
+: {nucmer} | $(LIB_DIR)/<lib> |> !lxxd |> $(BIN_DIR)/nucmer
 
 # : {umdmummer} |> !lxxd |> $(BIN_DIR)/umdmummer $(BIN_DIR)/<exec>

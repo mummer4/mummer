@@ -8,7 +8,7 @@ include_rules
     %f > %o; chmod a+rx %o |> ../bin/%B
 
 SRCS = exact-tandems.csh mapview.pl mummerplot.pl
-SRCS += dnadiff.pl nucmer.pl promer.pl
+SRCS += dnadiff.pl nucmer_ori.pl promer.pl
 SRCS += run-mummer1.csh run-mummer3.csh nucmer2xfig.pl
 : foreach $(SRCS) |> !replace |>
 : Foundation.pm |> install -m a+rx %f %o |> ../bin/Foundation.pm
