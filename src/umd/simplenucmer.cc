@@ -2,6 +2,8 @@
 #include <fstream>
 #include <climits>
 #include <cstdlib>
+#include <thread>
+#include <mutex>
 #include <mummer/nucmer.hpp>
 #include <src/umd/simplenucmer_cmdline.hpp>
 
@@ -59,18 +61,18 @@ int main(int argc, char *argv[]) {
   os << real_ref << ' ' << real_qry << '\n'
      << "NUCMER\n";
 
-  std::string qry_header;
-  std::string qry = read_sequence(args.qry_arg, qry_header);
-
+  std::mutex os_mutex;
   mummer::nucmer::FileAligner aligner(args.ref_arg, opts);
-  aligner.align(qry,
-                [&](std::vector<mummer::postnuc::Alignment>&& als,
-                   const mummer::nucmer::FastaRecordPtr& Af, const mummer::nucmer::FastaRecordSeq & Bf) {
-                  //  const auto alignments = mummer::nucmer::align_sequences(ref.c_str(), qry.c_str());
-                  mummer::postnuc::printDeltaAlignments(als, Af.Id(), Af.len(), qry_header, qry.size(),
-                                                        os);
-                  if(!os.good())
-                    simplenucmer_cmdline::error() << "Error while writing to output delta file '" << args.delta_arg << '\'';
-                });
+  auto print_function = [&](std::vector<mummer::postnuc::Alignment>&& als,
+                            const mummer::nucmer::FastaRecordPtr& Af, const mummer::nucmer::FastaRecordSeq& Bf) {
+    std::lock_guard<std::mutex> lock (os_mutex);
+    mummer::postnuc::printDeltaAlignments(als, Af.Id(), Af.len(), Bf.Id(), Bf.len(), os);
+    if(!os.good())
+      simplenucmer_cmdline::error() << "Error while writing to output delta file '" << args.delta_arg << '\'';
+  };
+  os << std::flush;
+
+  const unsigned int nb_threads = args.threads_given ? args.threads_arg : std::thread::hardware_concurrency();
+  aligner.align_file(args.qry_arg, print_function, nb_threads);
   return 0;
 }

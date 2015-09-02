@@ -3,9 +3,11 @@
 
 #include <vector>
 #include <forward_list>
+#include <thread>
 #include <mummer/sparseSA.hpp>
 #include <mummer/mgaps.hh>
 #include <mummer/postnuc.hh>
+#include <jellyfish/stream_manager.hpp>
 #include <jellyfish/whole_sequence_parser.hpp>
 
 namespace mummer {
@@ -226,6 +228,20 @@ public:
   void align(const std::string& query, AlignmentOut alignments) const {
     align(query.c_str(), query.length(), alignments);
   }
+
+  // Aligne the sequences in the file query against the references, in
+  // parallel
+  template<typename AlignmentOut>
+  void align_file(const char* query_path, AlignmentOut alignments, unsigned int threads = std::thread::hardware_concurrency()) const;
+
+  typedef jellyfish::stream_manager<const char**>          stream_manager;
+  typedef jellyfish::whole_sequence_parser<stream_manager> sequence_parser;
+  template<typename AlignmentOut>
+  static void trampoline_align_file(const FileAligner* self, sequence_parser* parser, AlignmentOut alignments) {
+    self->thread_align_file(*parser, alignments);
+  }
+  template<typename AlignmentOut>
+  void thread_align_file(sequence_parser& parser, AlignmentOut alignments) const;
 };
 
 //
@@ -295,6 +311,92 @@ void FileAligner::align(const char* query, size_t query_len, AlignmentOut alignm
   merger.processSyntenys_each(syntenys, Query, alignments);
 }
 
+template<typename AlignmentOut>
+void FileAligner::align_file(const char* query_path, AlignmentOut alignments, unsigned int nb_threads) const {
+  stream_manager  streams(&query_path, &query_path + 1);
+  sequence_parser parser(4 * nb_threads, 10, 1, streams);
+
+  std::vector<std::thread> threads;
+  for(unsigned int i = 0; i < nb_threads; ++i) {
+    threads.push_back(std::thread(trampoline_align_file<AlignmentOut>, this, &parser, alignments));
+  }
+  for(auto& th : threads)
+    th.join();
+}
+
+template<typename AlignmentOut>
+void FileAligner::thread_align_file(sequence_parser& parser, AlignmentOut alignments) const {
+  typedef postnuc::Synteny<FastaRecordPtr> synteny_type;
+  std::vector<mgaps::Match_t>       fwd_matches(1), bwd_matches(1);
+  std::vector<synteny_type>         syntenys;
+  std::forward_list<FastaRecordPtr> records;
+  mgaps::UnionFind                  UF;
+  char                              cluster_dir;
+
+  auto append_cluster = [&](const mgaps::cluster_type& cluster) {
+    postnuc::Cluster cl(cluster_dir);
+    // Re-map the reference coordinate back to its original sequence
+    const auto record  = reference_info.find(cluster[0].Start1);
+    const long offset  = record.seq_offset();
+    auto       synteny = syntenys.rbegin();
+    auto       it      = records.cbegin();
+    for( ; it != records.cend(); ++it, ++synteny)
+      if(*it == record)
+        break;
+    if(it == records.cend()) {
+      assert(synteny == syntenys.rend());
+      records.push_front(record);
+      syntenys.push_back(synteny_type(&records.front()));
+      synteny = syntenys.rbegin();
+    }
+
+    cl.matches.push_back({ cluster[0].Start1 - offset, cluster[0].Start2, cluster[0].Len });
+    for(size_t i = 1; i < cluster.size(); ++i) {
+      const auto& m = cluster[i];
+      cl.matches.push_back({ m.Start1 + m.Simple_Adj - offset, m.Start2 + m.Simple_Adj, m.Len - m.Simple_Adj });
+    }
+    synteny->clusters.push_back(std::move(cl));
+  };
+
+  while(true) {
+    sequence_parser::job j(parser);
+    if(j.is_empty()) break;
+
+    for(size_t i = 0; i < j->nb_filled; ++i) {
+      for(char& c : j->data[i].seq)
+        c = std::tolower(c);
+      FastaRecordSeq Query(j->data[i].seq.c_str(), j->data[i].seq.length(), j->data[i].header.c_str());
+      assert(fwd_matches.size() == 1);
+      assert(bwd_matches.size() == 1);
+      assert(syntenys.empty());
+      if(options.orientation & FORWARD) {
+        auto append_matches = [&](const mummer::match_t& m) { fwd_matches.push_back({ m.ref + 1, m.query + 1, m.len }); };
+        switch(options.match) {
+        case MUM: sa.findMUM_each(Query.seq() + 1, Query.len(), options.min_len, false, append_matches); break;
+        case MUMREFERENCE: sa.findMAM_each(Query.seq() + 1, Query.len(), options.min_len, false, append_matches); break;
+        case MAXMATCH: sa.findMEM_each(Query.seq() + 1, Query.len(), options.min_len, false, append_matches); break;
+        }
+        cluster_dir = postnuc::FORWARD_CHAR;
+        clusterer.Cluster_each(fwd_matches.data(), UF, fwd_matches.size() - 1, append_cluster);
+      }
+
+      if(options.orientation & REVERSE) {
+        std::string rquery(Query.seq() + 1, Query.len());
+        reverse_complement(rquery);
+        auto append_matches = [&](const mummer::match_t& m) { bwd_matches.push_back({ m.ref + 1, m.query + 1, m.len }); };
+        switch(options.match) {
+        case MUM: sa.findMUM_each(rquery, options.min_len, false, append_matches); break;
+        case MUMREFERENCE: sa.findMAM_each(rquery, options.min_len, false, append_matches); break;
+        case MAXMATCH: sa.findMEM_each(rquery, options.min_len, false, append_matches); break;
+        }
+        cluster_dir = postnuc::REVERSE_CHAR;
+        clusterer.Cluster_each(bwd_matches.data(), UF, bwd_matches.size() - 1, append_cluster);
+      }
+      merger.processSyntenys_each(syntenys, Query, alignments);
+    }
+  }
+
+}
 
 } // namespace nucmer
 } // namespace mummer

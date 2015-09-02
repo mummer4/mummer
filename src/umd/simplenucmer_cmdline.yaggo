@@ -49,6 +49,9 @@ option("nosimplify") {
 option("delta") {
   description "Output delta file"
   c_string; default "stdout" }
+option("t", "threads") {
+  description "Use NUM threads (# of cores)"
+  uint32; typestr "NUM" }
 
 # Hidden / experimental options
 option("banded") {
