@@ -1,7 +1,16 @@
 #include <iostream>
 #include <fstream>
+#include <climits>
+#include <cstdlib>
 #include <mummer/nucmer.hpp>
 #include <src/umd/simplenucmer_cmdline.hpp>
+
+struct getrealpath {
+  const char *path, *res;
+  getrealpath(const char* p) : path(p), res(realpath(p, nullptr)) { }
+  ~getrealpath() { free((void*)res); }
+  operator const char*() const { return res ? res : path; }
+};
 
 std::string read_sequence(const char* file, std::string& header) {
   std::string res;
@@ -15,8 +24,11 @@ std::string read_sequence(const char* file, std::string& header) {
     header = line.substr(1);
   else
     header.clear();
-  while(std::getline(is, line))
-    res += line;
+  while(std::getline(is, line)) {
+    for(const char base : line)
+      res += std::tolower(base);
+    //    res += line;
+  }
   return res;
 }
 
@@ -43,6 +55,9 @@ int main(int argc, char *argv[]) {
       simplenucmer_cmdline::error() << "Failed to open output delta file '" << args.delta_arg << '\'';
     os.rdbuf(delta.rdbuf());
   }
+  getrealpath real_ref(args.ref_arg), real_qry(args.qry_arg);
+  os << real_ref << ' ' << real_qry << '\n'
+     << "NUCMER\n";
 
   std::string qry_header;
   std::string qry = read_sequence(args.qry_arg, qry_header);
@@ -55,7 +70,7 @@ int main(int argc, char *argv[]) {
                   mummer::postnuc::printDeltaAlignments(als, Af.Id(), Af.len(), qry_header, qry.size(),
                                                         os);
                   if(!os.good())
-                    simplenucmer_cmdline::error() << "Failed to open output delta file '" << args.delta_arg << '\'';
+                    simplenucmer_cmdline::error() << "Error while writing to output delta file '" << args.delta_arg << '\'';
                 });
   return 0;
 }

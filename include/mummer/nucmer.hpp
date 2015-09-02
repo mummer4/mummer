@@ -183,7 +183,7 @@ public:
   }
   const char* seq() const {
     assert(m_id < m_info.records.size());
-    return m_info.sequence.c_str() + m_info.records[m_id].seq;
+    return m_info.sequence.c_str() + m_info.records[m_id].seq - 1;
   }
   size_t seq_offset() const {
     assert(m_id < m_info.records.size());
@@ -235,7 +235,7 @@ template<typename AlignmentOut>
 void FileAligner::align(const char* query, size_t query_len, AlignmentOut alignments) const {
   typedef postnuc::Synteny<FastaRecordPtr> synteny_type;
   std::vector<mgaps::Match_t>       fwd_matches(1), bwd_matches(1);
-  FastaRecordSeq                    Query(query);
+  FastaRecordSeq                    Query(query, query_len);
   std::vector<synteny_type>         syntenys;
   std::forward_list<FastaRecordPtr> records;
   mgaps::UnionFind                  UF;
@@ -271,9 +271,9 @@ void FileAligner::align(const char* query, size_t query_len, AlignmentOut alignm
   if(options.orientation & FORWARD) {
     auto append_matches = [&](const mummer::match_t& m) { fwd_matches.push_back({ m.ref + 1, m.query + 1, m.len }); };
     switch(options.match) {
-    case MUM: sa.findMUM_each(query, query_len, options.min_len, true, append_matches); break;
-    case MUMREFERENCE: sa.findMAM_each(query, query_len, options.min_len, true, append_matches); break;
-    case MAXMATCH: sa.findMEM_each(query, query_len, options.min_len, true, append_matches); break;
+    case MUM: sa.findMUM_each(query, query_len, options.min_len, false, append_matches); break;
+    case MUMREFERENCE: sa.findMAM_each(query, query_len, options.min_len, false, append_matches); break;
+    case MAXMATCH: sa.findMEM_each(query, query_len, options.min_len, false, append_matches); break;
     }
     cluster_dir = postnuc::FORWARD_CHAR;
     clusterer.Cluster_each(fwd_matches.data(), UF, fwd_matches.size() - 1, append_cluster);
@@ -284,9 +284,9 @@ void FileAligner::align(const char* query, size_t query_len, AlignmentOut alignm
     reverse_complement(rquery);
     auto append_matches = [&](const mummer::match_t& m) { bwd_matches.push_back({ m.ref + 1, m.query + 1, m.len }); };
     switch(options.match) {
-    case MUM: sa.findMUM_each(rquery, options.min_len, true, append_matches); break;
-    case MUMREFERENCE: sa.findMAM_each(rquery, options.min_len, true, append_matches); break;
-    case MAXMATCH: sa.findMEM_each(rquery, options.min_len, true, append_matches); break;
+    case MUM: sa.findMUM_each(rquery, options.min_len, false, append_matches); break;
+    case MUMREFERENCE: sa.findMAM_each(rquery, options.min_len, false, append_matches); break;
+    case MAXMATCH: sa.findMEM_each(rquery, options.min_len, false, append_matches); break;
     }
     cluster_dir = postnuc::REVERSE_CHAR;
     clusterer.Cluster_each(bwd_matches.data(), UF, bwd_matches.size() - 1, append_cluster);
