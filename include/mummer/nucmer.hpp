@@ -206,7 +206,7 @@ class FileAligner {
   const sequence_info           reference_info;
   const mummer::sparseSA        sa;
   const mgaps::ClusterMatches   clusterer;
-  const postnuc::merge_syntenys merger;
+  //  const postnuc::merge_syntenys merger;
   const Options                 options;
 
 public:
@@ -216,8 +216,8 @@ public:
     , clusterer(opts.fixed_separation, opts.max_separation,
                 opts.min_output_score, opts.separation_factor,
                 opts.use_extent)
-    , merger(opts.do_delta, opts.do_extend, opts.to_seqend, opts.do_shadows,
-             opts.break_len, opts.banding, sw_align::NUCLEOTIDE)
+    // , merger(opts.do_delta, opts.do_extend, opts.to_seqend, opts.do_shadows,
+    //          opts.break_len, opts.banding, sw_align::NUCLEOTIDE)
     , options(opts)
   { }
 
@@ -256,6 +256,10 @@ void FileAligner::align(const char* query, size_t query_len, AlignmentOut alignm
   std::forward_list<FastaRecordPtr> records;
   mgaps::UnionFind                  UF;
   char                              cluster_dir;
+  const postnuc::merge_syntenys     merger(options.do_delta, options.do_extend,
+                                           options.to_seqend, options.do_shadows,
+                                           options.break_len, options.banding,
+                                           sw_align::NUCLEOTIDE);
 
   auto append_cluster = [&](const mgaps::cluster_type& cluster) {
     postnuc::Cluster cl(cluster_dir);
@@ -332,6 +336,10 @@ void FileAligner::thread_align_file(sequence_parser& parser, AlignmentOut alignm
   std::forward_list<FastaRecordPtr> records;
   mgaps::UnionFind                  UF;
   char                              cluster_dir;
+  const postnuc::merge_syntenys     merger(options.do_delta, options.do_extend,
+                                           options.to_seqend, options.do_shadows,
+                                           options.break_len, options.banding,
+                                           sw_align::NUCLEOTIDE);
 
   auto append_cluster = [&](const mgaps::cluster_type& cluster) {
     postnuc::Cluster cl(cluster_dir);

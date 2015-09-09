@@ -240,7 +240,7 @@ struct sparseSA {
   void find_Lmaximal(const char* P, size_t Plen, long prefix, long i, long len, int min_len, bool flip_forward, Output out) const;
   template<typename Output>
   void find_Lmaximal(const std::string &P, long prefix, long i, long len, int min_len, bool flip_forward, Output out) const {
-    find_Lmaximal(P.c_str(), P.length, prefix, i, len, min_len, flip_forward, out);
+    find_Lmaximal(P.c_str(), P.length(), prefix, i, len, min_len, flip_forward, out);
   }
 
   // NOTE: min_len must be > 1

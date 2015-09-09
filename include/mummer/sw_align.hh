@@ -68,9 +68,39 @@ static const long int MAX_SEARCH_LENGTH = 10000;
 //-- Maximum number of bases (in either sequence) that the alignTarget may go
 static const long int MAX_ALIGNMENT_LENGTH = 10000;
 
-
-
 //------------------------------------------------------ Type Definitions ----//
+// An auto expanding vector
+template<typename T>
+class auto_vector {
+  std::vector<T> m_vec;
+public:
+  typedef typename std::vector<T>               vector_type;
+  typedef typename vector_type::value_type      value_type;
+  typedef typename vector_type::reference       reference;
+  typedef typename vector_type::const_reference const_reference;
+  typedef typename vector_type::size_type       size_type;
+
+  auto_vector() = default;
+
+  reference operator[](size_type n) {
+    if(n >= m_vec.size())
+      m_vec.resize(n + 1);
+    return m_vec[n];
+  }
+  const_reference operator[](size_type n) const {
+    return m_vec[n];
+  }
+  void clear() noexcept {
+    m_vec.clear();
+  }
+  void resize(size_type n) {
+    m_vec.resize(n);
+  }
+  void resize(size_type n, const value_type& val) {
+    m_vec.resize(n, val);
+  }
+};
+
 struct Score
 {
   long int value;
@@ -80,14 +110,47 @@ struct Score
 struct Node
 {
   Score S[3];
-  Score * max;
+  int   m_max;
+
+  Score& max() { return S[m_max]; }
+  const Score& max() const { return S[m_max]; }
+  void max(int i) { m_max = i; }
+  int edit() const { return m_max; }
 };
 
 struct Diagonal
 {
-  long int lbound, rbound;   // left(lower) and right(upper) bounds
-  Node * I;          // the matrix nodes
+  long int          lbound, rbound; // left(lower) and right(upper) bounds
+  auto_vector<Node> I;          // the matrix nodes
 };
+
+// Auto expanding non-square matrix which minimizes allocation / free
+class DiagonalMatrix {
+  std::vector<Diagonal> m_diag;
+  size_t                m_size; // Actual length.
+
+public:
+  DiagonalMatrix() : m_size(0) { }
+
+  Diagonal& operator[](size_t n) {
+    if(n >= m_size) {
+      if(n >= m_diag.size())
+        m_diag.resize(n + 1);
+      m_size = n + 1;
+    }
+    return m_diag[n];
+  }
+  const Diagonal& operator[](size_t n) const {
+    return m_diag[n];
+  }
+  void clear() noexcept {
+    for(size_t i = 0; i < m_size; ++i)
+      m_diag[i].I.clear();
+    m_size = 0;
+  }
+};
+
+
 
 
 class aligner {
@@ -147,7 +210,15 @@ public:
   //      same rules apply for Bstart and Bend.
   inline bool alignSearch(const char * A0, long int Astart, long int & Aend,
                           const char * B0, long int Bstart, long int & Bend,
-                          unsigned int m_o) const;
+                          unsigned int m_o, DiagonalMatrix& Diag) const;
+  inline bool alignSearch(const char * A0, long int Astart, long int & Aend,
+                          const char * B0, long int Bstart, long int & Bend,
+                          unsigned int m_o) const {
+    DiagonalMatrix Diag;
+    return alignSearch(A0, Astart, Aend,
+                       B0, Bstart, Bend,
+                       m_o, Diag);
+  }
 
   //  PURPOSE: This function aligns the sequences A0 and B0, starting
   //      at positions Astart and Bstart, as far as possible until the
@@ -182,7 +253,17 @@ public:
   //      Bstart and Bend.
   inline bool alignTarget(const char * A0, long int Astart, long int & Aend,
                           const char * B0, long int Bstart, long int & Bend,
-                          std::vector<long int> & Delta, unsigned int m_o) const;
+                          std::vector<long int>& Delta, unsigned int m_o,
+                          DiagonalMatrix& Diag) const;
+  inline bool alignTarget(const char * A0, long int Astart, long int & Aend,
+                          const char * B0, long int Bstart, long int & Bend,
+                          std::vector<long int>& Delta, unsigned int m_o) const {
+    DiagonalMatrix Diag;
+    return alignTarget(A0, Astart, Aend,
+                       B0, Bstart, Bend,
+                       Delta, m_o, Diag);
+  }
+
 
   int breakLen() const { return _break_len; }
   int banding() const { return _banding; }
@@ -196,19 +277,48 @@ protected:
   //----------------------------------------- Private Function Declarations ----//
   bool _alignEngine(const char * A0, long int Astart, long int & Aend,
                     const char * B0, long int Bstart, long int & Bend,
-                    std::vector<long int> & Delta, unsigned int m_o) const;
+                    std::vector<long int> & Delta, unsigned int m_o, DiagonalMatrix& Diag) const;
 
   long int scoreMatch (const Diagonal Diag, long int Dct, long int CDi,
                        const char * A, const char * B, long int N, unsigned int m_o) const;
 
 };
 
+// Identical to the above aligner class, with one difference. It keeps
+// a DiagonalMatrix buffer around. This is a speed optimization
+// (avoids repeated memory allocation/deallocation), but the
+// alignSearch and alignTarget methods are not const anymore and are
+// not thread safe.
+class aligner_buffer : public aligner {
+  mutable DiagonalMatrix m_Diag;
+public:
+  aligner_buffer() = default;
+  aligner_buffer(int break_len, int banding, int matrix_type) : aligner(break_len, banding, matrix_type) { }
+
+  // Warning: not thread safe!
+  bool alignTarget(const char * A0, long int Astart, long int & Aend,
+                   const char * B0, long int Bstart, long int & Bend,
+                   std::vector<long int>& Delta, unsigned int m_o) const {
+    return aligner::alignTarget(A0, Astart, Aend,
+                                B0, Bstart, Bend,
+                                Delta, m_o, m_Diag);
+  }
+
+  // Warning: not thread safe!
+  bool alignSearch(const char * A0, long int Astart, long int & Aend,
+                   const char * B0, long int Bstart, long int & Bend,
+                   unsigned int m_o) const {
+    return aligner::alignSearch(A0, Astart, Aend,
+                                B0, Bstart, Bend,
+                                m_o, m_Diag);
+  }
+};
 
 
 
 bool aligner::alignSearch(const char * A0, long int Astart, long int & Aend,
                           const char * B0, long int Bstart, long int & Bend,
-                          unsigned int m_o) const
+                          unsigned int m_o, DiagonalMatrix& Diag) const
 {
   bool                  rv;
   std::vector<long int> n_v;
@@ -241,7 +351,7 @@ bool aligner::alignSearch(const char * A0, long int Astart, long int & Aend,
     }
 #endif
 
-  rv = _alignEngine (A0, Astart, Aend, B0, Bstart, Bend, n_v, m_o);
+  rv = _alignEngine (A0, Astart, Aend, B0, Bstart, Bend, n_v, m_o, Diag);
 
 #ifdef _DEBUG_VERBOSE
   fprintf(stderr,"--------------------------------------\n");
@@ -262,7 +372,8 @@ bool aligner::alignSearch(const char * A0, long int Astart, long int & Aend,
 
 bool aligner::alignTarget(const char * A0, long int Astart, long int & Aend,
                           const char * B0, long int Bstart, long int & Bend,
-                          std::vector<long int> & Delta, unsigned int m_o) const
+                          std::vector<long int> & Delta, unsigned int m_o,
+                          DiagonalMatrix& Diag) const
 {
   bool rv;
 
@@ -285,7 +396,7 @@ bool aligner::alignTarget(const char * A0, long int Astart, long int & Aend,
 	   Bend - Bstart + 1 <= MAX_ALIGNMENT_LENGTH);
 #endif
 
-  rv = _alignEngine (A0, Astart, Aend, B0, Bstart, Bend, Delta, m_o);
+  rv = _alignEngine (A0, Astart, Aend, B0, Bstart, Bend, Delta, m_o, Diag);
 
 #ifdef _DEBUG_VERBOSE
   fprintf(stderr,"--------------------------------------\n");

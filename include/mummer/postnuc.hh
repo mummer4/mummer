@@ -178,17 +178,18 @@ struct AscendingClusterSort
 };
 
 struct merge_syntenys {
-  const bool              DO_DELTA;
-  const bool              DO_EXTEND;
-  const bool              TO_SEQEND;
-  const bool              DO_SHADOWS;
-  const sw_align::aligner aligner;
+  const bool                     DO_DELTA;
+  const bool                     DO_EXTEND;
+  const bool                     TO_SEQEND;
+  const bool                     DO_SHADOWS;
+  const sw_align::aligner_buffer aligner;
 
   merge_syntenys(bool dd, bool de, bool ts, bool ds)
     : DO_DELTA(dd)
     , DO_EXTEND(de)
     , TO_SEQEND(ts)
     , DO_SHADOWS(ds)
+    , aligner()
   { }
 
   merge_syntenys(bool dd, bool de, bool ts, bool ds, int break_len, int banding, int matrix_type)

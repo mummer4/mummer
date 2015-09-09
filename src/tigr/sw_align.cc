@@ -1,5 +1,6 @@
-#include <mummer/sw_align.hh>
 #include <math.h>
+#include <limits>
+#include <mummer/sw_align.hh>
 
 namespace mummer {
 namespace sw_align {
@@ -13,31 +14,28 @@ static const int NONE   = 4;
 
 //----------------------------------------- Private Function Declarations ----//
 static void generateDelta
-     (const Diagonal * Diag, long int FinishCt, long int FinishCDi,
+     (const DiagonalMatrix& Diag, long int FinishCt, long int FinishCDi,
       long int N, std::vector<long int> & Delta);
 
 
-static inline Score * maxScore
-     (Score S[3]);
+static inline int maxScore(Score S[3]);
 
 static inline void scoreEdit
      (Score & curr, const long int del, const long int ins, const long int mat);
 
 
-
-
-
 //------------------------------------------ Private Function Definitions ----//
 bool aligner::_alignEngine
-     (const char * A0, long int Astart, long int & Aend,
-      const char * B0, long int Bstart, long int & Bend,
-      std::vector<long int> & Delta, unsigned int m_o) const
+     (const char* A0, long int Astart, long int & Aend,
+      const char* B0, long int Bstart, long int & Bend,
+      std::vector<long int>& Delta, unsigned int m_o,
+      DiagonalMatrix& Diag) const
 
      //  A0 is a sequence such that A [1...\0]
      //  B0 is a sequence such that B [1...\0]
      //  The alignment should use bases A [Astart...Aend] (inclusive)
-     //  The alignment should use beses B [Bstart...Bend] (inclusive)
-     //       of [Aend...Astart] etc. if BACKWARD_SEARCH
+     //  The alignment should use bases B [Bstart...Bend] (inclusive)
+     //       or [Aend...Astart] etc. if BACKWARD_SEARCH
      //       Aend must never equal Astart, same goes for Bend and Bstart
      //  Delta is an integer vector, not necessarily empty
      //  m_o is the modus operandi of the function:
@@ -45,40 +43,33 @@ bool aligner::_alignEngine
      //  Returns true on success (Aend & Bend reached) or false on failure
 
 {
-  Diagonal * Diag;           // the list of diagonals to make up edit matrix
+  bool        TargetReached;    // the target was reached
+  const char *A, *B;            // the sequence pointers to be used by this func
 
-  bool TargetReached;        // the target was reached
+  static const long int min_score   = std::numeric_limits<long>::min(); // minimum possible score
+  long int              high_score  = min_score; // global maximum score
+  long int              xhigh_score = min_score; // non-optimal high score
+  const long int        max_diff    = good_score() * _break_len; // max score difference
 
-  const char * A, * B;       // the sequence pointers to be used by this func
+  long int CDi;                 // conceptual diagonal index (not relating to mem)
+  long int Dct, Di;             // diagonal counter, actual diagonal index
+  long int PDi, PPDi;           // previous diagonal index and prev prev diag index
+  long int Ds, PDs, PPDs;       // diagonal size, prev, prev prev diagonal size where 'size' = rbound - lbound + 1
 
-  long int min_score = (-1 * LONG_MAX);           // minimum possible score
-  long int high_score = min_score;                // global maximum score
-  long int xhigh_score = min_score;               // non-optimal high score
-
-                                                  // max score difference
-  long int max_diff = good_score() * _break_len;
-
-  long int CDi;              // conceptual diagonal index (not relating to mem)
-  long int Dct, Di;          // diagonal counter, actual diagonal index
-  long int PDct, PPDct;      // previous diagonal and prev prev diagonal
-  long int PDi, PPDi;        // previous diagonal index and prev prev diag index
-  long int Ds, PDs, PPDs;    // diagonal size, prev, prev prev diagonal size
-                             //     where 'size' = rbound - lbound + 1
-  long int Ll = 100;         // capacity of the diagonal list
-  long int Dl = 2;           // current conceptual diagonal length
-  long int lbound = 0;       // current diagonal left(lower) node bound index
-  long int rbound = 0;       // current diagonal right(upper) node bound index
-  long int FinishCt = 0;     // diagonal containing the high_score
-  long int FinishCDi = 0;    // conceptual index of the high_score on FinishCt
-  long int xFinishCt = 0;    // non-optimal ...
-  long int xFinishCDi = 0;   // non-optimal ...
-  long int N, M, L;          // maximum matrix dimensions... N rows, M columns
+  long int Dl         = 2;      // current conceptual diagonal length
+  long int lbound     = 0;      // current diagonal left(lower) node bound index
+  long int rbound     = 0;      // current diagonal right(upper) node bound index
+  long int FinishCt   = 0;      // diagonal containing the high_score
+  long int FinishCDi  = 0;      // conceptual index of the high_score on FinishCt
+  long int xFinishCt  = 0;      // non-optimal ...
+  long int xFinishCDi = 0;      // non-optimal ...
+  long int N, M, L;             // maximum matrix dimensions... N rows, M columns
 
   long int tlb, trb;
-  double Dmid = .5;            // diag midpoint
-  double Dband = _banding/2.0; // diag banding
+  double   Dmid  = .5;          // diag midpoint
+  double   Dband = _banding/2.0; // diag banding
 
-  int Iadj, Dadj, Madj;      // insert, delete and match adjust values
+  int Iadj, Dadj, Madj;         // insert, delete and match adjust values
 
 #ifdef _DEBUG_VERBOSE
   long int MaxL = 0;             // biggest diagonal seen
@@ -87,300 +78,236 @@ bool aligner::_alignEngine
 #endif
 
   //-- Set up character pointers for the appropriate m_o
-  if ( m_o & DIRECTION_BIT )
-    {
-      A = A0 + ( Astart - 1 );
-      B = B0 + ( Bstart - 1 );
-      N = Aend - Astart + 1;
-      M = Bend - Bstart + 1;
-    }
-  else
-    {
-      A = A0 + ( Astart + 1 );
-      B = B0 + ( Bstart + 1 );
-      N = Astart - Aend + 1;
-      M = Bstart - Bend + 1;
-    }
-
-  //-- Initialize the diagonals list
-  Diag = (Diagonal *) Safe_malloc ( Ll * sizeof(Diagonal) );
+  if(m_o & DIRECTION_BIT) {
+    A = A0 + ( Astart - 1 );
+    B = B0 + ( Bstart - 1 );
+    N = Aend - Astart + 1;
+    M = Bend - Bstart + 1;
+  } else {
+    A = A0 + ( Astart + 1 );
+    B = B0 + ( Bstart + 1 );
+    N = Astart - Aend + 1;
+    M = Bstart - Bend + 1;
+  }
 
   //-- Initialize position 0,0 in the matrices
-  Diag[0] . lbound = lbound;
-  Diag[0] . rbound = rbound ++;
+  Diag.clear();   // clear the list of diagonals to make up edit matrix
+  { auto& D0 = Diag[0];
+    D0.lbound = lbound;
+    D0.rbound = rbound ++;
+    auto& I0 = D0.I[0];
+    I0.S[DELETE].value = min_score;
+    I0.S[INSERT].value = min_score;
+    I0.S[MATCH].value  = 0;
+    I0.max(MATCH);
 
-  Diag[0] . I = (Node *) Safe_malloc ( 1 * sizeof(Node) );
-  Diag[0] . I[0] . S[DELETE] . value = min_score;
-  Diag[0] . I[0] . S[INSERT] . value = min_score;
-  Diag[0] . I[0] . S[MATCH] . value = 0;
-  Diag[0] . I[0] . max = Diag[0] . I[0] . S + MATCH;
-
-  Diag[0] . I[0] . S[DELETE] . used = NONE;
-  Diag[0] . I[0] . S[INSERT] . used = NONE;
-  Diag[0] . I[0] . S[MATCH] . used = START;
+    I0.S[DELETE].used = NONE;
+    I0.S[INSERT].used = NONE;
+    I0.S[MATCH].used  = START;
+  }
 
   L = N < M ? N : M;
 
   //-- **START** of diagonal processing loop
   //-- Calculate the rest of the diagonals until goal reached or score worsens
-  for ( Dct = 1; Dct <= N + M  &&
-          (Dct - FinishCt) <= _break_len  &&
-          lbound <= rbound; Dct++ )
-    {
-      //-- If diagonals capacity exceeded, realloc
-      if ( Dct >= Ll )
-        {
-          Ll *= 2;
-          Diag = (Diagonal *) Safe_realloc
-            ( Diag, sizeof(Diagonal) * Ll );
-        }
-      
-      Diag[Dct] . lbound = lbound;
-      Diag[Dct] . rbound = rbound;
+  for(Dct = 1; Dct <= N + M  && (Dct - FinishCt) <= _break_len  && lbound <= rbound; Dct++) {
+    auto& CurD = Diag[Dct];
+    CurD.lbound = lbound;
+    CurD.rbound = rbound;
 
-      //-- malloc space for the edit char and score nodes
-      Ds = rbound - lbound + 1;
-      Diag[Dct] . I = (Node *) Safe_malloc
-	( Ds * sizeof(Node) );
+    //-- malloc space for the edit char and score nodes
+    Ds = rbound - lbound + 1;
 
 #ifdef _DEBUG_VERBOSE
-      //-- Keep count of trimmed and calculated nodes
-      CalcCt += Ds;
-      TrimCt += Dl - Ds;
-      if ( Ds > MaxL )
-	MaxL = Ds;
+    //-- Keep count of trimmed and calculated nodes
+    CalcCt += Ds;
+    TrimCt += Dl - Ds;
+    if(Ds > MaxL )
+      MaxL = Ds;
 #endif
 
-      //-- Set diagonal index adjustment values
-      if ( Dct <= N )
-	{
-	  Iadj = 0;
-	  Madj = -1;
-	}
-      else
-	{
-	  Iadj = 1;
-	  Madj = Dct == N + 1 ? 0 : 1;
-	}
-      Dadj = Iadj - 1;
-      
-      //-- Set parent diagonal values
-      PDct = Dct - 1;
-      PDs = Diag[PDct] . rbound - Diag[PDct] . lbound + 1;
-      PDi = lbound + Dadj;
-      PDi = PDi - Diag[PDct] . lbound;
-
-      //-- Set grandparent diagonal values
-      PPDct = Dct - 2;
-      if ( PPDct >= 0 )
-	{
-	  PPDs = Diag[PPDct] . rbound - Diag[PPDct] . lbound + 1;
-	  PPDi = lbound + Madj;
-	  PPDi = PPDi - Diag[PPDct] . lbound;
-	}
-      else
-	PPDi = PPDs = 0;
-
-      //-- If forced alignment, don't keep track of global max
-      if ( m_o & FORCED_BIT )
-	high_score = min_score;
-
-      //-- **START** of internal node scoring loop
-      //-- Calculate scores for every node (within bounds) for diagonal Dct
-      for ( CDi = lbound; CDi <= rbound; CDi ++ )
-	{
-	  //-- Set the index (in memory) of current node and clear score
-	  Di = CDi - Diag[Dct] . lbound;
-
-	  //-- Calculate DELETE score
-	  if ( PDi >= 0  &&  PDi < PDs )
-	    scoreEdit
-	      (Diag[Dct] . I[Di] . S[DELETE],
-	       Diag[PDct] . I[PDi] . S[DELETE] . used == NONE ?
-	       Diag[PDct] . I[PDi] . S[DELETE] . value :
-	       Diag[PDct] . I[PDi] . S[DELETE] . value +
-	       CONT_GAP_SCORE [_matrix_type],
-	       Diag[PDct] . I[PDi] . S[INSERT] . used == NONE ?
-	       Diag[PDct] . I[PDi] . S[INSERT] . value :
-	       Diag[PDct] . I[PDi] . S[INSERT] . value +
-	       OPEN_GAP_SCORE [_matrix_type],
-	       Diag[PDct] . I[PDi] . S[MATCH]  . used == NONE ?
-	       Diag[PDct] . I[PDi] . S[MATCH]  . value :
-	       Diag[PDct] . I[PDi] . S[MATCH]  . value +
-	       OPEN_GAP_SCORE [_matrix_type]);
-	  else
-	    {
-	      Diag[Dct] . I[Di] . S[DELETE] . value = min_score;
-	      Diag[Dct] . I[Di] . S[DELETE] . used = NONE;
-	    }
-
-	  PDi ++;
-
-	  //-- Calculate INSERT score
-	  if ( PDi >= 0  &&  PDi < PDs )
-	    scoreEdit
-	      (Diag[Dct] . I[Di] . S[INSERT],
-	       Diag[PDct] . I[PDi] . S[DELETE] . used == NONE ?
-	       Diag[PDct] . I[PDi] . S[DELETE] . value :
-	       Diag[PDct] . I[PDi] . S[DELETE] . value +
-	       OPEN_GAP_SCORE [_matrix_type],
-	       Diag[PDct] . I[PDi] . S[INSERT] . used == NONE ?
-	       Diag[PDct] . I[PDi] . S[INSERT] . value :
-	       Diag[PDct] . I[PDi] . S[INSERT] . value +
-	       CONT_GAP_SCORE [_matrix_type],
-	       Diag[PDct] . I[PDi] . S[MATCH]  . used == NONE ?
-	       Diag[PDct] . I[PDi] . S[MATCH]  . value :
-	       Diag[PDct] . I[PDi] . S[MATCH]  . value +
-	       OPEN_GAP_SCORE [_matrix_type]);
-	  else
-	    {
-	      Diag[Dct] . I[Di] . S[INSERT] . value = min_score;
-	      Diag[Dct] . I[Di] . S[INSERT] . used = NONE;
-	    }
-
-	  //-- Calculate MATCH/MIS-MATCH score
-	  if ( PPDi >= 0  &&  PPDi < PPDs )
-	    {
-	      scoreEdit
-		(Diag[Dct] . I[Di] . S[MATCH],
-		 Diag[PPDct] . I[PPDi] . S[DELETE] . value,
-		 Diag[PPDct] . I[PPDi] . S[INSERT] . value,
-		 Diag[PPDct] . I[PPDi] . S[MATCH]  . value);
-	      Diag[Dct] . I[Di] . S[MATCH] . value +=
-		scoreMatch (Diag[Dct], Dct, CDi, A, B, N, m_o);
-	    }
-	  else
-	    {
-	      Diag[Dct] . I[Di] . S[MATCH] . value = min_score;
-	      Diag[Dct] . I[Di] . S[MATCH] . used = NONE;
-	    }
-
-	  PPDi ++;
-
-	  Diag[Dct] . I[Di] . max = maxScore (Diag[Dct] . I[Di] . S);
-
-	  //-- Reset high_score if new global max was found
-	  if ( Diag[Dct] . I[Di] . max->value >= high_score )
-	    {
-	      high_score = Diag[Dct] . I[Di] . max->value;
-	      FinishCt = Dct;
-	      FinishCDi = CDi;
-	    }
-	}
-      //-- **END** of internal node scoring loop
-
-
-      //-- Calculate max non-optimal score
-      if ( m_o & SEQEND_BIT  &&  Dct >= L )
-	{
-	  if ( L == N )
-	    {
-	      if ( lbound == 0 )
-		{
-		  if ( Diag[Dct] . I[0] . max->value >= xhigh_score )
-		    {
-		      xhigh_score = Diag[Dct] . I[0] . max->value;
-		      xFinishCt = Dct;
-		      xFinishCDi = 0;
-		    }
-		}
-	    }
-	  else  // L == M
-	    {
-	      if ( rbound == M )
-		{
-		  if ( Diag[Dct] . I[M-Diag[Dct].lbound] .
-		       max->value >= xhigh_score )
-		    {
-		      xhigh_score = Diag[Dct] . I[M-Diag[Dct].lbound] .
-			max->value;
-		      xFinishCt = Dct;
-		      xFinishCDi = M;
-		    }
-		}
-	    }
-	}
-
-
-      //-- If in extender modus operandi, free soon to be greatgrandparent diag
-      if ( m_o & SEARCH_BIT  &&  Dct > 1 )
-	free ( Diag[PPDct] . I );
-
-
-      //-- Trim hopeless diagonal nodes
-      for ( Di = 0; Di < Ds; Di ++ )
-	{
-	  if ( high_score - Diag[Dct] . I[Di] . max->value > max_diff )
-	    lbound ++;
-	  else
-	    break;
-	}
-      for ( Di = Ds - 1; Di >= 0; Di -- )
-	{
-	  if ( high_score - Diag[Dct] . I[Di] . max->value > max_diff )
-	    rbound --;
-	  else
-	    break;
-	}
-      
-      //-- Grow new diagonal and reset boundaries
-      if ( Dct < N && Dct < M )
-	{ Dl ++; rbound ++; Dmid = (Dct+1)/2.0; }
-      else if ( Dct >= N && Dct >= M )
-	{ Dl --; lbound --; Dmid = N - (Dct+1)/2.0; }
-      else if ( Dct >= N )
-        { lbound --; Dmid = N - (Dct+1)/2.0; }
-      else
-        { rbound ++; Dmid = (Dct+1)/2.0; }
-
-      //-- Trim at hard band
-      if ( Dband > 0 )
-        {
-          tlb = (long int)ceil(Dmid - Dband);
-          if ( lbound < tlb )
-            lbound = tlb;
-          trb = (long int)floor(Dmid + Dband);
-          if ( rbound > trb )
-            rbound = trb;
-        }
-
-      if ( lbound < 0 )
-	lbound = 0;
-      if ( rbound >= Dl )
-	rbound = Dl - 1;
+    //-- Set diagonal index adjustment values
+    if(Dct <= N) {
+      Iadj = 0;
+      Madj = -1;
+    } else {
+      Iadj = 1;
+      Madj = Dct == N + 1 ? 0 : 1;
     }
+    Dadj = Iadj - 1;
+
+    //-- Set parent diagonal values
+    auto&       PrevD  = Diag[Dct - 1] ; // previous diagonal
+    PDs                = PrevD.rbound - PrevD.lbound + 1;
+    PDi                = lbound + Dadj;
+    PDi                = PDi - PrevD.lbound;
+
+    //-- Set grandparent diagonal values
+    const long PPDct = Dct - 2; //  prev prev diagonal
+    const Diagonal& PPrevD = Diag[std::max((long)0, PPDct)]; // if PPDct < 0, not PPrevD is not used
+    if(PPDct >= 0) {
+      PPDs   = PPrevD.rbound - PPrevD.lbound + 1;
+      PPDi   = lbound + Madj;
+      PPDi   = PPDi - PPrevD.lbound;
+    } else
+      PPDi = PPDs = 0;
+
+    //-- If forced alignment, don't keep track of global max
+    if(m_o & FORCED_BIT )
+      high_score = min_score;
+
+    //-- **START** of internal node scoring loop
+    //-- Calculate scores for every node (within bounds) for diagonal Dct
+    for(CDi = lbound; CDi <= rbound; CDi ++) {
+      //-- Set the index (in memory) of current node and clear score
+      Di = CDi - CurD.lbound;
+
+      //-- Calculate DELETE score
+      if(PDi >= 0  &&  PDi < PDs ) {
+        const auto& PrevDi = PrevD.I[PDi];
+        scoreEdit(CurD.I[Di].S[DELETE],
+                  PrevDi.S[DELETE].value + (PrevDi.S[DELETE].used == NONE ? 0 : CONT_GAP_SCORE [_matrix_type]),
+                  PrevDi.S[INSERT].value + (PrevDi.S[INSERT].used == NONE ? 0 : OPEN_GAP_SCORE [_matrix_type]),
+                  PrevDi.S[MATCH].value  + (PrevDi.S[MATCH].used == NONE  ? 0 : OPEN_GAP_SCORE [_matrix_type]));
+      } else {
+        CurD.I[Di].S[DELETE].value = min_score;
+        CurD.I[Di].S[DELETE].used  = NONE;
+      }
+
+      PDi ++;
+
+      //-- Calculate INSERT score
+      if(PDi >= 0  &&  PDi < PDs ) {
+        const auto& PrevDi = PrevD.I[PDi];
+        scoreEdit(CurD.I[Di].S[INSERT],
+                  PrevDi.S[DELETE].value + (PrevDi.S[DELETE].used == NONE ? 0 : OPEN_GAP_SCORE [_matrix_type]),
+                  PrevDi.S[INSERT].value + (PrevDi.S[INSERT].used == NONE ? 0 : CONT_GAP_SCORE [_matrix_type]),
+                  PrevDi.S[MATCH].value  + (PrevDi.S[MATCH].used == NONE  ? 0 : OPEN_GAP_SCORE [_matrix_type]));
+      } else {
+        CurD.I[Di].S[INSERT].value = min_score;
+        CurD.I[Di].S[INSERT].used  = NONE;
+      }
+
+      //-- Calculate MATCH/MIS-MATCH score
+      if(PPDi >= 0  &&  PPDi < PPDs) {
+        const auto& PPrevDi = PPrevD.I[PPDi];
+        scoreEdit(CurD.I[Di].S[MATCH],
+                  PPrevDi.S[DELETE].value,
+                  PPrevDi.S[INSERT].value,
+                  PPrevDi.S[MATCH].value);
+        CurD.I[Di].S[MATCH].value += scoreMatch(CurD, Dct, CDi, A, B, N, m_o);
+      } else {
+        CurD.I[Di].S[MATCH].value = min_score;
+        CurD.I[Di].S[MATCH].used  = NONE;
+      }
+
+      PPDi ++;
+
+      CurD.I[Di].max(maxScore (CurD.I[Di].S));
+
+      //-- Reset high_score if new global max was found
+      if(CurD.I[Di].max().value >= high_score) {
+        high_score = CurD.I[Di].max().value;
+        FinishCt   = Dct;
+        FinishCDi  = CDi;
+      }
+    }
+    //-- **END** of internal node scoring loop
+
+
+    //-- Calculate max non-optimal score
+    if(m_o & SEQEND_BIT  &&  Dct >= L) {
+      if(L == N) {
+        if(lbound == 0) {
+          if(CurD.I[0].max().value >= xhigh_score) {
+            xhigh_score = CurD.I[0].max().value;
+            xFinishCt   = Dct;
+            xFinishCDi  = 0;
+          }
+        }
+      } else  { // L == M
+        if(rbound == M) {
+          if(CurD.I[M-CurD.lbound].max().value >= xhigh_score) {
+            xhigh_score = CurD.I[M-CurD.lbound].max().value;
+            xFinishCt   = Dct;
+            xFinishCDi  = M;
+          }
+        }
+      }
+    }
+
+
+    //-- If in extender modus operandi, free soon to be greatgrandparent diag
+    // if(m_o & SEARCH_BIT  &&  Dct > 1 )
+    //   free ( PPrevD->I );
+
+
+    //-- Trim hopeless diagonal nodes
+    for(Di = 0; Di < Ds; Di ++) {
+      if(high_score - CurD.I[Di].max().value > max_diff )
+        lbound ++;
+      else
+        break;
+    }
+    for(Di = Ds - 1; Di >= 0; Di --) {
+      if(high_score - CurD.I[Di].max().value > max_diff )
+        rbound --;
+      else
+        break;
+    }
+
+    //-- Grow new diagonal and reset boundaries
+    if(Dct < N && Dct < M) {
+      Dl ++; rbound ++; Dmid = (Dct+1)/2.0;
+    } else if(Dct >= N && Dct >= M) {
+      Dl --; lbound --; Dmid = N - (Dct+1)/2.0;
+    } else if(Dct >= N) {
+      lbound --; Dmid = N - (Dct+1)/2.0;
+    } else {
+      rbound ++; Dmid = (Dct+1)/2.0;
+    }
+
+    //-- Trim at hard band
+    if(Dband > 0) {
+      tlb = (long int)ceil(Dmid - Dband);
+      if(lbound < tlb )
+        lbound = tlb;
+      trb = (long int)floor(Dmid + Dband);
+      if(rbound > trb )
+        rbound = trb;
+    }
+
+    if(lbound < 0 )
+      lbound = 0;
+    if(rbound >= Dl )
+      rbound = Dl - 1;
+  }
   //-- **END** of diagonal processing loop
   Dct --;
 
   //-- Check if the target was reached
   //   If OPTIMAL, backtrack to last high_score to maximize alignment score
   TargetReached = false;
-  if ( Dct == N + M )
-    {
-      if ( ~m_o & OPTIMAL_BIT || m_o & SEQEND_BIT )
-	{
-	  TargetReached = true;
-	  FinishCt = N + M;
-	  FinishCDi = 0;
-	}
-      else if ( FinishCt == Dct )
-	TargetReached = true;
-    }
-  else if ( m_o & SEQEND_BIT  &&  xFinishCt != 0 )
-    {
-      //-- non-optimal, extend alignment to end of shortest seq if possible
-      FinishCt = xFinishCt;
-      FinishCDi = xFinishCDi;
-    }
+  if(Dct == N + M) {
+    if(~m_o & OPTIMAL_BIT || m_o & SEQEND_BIT) {
+      TargetReached = true;
+      FinishCt      = N + M;
+      FinishCDi     = 0;
+    } else if(FinishCt == Dct )
+      TargetReached = true;
+  } else if(m_o & SEQEND_BIT  &&  xFinishCt != 0) {
+    //-- non-optimal, extend alignment to end of shortest seq if possible
+    FinishCt  = xFinishCt;
+    FinishCDi = xFinishCDi;
+  }
 
   //-- Set A/Bend to finish positions
   long int Aadj = FinishCt <= N ? FinishCt - FinishCDi - 1 : N - FinishCDi - 1;
   long int Badj = FinishCt <= N ? FinishCDi - 1 : FinishCt - N + FinishCDi - 1;
-  if ( ~m_o & DIRECTION_BIT )
-    {
-      Aadj *= -1;
-      Badj *= -1;
-    }
+  if(~m_o & DIRECTION_BIT) {
+    Aadj *= -1;
+    Badj *= -1;
+  }
   Aend = Astart + Aadj;
   Bend = Bstart + Badj;
 
@@ -388,14 +315,14 @@ bool aligner::_alignEngine
   assert (FinishCt > 1);
 
   //-- Ouput calculation statistics
-  if ( TargetReached )
+  if(TargetReached )
     fprintf(stderr,"Finish score = %ld : %ld,%ld\n",
-	    Diag[FinishCt] . I[0] . max->value, N, M);
+	    Diag[FinishCt].I[0].max().value, N, M);
   else
     fprintf(stderr,"High score = %ld : %ld,%ld\n", high_score,
 	    labs(Aadj) + 1, labs(Badj) + 1);
   fprintf(stderr, "%ld nodes calculated, %ld nodes trimmed\n", CalcCt, TrimCt);
-  if ( m_o & DIRECTION_BIT )
+  if(m_o & DIRECTION_BIT )
     fprintf(stderr, "%ld bytes used\n",
 	    (long int)sizeof(Diagonal) * Dct + (long int)sizeof(Node) * CalcCt);
   else
@@ -404,13 +331,8 @@ bool aligner::_alignEngine
 #endif
 
   //-- If in forward alignment m_o, create the Delta information
-  if ( ~m_o & SEARCH_BIT )
-    generateDelta (Diag, FinishCt, FinishCDi, N, Delta);
-
-  //-- Free the scoring and edit spaces remaining
-  for ( Di = m_o & SEARCH_BIT ? Dct - 1 : 0; Di <= Dct; Di ++ )
-    free ( Diag[Di] . I );
-  free ( Diag );
+  if(~m_o & SEARCH_BIT )
+    generateDelta(Diag, FinishCt, FinishCDi, N, Delta);
 
   return TargetReached;
 }
@@ -457,7 +379,7 @@ long int aligner::scoreMatch
 
 
 static void generateDelta
-     (const Diagonal * Diag, long int FinishCt, long int FinishCDi,
+     (const DiagonalMatrix& Diag, long int FinishCt, long int FinishCDi,
       long int N, std::vector<long int> & Delta)
 
      //  Diag is the list of diagonals that compose the edit matrix
@@ -493,72 +415,67 @@ static void generateDelta
 
   //-- Which Score index is the maximum value in? Store in edit
   Di = CDi - Diag[Dct] . lbound;
-  edit = Diag[Dct] . I[Di] . max - Diag[Dct] . I[Di] . S;
+  edit = Diag[Dct].I[Di].edit();
+
 
   //-- Walk the path backwards through the edit space
-  while ( Dct >= 0 )
-    {
-      //-- remalloc path space if neccessary
-      if ( Pi >= PSize )
-	{
-	  PSize *= 2;
-	  Reverse_Path = (char *) Safe_realloc 
-	    ( Reverse_Path, sizeof(char) * PSize );
-	}
-
-      Di = CDi - Diag[Dct] . lbound;
-      curr_score = Diag[Dct] . I[Di] . S[edit];
-
-      Reverse_Path[Pi ++] = edit;
-      switch ( edit )
-	{
-	case DELETE :
-	  CDi = Dct -- <= N ? CDi - 1 : CDi;
-	  break;
-	case INSERT :
-	  CDi = Dct -- <= N ? CDi : CDi + 1;
-	  break;
-	case MATCH :
-	  CDi = Dct <= N ? CDi - 1 : ( Dct == N + 1 ? CDi : CDi + 1 );
-	  Dct -= 2;
-	  break;
-	case START :
-	  Dct = -1;
-	  break;
-	default :
-	  fprintf(stderr,"\nERROR: Invalid edit matrix entry,\n"
-		  "       please file a bug report\n");
-	  exit ( EXIT_FAILURE );
-	}
-
-      edit = curr_score . used;
+  while ( Dct >= 0 ) {
+    //-- remalloc path space if neccessary
+    if ( Pi >= PSize ) {
+      PSize *= 2;
+      Reverse_Path = (char *) Safe_realloc( Reverse_Path, sizeof(char) * PSize );
     }
+
+    Di = CDi - Diag[Dct].lbound;
+    curr_score = Diag[Dct].I[Di].S[edit];
+
+    Reverse_Path[Pi ++] = edit;
+    switch ( edit ) {
+    case DELETE :
+      CDi = Dct -- <= N ? CDi - 1 : CDi;
+      break;
+    case INSERT :
+      CDi = Dct -- <= N ? CDi : CDi + 1;
+      break;
+    case MATCH :
+      CDi = Dct <= N ? CDi - 1 : ( Dct == N + 1 ? CDi : CDi + 1 );
+      Dct -= 2;
+      break;
+    case START :
+      Dct = -1;
+      break;
+    default :
+      fprintf(stderr,"\nERROR: Invalid edit matrix entry,\n"
+              "       please file a bug report\n");
+      exit ( EXIT_FAILURE );
+    }
+
+    edit = curr_score.used;
+  }
 
   //-- Generate the delta information
   Count = 1;
-  for (Pi -= 2; Pi >= 0; Pi --)
-    {
-      switch ( Reverse_Path[Pi] )
-	{
-	case DELETE :
-	  Delta . push_back(-Count);
-	  Count = 1;
-	  break;
-	case INSERT :
-	  Delta . push_back(Count);
-	  Count = 1;
-	  break;
-	case MATCH :
-	  Count ++;
-	  break;
-	case START :
-	  break;
-	default :
-	  fprintf(stderr,"\nERROR: Invalid path matrix entry,\n"
-		  "       please file a bug report\n");
-	  exit ( EXIT_FAILURE );
-	}
+  for (Pi -= 2; Pi >= 0; Pi --) {
+    switch ( Reverse_Path[Pi] ) {
+    case DELETE :
+      Delta.push_back(-Count);
+      Count = 1;
+      break;
+    case INSERT :
+      Delta.push_back(Count);
+      Count = 1;
+      break;
+    case MATCH :
+      Count ++;
+      break;
+    case START :
+      break;
+    default :
+      fprintf(stderr,"\nERROR: Invalid path matrix entry,\n"
+              "       please file a bug report\n");
+      exit ( EXIT_FAILURE );
     }
+  }
 
   free (Reverse_Path);
 
@@ -568,23 +485,15 @@ static void generateDelta
 
 
 
-static inline Score * maxScore
-     (Score S[3])
+static inline int maxScore(Score S[3])
 
      //  Return a pointer to the maximum score in the score array
 
 {
-  if ( S[DELETE] . value > S[INSERT] . value )
-    {
-      if ( S[DELETE] . value > S[MATCH] . value )
-	return S + DELETE;
-      else
-	return S + MATCH;
-    }
-  else if ( S[INSERT] . value > S[MATCH] . value )
-    return S + INSERT;
+  if(S[DELETE].value > S[INSERT].value)
+    return S[DELETE].value > S[MATCH].value ? DELETE : MATCH;
   else
-    return S + MATCH;
+    return S[INSERT].value > S[MATCH].value ? INSERT : MATCH;
 }
 
 
@@ -596,31 +505,21 @@ static inline void scoreEdit
      //  Assign current edit a maximal score using either del, ins or mat
 
 {
-  if ( del > ins )
-    {
-      if ( del > mat )
-	{
-	  curr.value = del;
-	  curr.used = DELETE;
-	}
-      else
-	{
-	  curr.value = mat;
-	  curr.used = MATCH;
-	}
-    }
-  else if ( ins > mat )
-    {
-      curr.value = ins;
-      curr.used = INSERT;
-    }
-  else
-    {
+  if ( del > ins ) {
+    if ( del > mat ) {
+      curr.value = del;
+      curr.used = DELETE;
+    } else {
       curr.value = mat;
       curr.used = MATCH;
     }
-
-  return;
+  } else if ( ins > mat ) {
+    curr.value = ins;
+    curr.used = INSERT;
+  }  else {
+    curr.value = mat;
+    curr.used = MATCH;
+  }
 }
 
 } // namespace sw_align
