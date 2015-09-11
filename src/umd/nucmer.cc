@@ -102,11 +102,14 @@ sequence_info::sequence_info(const char* path)  {
 
     // Read metadata
     const size_t header_offset = headers.size();
-    const size_t start = line.find_first_not_of(" \t", 1);
-    if(start != std::string::npos) {
-      const size_t end = line.find_first_of(" \t", start);
-      headers += line.substr(start, end);
-    }
+    size_t start = line.find_first_not_of(" \t", 1);
+    if(start == std::string::npos)
+      start = 0;
+    const size_t end = line.find_first_of(" \t", start);
+    if(end == std::string::npos)
+      headers += line.substr(start);
+    else
+      headers += line.substr(start, end - start);
     headers += '\0';
 
     // Read sequence

@@ -54,7 +54,7 @@ struct vec_uchar {
   };
   std::vector<unsigned char> vec; // LCP values from 0-65534
   std::vector<item_t>        M;
-  void resize(size_t N) { vec.resize(N); }
+  void resize(size_t N) { vec.resize(N, 0); }
   // Vector X[i] notation to get LCP values.
   int operator[] (size_t idx) const {
     if(vec[idx] == std::numeric_limits<unsigned char>::max())
@@ -112,15 +112,22 @@ struct interval_t {
 struct bounded_string {
   const char* const s_;
   const size_t      al_; // actual length
-  const size_t      l_;  // length rounded to K
+  size_t            l_;  // length rounded to K
 
-  bounded_string(const char* s, size_t l, long K) :
-    s_(s),
-    al_(l),
-    l_(l + K + (l % K != 0 ? K - (l % K) : 0))
+  static long compute_l(size_t l, long K) {
+    return l + K + (l % K != 0 ? K - (l % K) : 0);
+  }
+  bounded_string(const char* s, size_t l, long K)
+    : s_(s)
+    , al_(l)
+    , l_(compute_l(l, K))
   { }
   bounded_string(const std::string s, long K) : bounded_string(s.c_str(), s.size(), K) { }
   bounded_string(const char* s, long K) : bounded_string(s, strlen(s), K) { }
+
+  void set_k(long K) {
+    l_ = compute_l(al_, K);
+  }
 
   char operator[](size_t i) const {
     if(__builtin_expect(i < al_, 1))
@@ -139,27 +146,26 @@ struct bounded_string {
 };
 
 struct sparseSA {
-  const bool                      _4column; // Use 4 column output format.
-
-  const long                K;  // suffix sampling, K = 1 every suffix, K = 2 every other suffix, K = 3, every 3rd sffix
-  const bounded_string      S;  //!< Reference to sequence data.
-  const long                N;  //!< Length of the sequence.
-  const long                logN; // ceil(log(N))
-  const long                NKm1; // N/K - 1
+  bool                      _4column; // Use 4 column output format.
+  long                      K;  // suffix sampling, K = 1 every suffix, K = 2 every other suffix, K = 3, every 3rd sffix
+  bounded_string            S;  //!< Reference to sequence data.
+  long                      N;  //!< Length of the sequence.
+  long                      logN; // ceil(log(N))
+  long                      NKm1; // N/K - 1
   std::vector<unsigned int> SA; // Suffix array.
   std::vector<int>          ISA; // Inverse suffix array.
   vec_uchar                 LCP; // Simulates a vector<int> LCP.
   std::vector<int>          CHILD; //child table
   std::vector<saTuple_t>    KMR;
 
-  const bool hasChild;
-  const bool hasSufLink;
+  bool hasChild;
+  bool hasSufLink;
   //fields for lookup table of sa intervals to a certain small depth
-  const bool hasKmer;
-  const long kMerSize;
-  long       kMerTableSize;
-  int        sparseMult;
-  const bool nucleotidesOnly;
+  bool hasKmer;
+  long kMerSize;
+  long kMerTableSize;
+  int  sparseMult;
+  bool nucleotidesOnly;
 
   long index_size_in_bytes() const ;
 
@@ -169,6 +175,16 @@ struct sparseSA {
   sparseSA(const std::string& S_, bool __4column, long K_, bool suflink_, bool child_, bool kmer_,
            int sparseMult_, int kMerSize_, bool nucleotidesOnly_)
     : sparseSA(S_.c_str(), S_.length(), __4column, K_, suflink_, child_, kmer_, sparseMult_, kMerSize_, nucleotidesOnly_)
+  { }
+  // Constructor load sparse suffix array from file
+  sparseSA(const char* S_, size_t Slen, const std::string& prefix)
+    : S(S_, Slen, 1)
+  {
+    load(prefix);
+    S.set_k(K);
+  }
+  sparseSA(const std::string& S_, const std::string& prefix)
+    : sparseSA(S_.c_str(), S_.length(), prefix)
   { }
 
   static sparseSA create_auto(const char* S, size_t Slen, int min_len, bool nucleotidesOnly_, int K = 1);
@@ -326,7 +342,7 @@ struct sparseSA {
   }
 
   //save index to files
-  void save(const std::string &prefix);
+  bool save(const std::string &prefix) const;
 
   //load index from file
   bool load(const std::string &prefix);

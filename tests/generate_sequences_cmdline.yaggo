@@ -1,0 +1,24 @@
+package "generate_sequences"
+description "Generate a random genome and sets of reads (two by default)"
+name "cmdline"
+
+option("p", "prefix") {
+  description "Prefix of output files"
+  required
+  string; typestr "PREFIX" }
+option("s", "seed") {
+  description "Random seed"
+  uint64 }
+option("G", "genome-size") {
+  description "Length L of genome"
+  uint32; typestr "L"; default "10M"; suffix }
+option("errors") {
+  description "Error rates (percentages) of reads (1 and 5)"
+  double; multiple}
+option("lengths") {
+  description "Length of reads (200 and 1000)"
+  uint32; multiple }
+option("numbers") {
+  description "Number of reads (100 and 100)"
+  uint32; multiple }
+

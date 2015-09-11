@@ -252,13 +252,13 @@ void sparseSA::computeKmer() {
 }
 
 //TODO: add error handling and messages
-void sparseSA::save(const std::string &prefix){
-    std::string basic = prefix;
-    std::string aux = basic + ".aux";
-    std::string sa = basic + ".sa";
-    std::string lcp = basic + ".lcp";
+bool sparseSA::save(const std::string &prefix) const {
+  const std::string basic = prefix;
+  const std::string aux = basic + ".aux";
+  const std::string sa = basic + ".sa";
+  const std::string lcp = basic + ".lcp";
+  { //print auxiliary information
     std::ofstream aux_s (aux.c_str(), std::ios::binary);
-    //print auxiliary information
     aux_s.write((const char*)&N,sizeof(N));
     aux_s.write((const char*)&K,sizeof(K));
     aux_s.write((const char*)&logN,sizeof(logN));
@@ -267,14 +267,16 @@ void sparseSA::save(const std::string &prefix){
     aux_s.write((const char*)&hasChild,sizeof(hasChild));
     aux_s.write((const char*)&hasKmer,sizeof(hasKmer));
     aux_s.write((const char*)&kMerSize,sizeof(kMerSize));
-    aux_s.close();
-    //print sa
+    if(!aux_s.good()) return false;
+  }
+  { //print sa
     std::ofstream sa_s (sa.c_str(), std::ios::binary);
     unsigned int sizeSA = SA.size();
     sa_s.write((const char*)&sizeSA,sizeof(sizeSA));
     sa_s.write((const char*)&SA[0],sizeSA*sizeof(unsigned int));
-    sa_s.close();
-    //print LCP
+    if(!sa_s.good()) return false;
+  }
+  { //print LCP
     std::ofstream lcp_s (lcp.c_str(), std::ios::binary);
     unsigned int sizeLCP = LCP.vec.size();
     unsigned int sizeM = LCP.M.size();
@@ -282,110 +284,102 @@ void sparseSA::save(const std::string &prefix){
     lcp_s.write((const char*)&sizeM,sizeof(sizeM));
     lcp_s.write((const char*)&LCP.vec[0],sizeLCP*sizeof(unsigned char));
     lcp_s.write((const char*)&LCP.M[0],sizeM*sizeof(vec_uchar::item_t));
-    lcp_s.close();
-    //print ISA if nec
-    if(hasSufLink){
-        std::string isa = basic + ".isa";
-        std::ofstream isa_s (isa.c_str(), std::ios::binary);
-        unsigned int sizeISA = ISA.size();
-        isa_s.write((const char*)&sizeISA,sizeof(sizeISA));
-        isa_s.write((const char*)&ISA[0],sizeISA*sizeof(int));
-        isa_s.close();
-    }
-    //print child if nec
-    if(hasChild){
-        std::string child = basic + ".child";
-        std::ofstream child_s (child.c_str(), std::ios::binary);
-        unsigned int sizeCHILD = CHILD.size();
-        child_s.write((const char*)&sizeCHILD,sizeof(sizeCHILD));
-        child_s.write((const char*)&CHILD[0],sizeCHILD*sizeof(int));
-        child_s.close();
-    }
-    //print kmer if nec
-    if(hasKmer){
-        std::string kmer = basic + ".kmer";
-        std::ofstream kmer_s (kmer.c_str(), std::ios::binary);
-        unsigned int sizeKMR = KMR.size();
-        kmer_s.write((const char*)&sizeKMR,sizeof(sizeKMR));
-        kmer_s.write((const char*)&KMR[0],sizeKMR*sizeof(saTuple_t));
-        kmer_s.close();
-    }
+    if(!lcp_s.good()) return false;
+  }
+  if(hasSufLink){ //print ISA if nec
+    const std::string isa = basic + ".isa";
+    std::ofstream isa_s (isa.c_str(), std::ios::binary);
+    unsigned int sizeISA = ISA.size();
+    isa_s.write((const char*)&sizeISA,sizeof(sizeISA));
+    isa_s.write((const char*)&ISA[0],sizeISA*sizeof(int));
+    if(!isa_s.good()) return false;
+  }
+  if(hasChild){ //print child if nec
+    const std::string child = basic + ".child";
+    std::ofstream child_s (child.c_str(), std::ios::binary);
+    unsigned int sizeCHILD = CHILD.size();
+    child_s.write((const char*)&sizeCHILD,sizeof(sizeCHILD));
+    child_s.write((const char*)&CHILD[0],sizeCHILD*sizeof(int));
+    if(!child_s.good()) return false;
+  }
+  if(hasKmer){ //print kmer if nec
+    const std::string kmer = basic + ".kmer";
+    std::ofstream kmer_s (kmer.c_str(), std::ios::binary);
+    unsigned int sizeKMR = KMR.size();
+    kmer_s.write((const char*)&sizeKMR,sizeof(sizeKMR));
+    kmer_s.write((const char*)&KMR[0],sizeKMR*sizeof(saTuple_t));
+    if(!kmer_s.good()) return false;
+  }
+  return true;
 }
 
 bool sparseSA::load(const std::string &prefix){
-    std::cerr << "atempting to load index " << prefix << " ... "<< std::endl;
-    std::string basic = prefix;
-    std::string aux = basic + ".aux";
-    std::string sa = basic + ".sa";
-    std::string lcp = basic + ".lcp";
-    std::ifstream aux_s (aux.c_str(), std::ios::binary);
-    if(!aux_s.good()){
-        std::cerr << "unable to open " << prefix << std::endl;
-        return false;
+    const std::string basic = prefix;
+    const std::string aux   = basic + ".aux";
+    const std::string sa    = basic + ".sa";
+    const std::string lcp   = basic + ".lcp";
+
+    { // Load auxiliary infomation
+      std::ifstream     aux_s (aux.c_str(), std::ios::binary);
+      aux_s.read((char*)&N,sizeof(N));
+      aux_s.read((char*)&K,sizeof(K));
+      aux_s.read((char*)&logN,sizeof(logN));
+      aux_s.read((char*)&NKm1,sizeof(NKm1));
+      aux_s.read((char*)&hasSufLink,sizeof(hasSufLink));
+      aux_s.read((char*)&hasChild,sizeof(hasChild));
+      aux_s.read((char*)&hasKmer,sizeof(hasKmer));
+      aux_s.read((char*)&kMerSize,sizeof(kMerSize));
+      if(!aux_s.good()) return false;
     }
-    //read auxiliary information
-    //    long readN;
-    //    aux_s.read((char*)&readN,sizeof(N));
-    //    N = readN;
-    aux_s.read((char*)&N,sizeof(N));
-    aux_s.read((char*)&K,sizeof(K));
-    aux_s.read((char*)&logN,sizeof(logN));
-    aux_s.read((char*)&NKm1,sizeof(NKm1));
-    aux_s.read((char*)&hasSufLink,sizeof(hasSufLink));
-    aux_s.read((char*)&hasChild,sizeof(hasChild));
-    aux_s.read((char*)&hasKmer,sizeof(hasKmer));
-    aux_s.read((char*)&kMerSize,sizeof(kMerSize));
-    aux_s.close();
-    //read sa
-    std::ifstream sa_s (sa.c_str(), std::ios::binary);
-    unsigned int sizeSA;
-    sa_s.read((char*)&sizeSA,sizeof(sizeSA));
-    SA.resize(sizeSA);
-    sa_s.read((char*)&SA[0],sizeSA*sizeof(unsigned int));
-    sa_s.close();
-    //read LCP
-    std::ifstream lcp_s (lcp.c_str(), std::ios::binary);
-    unsigned int sizeLCP;
-    unsigned int sizeM;
-    lcp_s.read((char*)&sizeLCP,sizeof(sizeLCP));
-    lcp_s.read((char*)&sizeM,sizeof(sizeM));
-    LCP.vec.resize(sizeLCP);
-    LCP.M.resize(sizeM);
-    lcp_s.read((char*)&LCP.vec[0],sizeLCP*sizeof(unsigned char));
-    lcp_s.read((char*)&LCP.M[0],sizeM*sizeof(vec_uchar::item_t));
-    lcp_s.close();
-    //read ISA if nec
-    if(hasSufLink){
-        std::string isa = basic + ".isa";
-        std::ifstream isa_s (isa.c_str(), std::ios::binary);
-        unsigned int sizeISA;
-        isa_s.read((char*)&sizeISA,sizeof(sizeISA));
-        ISA.resize(sizeISA);
-        isa_s.read((char*)&ISA[0],sizeISA*sizeof(int));
-        isa_s.close();
+    { //read sa
+      std::ifstream sa_s (sa.c_str(), std::ios::binary);
+      unsigned int  sizeSA;
+      sa_s.read((char*)&sizeSA,sizeof(sizeSA));
+      SA.resize(sizeSA);
+      sa_s.read((char*)&SA[0],sizeSA*sizeof(unsigned int));
+      if(!sa_s.good()) return false;
     }
-    //read child if nec
-    if(hasChild){
-        std::string child = basic + ".child";
-        std::ifstream child_s (child.c_str(), std::ios::binary);
-        unsigned int sizeCHILD;
-        child_s.read((char*)&sizeCHILD,sizeof(sizeCHILD));
-        CHILD.resize(sizeCHILD);
-        child_s.read((char*)&CHILD[0],sizeCHILD*sizeof(int));
-        child_s.close();
+    { //read LCP
+      std::ifstream lcp_s (lcp.c_str(), std::ios::binary);
+      unsigned int  sizeLCP;
+      unsigned int  sizeM;
+      lcp_s.read((char*)&sizeLCP,sizeof(sizeLCP));
+      lcp_s.read((char*)&sizeM,sizeof(sizeM));
+      LCP.vec.resize(sizeLCP);
+      LCP.M.resize(sizeM);
+      lcp_s.read((char*)&LCP.vec[0],sizeLCP*sizeof(unsigned char));
+      lcp_s.read((char*)&LCP.M[0],sizeM*sizeof(vec_uchar::item_t));
+      if(!lcp_s.good()) return false;
     }
-    //read kmer table if nec
-    if(hasKmer){
-        std::string kmer = basic + ".kmer";
-        std::ifstream kmer_s (kmer.c_str(), std::ios::binary);
-        unsigned int sizeKMR;
-        kmer_s.read((char*)&sizeKMR,sizeof(sizeKMR));
-        KMR.resize(sizeKMR);
-        kMerTableSize = sizeKMR;
-        kmer_s.read((char*)&KMR[0],sizeKMR*sizeof(saTuple_t));
-        kmer_s.close();
+    if(hasSufLink){ //read ISA if nec
+      const std::string isa = basic + ".isa";
+      std::ifstream     isa_s (isa.c_str(), std::ios::binary);
+      unsigned int      sizeISA;
+      isa_s.read((char*)&sizeISA,sizeof(sizeISA));
+      ISA.resize(sizeISA);
+      isa_s.read((char*)&ISA[0],sizeISA*sizeof(int));
+      if(!isa_s.good()) return false;
     }
-    std::cerr << "index loaded succesful" << std::endl;
+    if(hasChild){ //read child if nec
+      const std::string child = basic + ".child";
+      std::ifstream     child_s (child.c_str(), std::ios::binary);
+      unsigned int      sizeCHILD;
+      child_s.read((char*)&sizeCHILD,sizeof(sizeCHILD));
+      CHILD.resize(sizeCHILD);
+      child_s.read((char*)&CHILD[0],sizeCHILD*sizeof(int));
+      if(!child_s.good()) return false;
+    }
+    if(hasKmer){ //read kmer table if nec
+      const std::string kmer = basic + ".kmer";
+      std::ifstream     kmer_s (kmer.c_str(), std::ios::binary);
+      unsigned int      sizeKMR;
+      kmer_s.read((char*)&sizeKMR,sizeof(sizeKMR));
+      KMR.resize(sizeKMR);
+      kMerTableSize = sizeKMR;
+      kmer_s.read((char*)&KMR[0],sizeKMR*sizeof(saTuple_t));
+      if(!kmer_s.good()) return false;
+    }
+
     return true;
 }
 

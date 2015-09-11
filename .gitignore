@@ -13,3 +13,4 @@ depcomp
 missing
 autom4te.cache
 compile
+test-driver

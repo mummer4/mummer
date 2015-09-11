@@ -50,6 +50,12 @@ option("nosimplify") {
 option("delta") {
   description "Output delta file"
   c_string; default "stdout" }
+option("save") {
+  description "Save suffix array to files starting with PREFIX"
+  string; typestr "PREFIX" }
+option("load") {
+  description "Load suffix array from file starting with PREFIX"
+  string; typestr "PREFIX" }
 option("t", "threads") {
   description "Use NUM threads (# of cores)"
   uint32; typestr "NUM" }
