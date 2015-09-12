@@ -28,7 +28,7 @@ EXTRA_DIST = $(GTEST_SRC)
 check_PROGRAMS = test_nucmer generate_sequences
 test_nucmer_SOURCES = test_nucmer.cc
 generate_sequences_SOURCES = generate_sequences.cc
-YAGGO_BUILT = generate_sequences_cmdline.hpp
+YAGGO_BUILT += generate_sequences_cmdline.hpp
 
 small_reads_0.fa: ./generate_sequences
 	./generate_sequences -p small -G 1M --numbers 1000 --numbers 1000
