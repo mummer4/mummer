@@ -79,11 +79,13 @@ public:
   typedef typename vector_type::reference       reference;
   typedef typename vector_type::const_reference const_reference;
   typedef typename vector_type::size_type       size_type;
+  typedef typename vector_type::iterator        iterator;
+  typedef typename vector_type::const_iterator  const_iterator;
 
   auto_vector() = default;
 
   reference operator[](size_type n) {
-    if(n >= m_vec.size())
+    if(__builtin_expect(n >= m_vec.size(), 0))
       m_vec.resize(n + 1);
     return m_vec[n];
   }
@@ -99,6 +101,13 @@ public:
   void resize(size_type n, const value_type& val) {
     m_vec.resize(n, val);
   }
+
+  iterator begin() { return m_vec.begin(); }
+  const_iterator begin() const { return m_vec.begin(); }
+  const_iterator cbegin() const { return m_vec.cbegin(); }
+  iterator end() { return m_vec.end(); }
+  const_iterator end() const { return m_vec.end(); }
+  const_iterator cend() const { return m_vec.cend(); }
 };
 
 struct Score
@@ -279,7 +288,7 @@ protected:
                     const char * B0, long int Bstart, long int & Bend,
                     std::vector<long int> & Delta, unsigned int m_o, DiagonalMatrix& Diag) const;
 
-  long int scoreMatch (const Diagonal Diag, long int Dct, long int CDi,
+  long int scoreMatch (const Diagonal& Diag, long int Dct, long int CDi,
                        const char * A, const char * B, long int N, unsigned int m_o) const;
 
 };

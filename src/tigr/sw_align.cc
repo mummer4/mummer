@@ -137,10 +137,10 @@ bool aligner::_alignEngine
     Dadj = Iadj - 1;
 
     //-- Set parent diagonal values
-    auto&       PrevD  = Diag[Dct - 1] ; // previous diagonal
-    PDs                = PrevD.rbound - PrevD.lbound + 1;
-    PDi                = lbound + Dadj;
-    PDi                = PDi - PrevD.lbound;
+    const auto& PrevD = Diag[Dct - 1] ; // previous diagonal
+    PDs               = PrevD.rbound - PrevD.lbound + 1;
+    PDi               = lbound + Dadj;
+    PDi               = PDi - PrevD.lbound;
 
     //-- Set grandparent diagonal values
     const long PPDct = Dct - 2; //  prev prev diagonal
@@ -161,17 +161,18 @@ bool aligner::_alignEngine
     for(CDi = lbound; CDi <= rbound; CDi ++) {
       //-- Set the index (in memory) of current node and clear score
       Di = CDi - CurD.lbound;
+      auto& CurDi = CurD.I[Di];
 
       //-- Calculate DELETE score
       if(PDi >= 0  &&  PDi < PDs ) {
         const auto& PrevDi = PrevD.I[PDi];
-        scoreEdit(CurD.I[Di].S[DELETE],
+        scoreEdit(CurDi.S[DELETE],
                   PrevDi.S[DELETE].value + (PrevDi.S[DELETE].used == NONE ? 0 : CONT_GAP_SCORE [_matrix_type]),
                   PrevDi.S[INSERT].value + (PrevDi.S[INSERT].used == NONE ? 0 : OPEN_GAP_SCORE [_matrix_type]),
                   PrevDi.S[MATCH].value  + (PrevDi.S[MATCH].used == NONE  ? 0 : OPEN_GAP_SCORE [_matrix_type]));
       } else {
-        CurD.I[Di].S[DELETE].value = min_score;
-        CurD.I[Di].S[DELETE].used  = NONE;
+        CurDi.S[DELETE].value = min_score;
+        CurDi.S[DELETE].used  = NONE;
       }
 
       PDi ++;
@@ -179,35 +180,35 @@ bool aligner::_alignEngine
       //-- Calculate INSERT score
       if(PDi >= 0  &&  PDi < PDs ) {
         const auto& PrevDi = PrevD.I[PDi];
-        scoreEdit(CurD.I[Di].S[INSERT],
+        scoreEdit(CurDi.S[INSERT],
                   PrevDi.S[DELETE].value + (PrevDi.S[DELETE].used == NONE ? 0 : OPEN_GAP_SCORE [_matrix_type]),
                   PrevDi.S[INSERT].value + (PrevDi.S[INSERT].used == NONE ? 0 : CONT_GAP_SCORE [_matrix_type]),
                   PrevDi.S[MATCH].value  + (PrevDi.S[MATCH].used == NONE  ? 0 : OPEN_GAP_SCORE [_matrix_type]));
       } else {
-        CurD.I[Di].S[INSERT].value = min_score;
-        CurD.I[Di].S[INSERT].used  = NONE;
+        CurDi.S[INSERT].value = min_score;
+        CurDi.S[INSERT].used  = NONE;
       }
 
       //-- Calculate MATCH/MIS-MATCH score
       if(PPDi >= 0  &&  PPDi < PPDs) {
         const auto& PPrevDi = PPrevD.I[PPDi];
-        scoreEdit(CurD.I[Di].S[MATCH],
+        scoreEdit(CurDi.S[MATCH],
                   PPrevDi.S[DELETE].value,
                   PPrevDi.S[INSERT].value,
                   PPrevDi.S[MATCH].value);
-        CurD.I[Di].S[MATCH].value += scoreMatch(CurD, Dct, CDi, A, B, N, m_o);
+        CurDi.S[MATCH].value += scoreMatch(CurD, Dct, CDi, A, B, N, m_o);
       } else {
-        CurD.I[Di].S[MATCH].value = min_score;
-        CurD.I[Di].S[MATCH].used  = NONE;
+        CurDi.S[MATCH].value = min_score;
+        CurDi.S[MATCH].used  = NONE;
       }
 
       PPDi ++;
 
-      CurD.I[Di].max(maxScore (CurD.I[Di].S));
+      CurDi.max(maxScore (CurDi.S));
 
       //-- Reset high_score if new global max was found
-      if(CurD.I[Di].max().value >= high_score) {
-        high_score = CurD.I[Di].max().value;
+      if(CurDi.max().value >= high_score) {
+        high_score = CurDi.max().value;
         FinishCt   = Dct;
         FinishCDi  = CDi;
       }
@@ -243,14 +244,16 @@ bool aligner::_alignEngine
 
 
     //-- Trim hopeless diagonal nodes
-    for(Di = 0; Di < Ds; Di ++) {
-      if(high_score - CurD.I[Di].max().value > max_diff )
+    const auto CurDi_start = CurD.I.cbegin();
+    const auto CurDi_end   = CurDi_start + Ds;
+    for(auto it = CurDi_start ; it < CurDi_end; ++it) {
+      if(high_score - it->max().value > max_diff )
         lbound ++;
       else
         break;
     }
-    for(Di = Ds - 1; Di >= 0; Di --) {
-      if(high_score - CurD.I[Di].max().value > max_diff )
+    for(auto it = CurDi_end - 1; it >= CurDi_start; --it) {
+      if(high_score - it->max().value > max_diff )
         rbound --;
       else
         break;
@@ -338,7 +341,7 @@ bool aligner::_alignEngine
 }
 
 long int aligner::scoreMatch
-     (const Diagonal Diag, long int Dct, long int CDi,
+     (const Diagonal& Diag, long int Dct, long int CDi,
       const char * A, const char * B, long int N, unsigned int m_o) const
 
      //  Diag is the single diagonal that contains the node to be scored
