@@ -7,3 +7,4 @@ V_YAGGO_0 = @echo "  YAGGO   " $@;
 
 YAGGO_BUILT = # Append all file to be built by yaggo
 BUILT_SOURCES = $(YAGGO_BUILT)
+noinst_HEADERS = $(YAGGO_BUILT)
