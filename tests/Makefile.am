@@ -17,4 +17,3 @@ SH_LOG_COMPILER = $(srcdir)/tests/testsh
 TESTS += %D%/save_load.sh
 
 %D%/save_load.log: %D%/data/small_reads_0.fa %D%/data/small_reads_1.fa
-

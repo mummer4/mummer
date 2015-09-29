@@ -59,6 +59,10 @@ option("save") {
 option("load") {
   description "Load suffix array from file starting with PREFIX"
   string; typestr "PREFIX" }
+option("batch") {
+  description "Proceed by batch of chunks of BASES from the reference"
+  uint64; typestr "BASES"
+  conflict "save", "load" }
 option("t", "threads") {
   description "Use NUM threads (# of cores)"
   uint32; typestr "NUM" }

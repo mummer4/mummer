@@ -4,6 +4,8 @@
 #include <vector>
 #include <forward_list>
 #include <thread>
+#include <limits>
+#include <memory>
 #include <mummer/sparseSA.hpp>
 #include <mummer/mgaps.hh>
 #include <mummer/postnuc.hh>
@@ -163,8 +165,13 @@ struct sequence_info {
   std::string         sequence;
   std::string         headers;
 
+  static std::unique_ptr<std::ifstream> open_path(const char* path);
+
   // Load from a file
-  explicit sequence_info(const char* path);
+  sequence_info(std::istream& is, size_t chunk_size);
+  explicit sequence_info(std::istream& is) : sequence_info(is, std::numeric_limits<size_t>::max()) { }
+  sequence_info(std::unique_ptr<std::ifstream>&& is, size_t chunk_size) : sequence_info(*is, chunk_size) { }
+  explicit sequence_info(const char* path) : sequence_info(open_path(path), std::numeric_limits<size_t>::max()) { }
   sequence_info(sequence_info&& rhs) = default;
   sequence_info(const sequence_info& rhs) = delete;
   sequence_info& operator=(const sequence_info& rhs) = delete;
@@ -218,8 +225,15 @@ public:
     , m_clusterer(opts.fixed_separation, opts.max_separation,
                   opts.min_output_score, opts.separation_factor,
                   opts.use_extent)
-    // , merger(opts.do_delta, opts.do_extend, opts.to_seqend, opts.do_shadows,
-    //          opts.break_len, opts.banding, sw_align::NUCLEOTIDE)
+    , m_options(opts)
+  { }
+  FileAligner(std::istream& is, size_t chunk_size, Options opts = Options())
+    : m_reference_info(is, chunk_size)
+    , m_sa(mummer::sparseSA::create_auto(m_reference_info.sequence.c_str(), m_reference_info.sequence.length(),
+                                         opts.min_len, true))
+    , m_clusterer(opts.fixed_separation, opts.max_separation,
+                  opts.min_output_score, opts.separation_factor,
+                  opts.use_extent)
     , m_options(opts)
   { }
   FileAligner(sequence_info&& reference_info, mummer::sparseSA&& sa, Options opts = Options())

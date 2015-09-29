@@ -2,6 +2,7 @@
 #include <fstream>
 #include <functional>
 #include <unordered_map>
+#include <stdexcept>
 #include <mummer/nucmer.hpp>
 #include <mummer/sparseSA.hpp>
 #include <mummer/mgaps.hh>
@@ -87,17 +88,21 @@ void SequenceAligner::align(const char* query, size_t query_len, std::vector<pos
                                   const FastaRecordSeq& Bf) { for(auto& al : als) alignments.push_back(std::move(al)); });
 }
 
-sequence_info::sequence_info(const char* path)  {
+std::unique_ptr<std::ifstream> sequence_info::open_path(const char* path) {
+  std::unique_ptr<std::ifstream> data(new std::ifstream(path));
+  if(!data->good())
+    throw std::runtime_error(std::string("Unable to open '") + path + "'");
+  return data;
+}
+
+sequence_info::sequence_info(std::istream& data, size_t chunk_size)  {
   std::string meta, line;
 
-
-  // TODO: should not write to cerr, but return an error, somehow.
-  std::ifstream data(path);
-  if(!data.is_open()) { std::cerr << "unable to open " << path << std::endl; exit(1); }
   int c = data.peek();
-  if(c != '>') { std::cerr << "first character must be a '>', got '" << (char)c << "'" << std::endl; exit(1); }
+  if(c != '>')
+    throw std::runtime_error(std::string("First character must be a '>', got '") + (char)c + "'");
 
-  while(c != EOF) {
+  while(c != EOF && sequence.size() < chunk_size) {
     std::getline(data, line); // Load one line at a time.
 
     // Read metadata

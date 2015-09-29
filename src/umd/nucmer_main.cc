@@ -61,30 +61,42 @@ int main(int argc, char *argv[]) {
 
   std::mutex os_mutex;
   std::unique_ptr<mummer::nucmer::FileAligner> aligner;
+  std::ifstream reference;
 
   if(args.load_given) {
     mummer::nucmer::sequence_info reference_info(args.ref_arg);
     mummer::mummer::sparseSA SA(reference_info.sequence, args.load_arg);
     aligner.reset(new mummer::nucmer::FileAligner(std::move(reference_info), std::move(SA)));
   } else {
-    aligner.reset(new mummer::nucmer::FileAligner(args.ref_arg, opts));
+    reference.open(args.ref_arg);
+    if(!reference.good())
+      nucmer_cmdline::error() << "Failed to open reference file '" << args.ref_arg << "'";
   }
 
-  if(args.save_given && !aligner->sa().save(args.save_arg))
-    nucmer_cmdline::error() << "Can't save the suffix array to '" << args.save_arg << "'";
+  const size_t batch_size = args.batch_given ? args.batch_arg : std::numeric_limits<size_t>::max();
+  int i = 0;
+  do {
+    if(!args.load_given)
+      aligner.reset(new mummer::nucmer::FileAligner(reference, batch_size,  opts));
 
-  auto print_function = [&](std::vector<mummer::postnuc::Alignment>&& als,
-                            const mummer::nucmer::FastaRecordPtr& Af, const mummer::nucmer::FastaRecordSeq& Bf) {
-    std::lock_guard<std::mutex> lock (os_mutex);
-    assert(Af.Id()[strlen(Af.Id()) - 1] != ' ');
-    assert(Bf.Id().back() != ' ');
-    mummer::postnuc::printDeltaAlignments(als, Af.Id(), Af.len(), Bf.Id(), Bf.len(), os);
-    if(!os.good())
-      nucmer_cmdline::error() << "Error while writing to output delta file '" << args.delta_arg << '\'';
-  };
-  os << std::flush;
+    if(args.save_given && !aligner->sa().save(args.save_arg))
+      nucmer_cmdline::error() << "Can't save the suffix array to '" << args.save_arg << "'";
 
-  const unsigned int nb_threads = args.threads_given ? args.threads_arg : std::thread::hardware_concurrency();
-  aligner->align_file(args.qry_arg, print_function, nb_threads);
+    auto print_function = [&](std::vector<mummer::postnuc::Alignment>&& als,
+                              const mummer::nucmer::FastaRecordPtr& Af, const mummer::nucmer::FastaRecordSeq& Bf) {
+      std::lock_guard<std::mutex> lock (os_mutex);
+      assert(Af.Id()[strlen(Af.Id()) - 1] != ' ');
+      assert(Bf.Id().back() != ' ');
+      mummer::postnuc::printDeltaAlignments(als, Af.Id(), Af.len(), Bf.Id(), Bf.len(), os);
+      if(!os.good())
+        nucmer_cmdline::error() << "Error while writing to output delta file '" << args.delta_arg << '\'';
+    };
+    os << std::flush;
+
+    const unsigned int nb_threads = args.threads_given ? args.threads_arg : std::thread::hardware_concurrency();
+    aligner->align_file(args.qry_arg, print_function, nb_threads);
+    std::cerr << i++ << ' ' << (char)reference.peek() << ' ' << reference.tellg() << std::endl;
+  } while(!args.load_given && reference.peek() != EOF);
+
   return 0;
 }
