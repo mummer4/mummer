@@ -47,9 +47,12 @@ option("r", "reverse") {
 option("nosimplify") {
   description "Don't simplify alignments by removing shadowed clusters. Use this option when aligning a sequence to itself to look for repeats"
   off }
+option("p", "prefix") {
+  description "Write output to PREFIX.delta"
+  string; typestr "PREFIX"; default "out" }
 option("delta") {
-  description "Output delta file"
-  c_string; default "stdout" }
+  description "Output delta file to PATH (instead of PREFIX.delta)"
+  c_string; typestr "PATH"; conflict "prefix" }
 option("save") {
   description "Save suffix array to files starting with PREFIX"
   string; typestr "PREFIX" }

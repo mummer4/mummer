@@ -50,14 +50,11 @@ int main(int argc, char *argv[]) {
   if(args.forward_flag) opts.forward();
   if(args.reverse_flag) opts.reverse();
 
-  std::ostream os(std::cout.rdbuf());
-  std::ofstream delta;
-  if(args.delta_given) {
-    delta.open(args.delta_arg);
-    if(!delta.good())
-      nucmer_cmdline::error() << "Failed to open output delta file '" << args.delta_arg << '\'';
-    os.rdbuf(delta.rdbuf());
-  }
+  const std::string delta_file = args.delta_given ? args.delta_arg : args.prefix_arg + ".delta";
+  std::ofstream os(delta_file);
+  if(!os.good())
+    nucmer_cmdline::error() << "Failed to open output delta file '" << delta_file << '\'';
+
   getrealpath real_ref(args.ref_arg), real_qry(args.qry_arg);
   os << real_ref << ' ' << real_qry << '\n'
      << "NUCMER\n";
