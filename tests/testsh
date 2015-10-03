@@ -1,0 +1,17 @@
+#! /bin/bash
+
+set -e
+set -x
+
+BUILD=$(pwd)
+# Path to data
+D=$(pwd)/tests/data
+PATH=$(pwd):$PATH
+# Name
+N=$(basename $1 .sh)
+# Working directory
+WORKDIR=tests/$N
+mkdir -p $WORKDIR
+cd $WORKDIR
+
+source $BUILD/$1

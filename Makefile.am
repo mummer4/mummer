@@ -1,12 +1,20 @@
 include yaggo.mk
-SUBDIRS = . tests $(MAYBE_SWIG)
+# SUBDIRS = . tests
 ACLOCAL_AMFLAGS = -I m4
 
 AM_CPPFLAGS = -Wall -I$(srcdir)/include $(JELLYFISH2_0_CFLAGS)
 AM_LDFLAGS = -lpthread
 
+######################
+# Automake variables #
+######################
 bin_PROGRAMS =
 EXTRA_DIST =
+CLEANFILES =
+DISTCLEANFILES =
+check_PROGRAMS =
+TESTS =
+TEST_EXTENSIONS =
 
 ###########
 # library #
@@ -46,3 +54,14 @@ postnuc_SOURCES = src/tigr/postnuc_main.cc
 bin_PROGRAMS += nucmer
 YAGGO_BUILT += src/umd/nucmer_cmdline.hpp
 nucmer_SOURCES = src/umd/nucmer_main.cc
+
+#################
+# SWIG bindings #
+#################
+include swig/Makefile.am
+
+#########
+# Tests #
+#########
+include unittests/Makefile.am
+include tests/Makefile.am

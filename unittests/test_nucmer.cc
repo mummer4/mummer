@@ -65,12 +65,6 @@ TEST(Nucmer, PairSequences) {
   s2[25] = (s2[25] == 'a' ? 'c' : 'a'); // substitution
   EXPECT_EQ((size_t)999, s1.size());
   EXPECT_EQ((size_t)999, s2.size());
-  { std::ofstream os("ref.fa");
-    os << ">ref\n" << s1 << "\n";
-  }
-  { std::ofstream os("qry.fa");
-    os << ">qry\n" << s2 << "\n";
-  }
 
   mummer::nucmer::Options opts;
   opts.minmatch(10).mincluster(15);

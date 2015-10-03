@@ -42,36 +42,26 @@ AC_ARG_ENABLE([swig],
 AS_IF([test x$enable_swig = xyes],
       [AX_PKG_SWIG([3.0.0], [], [AC_MSG_ERROR([SWIG version 3 is required])])])
 AS_IF([test -n "$SWIG"],
-      [SWIG_ENABLE_CXX]
-      [maybe_swig=swig])
+      [SWIG_ENABLE_CXX])
 AM_CONDITIONAL([HAVE_SWIG], [test -n "$SWIG"])
 
 # Python binding setup
 AM_CONDITIONAL(PYTHON_BINDING, [test -n "$enable_python_binding" -a x$enable_python_binding != xno])
 AM_COND_IF([PYTHON_BINDING],
            [AS_IF([test x$enable_python_binding != xyes], [PYTHON_SITE_PKG=$enable_python_binding])]
-           [AX_PYTHON_DEVEL]
-           [maybe_swig=swig])
+           [AX_PYTHON_DEVEL])
 
 # Ruby binding setup
 AM_CONDITIONAL([RUBY_BINDING], [test -n "$enable_ruby_binding" -a x$enable_ruby_binding != xno])
 AM_COND_IF([RUBY_BINDING],
            [AS_IF([test x$enable_ruby_binding != xyes], [RUBY_EXT_LIB=$enable_ruby_binding])]
-           [AX_RUBY_EXT]
-           [maybe_swig=swig])
+           [AX_RUBY_EXT])
 
 # Perl binding setup
 AM_CONDITIONAL([PERL_BINDING], [test -n "$enable_perl_binding" -a x$enable_perl_binding != xno])
 AM_COND_IF([PERL_BINDING],
            [AS_IF([test x$enable_perl_binding != xyes], [PERL_EXT_LIB=$enable_perl_binding])]
-           [AX_PERL_EXT]
-           [maybe_swig=swig])
+           [AX_PERL_EXT])
 
-# Enable compilation of SWIG and bindings
-AC_SUBST([MAYBE_SWIG], [$maybe_swig])
-AS_IF([test -n "$maybe_swig"],
-      [AC_CONFIG_FILES([swig/Makefile])])
-
-
-AC_CONFIG_FILES([Makefile tests/Makefile])
+AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
