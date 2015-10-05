@@ -1,0 +1,9 @@
+purpose "Sort the data inside of fasta file"
+
+description "Sort, line by line, the data within each entry of the
+fasta file."
+
+arg("file") {
+  description "Input fasta files"
+  c_string; typestr "path"
+  multiple; at_least 1 }

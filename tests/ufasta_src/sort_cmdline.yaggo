@@ -1,0 +1,23 @@
+purpose "Sort fasta file according to header"
+
+option("n", "numeric-sort") {
+  description "Compare according to string numerical value"
+  off }
+option("R", "random-sort") {
+  description "Random order"
+  off; conflict "numeric-sort" }
+option("f", "ignore-case") {
+  description "Case insensitive sorting"
+  off; conflict "random-sort", "numeric-sort" }
+option("C", "character") {
+  description "Starting character of sorting key"
+  uint32; default 1 }
+option("H", "header-full") {
+  description "Use full line of header as sorting key, not first word"
+  off }
+option("k", "key") {
+  description "1-index of column in header to sort by"
+  uint32; default 1 }
+arg("file") {
+  description "Input fasta files"
+  c_string; typestr "path"; multiple; at_least 1 }
