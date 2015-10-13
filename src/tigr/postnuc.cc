@@ -115,109 +115,113 @@ void merge_syntenys::extendClusters(std::vector<Cluster> & Clusters,
 
   std::vector<Match>::iterator Mp;          // match pointer
 
-  // std::vector<Cluster>::iterator PrevCp;    // where the extensions last left off
-  // std::vector<Cluster>::iterator CurrCp;    // the current cluster being extended
-  // std::vector<Cluster>::iterator TargetCp = Clusters.end( );  // the target cluster
-  auto TargetCp = Clusters.end();
-  decltype(TargetCp) PrevCp;
-  decltype(TargetCp)  CurrCp;
-
   std::vector<Alignment>::iterator CurrAp = Alignments.begin( );   // current align
   std::vector<Alignment>::iterator TargetAp;                // target align
 
 
   //-- Extend each cluster
-  PrevCp = Clusters.begin( );
-  CurrCp = Clusters.begin( );
+  auto TargetCp = Clusters.end(); // the target cluster
+  auto PrevCp   = Clusters.begin( ); // where the extensions last left off
+  auto CurrCp   = Clusters.begin( ); // the current cluster being extended
   while ( CurrCp < Clusters.end( ) ) {
-      if ( DO_EXTEND ) {
-        if ( ! target_reached ) //-- Ignore if shadowed or already extended
-          if ( CurrCp->wasFused ||
-               (!DO_SHADOWS && isShadowedCluster (CurrCp, Alignments, CurrAp)) ) {
-            CurrCp->wasFused = true;
-            CurrCp = ++ PrevCp;
-            continue;
+    if ( DO_EXTEND ) {
+      if ( ! target_reached ) //-- Ignore if shadowed or already extended
+        if ( CurrCp->wasFused ||
+             (!DO_SHADOWS && isShadowedCluster (CurrCp, Alignments, CurrAp)) ) {
+          CurrCp->wasFused = true;
+          CurrCp = ++ PrevCp;
+          continue;
+        }
+    }
+
+    //-- Pick the right directional sequence for B
+    if ( CurrCp->dirB == FORWARD_CHAR )
+      B = Bseq;
+    else if ( Brev )
+      B = Brev.get();
+    else {
+      Brev.reset(new char[Blen + 2]);
+      memcpy ( Brev.get() + 1, Bseq + 1, Blen );
+      Brev[0] = Brev[Blen+1] = '\0';
+      Reverse_Complement (Brev.get(), 1, Blen);
+      B = Brev.get();
+    }
+
+    //-- Extend each match in the cluster
+    for ( Mp = CurrCp->matches.begin( ); Mp < CurrCp->matches.end( ); ++Mp) {
+      //-- Try to extend the current match backwards
+      if ( target_reached ) {
+        //-- Merge with the previous match
+        if ( CurrAp->eA != Mp->sA  ||  CurrAp->eB != Mp->sB ) {
+          if ( Mp >= CurrCp->matches.end( ) - 1 ) {
+            std::cerr << "ERROR: Target match does not exist, please\n"
+                      << "       file a bug report\n";
+            exit (EXIT_FAILURE);
           }
+          continue;
+        }
+        CurrAp->eA += Mp->len - 1;
+        CurrAp->eB += Mp->len - 1;
+        assert(CurrAp->sA >= 1 && CurrAp->eA <= Alen);
+        assert(CurrAp->sB >= 1 && CurrAp->eB <= Blen);
+      } else { //-- Create a new alignment object
+        Alignments.push_back({ *Mp, CurrCp->dirB } );
+        CurrAp = Alignments.end( ) - 1;
+
+        if ( DO_EXTEND  ||  Mp != CurrCp->matches.begin ( ) ) {
+          //-- Target the closest/best alignment object
+          TargetAp = getReverseTargetAlignment (Alignments, CurrAp);
+          assert(CurrAp->sA >= 1 && CurrAp->eA <= Alen);
+          assert(CurrAp->sB >= 1 && CurrAp->eB <= Blen);
+          assert(TargetAp >= Alignments.begin());
+          assert(TargetAp <= Alignments.end());
+
+          //-- Extend the new alignment object backwards
+          if ( extendBackward (Alignments, CurrAp, TargetAp, A, B) )
+            CurrAp = TargetAp;
+          assert(CurrAp->sA >= 1 && CurrAp->eA <= Alen);
+          assert(CurrAp->sB >= 1 && CurrAp->eB <= Blen);
+        }
       }
 
-      //-- Pick the right directional sequence for B
-      if ( CurrCp->dirB == FORWARD_CHAR )
-        B = Bseq;
-      else if ( Brev )
-        B = Brev.get();
-      else {
-        Brev.reset(new char[Blen + 2]);
-        memcpy ( Brev.get() + 1, Bseq + 1, Blen );
-        Brev[0] = Brev[Blen+1] = '\0';
-        Reverse_Complement (Brev.get(), 1, Blen);
-        B = Brev.get();
-      }
+      m_o = sw_align::FORWARD_ALIGN;
 
-      //-- Extend each match in the cluster
-      for ( Mp = CurrCp->matches.begin( ); Mp < CurrCp->matches.end( ); Mp ++ ) {
-        //-- Try to extend the current match backwards
-        if ( target_reached ) {
-          //-- Merge with the previous match
-          if ( CurrAp->eA != Mp->sA  ||  CurrAp->eB != Mp->sB ) {
-            if ( Mp >= CurrCp->matches.end( ) - 1 ) {
-              std::cerr << "ERROR: Target match does not exist, please\n"
-                   << "       file a bug report\n";
-              exit (EXIT_FAILURE);
-            }
-            continue;
-          }
-          CurrAp->eA += Mp->len - 1;
-          CurrAp->eB += Mp->len - 1;
-        } else { //-- Create a new alignment object
-          Alignments.push_back({ *Mp, CurrCp->dirB } );
-          CurrAp = Alignments.end( ) - 1;
+      //-- Try to extend the current match forwards
+      if ( Mp < CurrCp->matches.end( ) - 1 ) {
+        //-- Target the next match in the cluster
+        targetA = (Mp + 1)->sA;
+        targetB = (Mp + 1)->sB;
 
-          if ( DO_EXTEND  ||  Mp != CurrCp->matches.begin ( ) ) {
-            //-- Target the closest/best alignment object
-            TargetAp = getReverseTargetAlignment (Alignments, CurrAp);
+        //-- Extend the current alignment object forward
+        target_reached = extendForward (CurrAp, A, targetA, B, targetB, m_o);
+      } else if ( DO_EXTEND ) {
+        targetA = Alen;
+        targetB = Blen;
 
-            //-- Extend the new alignment object backwards
-            if ( extendBackward (Alignments, CurrAp, TargetAp, A, B) )
-              CurrAp = TargetAp;
-          }
+        //-- Target the closest/best match in a future cluster
+        TargetCp = getForwardTargetCluster (Clusters, CurrCp, targetA, targetB);
+        assert(targetA <= Alen);
+        assert(targetB <= Blen);
+        if ( TargetCp == Clusters.end( ) ) {
+          m_o |= sw_align::OPTIMAL_BIT;
+          if ( TO_SEQEND )
+            m_o |= sw_align::SEQEND_BIT;
         }
 
-        m_o = sw_align::FORWARD_ALIGN;
-
-          //-- Try to extend the current match forwards
-          if ( Mp < CurrCp->matches.end( ) - 1 ) {
-            //-- Target the next match in the cluster
-            targetA = (Mp + 1)->sA;
-            targetB = (Mp + 1)->sB;
-
-            //-- Extend the current alignment object forward
-            target_reached = extendForward (CurrAp, A, targetA, B, targetB, m_o);
-          } else if ( DO_EXTEND ) {
-            targetA = Alen;
-            targetB = Blen;
-
-            //-- Target the closest/best match in a future cluster
-            TargetCp = getForwardTargetCluster (Clusters, CurrCp, targetA, targetB);
-            if ( TargetCp == Clusters.end( ) ) {
-              m_o |= sw_align::OPTIMAL_BIT;
-              if ( TO_SEQEND )
-                m_o |= sw_align::SEQEND_BIT;
-            }
-
-            //-- Extend the current alignment object forward
-            target_reached = extendForward (CurrAp, A, targetA, B, targetB, m_o);
-          }
+        //-- Extend the current alignment object forward
+        target_reached = extendForward (CurrAp, A, targetA, B, targetB, m_o);
       }
-      if ( TargetCp == Clusters.end( ) )
-        target_reached = false;
-
-      CurrCp->wasFused = true;
-
-      if ( target_reached == false )
-        CurrCp = ++ PrevCp;
-      else
-        CurrCp = TargetCp;
     }
+    if ( TargetCp == Clusters.end( ) )
+      target_reached = false;
+
+    CurrCp->wasFused = true;
+
+    if ( target_reached == false )
+      CurrCp = ++ PrevCp;
+    else
+      CurrCp = TargetCp;
+  }
 
 #ifdef _DEBUG_ASSERT
   validateData (Alignments, Clusters, Aseq, Alen, Bseq, Blen);
@@ -506,8 +510,6 @@ std::vector<Alignment>::iterator merge_syntenys::getReverseTargetAlignment
 //  therefore all alignments are in order by their start A coordinate.
 
 {
-  std::vector<Alignment>::iterator Ap;        // alignment pointer
-  std::vector<Alignment>::iterator Aip;       // alignment iterative pointer
   long int greater, lesser;              // gap sizes between the two alignments
   const long int sA = CurrAp->sA;              // the startA of the current alignment
   const long int sB = CurrAp->sB;              // the startB of the current alignment
@@ -516,46 +518,35 @@ std::vector<Alignment>::iterator merge_syntenys::getReverseTargetAlignment
   long int dist = (sA < sB ? sA : sB);
 
   //-- For all alignments less than the current alignment (on sequence A)
-  Ap = Alignments.end( );
-  for ( Aip = CurrAp - 1; Aip >= Alignments.begin( ); --Aip)
-    {
-      //-- If the alignment is on the same direction
-      if ( CurrAp->dirB == Aip->dirB )
-        {
-          const long eA = Aip->eA;
-          const long eB = Aip->eB;
+  auto Ap = Alignments.end( ); // alignment pointer
+  for (auto Aip = CurrAp - 1; Aip >= Alignments.begin( ); --Aip) {
+    //-- If the alignment is on the same direction
+    if ( CurrAp->dirB == Aip->dirB ) {
+      const long eA = Aip->eA;
+      const long eB = Aip->eB;
 
-          //-- If the alignment is strictly less than current cluster
-          if ( eA <= sA  && eB <= sB )
-            {
-              if ( sA - eA > sB - eB )
-                {
-                  greater = sA - eA;
-                  lesser = sB - eB;
-                }
-              else
-                {
-                  lesser = sA - eA;
-                  greater = sB - eB;
-                }
-
-              //-- If the cluster is close enough
-              if ( greater < aligner.breakLen( )  ||
-                   (lesser) * aligner.good_score() +
-                   (greater - lesser) * aligner.cont_gap_score() >= 0 )
-                {
-                  Ap = Aip;
-                  break;
-                }
-              else if ( (greater << 1) - lesser < dist )
-                {
-                  Ap = Aip;
-                  dist = (greater << 1) - lesser;
-                }
-            }
+      //-- If the alignment is strictly less than current cluster
+      if ( eA <= sA  && eB <= sB ) {
+        if ( sA - eA > sB - eB ) {
+          greater = sA - eA;
+          lesser  = sB - eB;
+        } else {
+          lesser  = sA - eA;
+          greater = sB - eB;
         }
-    }
 
+        //-- If the cluster is close enough
+        if ( greater < aligner.breakLen( )  ||
+             (lesser) * aligner.good_score() + (greater - lesser) * aligner.cont_gap_score() >= 0 ) {
+          Ap = Aip;
+          break;
+        } else if ( (greater << 1) - lesser < dist ) {
+          Ap = Aip;
+          dist = (greater << 1) - lesser;
+        }
+      }
+    }
+  }
 
   return Ap;
 }
@@ -570,23 +561,21 @@ bool isShadowedCluster(std::vector<Cluster>::const_iterator CurrCp,
 //  alignment region. Return true if it is, else false.
 
 {
-  long int sA = CurrCp->matches.front().sA;
-  long int eA = CurrCp->matches.back().sA + CurrCp->matches.back().len - 1;
-  long int sB = CurrCp->matches.front().sB;
-  long int eB = CurrCp->matches.back().sB + CurrCp->matches.rbegin( )->len - 1;
+  const long int sA = CurrCp->matches.front().sA;
+  const long int eA = CurrCp->matches.back().sA + CurrCp->matches.back().len - 1;
+  const long int sB = CurrCp->matches.front().sB;
+  const long int eB = CurrCp->matches.back().sB + CurrCp->matches.back().len - 1;
 
-  if ( ! Alignments.empty( ) )             // if there are alignments to use
-    {
-      //-- Look backwards in hope of finding a shadowing alignment
-      auto Aip = Ap;
-      for ( ; Aip >= Alignments.begin( ); -- Aip ) {
-          //-- If in the same direction and shadowing the current cluster, break
-          if ( Aip->dirB == CurrCp->dirB )
-            if ( Aip->eA >= eA  &&  Aip->eB >= eB )
-              if ( Aip->sA <= sA  &&  Aip->sB <= sB )
-                return true; // shadow found
-      }
+  if ( ! Alignments.empty( ) ) {           // if there are alignments to use
+    //-- Look backwards in hope of finding a shadowing alignment
+    for(auto Aip = Ap ; Aip != Alignments.cbegin( ); -- Aip ) {
+      //-- If in the same direction and shadowing the current cluster, break
+      if ( Aip->dirB == CurrCp->dirB &&
+           Aip->eA >= eA  &&  Aip->eB >= eB &&
+           Aip->sA <= sA  &&  Aip->sB <= sB )
+        return true; // shadow found
     }
+  }
 
   //-- Return false if Alignments was empty or loop was not broken
   return false;

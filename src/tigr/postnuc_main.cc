@@ -300,7 +300,11 @@ int main(int argc, char *argv[]) {
                << "Attempting to continue.\n";
           continue;
         }
-        if(!IdA) {
+        if(!IdA || IdA != &Af[Seqi].Id()) {
+          if(!currCl.matches.empty()) {
+            CurrSp->clusters.push_back(std::move(currCl));
+            currCl = Cluster(DirB);
+          }
           IdA = &Af[Seqi].Id();
           CurrSp = std::find_if(Syntenys.rbegin(), Syntenys.rend(), [=](const synteny_type& s) { return s.AfP->Id() == *IdA; });
           if(CurrSp == Syntenys.rend()) { // Not seen yet, create new synteny region
@@ -314,16 +318,11 @@ int main(int argc, char *argv[]) {
             exit (EXIT_FAILURE);
           }
         }
-        if(*IdA != Af[Seqi].Id()) {
-          cerr << "WARNING: A cluster was found straddling two reference sequences:\n"
-               << "1) " << IdA << "\nand\n2) " << Af[Seqi].Id() << '\n'
-               << "File a bug report\n";
-          exit(EXIT_FAILURE);
-        }
         if(len > 1)
           currCl.matches.push_back({ sA, sB, len });
       }
-      CurrSp->clusters.push_back(std::move(currCl));
+      if(!currCl.matches.empty())
+        CurrSp->clusters.push_back(std::move(currCl));
       if(c == '#')
         ignore_line(std::cin);
     }
