@@ -49,6 +49,8 @@ int main(int argc, char *argv[]) {
   if(args.nosimplify_flag) opts.nosimplify();
   if(args.forward_flag) opts.forward();
   if(args.reverse_flag) opts.reverse();
+  if(args.mum_flag) opts.mum();
+  if(args.maxmatch_flag) opts.maxmatch();
 
   const std::string delta_file = args.delta_given ? args.delta_arg : args.prefix_arg + ".delta";
   std::ofstream os(delta_file);
@@ -74,7 +76,6 @@ int main(int argc, char *argv[]) {
   }
 
   const size_t batch_size = args.batch_given ? args.batch_arg : std::numeric_limits<size_t>::max();
-  int i = 0;
   do {
     if(!args.load_given)
       aligner.reset(new mummer::nucmer::FileAligner(reference, batch_size,  opts));
@@ -95,7 +96,6 @@ int main(int argc, char *argv[]) {
 
     const unsigned int nb_threads = args.threads_given ? args.threads_arg : std::thread::hardware_concurrency();
     aligner->align_file(args.qry_arg, print_function, nb_threads);
-    std::cerr << i++ << ' ' << (char)reference.peek() << ' ' << reference.tellg() << std::endl;
   } while(!args.load_given && reference.peek() != EOF);
 
   return 0;

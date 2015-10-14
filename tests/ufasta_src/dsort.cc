@@ -5,7 +5,12 @@
 #include <dsort_cmdline.hpp>
 
 int dsort_main(int argc, char *argv[]) {
-  const dsort_cmdline args(argc, argv);
+  dsort_cmdline args(argc, argv);
+  if(args.file_arg.empty()) {
+    args.file_arg.push_back("/dev/stdin");
+    if(isatty(0))
+      std::cerr << "Warning: reading from terminal" << std::endl;
+  }
 
   int         res = EXIT_SUCCESS;
   int         c;

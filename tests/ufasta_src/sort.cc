@@ -237,6 +237,11 @@ static int sort_mmap(const sort_cmdline& args) {
 
 int sort_main(int argc, char *argv[]) {
   args.parse(argc, argv);
+  if(args.file_arg.empty()) {
+    args.file_arg.push_back("/dev/stdin");
+    if(isatty(0))
+      std::cerr << "Warning: reading from terminal" << std::endl;
+  }
 
   if(args.numeric_sort_flag)
     return sort_mmap<int64_t>(args);

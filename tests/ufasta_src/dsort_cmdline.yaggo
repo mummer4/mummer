@@ -6,4 +6,4 @@ fasta file."
 arg("file") {
   description "Input fasta files"
   c_string; typestr "path"
-  multiple; at_least 1 }
+  multiple }

@@ -20,4 +20,4 @@ option("k", "key") {
   uint32; default 1 }
 arg("file") {
   description "Input fasta files"
-  c_string; typestr "path"; multiple; at_least 1 }
+  c_string; typestr "path"; multiple }
