@@ -12,7 +12,7 @@ check_LTLIBRARIES = %D%/libgtest.la %D%/libgtest_main.la
 
 GTEST_SRC = %D%/gtest/src/gtest-all.cc	\
 	    %D%/gtest/src/gtest_main.cc	\
-	    %D%/gtest/gtest.h
+	    %D%/gtest/gtest.h %D%/gtest/test.hpp
 
 EXTRA_DIST += $(GTEST_SRC)
 

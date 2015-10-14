@@ -1,4 +1,4 @@
-#!__PERL_PATH
+#!@PERL@
 
 ################################################################################
 #   Programmer: Adam M Phillippy, The Institute for Genomic Research
@@ -16,13 +16,13 @@
 # 
 ################################################################################
 
-use lib "__SCRIPT_DIR";
+use lib "@LIB_DIR@";
 use Foundation;
 use strict;
 use IO::Socket;
 
-my $BIN_DIR = "__BIN_DIR";
-my $SCRIPT_DIR = "__SCRIPT_DIR";
+my $BIN_DIR = "@BIN_DIR@";
+my $LIB_DIR = "@LIB_DIR@";
 
 
 #================================================================= Globals ====#
@@ -176,7 +176,7 @@ my $HELP = qq~
 
 my @DEPEND =
     (
-     "$SCRIPT_DIR/Foundation.pm",
+     "$LIB_DIR/Foundation.pm",
      "$BIN_DIR/delta-filter",
      "$BIN_DIR/show-coords",
      "$BIN_DIR/show-snps",
@@ -881,7 +881,7 @@ sub PlotData ($$$)
         my ($refoff, $reflen, $refdir);
         my ($qryoff, $qrylen, $qrydir);
 
-        if ( defined (%$rref) ) {
+        if ( %$rref ) {
             #-- skip reference sequence or set atts from hash
             if ( !exists ($rref->{$idR}) ) { next; }
             else { ($refoff, $reflen, $refdir) = @{$rref->{$idR}}; }
@@ -891,7 +891,7 @@ sub PlotData ($$$)
             ($refoff, $reflen, $refdir) = (0, $lenR, 1);
         }
 
-        if ( defined (%$qref) ) {
+        if ( %$qref ) {
             #-- skip query sequence or set atts from hash
             if ( !exists ($qref->{$idQ}) ) { next; }
             else { ($qryoff, $qrylen, $qrydir) = @{$qref->{$idQ}}; }
@@ -978,7 +978,7 @@ sub PlotData ($$$)
             my ($refoff, $reflen, $refdir);
             my ($qryoff, $qrylen, $qrydir);
             
-            if ( defined (%$rref) ) {
+            if ( %$rref ) {
                 #-- skip reference sequence or set atts from hash
                 if ( !exists ($rref->{$idR}) ) { next; }
                 else { ($refoff, $reflen, $refdir) = @{$rref->{$idR}}; }
@@ -988,7 +988,7 @@ sub PlotData ($$$)
                 ($refoff, $reflen, $refdir) = (0, $lenR, 1);
             }
             
-            if ( defined (%$qref) ) {
+            if ( %$qref ) {
                 #-- skip query sequence or set atts from hash
                 if ( !exists ($qref->{$idQ}) ) { next; }
                 else { ($qryoff, $qrylen, $qrydir) = @{$qref->{$idQ}}; }
@@ -1031,7 +1031,7 @@ sub PlotData ($$$)
     }
 
 
-    if ( !defined (%$rref) ) {
+    if ( !%$rref ) {
         if ( $ismultiref ) {
             print STDERR
                 "WARNING: Multiple ref sequences overlaid, try -R or -r\n";
@@ -1041,7 +1041,7 @@ sub PlotData ($$$)
         }
     }
 
-    if ( !defined (%$qref) ) {
+    if ( !%$qref ) {
         if ( $ismultiqry && !$OPT_coverage ) {
             print STDERR
                 "WARNING: Multiple qry sequences overlaid, try -Q, -q or -c\n";

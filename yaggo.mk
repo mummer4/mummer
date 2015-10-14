@@ -6,5 +6,6 @@ V_YAGGO_0 = @echo "  YAGGO   " $@;
 	$(V_YAGGO)$(YAGGO) -o $@ $<
 
 YAGGO_BUILT = # Append all file to be built by yaggo
-BUILT_SOURCES = $(YAGGO_BUILT)
+BUILT_SOURCES += $(YAGGO_BUILT)
 noinst_HEADERS = $(YAGGO_BUILT)
+DISTCLEANFILES += $(YAGGO_BUILT)

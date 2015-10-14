@@ -1,9 +1,9 @@
-#!__PERL_PATH
+#!@PERL@
 
-use lib "__SCRIPT_DIR";
+use lib "@LIB_DIR@";
 use Foundation;
 
-my $SCRIPT_DIR = "__SCRIPT_DIR";
+my $SCRIPT_DIR = "@LIB_DIR@";
 
 
 my $VERSION_INFO = q~

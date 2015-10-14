@@ -49,7 +49,7 @@ pythonc_v_GEN_0 = @echo "  PYTHONC " $@;
 %/__init__.pyc: %/mummer.py
 	$(PYTHONC_V_GEN)$(PYTHON) -c 'import py_compile, sys; py_compile.compile(sys.argv[1], sys.argv[2])' $< $@
 %D%/python/mummer.py: %D%/python/swig_wrap.cpp
-EXTRA_DIST += %D%/python/mumemr.py
+# EXTRA_DIST += %D%/python/mummer.py
 
 # Tests
 SWIG_TESTS += %D%/python/test_nucmer.py

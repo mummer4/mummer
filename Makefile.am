@@ -1,24 +1,42 @@
-include yaggo.mk
-# SUBDIRS = . tests
+##########################
+# Automake configuration #
+##########################
 ACLOCAL_AMFLAGS = -I m4
 
 AM_CPPFLAGS = -Wall -I$(srcdir)/include $(JELLYFISH2_0_CFLAGS)
 AM_LDFLAGS = -lpthread
 
-######################
-# Automake variables #
-######################
+# Pre-declare all used variables.
 bin_PROGRAMS =
+bin_SCRIPTS =
+noinst_SCRIPTS =
 EXTRA_DIST =
 CLEANFILES =
 DISTCLEANFILES =
 check_PROGRAMS =
+check_SCRIPTS =
 TESTS =
 TEST_EXTENSIONS =
+BUILT_SOURCES =
 
-###########
-# library #
-###########
+# Special cleaning rules. Like CLEANFILES and DISTCLEANFILES, but for
+# directories.
+CLEANDIRS =
+DISTCLEANDIRS =
+clean-local: clean-local-dirs
+distclean-local: distclean-local-dirs
+.PHONY: clean-local-dirs distclean-local-dirs
+clean-local-dirs:
+	-rm -rf $(CLEANDIRS)
+distclean-local-dirs:
+	-rm -rf $(DISTCLEANDIRS)
+
+# yaggo rules
+include yaggo.mk
+
+##############################
+# Build library libumdmummer #
+##############################
 lib_LTLIBRARIES = libumdmummer.la
 LDADD = libumdmummer.la
 libumdmummer_la_SOURCES  = src/essaMEM/sparseSA.cpp src/essaMEM/qsufsort.c
@@ -44,9 +62,44 @@ essamummer_SOURCES = src/essaMEM/fasta.cpp src/essaMEM/mummer.cpp
 ########
 # tigr #
 ########
-bin_PROGRAMS += mgaps postnuc
+bin_PROGRAMS += mgaps postnuc show-coords show-aligns show-snps
 mgaps_SOURCES = src/tigr/mgaps_main.cc
 postnuc_SOURCES = src/tigr/postnuc_main.cc
+show_coords_SOURCES = src/tigr/show-coords.cc src/tigr/delta.cc
+show_aligns_SOURCES = src/tigr/show-aligns.cc src/tigr/delta.cc src/tigr/translate.cc
+show_snps_SOURCES = src/tigr/show-snps.cc src/tigr/delta.cc src/tigr/translate.cc
+
+###########
+# scripts #
+###########
+# For each script, generate 2 versions: one with local path, to use
+# directly; and one (in .libs/) to use after installation. Similar to
+# what LIBTOOLS does.
+
+# List of scripts to install
+perl_scripts = mummerplot mapview dnadiff
+perl_libs_scripts = $(patsubst %,.libs/%,$(perl_scripts))
+bin_SCRIPTS += $(perl_libs_scripts)
+noinst_SCRIPTS += $(perl_scripts)
+EXTRA_DIST += $(patsubst %,scripts/%.pl,$(perl_scripts))
+CLEANFILES += $(perl_libs_scripts) $(perl_scripts)
+
+# Rules to generate the scripts, in .libs and in build directory.
+perl_inst_subst  = sed -e 's,[@]PERL[@],$(PERL),g' \
+                       -e 's,[@]BIN_DIR[@],$(bindir),g' \
+                       -e 's,[@]LIB_DIR[@],$(perl_libdir),g'
+perl_local_subst = sed -e 's,[@]PERL[@],$(PERL),g' \
+                       -e 's,[@]BIN_DIR[@],$(abs_builddir),g' \
+                       -e 's,[@]LIB_DIR[@],$(abs_srcdir)/scripts,g'
+.libs/%: scripts/%.pl
+	@mkdir -p $(dir $@) && $(perl_inst_subst) < $< > $@
+%: scripts/%.pl
+	$(AM_V_GEN)$(perl_local_subst) < $< > $@ && chmod a+x $@
+
+# Supporting Perl module
+perl_lib_SCRIPTS = scripts/Foundation.pm
+perl_libdir = $(libdir)/mummer
+EXTRA_DIST += scripts/Foundation.pm
 
 #######
 # umd #
