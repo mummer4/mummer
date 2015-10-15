@@ -11,8 +11,7 @@ AM_PY_LOG_FLAGS = PYTHONPATH=$(builddir)/%D%/python:$(builddir)/%D%/python/.libs
 RB_LOG_COMPILER = $(RUBY)
 AM_RB_LOG_FLAGS = -I$(builddir)/%D%/ruby/.libs
 PL_LOG_COMPILER = $(PERL)
-AM_PL_LOG_FLAGS = -I$(builddir)/%D%/perl5 -I$(builddir)/%D%/perl5/.libs
-
+AM_PL_LOG_FLAGS = -I$(builddir)/%D%/perl5 -I$(builddir)/%D%/perl5/.libs -I$(srcdir)/%D%/perl5
 
 SWIG_CPPFLAGS = -I$(srcdir)/include $(JELLYFISH2_0_CFLAGS)
 SWIG_LIBS = $(JELLYFISH2_0_LIBS)
@@ -33,6 +32,7 @@ endif
 if PYTHON_BINDING
 PYTHON_BUILT = %D%/python/swig_wrap.cpp %D%/python/mummer.py
 BUILT_SOURCES += $(PYTHON_BUILT)
+EXTRA_DIST += $(PYTHON_BUILT)
 
 pythonextdir = $(PYTHON_SITE_PKG)/mummer
 pythonext_SCRIPTS = %D%/python/__init__.pyc
@@ -42,14 +42,13 @@ pythonext_LTLIBRARIES = %D%/python/_mummer.la
 %C%_python__mummer_la_LDFLAGS = -module $(PYTHON_LDFLAGS)
 %C%_python__mummer_la_LIBS = $(SWIG_LIBS)
 %C%_python__mummer_la_LIBADD = libumdmummer.la
-DISTCLEANFILES += $(PYTHON_BUILT) $(dist_pythonext_DATA)
+DISTCLEANFILES += $(PYTHON_BUILT) $(pythonext_SCRIPTS)
 PYTHONC_V_GEN = $(pythonc_v_GEN_$(V))
 pythonc_v_GEN_ = $(pythonc_v_GEN_$(AM_DEFAULT_VERBOSITY))
 pythonc_v_GEN_0 = @echo "  PYTHONC " $@;
 %/__init__.pyc: %/mummer.py
 	$(PYTHONC_V_GEN)$(PYTHON) -c 'import py_compile, sys; py_compile.compile(sys.argv[1], sys.argv[2])' $< $@
 %D%/python/mummer.py: %D%/python/swig_wrap.cpp
-# EXTRA_DIST += %D%/python/mummer.py
 
 # Tests
 SWIG_TESTS += %D%/python/test_nucmer.py
@@ -76,6 +75,8 @@ endif
 if PERL_BINDING
 PERL_BUILT = %D%/perl5/swig_wrap.cpp %D%/perl5/mummer.pm
 BUILT_SOURCES += $(PERL_BUILT)
+EXTRA_DIST += $(PERL_BUILT)
+
 perlextdir = $(PERL_EXT_LIB)
 perlext_SCRIPTS = %D%/perl5/mummer.pm
 perlext_LTLIBRARIES = %D%/perl5/mummer.la
@@ -86,7 +87,6 @@ perlext_LTLIBRARIES = %D%/perl5/mummer.la
 %C%_perl5_mummer_la_LIBADD = libumdmummer.la
 DISTCLEANFILES += $(PERL_BUILT)
 %D%/perl5/mummer.pm: %D%/perl5/swig_wrap.cpp
-EXTRA_DIST += %D%/perl5/mummer.pm
 
 # Tests
 SWIG_TESTS += %D%/perl5/test_nucmer.pl

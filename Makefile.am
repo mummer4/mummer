@@ -10,6 +10,7 @@ AM_LDFLAGS = -lpthread
 bin_PROGRAMS =
 bin_SCRIPTS =
 noinst_SCRIPTS =
+noinst_HEADERS =
 EXTRA_DIST =
 CLEANFILES =
 DISTCLEANFILES =
