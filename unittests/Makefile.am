@@ -16,8 +16,15 @@ GTEST_SRC = %D%/gtest/src/gtest-all.cc	\
 
 EXTRA_DIST += $(GTEST_SRC)
 
-check_PROGRAMS += %D%/test_nucmer
-unittests_test_nucmer_SOURCES = %D%/test_nucmer.cc
-unittests_test_nucmer_LDADD = $(LDADD) unittests/libgtest_main.la
-unittests_test_nucmer_CXXFLAGS = -I$(srcdir)/unittests
-TESTS += %D%/test_nucmer
+#####################
+# Unittest programs #
+#####################
+unittests_programs = %D%/test_all
+check_PROGRAMS += $(unittests_programs)
+TESTS += $(unittests_programs)
+
+%C%_test_all_SOURCES = %D%/test_nucmer.cc %D%/test_cooperative_pool2.cc %D%/test_whole_sequence_parser.cc
+%C%_test_all_LDADD = $(LDADD) %D%/libgtest_main.la
+%C%_test_all_CXXFLAGS = -I$(srcdir)/unittests
+
+

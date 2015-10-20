@@ -13,8 +13,8 @@ AM_RB_LOG_FLAGS = -I$(builddir)/%D%/ruby/.libs
 PL_LOG_COMPILER = $(PERL)
 AM_PL_LOG_FLAGS = -I$(builddir)/%D%/perl5 -I$(builddir)/%D%/perl5/.libs -I$(srcdir)/%D%/perl5
 
-SWIG_CPPFLAGS = -I$(srcdir)/include $(JELLYFISH2_0_CFLAGS)
-SWIG_LIBS = $(JELLYFISH2_0_LIBS)
+SWIG_CPPFLAGS = -I$(srcdir)/include
+SWIG_LIBS =
 
 if HAVE_SWIG
 SWIG_V_GEN = $(swig_v_GEN_$(V))

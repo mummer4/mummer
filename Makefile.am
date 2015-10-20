@@ -3,7 +3,7 @@
 ##########################
 ACLOCAL_AMFLAGS = -I m4
 
-AM_CPPFLAGS = -Wall -I$(srcdir)/include $(JELLYFISH2_0_CFLAGS)
+AM_CPPFLAGS = -Wall -I$(srcdir)/include
 AM_LDFLAGS = -lpthread
 
 # Pre-declare all used variables.
@@ -43,7 +43,6 @@ LDADD = libumdmummer.la
 libumdmummer_la_SOURCES  = src/essaMEM/sparseSA.cpp src/essaMEM/qsufsort.c
 libumdmummer_la_SOURCES += src/tigr/mgaps.cc src/tigr/postnuc.cc src/tigr/sw_align.cc src/tigr/tigrinc.cc
 libumdmummer_la_SOURCES += src/umd/nucmer.cc
-libumdmummer_la_LIBS = $(JELLYFISH2_0_LIBS)
 include_HEADERS = include/mummer/sparseSA.hpp				\
                   include/mummer/fasta.hpp include/mummer/postnuc.hh	\
                   include/mummer/translate.hh				\

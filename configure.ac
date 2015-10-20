@@ -15,12 +15,18 @@ AC_PROG_CXX
 AC_PROG_CC
 AC_PATH_PROG(ENV_PROG, [env])
 
-# Jellyfish module
-PKG_CHECK_MODULES([JELLYFISH2_0], [jellyfish-2.0])
-
 # Check for yaggo
 AC_ARG_VAR([YAGGO], [Yaggo switch parser generator])
 AS_IF([test "x$YAGGO" = "x"], [AC_PATH_PROG([YAGGO], [yaggo], [false])])
+
+# Check that type __int128 is supported and if the
+AC_ARG_WITH([int128],
+            [AS_HELP_STRING([--with-int128], [enable int128])],
+            [], [with_int128=yes])
+AS_IF([test "x$with_int128" != xno],
+      [AC_CHECK_TYPE([__int128],
+                     [AC_DEFINE([HAVE_INT128], [1], [Define if type __int128 is supported])])])
+
 
 #
 # SWIG and bindings
