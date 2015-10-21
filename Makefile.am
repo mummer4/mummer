@@ -62,12 +62,23 @@ essamummer_SOURCES = src/essaMEM/fasta.cpp src/essaMEM/mummer.cpp
 ########
 # tigr #
 ########
-bin_PROGRAMS += mgaps postnuc show-coords show-aligns show-snps
+bin_PROGRAMS += mgaps postnuc show-coords show-aligns show-snps	\
+                show-tiling show-diff repeat-match annotate	\
+                combineMUMs delta-filter gaps prepro
 mgaps_SOURCES = src/tigr/mgaps_main.cc
 postnuc_SOURCES = src/tigr/postnuc_main.cc
 show_coords_SOURCES = src/tigr/show-coords.cc src/tigr/delta.cc
 show_aligns_SOURCES = src/tigr/show-aligns.cc src/tigr/delta.cc src/tigr/translate.cc
 show_snps_SOURCES = src/tigr/show-snps.cc src/tigr/delta.cc src/tigr/translate.cc
+show_tiling_SOURCES = src/tigr/show-tiling.cc src/tigr/delta.cc
+show_diff_SOURCES = src/tigr/show-diff.cc src/tigr/delta.cc
+repeat_match_SOURCES = src/tigr/repeat-match.cc
+annotate_SOURCES = src/tigr/annotate.cc
+combineMUMs_SOURCES = src/tigr/combineMUMs.cc
+delta_filter_SOURCES = src/tigr/delta-filter.cc src/tigr/delta.cc
+gaps_SOURCES = src/tigr/gaps.cc
+prepro_SOURCES = src/tigr/prepro.cc src/tigr/translate.cc
+postpro_SOURCES = src/tigr/postpro.cc src/tigr/translate.cc
 
 ###########
 # scripts #
@@ -78,28 +89,36 @@ show_snps_SOURCES = src/tigr/show-snps.cc src/tigr/delta.cc src/tigr/translate.c
 
 # List of scripts to install
 perl_scripts = mummerplot mapview dnadiff
-perl_libs_scripts = $(patsubst %,.libs/%,$(perl_scripts))
-bin_SCRIPTS += $(perl_libs_scripts)
-noinst_SCRIPTS += $(perl_scripts)
+shell_scripts = exact-tandems
+all_scripts = $(perl_scripts) $(shell_scripts)
+
+libs_scripts = $(patsubst %,.libs/%,$(all_scripts))
+bin_SCRIPTS += $(libs_scripts)
+noinst_SCRIPTS += $(all_scripts)
 EXTRA_DIST += $(patsubst %,scripts/%.pl,$(perl_scripts))
-CLEANFILES += $(perl_libs_scripts) $(perl_scripts)
+EXTRA_DIST += $(patsubst %,scripts/%.sh,$(shell_scripts))
+CLEANFILES += $(libs_scripts) $(all_scripts)
 
 # Rules to generate the scripts, in .libs and in build directory.
-perl_inst_subst  = sed -e 's,[@]PERL[@],$(PERL),g' \
+script_inst_subst  = sed -e 's,[@]PERL[@],$(PERL),g' \
                        -e 's,[@]BIN_DIR[@],$(bindir),g' \
-                       -e 's,[@]LIB_DIR[@],$(perl_libdir),g'
-perl_local_subst = sed -e 's,[@]PERL[@],$(PERL),g' \
+                       -e 's,[@]LIB_DIR[@],$(script_libdir),g'
+script_local_subst = sed -e 's,[@]PERL[@],$(PERL),g' \
                        -e 's,[@]BIN_DIR[@],$(abs_builddir),g' \
                        -e 's,[@]LIB_DIR[@],$(abs_srcdir)/scripts,g'
 .libs/%: scripts/%.pl
-	@mkdir -p $(dir $@) && $(perl_inst_subst) < $< > $@
+	@mkdir -p $(dir $@) && $(script_inst_subst) < $< > $@
 %: scripts/%.pl
-	$(AM_V_GEN)$(perl_local_subst) < $< > $@ && chmod a+x $@
+	$(AM_V_GEN)$(script_local_subst) < $< > $@ && chmod a+x $@
+.libs/%: scripts/%.sh
+	@mkdir -p $(dir $@) && $(script_inst_subst) < $< > $@
+%: scripts/%.sh
+	$(AM_V_GEN)$(script_local_subst) < $< > $@ && chmod a+x $@
 
-# Supporting Perl module
-perl_lib_SCRIPTS = scripts/Foundation.pm
-perl_libdir = $(libdir)/mummer
-EXTRA_DIST += scripts/Foundation.pm
+# Supporting modules
+script_lib_SCRIPTS = scripts/Foundation.pm scripts/tandem-repeat.awk
+script_libdir = $(libdir)/mummer
+EXTRA_DIST += $(script_lib_SCRIPTS)
 
 #######
 # umd #

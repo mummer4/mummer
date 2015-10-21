@@ -277,15 +277,13 @@ int main(int argc, char* argv[]) {
       rev_comp = true;
   if(setRevComp)
       forward = false;
- 
   sa = new mummer::mummer::sparseSAMatch(ref, refdescr, startpos, _4column, K, suflink, child, kmer>0, sparseMult, kmer, printSubstring, nucleotides_only);
   if(!load.empty()){
-      std::cerr << "attempting to load index " << load << std::endl;
-      if(sa->load(load)){
-          std::cerr << "index loaded succesfully" << std::endl;
-          std::cerr << "WARNING: program does not check the soundness of the reference file for given loaded index. Use the same reference file as used for constructing the index" << std::endl;
-          std::cerr << "WARNING: some options are now taken from loaded index instead of current user-set values" << std::endl;
-          std::cerr << "these include: sparseness (-k), suffix links (-suflink), child array (-child) and kmer table size (-kmer)." << std::endl;
+    if(sa->load(load)){
+      std::cerr << "index loaded succesfully\n"
+                << "WARNING: program does not check the soundness of the reference file for given loaded index. Use the same reference file as used for constructing the index\n"
+                << "WARNING: some options are now taken from loaded index instead of current user-set values\n"
+                << "these include: sparseness (-k), suffix links (-suflink), child array (-child) and kmer table size (-kmer)." << std::endl;
           //update sparseMult if necessary
           if(automaticSkip){
             if(sa->hasSufLink && !sa->hasChild) sparseMult = 1;
@@ -301,8 +299,8 @@ int main(int argc, char* argv[]) {
                 std::cerr << "skip parameter was decreased to " << sparseMult << " because skip*K > minimum length" << std::endl;
             }
             if(sparseMult*sa->K > min_len-10){
-                std::cerr << "note that the skip parameter is very high, a value of " << ((int) (min_len-10)/K);
-                std::cerr << " or " << ((int) (min_len-12)/sa->K) << " would be more appropriate" << std::endl;
+              std::cerr << "note that the skip parameter is very high, a value of " << ((int) (min_len-10)/K) << '\n'
+                        << " or " << ((int) (min_len-12)/sa->K) << " would be more appropriate" << std::endl;
             }
          }
           sa->sparseMult = sparseMult;
@@ -313,8 +311,8 @@ int main(int argc, char* argv[]) {
          K = sa->K;
       }
       else{
-          std::cerr << "unable to load index " << load << std::endl;
-          std::cerr << "construct new index..." << std::endl;
+          std::cerr << "unable to load index " << load << '\n'
+                    << "construct new index..." << std::endl;
           sa->construct();
       }
   }
@@ -323,18 +321,17 @@ int main(int argc, char* argv[]) {
   }
   if(!save.empty()){
       sa->save(save);
-      std::cerr << "saved index to " << save << std::endl;
   }
-  std::cerr << "INDEX SIZE IN BYTES: " << sa->index_size_in_bytes() << std::endl;
 
-  clock_t start = clock();
-  rusage m_ruse1, m_ruse2;
-  getrusage(RUSAGE_SELF, &m_ruse1);
+  // clock_t start = clock();
+  // rusage m_ruse1, m_ruse2;
+  // getrusage(RUSAGE_SELF, &m_ruse1);
+
   pthread_attr_t attr;  pthread_attr_init(&attr);
   pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
   for(int idx = 0; idx < numQueryFiles; idx++){
     std::vector<query_arg> args(query_threads);
-    std::vector<pthread_t> thread_ids(query_threads); 
+    std::vector<pthread_t> thread_ids(query_threads);
 
     // Initialize additional thread data.
     for(int i = 0; i < query_threads; i++) {
@@ -349,22 +346,23 @@ int main(int argc, char* argv[]) {
 
     // Wait for all threads to terminate.
     for(int i = 0; i < query_threads; i++)
-        pthread_join(thread_ids[i], NULL);   
+        pthread_join(thread_ids[i], NULL);
   }
-  clock_t end = clock();
-  getrusage(RUSAGE_SELF, &m_ruse2);
-  double wall_time = (double)( end - start ) /CLOCKS_PER_SEC;
-  std::cerr << "mapping: done" << std::endl;
-  std::cerr << "time for mapping (wall time): " << wall_time << std::endl;
-  timeval t1, t2;
-  t1 = m_ruse1.ru_utime;
-  t2 = m_ruse2.ru_utime;
-  double cpu_time = ((double)(t2.tv_sec*1000000 + t2.tv_usec - (t1.tv_sec*1000000 + t1.tv_usec )))/1000.0;
-  std::cerr << "time for mapping (cpu time): " << cpu_time << std::endl;
-  t1 = m_ruse1.ru_stime;
-  t2 = m_ruse2.ru_stime;
-  double sys_time = ((double)(t2.tv_sec*1000000 + t2.tv_usec - (t1.tv_sec*1000000 + t1.tv_usec )))/1000.0;
-  std::cerr << "time for mapping (sys time): " << sys_time << std::endl;
+
+  // clock_t end = clock();
+  // getrusage(RUSAGE_SELF, &m_ruse2);
+  // double wall_time = (double)( end - start ) /CLOCKS_PER_SEC;
+  // std::cerr << "mapping: done" << std::endl;
+  // std::cerr << "time for mapping (wall time): " << wall_time << std::endl;
+  // timeval t1, t2;
+  // t1 = m_ruse1.ru_utime;
+  // t2 = m_ruse2.ru_utime;
+  // double cpu_time = ((double)(t2.tv_sec*1000000 + t2.tv_usec - (t1.tv_sec*1000000 + t1.tv_usec )))/1000.0;
+  // std::cerr << "time for mapping (cpu time): " << cpu_time << std::endl;
+  // t1 = m_ruse1.ru_stime;
+  // t2 = m_ruse2.ru_stime;
+  // double sys_time = ((double)(t2.tv_sec*1000000 + t2.tv_usec - (t1.tv_sec*1000000 + t1.tv_usec )))/1000.0;
+  // std::cerr << "time for mapping (sys time): " << sys_time << std::endl;
 
   delete sa;
 }

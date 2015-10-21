@@ -185,8 +185,9 @@ int main  (int argc, char * argv [])
    List_Tree (Root, false, 0, 0);
 #endif
 
-   fprintf (stderr, "Genome Length = %ld   Used %d internal nodes\n",
-                Genome_Len, Next_Avail_Node);
+   if(Verbose > 0)
+     fprintf (stderr, "Genome Length = %ld   Used %d internal nodes\n",
+              Genome_Len, Next_Avail_Node);
 
    Set_Subtree_Size (Root, false, NIL, 0);
 
