@@ -1,16 +1,11 @@
-# MUMmer3.x README 
+# MUMmer43.x README 
 
 **NOTE**
 
-A comprehensive HTML user manual is available in the docs/web/manual
-subdirectory or at http://mummer.sourceforge.net/manual
+Further documentation, but potentially out of date, is in the [docs](../../tree/master/docs) directory. Please refer to the [INSTALL.md](INSTALL.md) file for installation
+instructions.
 
-MUMmer is now an open source package!  Please contact us if you would like
-to contribute to the MUMmer project.  For more information or the latest
-release please visit the MUMmer homepage at http://mummer.sourceforge.net
-
-Please refer to the [INSTALL.md](INSTALL.md) file for installation
-instructions.  This file contains brief descriptions of all
+This file contains brief descriptions of all
 executables in the base directory and general information about the
 MUMmer package.
 
@@ -53,7 +48,9 @@ system:
 >Nucleic Acids Research, 27:11 (1999), 2369-2376.
 
 
-## RUNNING MUMmer4.x MUMmer4.x is comprised of many various utilities
+## RUNNING MUMmer4.x
+
+MUMmer4.x is comprised of many various utilities
 and scripts.  For general purposes, the programs `nucmer`, and
 `promer` will be all that is needed.  See their descriptions in the
 "RUNNING THE MUMmer PROGRAMS" section, or refer to their individual
@@ -62,6 +59,7 @@ MUMmer UTILITIES" section for a brief description of all of the
 utilities in this directory.
 
 ###Simple use case
+
 Given a file containing a single reference sequence (ref.seq) in
 FASTA format and another file containing multiple sequences in FastA
 format (qry.seq) type the following at the command line:
