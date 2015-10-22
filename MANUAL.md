@@ -9,9 +9,10 @@ MUMmer is now an open source package!  Please contact us if you would like
 to contribute to the MUMmer project.  For more information or the latest
 release please visit the MUMmer homepage at http://mummer.sourceforge.net
 
-Please refer to the INSTALL file for installation instructions.  This file
-contains brief descriptions of all executables in the base directory and
-general information about the MUMmer package.
+Please refer to the [INSTALL.md](INSTALL.md) file for installation
+instructions.  This file contains brief descriptions of all
+executables in the base directory and general information about the
+MUMmer package.
 
 ## DESCRIPTION
 MUMmer is a system for rapidly aligning entire genomes.  The current
@@ -805,6 +806,12 @@ the the references.
 When run with the -x option, `show-tiling` will produce an XML output
 format that can be accepted by TIGR's open source scaffolding software
 'Bambus' as contig linking information.
+
+##Obsolete programs
+
+The programs `mapview`, `run-mummer1`, `run-mummer3` and `nucmer2xfig`
+are now obsolete. The original documentation is still available in
+[OBSOLETE.md](OBSOLETE.md).
 
 ##CONTACT INFORMATION
 
