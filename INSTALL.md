@@ -2,7 +2,7 @@
 
 ## Dependencies
 
-If compiling from a [release source tarball](releases) you need a
+If compiling from a [release source tarball](../../releases) you need a
 recent version of the GCC compiler (g++ version >= 4.7) and other
 essential tools for compilation (GNU make, ar, etc. Install
 `build-essentials` on Debian or Ubuntu derivatives).  Additional
@@ -60,4 +60,4 @@ make uninstall
 ##CONTACT INFORMATION
 
 Please address questions and bug reports via the [github issue
-tracker](issues).
+tracker](../../issues).
