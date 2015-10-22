@@ -1,4 +1,4 @@
-#!__PERL_PATH
+#!@PERL@
 # (c) Steven Salzberg 2001
 # Make an xfig plot for a comparison of a reference chromosome (or single
 # molecule) versus a multifasta file of contigs from another genome.  

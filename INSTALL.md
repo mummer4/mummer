@@ -45,4 +45,5 @@ to run correctly. In parenthesis the minimum version. These utilities must be ac
 make uninstall
 ```
 
+##CONTACT INFORMATION
 Please address questions and bug reports via the [github issue tracker](https://github.com/gmarcais/mummer/issues).

@@ -56,15 +56,15 @@ include_HEADERS = include/mummer/sparseSA.hpp				\
 ###########
 # essaMEM #
 ###########
-bin_PROGRAMS += essamummer
-essamummer_SOURCES = src/essaMEM/fasta.cpp src/essaMEM/mummer.cpp
+bin_PROGRAMS += mummer
+mummer_SOURCES = src/essaMEM/fasta.cpp src/essaMEM/mummer.cpp
 
 ########
 # tigr #
 ########
 bin_PROGRAMS += mgaps postnuc show-coords show-aligns show-snps	\
                 show-tiling show-diff repeat-match annotate	\
-                combineMUMs delta-filter gaps prepro
+                combineMUMs delta-filter prepro
 mgaps_SOURCES = src/tigr/mgaps_main.cc
 postnuc_SOURCES = src/tigr/postnuc_main.cc
 show_coords_SOURCES = src/tigr/show-coords.cc src/tigr/delta.cc
@@ -76,9 +76,11 @@ repeat_match_SOURCES = src/tigr/repeat-match.cc
 annotate_SOURCES = src/tigr/annotate.cc
 combineMUMs_SOURCES = src/tigr/combineMUMs.cc
 delta_filter_SOURCES = src/tigr/delta-filter.cc src/tigr/delta.cc
-gaps_SOURCES = src/tigr/gaps.cc
 prepro_SOURCES = src/tigr/prepro.cc src/tigr/translate.cc
 postpro_SOURCES = src/tigr/postpro.cc src/tigr/translate.cc
+
+# Obsolete stuff
+EXTRA_DIST = src/tigr/gaps.cc
 
 ###########
 # scripts #
@@ -88,9 +90,13 @@ postpro_SOURCES = src/tigr/postpro.cc src/tigr/translate.cc
 # what LIBTOOLS does.
 
 # List of scripts to install
-perl_scripts = mummerplot mapview dnadiff
+perl_scripts = mummerplot dnadiff
 shell_scripts = exact-tandems
 all_scripts = $(perl_scripts) $(shell_scripts)
+
+# Obsolete stuff
+EXTRA_DIST = scripts/run-mummer1.sh scripts/run-mummer3.sh	\
+             scripts/mapview.pl scripts/nucmer2xfig.pl
 
 libs_scripts = $(patsubst %,.libs/%,$(all_scripts))
 bin_SCRIPTS += $(libs_scripts)

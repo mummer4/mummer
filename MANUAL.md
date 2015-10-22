@@ -15,7 +15,7 @@ general information about the MUMmer package.
 
 ## DESCRIPTION
 MUMmer is a system for rapidly aligning entire genomes.  The current
-version (release 3.0) can find all 20 base pair maximal exact matches between
+version (release 4.x) can find all 20 base pair maximal exact matches between
 two bacterial genomes of ~5 million base pairs each in 20 seconds, using 90 MB
 of memory, on a typical 1.8 GHz Linux desktop computer.  MUMmer can also align
 incomplete genomes; it handles the 100s or 1000s of contigs from a shotgun
@@ -52,13 +52,13 @@ system:
 >Nucleic Acids Research, 27:11 (1999), 2369-2376.
 
 
-## RUNNING MUMmer3.0
-MUMmer3.0 is comprised of many various utilities and scripts.  For general
-purposes, the scripts `run-mummer1`, `run-mummer3`, `nucmer`, and `promer`
-will be all that is needed.  See their descriptions in the "RUNNING THE MUMmer
-SCRIPTS" section, or refer to their individual documentation in the "docs/"
-subdirectory.  Refer to the "RUNNING THE MUMmer UTILITIES" section for a brief
-description of all of the utilities in this directory.
+## RUNNING MUMmer4.x MUMmer4.x is comprised of many various utilities
+and scripts.  For general purposes, the programs `nucmer`, and
+`promer` will be all that is needed.  See their descriptions in the
+"RUNNING THE MUMmer PROGRAMS" section, or refer to their individual
+documentation in the "docs/" subdirectory.  Refer to the "RUNNING THE
+MUMmer UTILITIES" section for a brief description of all of the
+utilities in this directory.
 
 ###Simple use case
 Given a file containing a single reference sequence (ref.seq) in
@@ -70,17 +70,6 @@ format (qry.seq) type the following at the command line:
 To produce the following files:
    
     <prefix>.delta
-
-or
-
-`./run-mummer3.csh  ref.seq  qry.seq  <prefix>`
-
-   To produce the following files:
-   
-        <prefix>.out
-        <prefix>.gaps
-        <prefix>.align
-        <prefix>.errorsgaps
 
 Please read the utility-specific documentation in the "docs/" subdirectory
 for descriptions of these files and information on how to change the
@@ -96,11 +85,6 @@ explore the \<prefix>.[fr]plot file to see the data collection.
 
 `./mummerplot  -p <prefix>  <prefix>.out`
 
-Or you can use the web viewer for completed microbial genomes:
-http://www.tigr.org/CMR
-
-
-
 ##RUNNING THE MUMmer SCRIPTS
 Because of MUMmer's modular design, it may be necessary to use a number
 of separate programs to produce the desired output.  The MUMmer scripts
@@ -112,7 +96,7 @@ descriptions and usage definitions for these scripts.  Please refer to the
 
 ###nucmer
 
-####DESCRIPTION
+**Description: **
 
 `nucmer` is for the all-vs-all comparison of nucleotide sequences
 contained in multi-FastA data files.  It is best used for highly
@@ -191,84 +175,6 @@ default, use the '--mum' or '--maxmatch' options to change this
 behavior.
 
 
-###run-mummer1
-
-**Description:**
-
-This script is taken directly from MUMmer1.0 and is best used to
-align two sequences in which there is high similarity and no re-
-arrangements.  Common use cases are: aligning two finished bacterial
-chromosomes.  Please refer to "docs/run-mummer1.README" for the
-original documentation for this script and its output.
-
-        USAGE:
-        run-mummer1  <seq1>  <seq2>  <tag>  [-r]
-
-        <seq1>  specifies the file with the first sequence in FastA format.
-                No more than one sequence is allowed.
-        <seq2>  specifies the file with the second sequence in FastA format.
-                No more than one sequence is allowed.
-        <tag>   specifies the prefix to be used for the output files.
-        [-r]    is an optional parameter that will reverse complement the
-                second sequence.
-
-        OUTPUT:
-        out.align       the out.gaps file interspersed with the alignments
-                        of the gaps.
-        out.errorsgaps  the out.gaps file with an extra column stating the
-                        number of errors contained in each gap.
-        out.gaps        an ordered (clustered) list of matches with position
-                        information, and gap distances between each match.
-        out.out         a list of all maximal unique matches between the two
-                        input sequences ordered by their start position in the
-                        second sequence.
-
-**Notes:**
-
-All output coordinates reference their respective strand.  This means
-that if the -r switch is active, coordinates that reference the
-second sequence will be relative to the reverse complement of the
-second sequence.  Please use nucmer or promer if this coordinate
-system is confusing.
-
-Eventually, this script's components will be rewritten to work
-with the new MUMmer format standards and phased out in favor of the
-new components and wrapping script.
-
-
-###run-mummer3
-
-**Description:**
-
-This script is the improved version of the MUMmer1.0 run-mummer1
-script.  It uses a new clustering algorithm that appropriately
-handles multiple sequence rearrangements and inversions.  Because
-of this, it can handle more divergent sequences better than
-run-mummer1.  In addition, it allows a multi-FastA query file for
-1-vs-many sequence comparisons.  Please refer to
-"docs/run-mummer3.README" for more detailed documentation of this
-script and its output.
-
-        USAGE:
-        run-mummer3  <reference>  <query>  <prefix>
-
-        <reference>  specifies the file with the reference sequence in FastA
-                     format.  No more than one sequence is allowed.
-        <query>      specifies the multi-FastA sequence file that contains
-                     the query sequences.
-        <prefix>     specifies the file prefix for the output files.
-
-        OUTPUT:
-        out.align       the out.gaps file interspersed with the alignments
-                        of the gaps.
-        out.errorsgaps  the out.gaps file with an extra column stating the
-                        number of errors contained in each gap.
-        out.gaps        an ordered (clustered) list of matches with position
-                        information, and gap distances between each match.
-        out.out         a list of all maximal unique matches between the two
-                        input sequences ordered by their start position in the
-                        second sequence.
-
 **Notes:**
 
 All output coordinates reference their respective strand.  This means
@@ -335,7 +241,7 @@ and usage definitions for these utilities.
 
 ###annotate
 
-DESCRIPTION:
+**Description: **
 This program reads the output of the `gaps` program and adds alignment
 information to it.  Part of the original MUMmer1.0 pipeline and can
 only be used on the output of the `gaps` program.
@@ -365,7 +271,7 @@ or nucmer match extenders, but persists for the time being.
 **Description:**
 
 This program reads the output of the `mgaps` program and adds alignment
-information to it.  Part of the MUMmer3.0 pipeline and can only be
+information to it.  Part of the MUMmer4.x pipeline and can only be
 used on the output of the `mgaps` program. This -D option alters this
 behavior and only outputs the positions of difference, e.g. SNPs.
 
@@ -447,76 +353,6 @@ interface and output for tandem repeat detection.
                 of the repeat region, the length of each repetitive unit, and
                 to total copies of the repetitive unit involved.
 
-
-###gaps
-
-**Description:**
-
-This program reads a list of unique matches between two strings and
-outputs the longest consistent set of matches, followed by all the
-other matches.  Part of the MUMmer1.0 pipeline and the output of the
-`mummer` program needs to be processed (to strip all non-match lines)
-before it can be passed to this program.
-
-        USAGE:
-        gaps  <seq1>  [-r]  <  <matchlist>
-
-        <seq1>       The first sequence file that the match list represents.
-        <matchlist>  A simple list of matches and NO header lines or other
-                     mumbo jumbo.  The columns of the match list should be
-                     start in the reference, start in the query, and length
-                     of the match.
-        [-r]         Simply puts the string "reverse" on the header of the
-                     output so 'annotate' knows to reverse the second
-                     sequence.
-
-        OUTPUT:
-        stdout  an ordered set of the input matches, separated by headers.
-                The first set is the longest consistent set of matches and
-                the second set is all other matches.
-
-**Notes:**
-
-This program will eventually be rewritten to be interchangeable with
-`mgaps`, so that it may be plugged into the nucmer or promer
-pipelines.
-
-
-###mapview
-
-**Description:**
-
-`mapview` is a utility program for displaying sequence alignments as
-provided by MUMmer, nucmer or promer. This program takes the output
-from these alignment routines and converts it to a FIG, PDF or PS
-file for visual analysis. It can also break the output into multiple
-files for easier viewing and printing. Please refer to
-"docs/mapview.README" for a more detailed description and explination.
-
-        USAGE:
-        mapview  [options]  <coords file>  [UTR coords]  [CDS coords]
-
-        [options]       type 'mapview -h' for a list of options.
-        <coords file>   show-coords output file
-        [UTR coords]    UTR coordinate file in GFF format
-        [CDS coords]    CDS coordinate file in GFF format
-
-        OUTPUT:
-        Default output format is an xfig file, however this can be changed to
-        a postscript of PDF file with the -f option. See 'mapview -h' for a
-        list of available formatting options.
-
-**Notes:**
-
-The produce the coords file input, `show-coords` must be run with the
--r -l options. To reduce redundant matches in promer output, run
-show-coords with the -k option. To generate output formats other than
-xfig, the fig2dev utility must be available from the system path. For
-very large reference genomes, FIG format may be the only option that
-will allow the entire display to be stored in one file, as fig2dev has
-problems if the output is too large.
-
-
 ###mgaps
 
 **Description:**
@@ -524,7 +360,7 @@ problems if the output is too large.
 This program reads a list of matches between a single-FastA reference
 and a multi-FastA query file and outputs clusters of matches that lie
 on similar diagonals and within a reasonable distance.  Part of the
-MUMmer3.0 pipeline and the output of `mummer` need not be processed
+MUMmer4.x pipeline and the output of `mummer` need not be processed
 before passing it to this program, so long as `mummer` was run on a
 1-vs-many or 1-vs-1 dataset.
 
@@ -970,9 +806,6 @@ When run with the -x option, `show-tiling` will produce an XML output
 format that can be accepted by TIGR's open source scaffolding software
 'Bambus' as contig linking information.
 
-
 ##CONTACT INFORMATION
 
-Please address questions and bug reports to: <mummer-help@lists.sourceforge.net>
-
-Last Revised May 12, 2005
+Please address questions and bug reports via the [github issue tracker](https://github.com/gmarcais/mummer/issues).

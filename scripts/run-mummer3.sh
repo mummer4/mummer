@@ -1,4 +1,4 @@
-#!__CSH_PATH -f
+#!/bin/sh
 #
 # for running the basic mummer 3 suite, should use nucmer instead when possible
 # to avoid the confusing reverse coordinate system of the raw programs.
@@ -9,16 +9,16 @@
 # Edit this script as necessary to alter the matching and clustering values
 #
 
-set ref = $1
-set qry = $2
-set pfx = $3
+ref=$1
+qry=$2
+pfx=$3
 
-set bindir = __BIN_DIR
+bindir="@BIN_DIR@"
 
-if($ref == '' || $qry == '' || $pfx == '') then
+if [ -z "$ref" -o -z "$qry" -o -z "$pfx" ]; then
     echo "USAGE: $0 <fasta reference> <multi-fasta query> <prefix>"
-    exit(-1)
-endif
+    exit 1
+fi
 
 echo "Find MUMs"
 $bindir/mummer -mumreference -b -l 20 $ref $qry > $pfx.out
