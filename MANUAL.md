@@ -97,7 +97,7 @@ descriptions and usage definitions for these scripts.  Please refer to the
 
 ###nucmer
 
-**Description: **
+**Description:**
 
 `nucmer` is for the all-vs-all comparison of nucleotide sequences
 contained in multi-FastA data files.  It is best used for highly
@@ -242,7 +242,7 @@ and usage definitions for these utilities.
 
 ###annotate
 
-**Description: **
+**Description:**
 This program reads the output of the `gaps` program and adds alignment
 information to it.  Part of the original MUMmer1.0 pipeline and can
 only be used on the output of the `gaps` program.
