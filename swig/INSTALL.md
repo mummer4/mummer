@@ -62,5 +62,5 @@ then the following should print OK:
 ```Shell
 python -c 'import mummer; print("OK")'
 ruby -rmummer -e 'puts("OK")'
-perl -Mmumer -e 'print("OK\n")'
+perl -Mmummer -e 'print("OK\n")'
 ```
