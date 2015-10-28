@@ -575,9 +575,11 @@ bool sparseSA::search(const char* P, size_t Plen, long &start, long &end) const 
 // until mismatch or min_len characters reached.
 void sparseSA::traverse(const char* P, size_t Plen, long prefix, interval_t &cur, int min_len) const {
   if(hasKmer && cur.depth == 0 && min_len >= kMerSize){//free match first bases
+    if((size_t)(prefix + kMerSize) > Plen) return;
     unsigned int index = 0;
-    for(long i = 0; i < kMerSize; i++)
+    for(long i = 0; i < kMerSize; i++) {
       index = (index << 2 ) | BITADD[(int)P[prefix + i]];
+    }
     if(index < kMerTableSize && KMR[index].right>0){
       cur.depth = kMerSize;
       cur.start = KMR[index].left;

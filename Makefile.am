@@ -49,7 +49,13 @@ include_HEADERS = include/mummer/sparseSA.hpp				\
                   include/mummer/sw_align.hh				\
                   include/mummer/tigrinc.hh include/mummer/nucmer.hpp	\
                   include/mummer/mgaps.hh include/mummer/delta.hh	\
-                  include/mummer/sw_alignscore.hh
+                  include/mummer/sw_alignscore.hh			\
+                  include/jellyfish/circular_buffer.hpp			\
+                  include/jellyfish/cooperative_pool2.hpp		\
+                  include/jellyfish/cpp_array.hpp			\
+                  include/jellyfish/divisor.hpp				\
+                  include/jellyfish/stream_manager.hpp			\
+                  include/jellyfish/whole_sequence_parser.hpp
 
 
 
