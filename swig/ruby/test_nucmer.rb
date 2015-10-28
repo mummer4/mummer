@@ -84,7 +84,6 @@ class TestNucmer < MiniTest::Unit::TestCase
     assert_equal 999, s1.size
     assert_equal 999, s2.size
     o = Mummer::Options.new.minmatch(10).mincluster(10)
-    p o.break_len
 
     a = Mummer::align_sequences(s1, s2, o)
     assert(1 <= a.size)
@@ -115,7 +114,6 @@ class TestNucmer < MiniTest::Unit::TestCase
     assert_good_alignment(a, s1, rs2)
 
     a = Mummer::align_sequences(rs1, s2, o)
-    p a.size
     assert(1 <= a.size)
     al = a.find { |x| x.sA == 1 && x.eA == 99 }
     refute_nil al
