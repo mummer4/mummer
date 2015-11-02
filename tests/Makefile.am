@@ -8,8 +8,8 @@ CLEANFILES += $(check_SCRIPTS)
 # Build testsh. A wrapper around /bin/shell that runs the tests in the
 # proper environment
 %D%/testsh: %D%/testsh.in
-	$(AM_V_GEN)sed -e 's,[@]BUILDDIR[@],$(builddir),g' \
-	               -e 's,[@]SRCDIR[@],$(srcdir),g' $< > $@
+	$(AM_V_GEN)sed -e 's,[@]BUILDDIR[@],$(abs_builddir),g' \
+	               -e 's,[@]SRCDIR[@],$(abs_srcdir),g' $< > $@
 	@chmod a+x $@
 EXTRA_DIST += %D%/testsh.in
 

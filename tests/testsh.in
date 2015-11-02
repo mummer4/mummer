@@ -4,9 +4,10 @@ set -e
 set -x
 set -o pipefail
 
-BUILD=$(realpath @BUILDDIR@)
-SRC=$(realpath @SRCDIR@)
-SCRIPT=$(realpath $1)
+BUILD=@BUILDDIR@
+SRC=@SRCDIR@
+SCRIPT=$1
+
 # Path to data
 D=$BUILD/tests/data
 PATH=$BUILD:$BUILD/tests:$SRC/tests:$PATH
@@ -15,6 +16,9 @@ N=$(basename $1 .sh)
 # Working directory
 WORKDIR=tests/$N
 mkdir -p $WORKDIR
-cd $WORKDIR
 
-source $SCRIPT
+# Read script in fd 3 so that it is availabe after changing directory
+# (path to SCRIPT may not be absolute).
+exec 3<$SCRIPT
+cd $WORKDIR
+source /dev/fd/3
