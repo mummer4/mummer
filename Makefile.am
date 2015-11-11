@@ -70,7 +70,7 @@ mummer_SOURCES = src/essaMEM/fasta.cpp src/essaMEM/mummer.cpp
 ########
 bin_PROGRAMS += mgaps postnuc show-coords show-aligns show-snps	\
                 show-tiling show-diff repeat-match annotate	\
-                combineMUMs delta-filter prepro
+                combineMUMs delta-filter prepro postpro
 mgaps_SOURCES = src/tigr/mgaps_main.cc
 postnuc_SOURCES = src/tigr/postnuc_main.cc
 show_coords_SOURCES = src/tigr/show-coords.cc src/tigr/delta.cc
@@ -86,7 +86,7 @@ prepro_SOURCES = src/tigr/prepro.cc src/tigr/translate.cc
 postpro_SOURCES = src/tigr/postpro.cc src/tigr/translate.cc
 
 # Obsolete stuff
-EXTRA_DIST = src/tigr/gaps.cc
+EXTRA_DIST += src/tigr/gaps.cc
 
 ###########
 # scripts #
@@ -101,8 +101,8 @@ shell_scripts = exact-tandems
 all_scripts = $(perl_scripts) $(shell_scripts)
 
 # Obsolete stuff
-EXTRA_DIST = scripts/run-mummer1.sh scripts/run-mummer3.sh	\
-             scripts/mapview.pl scripts/nucmer2xfig.pl
+EXTRA_DIST += scripts/run-mummer1.sh scripts/run-mummer3.sh	\
+              scripts/mapview.pl scripts/nucmer2xfig.pl
 
 libs_scripts = $(patsubst %,.libs/%,$(all_scripts))
 bin_SCRIPTS += $(libs_scripts)

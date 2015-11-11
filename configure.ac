@@ -31,7 +31,7 @@ AS_IF([test "x$with_int128" != xno],
 #
 # SWIG and bindings
 #
-maybe_swig=
+need_shared_libraries=no
 # --enable-python-binding
 AC_ARG_ENABLE([python-binding],
               [AC_HELP_STRING([--enable-python-binding@<:@=PATH@:>@], [create SWIG python module and install in PATH])])
@@ -56,21 +56,30 @@ AM_CONDITIONAL(PYTHON_BINDING, [test -n "$enable_python_binding" -a x$enable_pyt
 AM_COND_IF([PYTHON_BINDING],
            [AS_IF([test "x$enable_python_binding" != xyes], [PYTHON_SITE_PKG=$enable_python_binding],
                   [test "x$prefix" != xNONE], [PYTHON_SITE_PKG=$libdir/python])]
-           [AX_PYTHON_DEVEL])
+           [AX_PYTHON_DEVEL]
+           [need_shared_libraries=yes])
 
 # Ruby binding setup
 AM_CONDITIONAL([RUBY_BINDING], [test -n "$enable_ruby_binding" -a x$enable_ruby_binding != xno])
 AM_COND_IF([RUBY_BINDING],
            [AS_IF([test "x$enable_ruby_binding" != xyes], [RUBY_EXT_LIB=$enable_ruby_binding],
                   [test "x$prefix" != xNONE], [RUBY_EXT_LIB=$libdir/ruby])]
-           [AX_RUBY_EXT])
+           [AX_RUBY_EXT]
+           [need_shared_libraries=yes])
 
 # Perl binding setup
 AM_CONDITIONAL([PERL_BINDING], [test -n "$enable_perl_binding" -a x$enable_perl_binding != xno])
 AM_COND_IF([PERL_BINDING],
            [AS_IF([test "x$enable_perl_binding" != xyes], [PERL_EXT_LIB=$enable_perl_binding],
                   [test "x$prefix" != xNONE], [PERL_EXT_LIB=$libdir/perl])]
-           [AX_PERL_EXT])
+           [AX_PERL_EXT]
+           [need_shared_libraries=yes])
+
+# Check that shared libraries are enabled if needed by SWIG bindings
+AS_IF([test "x$need_shared_libraries" = xyes -a "x$enable_shared" = xno],
+      [AC_MSG_ERROR([Shared libraries are required for the SWIG script binding but are disabled (probably by the switch --disable-shared)])])
+AS_IF([test "x$need_shared_libraries" = xyes -a "x$can_build_shared" = xno],
+      [AC_MSG_ERROR([Shared libraries (modules) are required for the SWIG script binding but cannot be build (probably not supported by the compiler)])])
 
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
