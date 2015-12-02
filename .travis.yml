@@ -2,6 +2,7 @@ language: cpp
 cache:
   directories:
     - $HOME/bin
+    - $HOME/share
 before_install: sh travis/before_install.sh
 script: sh travis/script.sh
 branches:
