@@ -1,8 +1,4 @@
 language: cpp
-addons:
-  apt:
-    packages:
-      - bc
 cache:
   directories:
     - $HOME/bin
