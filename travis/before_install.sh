@@ -29,11 +29,22 @@ if [ ! -e "$HOME/bin/autoconf" ]; then
     make install
 fi
 
+# Install libtool 2.4.6
+if [ ! -e "$HOME/bin/libtoolize" ]; then
+    wget ftp://ftp.gnu.org/gnu/libtool/libtool-2.4.6.tar.gz
+    tar zxf libtool-2.4.6.tar.gz
+    cd libtool-2.4.6
+    ./configure --prefix="$HOME"
+    make
+    make install
+fi
+
 # Check exec
 echo "PATH: $PATH"
 echo -n "yaggo: "; which yaggo
 echo -n "automake: "; which automake
 echo -n "autoconf: "; which autoconf
+echo -n "libtool: "; which libtool
 
 # Check automake && autoconf version (Should not fail!)
 automake --version
@@ -43,3 +54,7 @@ automake --version | \
 autoconf --version
 autoconf --version | \
     ruby -ne '$_ =~ /(\d+)\.(\d+)/ and ($1.to_i > 2 || ($1.to_i == 2 && $2.to_i > 68)) and exit(0); puts("Autoconf is too old"); exit(1)'
+
+libtool --version
+libtool --version | \
+    ruby -ne '$_ =~ /(\d+)\.(\d+)/ and ($1.to_i > 2 || ($1.to_i == 2 && $2.to_i > 3)) and exit(0); puts("Libtool is too old"); exit(1)'
