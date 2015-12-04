@@ -9,6 +9,7 @@
 #include <iomanip>
 
 #include <mummer/sparseSA.hpp>
+#include <mummer/timer.hpp>
 
 namespace mummer {
 namespace mummer {
@@ -96,6 +97,8 @@ long sparseSA::index_size_in_bytes() const {
 // Manzini 2004 to compute the LCP array. Modified to handle sparse
 // suffix arrays and inverse sparse suffix arrays.
 void sparseSA::computeLCP() {
+  TIME_FUNCTION;
+
   long h=0;
   for(long i = 0; i < N; i+=K) {
     long m = ISA[i/K];
@@ -111,9 +114,11 @@ void sparseSA::computeLCP() {
 
 // Child array construction algorithm
 void sparseSA::computeChild() {
-    for(int i = 0; i < N/K; i++){
-        CHILD[i] = -1;
-    }
+  TIME_FUNCTION;
+
+  for(int i = 0; i < N/K; i++){
+    CHILD[i] = -1;
+  }
         //Compute up and down values
         int lastIndex  = -1;
         std::stack<int,std::vector<int> > stapelUD;
@@ -157,6 +162,8 @@ void sparseSA::computeChild() {
 
 // Look-up table construction algorithm
 void sparseSA::computeKmer() {
+  TIME_FUNCTION;
+
     std::stack<interval_t> intervalStack;
     std::stack<unsigned int> indexStack;
 
@@ -384,6 +391,8 @@ bool sparseSA::load(const std::string &prefix){
 }
 
 void sparseSA::construct(){
+  TIME_FUNCTION;
+  
     if(K > 1) {
         long bucketNr = 1;
         int *intSA = new int[N/K+1];

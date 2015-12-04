@@ -55,9 +55,8 @@ include_HEADERS = include/mummer/sparseSA.hpp				\
                   include/jellyfish/cpp_array.hpp			\
                   include/jellyfish/divisor.hpp				\
                   include/jellyfish/stream_manager.hpp			\
-                  include/jellyfish/whole_sequence_parser.hpp
-
-
+                  include/jellyfish/whole_sequence_parser.hpp		\
+                  include/mummer/timer.hpp
 
 ###########
 # essaMEM #
