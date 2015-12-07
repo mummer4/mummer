@@ -9,6 +9,7 @@
 #include <type_traits>
 #include <limits.h>
 #include <cstring>
+#include <cassert>
 
 
 namespace mummer {
@@ -54,16 +55,25 @@ struct vec_uchar {
     item_t(size_t i, large_type v) : idx(i), val(v) { }
     size_t idx;
     large_type val;
-    bool operator < (item_t t) const { return idx < t.idx;  }
+    bool operator < (item_t t) const { return idx < t.idx; }
   };
-  std::vector<small_type> vec; // LCP values from 0-65534
-  std::vector<item_t>        M;
+  std::vector<small_type>  vec; // LCP values from 0-65534
+  std::vector<item_t>      M;
+  std::vector<large_type>* sa;
+
+  vec_uchar(std::vector<large_type>& sa_) : vec(sa_.size(), 0), sa(&sa_) { }
   void resize(size_t N) { vec.resize(N, 0); }
+
   // Vector X[i] notation to get LCP values.
   large_type operator[] (size_t idx) const {
     static const large_type max = std::numeric_limits<small_type>::max();
     const large_type        res = vec[idx];
-    return res != max ? res : lower_bound(M.begin(), M.end(), item_t(idx))->val;
+    if(res != max) return res;
+    idx = (*sa)[idx];
+    auto it = upper_bound(M.begin(), M.end(), item_t(idx));
+    assert(it != M.begin());
+    --it;
+    return it->val - (idx - it->idx);
   }
   // Actually set LCP values, distingushes large and small LCP
   // values.
@@ -72,12 +82,29 @@ struct vec_uchar {
       vec[idx] = v;
     } else {
       vec[idx] = std::numeric_limits<small_type>::max();
-      M.push_back(item_t(idx, v));
+      M.push_back(item_t((*sa)[idx], v));
     }
   }
   // Once all the values are set, call init. This will assure the
-  // values >= 255 are sorted by index for fast retrieval.
+  // values >= 255 are sorted by index for fast retrieval. The values
+  // are compacted into ranges.
   void init() {
+    // First sort by end of range [idx, idx + val]
+    sort(M.begin(), M.end(), [](const item_t& a, const item_t& b) -> bool {
+        return a.idx + a.val < b.idx + b.val || (a.idx + a.val == b.idx + b.val && a.idx < b.idx);
+      });
+    // Second, remove elements that are consecutive in a range
+    size_t pidx = 0;
+    large_type pval = 0;
+    auto nend = std::remove_if(M.begin(), M.end(), [&](const item_t& a) -> bool {
+        bool res = a.idx + a.val == pidx + pval && a.idx == pidx + 1;
+        pidx = a.idx;
+        pval = a.val;
+        return res;
+      });
+    M.resize(nend - M.begin());
+    M.shrink_to_fit();
+    // Third, sort by beginning of compacted ranges
     sort(M.begin(), M.end());
   }
 
@@ -185,6 +212,7 @@ struct sparseSA {
   // Constructor load sparse suffix array from file
   sparseSA(const char* S_, size_t Slen, const std::string& prefix)
     : S(S_, Slen, 1)
+    , LCP(SA)
   {
     load(prefix);
     S.set_k(K);

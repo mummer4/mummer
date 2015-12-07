@@ -46,6 +46,7 @@ sparseSA::sparseSA(const char* S_, size_t Slen,
   , N(S.length())
   , logN((long)ceil(log(N/K) / log(2.0)))
   , NKm1(N/K-1)
+  , LCP(SA)
   , hasChild(child_)
   , hasSufLink(suflink_)
   , hasKmer(kmer_)
@@ -394,7 +395,7 @@ bool sparseSA::load(const std::string &prefix){
 
 void sparseSA::construct(){
   TIME_FUNCTION;
-  
+
     if(K > 1) {
         long bucketNr = 1;
         int *intSA = new int[N/K+1];
