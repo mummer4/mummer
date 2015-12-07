@@ -53,6 +53,15 @@ void get_seed(int& argc, char** argv) {
   argc -= 2;
 }
 
+std::string sequence(size_t len) {
+  static char bases[4] = { 'a', 'c', 'g', 't' };
+  std::uniform_int_distribution<int> dist(0, 3);
+  std::string                        result;
+  for(size_t i = 0; i < len; ++i)
+    result += bases[dist(rand_gen)];
+  return result;
+}
+
 GTEST_API_ int main(int argc, char **argv) {
   get_seed(argc, argv);
   rand_gen.seed(seed);

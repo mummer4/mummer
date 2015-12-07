@@ -99,14 +99,16 @@ long sparseSA::index_size_in_bytes() const {
 void sparseSA::computeLCP() {
   TIME_FUNCTION;
 
-  long h=0;
-  for(long i = 0; i < N; i+=K) {
-    long m = ISA[i/K];
-    if(m==0) LCP.set(m, 0); // LCP[m]=0;
-    else {
-      long j = SA[m-1];
-      while(i+h < N && j+h < N && S[i+h] == S[j+h])  h++;
+  long h = 0;
+  for(long i = 0; i < N / K; ++i) {
+    const long m = ISA[i];
+    if(m > 0) {
+      const long bj  = SA[m-1];
+      const long bi = i * K;
+      while(bi + h < N && bj + h < N && S[bi + h] == S[bj + h])  ++h;
       LCP.set(m, h); //LCP[m] = h;
+    } else {
+      LCP.set(m, 0); // LCP[m]=0;
     }
     h = std::max(0L, h - K);
   }
@@ -141,7 +143,7 @@ void sparseSA::computeChild() {
         while(0 < LCP[stapelUD.top()]){//last row (fix for last character of sequence not being unique
             lastIndex = stapelUD.top();
             stapelUD.pop();
-            if(0 <= LCP[stapelUD.top()] && LCP[stapelUD.top()] != LCP[lastIndex]){
+            if(LCP[stapelUD.top()] != LCP[lastIndex]){
                 CHILD[stapelUD.top()] = lastIndex;
             }
         }
