@@ -418,15 +418,26 @@ public:
     if(sparseSA::K != 1) return;  // Only valid for full suffix array.
     findMAM(P, min_len, flip_forward, os);
   }
+  void MAM(const std::string& P, int min_len, bool flip_forward, std::vector<match_t>& matches) const {
+    sparseSA::MAM(P, min_len, flip_forward, matches);
+  }
+
 
   // Print MEMs
   void MEM(const std::string &P, int min_len, bool flip_forward, std::ostream& os) const {
     findMEM_each(P, min_len, flip_forward, [&](const match_t& m) { print_match(os, m); });
   }
+  void MEM(const std::string &P, int min_len, bool flip_forward, std::vector<match_t>& matches) const {
+    sparseSA::MEM(P, min_len, flip_forward, matches);
+  }
+
 
   // Print MUMs
   void MUM(const std::string &P, int min_len, bool flip_forward, std::ostream& os) const {
     findMUM_each(P, min_len, flip_forward, [&](const match_t& m) { print_match(os, m); });
+  }
+  void MUM(const std::string &P, int min_len, bool flip_forward, std::vector<match_t>& matches) const {
+    sparseSA::MUM(P, min_len, flip_forward, matches);
   }
 };
 

@@ -44,6 +44,7 @@ cmd_func cmd_list[] = {
   // {"extract",           &extract_main},
   // {"format",            &format_main},
   {"sort",              &sort_main},
+  {"hsort",             &sort_main},
   {"dsort",             &dsort_main},
 // #ifdef HAVE_BOOST_REGEX
 //   {"hgrep",             &hgrep_main},

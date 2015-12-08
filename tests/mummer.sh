@@ -1,2 +1,2 @@
-mummer -mum $D/seed_reads_1.fa $D/seed_reads_0.fa | ufasta dsort /dev/stdin | test_md5 66805ce38f31278c960ea28787494f02
-mummer -maxmatch $D/seed_reads_1.fa $D/seed_reads_0.fa | ufasta dsort /dev/stdin | test_md5 5ae11b38619c97ce2537f97ce90fb162
+mummer -mum $D/seed_reads_1.fa $D/seed_reads_0.fa | ufasta hsort -H | ufasta dsort | test_md5 dde330968ea5e0341a786f318ba5d6c9
+mummer -maxmatch $D/seed_reads_1.fa $D/seed_reads_0.fa | ufasta hsort -H | ufasta dsort | test_md5 d75f4b0ca0a30cabc603ae8d30acf0f2

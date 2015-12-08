@@ -18,6 +18,7 @@
 #define __JELLYFISH_CPP_ARRAY_HPP_
 
 #include <cstddef>
+#include <cstring>
 #include <memory>
 
 namespace jellyfish {
