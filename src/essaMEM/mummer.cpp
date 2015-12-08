@@ -9,6 +9,7 @@
 #include <jellyfish/whole_sequence_parser.hpp>
 #include <mummer/sparseSA.hpp>
 #include <mummer/fasta.hpp>
+#include <thread_pipe.hpp>
 
 #include <getopt.h>
 #include <time.h>
@@ -50,18 +51,45 @@ int   K                = 1;
 int   num_threads      = 1;
 int   query_threads    = 0;
 
-struct query_arg {
-  int skip0;
-  int skip;
-  int queryFile;
+// Information on matches and write in multi-thread safe
+struct match_info {
+  std::string                          meta;
+  size_t                               len;
+  std::vector<mummer::mummer::match_t> fwd_matches, bwd_matches;
+};
+class match_printer : public thread_pipe::consumer<match_printer, match_info> {
+public:
+  match_printer(std::ostream& os, const mummer::mummer::sparseSAMatch* sa, bool print_length, bool rev_comp)
+    : m_os(os)
+    , m_sa(sa)
+    , m_print_length(print_length)
+    , m_rev_comp(rev_comp)
+  { }
+
+  bool consume(const match_info& m) {
+    m_os << "> " << m.meta;
+    if(m_print_length) m_os << "\tLen = " << m.len;
+    m_os << '\n';
+    for(const auto m : m.fwd_matches)
+      m_sa->print_match(m_os, m);
+    if(m_rev_comp) {
+      m_os << "> " << m.meta << " Reverse";
+      if(m_print_length) m_os << "\tLen = " << m.len;
+      m_os << '\n';
+      for(const auto m : m.bwd_matches)
+        m_sa->print_match(m_os, m);
+    }
+    return !m_os;
+  }
+
+protected:
+  std::ostream&                        m_os;
+  const mummer::mummer::sparseSAMatch* m_sa;
+  const bool                           m_print_length;
+  const bool                           m_rev_comp;
 };
 
-void query_thread(const mummer::mummer::sparseSAMatch* sa, sequence_parser* parser, std::mutex* os_mutex) {
-
-  std::vector<mummer::mummer::match_t> fwd_matches, bwd_matches;
-
-  std::string meta;
-
+void query_thread(const mummer::mummer::sparseSAMatch* sa, sequence_parser* parser, match_printer* printer) {
   while(true) {
     // Get a job (a batch of sequences)
     sequence_parser::job j(*parser);
@@ -69,15 +97,20 @@ void query_thread(const mummer::mummer::sparseSAMatch* sa, sequence_parser* pars
 
     // Process each sequence in job
     for(size_t i = 0; i < j->nb_filled; ++i) {
-      meta.clear();
+      // Get an output job
+      match_printer::job oj(*printer);
+
+      // Get meta (header)
+      oj->meta.clear();
       std::string& header = j->data[i].header;
       size_t start_meta = header.find_first_not_of(" ");
       if(start_meta == std::string::npos) continue;
       size_t end_meta = header.find_first_of(" ", start_meta);
-      meta = header.substr(start_meta, std::min(end_meta, header.size()) - start_meta);
+      oj->meta = header.substr(start_meta, std::min(end_meta, header.size()) - start_meta);
 
       // Clean up sequence if nucleotides only
       std::string& P = j->data[i].seq;
+      oj->len = P.size();
       char* const end = (char*)P.data() + P.size();
       if(nucleotides_only) {
         for(char* seq = (char*)P.data(); seq != end; ++seq) {
@@ -96,40 +129,28 @@ void query_thread(const mummer::mummer::sparseSAMatch* sa, sequence_parser* pars
           *seq = std::tolower(*seq);
       }
 
+      // Get matches
       if(forward) {
-        fwd_matches.clear();
+        oj->fwd_matches.clear();
         switch(type) {
-        case MAM: sa->MAM(P, min_len, false, fwd_matches); break;
-        case MUM: sa->MUM(P, min_len, false, fwd_matches); break;
-        case MEM: sa->MEM(P, min_len, false, fwd_matches); break;
+        case MAM: sa->MAM(P, min_len, false, oj->fwd_matches); break;
+        case MUM: sa->MUM(P, min_len, false, oj->fwd_matches); break;
+        case MEM: sa->MEM(P, min_len, false, oj->fwd_matches); break;
         }
       }
       if(rev_comp) {
-        bwd_matches.clear();
+        oj->bwd_matches.clear();
         reverse_complement(P, nucleotides_only);
         switch(type) {
-        case MAM: sa->MAM(P, min_len, printRevCompForw, bwd_matches); break;
-        case MUM: sa->MUM(P, min_len, printRevCompForw, bwd_matches); break;
-        case MEM: sa->MEM(P, min_len, printRevCompForw, bwd_matches); break;
+        case MAM: sa->MAM(P, min_len, printRevCompForw, oj->bwd_matches); break;
+        case MUM: sa->MUM(P, min_len, printRevCompForw, oj->bwd_matches); break;
+        case MEM: sa->MEM(P, min_len, printRevCompForw, oj->bwd_matches); break;
         }
       }
-
-      { std::lock_guard<std::mutex> lock(*os_mutex);
-        std::cout << "> " << meta;
-        if(print_length) std::cout << "\tLen = " << P.length();
-        std::cout << '\n';
-        for(const auto m : fwd_matches)
-          sa->print_match(std::cout, m);
-        if(rev_comp) {
-          std::cout << "> " << meta << " Reverse";
-          if(print_length) std::cout << "\tLen = " << P.length();
-          std::cout << '\n';
-          for(const auto m : bwd_matches)
-            sa->print_match(std::cout, m);
-        }
-      } // Release lock
     }
   }
+
+  printer->close();
 }
 
 int main(int argc, char* argv[]) {
@@ -314,12 +335,12 @@ int main(int argc, char* argv[]) {
   // Open input files
   stream_manager  streams((const char**)(argv + argNumber), (const char**)(argv + argc));
   sequence_parser parser(4 * query_threads, 10, 1, streams);
-  std::mutex      os_mutex;
+  match_printer printer(std::cout, sa.get(), print_length, rev_comp);
 
   // Launch query threads
   std::vector<std::thread> threads;
   for(int i = 0; i < query_threads; ++i)
-    threads.push_back(std::thread(query_thread, sa.get(), &parser, &os_mutex));
+    threads.push_back(std::thread(query_thread, sa.get(), &parser, &printer));
 
   // Wait for all threads to terminate.
   for(auto& th : threads)

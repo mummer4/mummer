@@ -827,8 +827,6 @@ void sparseSAMatch::print_match(std::ostream& os, match_t m) const {
   else {
     long refseq=0, refpos=0;
     from_set(m.ref, refseq, refpos); // from_set is slow!!!
-    // printf works faster than count... why? I don't know!!
-    // Because one must disable C++ IO and stdio synchronization
     os << "  " << std::left << std::setw(maxdescrlen + 1) << descr[refseq] << std::right << ' '
        << std::setw(8) << (refpos + 1) << "  "
        << std::setw(8) << (m.query + 1) << "  "
