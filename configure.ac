@@ -5,15 +5,18 @@ AM_INIT_AUTOMAKE([subdir-objects foreign parallel-tests color-tests])
 AM_SILENT_RULES([yes])
 AC_CONFIG_SRCDIR([.])
 AC_CONFIG_HEADERS([config.h])
-AC_PROG_LIBTOOL()
+AC_PROG_LIBTOOL
 
-# Change default compilation flags
-AC_SUBST([ALL_CXXFLAGS], [-std=c++0x])
-CXXFLAGS="-std=c++0x $CXXFLAGS"
+# Check for compiler and flags
+AS_IF([test -z "$CXXFLAGS"], [cxxflags_given=no], [cxxflags_given=yes])
 AC_LANG(C++)
 AC_PROG_CXX
 AC_PROG_CC
 AC_PATH_PROG(ENV_PROG, [env])
+
+# Add -std=c++0x always. Add -DNDEBUG only if CXXFLAGS is not given on command line
+CXXFLAGS="-std=c++0x $CXXFLAGS"
+AS_IF([test x$cxxflags_given = xno], [CXXFLAGS="-DNDEBUG $CXXFLAGS"])
 
 # Check for yaggo
 AC_ARG_VAR([YAGGO], [Yaggo switch parser generator])
@@ -80,6 +83,8 @@ AS_IF([test "x$need_shared_libraries" = xyes -a "x$enable_shared" = xno],
       [AC_MSG_ERROR([Shared libraries are required for the SWIG script binding but are disabled (probably by the switch --disable-shared)])])
 AS_IF([test "x$need_shared_libraries" = xyes -a "x$can_build_shared" = xno],
       [AC_MSG_ERROR([Shared libraries (modules) are required for the SWIG script binding but cannot be build (probably not supported by the compiler)])])
+
+AC_MSG_NOTICE([compiling with flags: CXXFLAGS=$CXXFLAGS])
 
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
