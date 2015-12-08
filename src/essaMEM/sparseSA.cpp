@@ -447,8 +447,10 @@ void sparseSA::construct(){
         int alphalast = alphasz + 1;
 
         // Use LS algorithm to construct the suffix array.
-        int *SAint = (int*)(&SA[0]);
-        suffixsort(&ISA[0], SAint , N-1, alphalast, 1);
+        { TIME_SCOPE("suffixsort");
+          int *SAint = (int*)(&SA[0]);
+          suffixsort(&ISA[0], SAint , N-1, alphalast, 1);
+        }
     }
 
     //    std::cerr << "N=" << N << std::endl;

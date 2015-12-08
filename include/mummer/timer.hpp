@@ -61,6 +61,7 @@ struct scope {
   }
 };
 } // namespace timer
+#define TIME_SCOPE(msg) timer::scope scope_timer ## __COUNTER__(msg);
 #define TIME_FUNCTION timer::scope function_timer ## __COUNTER__(__PRETTY_FUNCTION__);
 #else
 #include <ostream>
@@ -83,6 +84,7 @@ struct scope {
   scope(const char* msg, std::ostream& os = std::clog) { }
 };
 } // namespace timer
+#define TIME_SCOPE(msg)
 #define TIME_FUNCTION
 
 #endif
