@@ -70,14 +70,14 @@ public:
     m_os << "> " << m.meta;
     if(m_print_length) m_os << "\tLen = " << m.len;
     m_os << '\n';
-    for(const auto m : m.fwd_matches)
-      m_sa->print_match(m_os, m);
+    for(const auto& i : m.fwd_matches)
+      m_sa->print_match(m_os, i);
     if(m_rev_comp) {
       m_os << "> " << m.meta << " Reverse";
       if(m_print_length) m_os << "\tLen = " << m.len;
       m_os << '\n';
-      for(const auto m : m.bwd_matches)
-        m_sa->print_match(m_os, m);
+      for(const auto& i : m.bwd_matches)
+        m_sa->print_match(m_os, i);
     }
     return !m_os;
   }
