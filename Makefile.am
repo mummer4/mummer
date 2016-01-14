@@ -41,7 +41,7 @@ include yaggo.mk
 ##############################
 lib_LTLIBRARIES = libumdmummer.la
 LDADD = libumdmummer.la
-libumdmummer_la_SOURCES  = src/essaMEM/sparseSA.cpp src/essaMEM/qsufsort.c
+libumdmummer_la_SOURCES  = src/essaMEM/sparseSA.cpp src/essaMEM/sssort_compact.cc
 libumdmummer_la_SOURCES += src/tigr/mgaps.cc src/tigr/postnuc.cc src/tigr/sw_align.cc src/tigr/tigrinc.cc
 libumdmummer_la_SOURCES += src/umd/nucmer.cc
 include_HEADERS = include/mummer/sparseSA.hpp				\

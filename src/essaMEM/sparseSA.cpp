@@ -10,6 +10,7 @@
 
 #include <mummer/sparseSA.hpp>
 #include <mummer/timer.hpp>
+#include <compactsufsort/compactsufsort.hpp>
 
 namespace mummer {
 namespace mummer {
@@ -98,7 +99,7 @@ long sparseSA::index_size_in_bytes() const {
 // Manzini 2004 to compute the LCP array. Modified to handle sparse
 // suffix arrays and inverse sparse suffix arrays.
 void sparseSA::computeLCP() {
-  TIME_FUNCTION;
+  //  TIME_FUNCTION;
 
   long h = 0;
   for(long i = 0; i < N / K; ++i) {
@@ -117,7 +118,7 @@ void sparseSA::computeLCP() {
 
 // Child array construction algorithm
 void sparseSA::computeChild() {
-  TIME_FUNCTION;
+  //  TIME_FUNCTION;
 
   for(int i = 0; i < N/K; i++){
     CHILD[i] = -1;
@@ -394,7 +395,7 @@ bool sparseSA::load(const std::string &prefix){
 }
 
 void sparseSA::construct(){
-  TIME_FUNCTION;
+  //  TIME_FUNCTION;
 
     if(K > 1) {
         long bucketNr = 1;
@@ -406,51 +407,29 @@ void sparseSA::construct(){
         t_new[N/K] = 0; // Terminate new integer string.
         delete[] BucketBegin;
 
+        throw "Not supported yet";
         // Suffix sort integer text.
-        std::cerr << "# suffixsort()" << std::endl;
-        suffixsort(t_new, intSA, N/K, bucketNr, 0);
-        std::cerr << "# DONE suffixsort()" << std::endl;
+        // std::cerr << "# suffixsort()" << std::endl;
+        // suffixsort(t_new, intSA, N/K, bucketNr, 0);
+        // std::cerr << "# DONE suffixsort()" << std::endl;
 
-        delete[] t_new;
+        // delete[] t_new;
 
-        // Translate suffix array.
-        SA.resize(N/K);
-        for (long i=0; i<N/K; i++) SA[i] = (unsigned int)intSA[i+1] * K;
-        delete[] intSA;
+        // // Translate suffix array.
+        // SA.resize(N/K);
+        // for (long i=0; i<N/K; i++) SA[i] = (unsigned int)intSA[i+1] * K;
+        // delete[] intSA;
 
-        // Build ISA using sparse SA.
-        ISA.resize(N/K);
-        for(long i = 0; i < N/K; i++) { ISA[SA[i]/K] = i; }
+        // // Build ISA using sparse SA.
+        // ISA.resize(N/K);
+        // for(long i = 0; i < N/K; i++) { ISA[SA[i]/K] = i; }
     }
     else {
         SA.resize(N);
         ISA.resize(N);
-        int char2int[UCHAR_MAX+1]; // Map from char to integer alphabet.
-
-        // Zero char2int mapping.
-        for (int i=0; i<=UCHAR_MAX; i++) char2int[i]=0;
-
-        // Determine which characters are used in the string S.
-        for (long i = 0; i < N; i++) char2int[(int)S[i]]=1;
-
-        // Count the size of the alphabet.
-        int alphasz = 0;
-        for(int i=0; i <= UCHAR_MAX; i++) {
-            if (char2int[i]) char2int[i]=alphasz++;
-            else char2int[i] = -1;
-        }
-
-        // Remap the alphabet.
-        for(long i = 0; i < N; i++) ISA[i] = (int)S[i];
-        for (long i = 0; i < N; i++) ISA[i]=char2int[ISA[i]] + 1;
-        // First "character" equals 1 because of above plus one, l=1 in suffixsort().
-        int alphalast = alphasz + 1;
-
-        // Use LS algorithm to construct the suffix array.
-        { TIME_SCOPE("suffixsort");
-          int *SAint = (int*)(&SA[0]);
-          suffixsort(&ISA[0], SAint , N-1, alphalast, 1);
-        }
+        int *SAint = (int*)SA.data();
+        compactsufsort::create((const unsigned char*)(S + 0), SAint, N);
+        for(long i = 0; i < N; ++i) { ISA[SA[i]] = i; }
     }
 
     //    std::cerr << "N=" << N << std::endl;
