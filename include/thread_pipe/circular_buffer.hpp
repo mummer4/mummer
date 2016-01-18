@@ -67,9 +67,9 @@ template<typename T, unsigned int n, T g = (T(1) << n) - 1>
     void close() { _closed.store(true); }
 
     /// Return capacity of circular buffer
-    size_t size() { return _size.d(); }
+    size_t size() const { return _size.d(); }
     /// Return the number of element currently in circular buffer
-    size_t fill() {
+    size_t fill() const {
       size_t head, tail;
       size_t nhead = _head.load(std::memory_order_acquire);
       do {

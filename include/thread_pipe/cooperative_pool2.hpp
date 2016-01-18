@@ -227,7 +227,7 @@ private:
       // If less than half full -> try to fill up producer to consumer
       // queue. Disregard return value: in any case will
       // attempt to get an element for ourselves
-      if(super::prod_cons_.fill() < super::prod_cons_.size() / 2)
+      if(super::prod_cons_.fill() < super::size() / 2)
         become_producer();
 
       size_type i = super::prod_cons_.dequeue();
@@ -335,7 +335,7 @@ private:
       // If more than half full -> try to empty consumer to producer
       // queue. Disregard return value: in any case will attempt to
       // get an element for ourselves
-      if(super::prod_cons_.fill() > super::prod_cons_.size() / 2)
+      if(super::prod_cons_.fill() > super::size() / 2)
         become_consumer();
 
       size_type i = super::cons_prod_.dequeue();
