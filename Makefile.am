@@ -44,7 +44,9 @@ LDADD = libumdmummer.la
 libumdmummer_la_SOURCES  = src/essaMEM/sparseSA.cpp src/essaMEM/sssort_compact.cc
 libumdmummer_la_SOURCES += src/tigr/mgaps.cc src/tigr/postnuc.cc src/tigr/sw_align.cc src/tigr/tigrinc.cc
 libumdmummer_la_SOURCES += src/umd/nucmer.cc
-include_HEADERS = include/mummer/sparseSA.hpp				\
+
+# TODO: remove duplicated header and functionality between jellyfish and thread_pipe
+noinst_HEADERS += include/mummer/sparseSA.hpp				\
                   include/mummer/fasta.hpp include/mummer/postnuc.hh	\
                   include/mummer/translate.hh				\
                   include/mummer/sw_align.hh				\
@@ -58,6 +60,18 @@ include_HEADERS = include/mummer/sparseSA.hpp				\
                   include/jellyfish/stream_manager.hpp			\
                   include/jellyfish/whole_sequence_parser.hpp		\
                   include/mummer/timer.hpp
+noinst_HEADERS += include/thread_pipe.hpp			\
+                  include/thread_pipe/circular_buffer.hpp	\
+                  include/thread_pipe/cooperative_pool2.hpp	\
+                  include/thread_pipe/divisor.hpp		\
+                  include/thread_pipe/traits.hpp
+noinst_HEADERS += include/compactsufsort/compactsufsort.hpp		\
+                  include/compactsufsort/const_iterator_traits.hpp	\
+                  include/compactsufsort/said_traits.hpp		\
+                  include/compactsufsort/trsort_imp.hpp			\
+                  include/compactsufsort/compactsufsort_imp.hpp		\
+                  include/compactsufsort/divsufsort_private.h		\
+                  include/compactsufsort/sssort_imp.hpp
 
 ###########
 # essaMEM #
