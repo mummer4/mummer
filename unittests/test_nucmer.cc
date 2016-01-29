@@ -14,14 +14,6 @@ char comp(char b) {
   default: return 'n';
   }
 }
-std::string sequence(size_t len) {
-  static char bases[4] = { 'a', 'c', 'g', 't' };
-  std::uniform_int_distribution<int> dist(0, 3);
-  std::string                        result;
-  for(size_t i = 0; i < len; ++i)
-    result += bases[dist(rand_gen)];
-  return result;
-}
 
 void assert_good_alignment(const mummer::postnuc::Alignment& al, const std::string& s1, const std::string& s2) {
   SCOPED_TRACE(::testing::Message() << "al:" << al);

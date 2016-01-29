@@ -21,5 +21,9 @@ struct file_unlink {
   }
 };
 
+// Generate a random sequence of size len
+std::string sequence(size_t len);
+
+
 
 #endif /* __TEST_H__ */

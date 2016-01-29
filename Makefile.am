@@ -4,6 +4,7 @@
 ACLOCAL_AMFLAGS = -I m4
 
 AM_CPPFLAGS = -Wall -I$(srcdir)/include
+AM_CXXFLAGS = $(EXTRA_CXXFLAGS)
 AM_LDFLAGS = -lpthread
 
 # Pre-declare all used variables.
@@ -40,10 +41,12 @@ include yaggo.mk
 ##############################
 lib_LTLIBRARIES = libumdmummer.la
 LDADD = libumdmummer.la
-libumdmummer_la_SOURCES  = src/essaMEM/sparseSA.cpp src/essaMEM/qsufsort.c
+libumdmummer_la_SOURCES  = src/essaMEM/sparseSA.cpp src/essaMEM/sssort_compact.cc
 libumdmummer_la_SOURCES += src/tigr/mgaps.cc src/tigr/postnuc.cc src/tigr/sw_align.cc src/tigr/tigrinc.cc
 libumdmummer_la_SOURCES += src/umd/nucmer.cc
-include_HEADERS = include/mummer/sparseSA.hpp				\
+
+# TODO: remove duplicated header and functionality between jellyfish and thread_pipe
+noinst_HEADERS += include/mummer/sparseSA.hpp				\
                   include/mummer/fasta.hpp include/mummer/postnuc.hh	\
                   include/mummer/translate.hh				\
                   include/mummer/sw_align.hh				\
@@ -55,9 +58,20 @@ include_HEADERS = include/mummer/sparseSA.hpp				\
                   include/jellyfish/cpp_array.hpp			\
                   include/jellyfish/divisor.hpp				\
                   include/jellyfish/stream_manager.hpp			\
-                  include/jellyfish/whole_sequence_parser.hpp
-
-
+                  include/jellyfish/whole_sequence_parser.hpp		\
+                  include/mummer/timer.hpp
+noinst_HEADERS += include/thread_pipe.hpp			\
+                  include/thread_pipe/circular_buffer.hpp	\
+                  include/thread_pipe/cooperative_pool2.hpp	\
+                  include/thread_pipe/divisor.hpp		\
+                  include/thread_pipe/traits.hpp
+noinst_HEADERS += include/compactsufsort/compactsufsort.hpp		\
+                  include/compactsufsort/const_iterator_traits.hpp	\
+                  include/compactsufsort/said_traits.hpp		\
+                  include/compactsufsort/trsort_imp.hpp			\
+                  include/compactsufsort/compactsufsort_imp.hpp		\
+                  include/compactsufsort/divsufsort_private.h		\
+                  include/compactsufsort/sssort_imp.hpp
 
 ###########
 # essaMEM #
@@ -70,7 +84,7 @@ mummer_SOURCES = src/essaMEM/fasta.cpp src/essaMEM/mummer.cpp
 ########
 bin_PROGRAMS += mgaps postnuc show-coords show-aligns show-snps	\
                 show-tiling show-diff repeat-match annotate	\
-                combineMUMs delta-filter prepro
+                combineMUMs delta-filter prepro postpro
 mgaps_SOURCES = src/tigr/mgaps_main.cc
 postnuc_SOURCES = src/tigr/postnuc_main.cc
 show_coords_SOURCES = src/tigr/show-coords.cc src/tigr/delta.cc
@@ -86,7 +100,7 @@ prepro_SOURCES = src/tigr/prepro.cc src/tigr/translate.cc
 postpro_SOURCES = src/tigr/postpro.cc src/tigr/translate.cc
 
 # Obsolete stuff
-EXTRA_DIST = src/tigr/gaps.cc
+EXTRA_DIST += src/tigr/gaps.cc
 
 ###########
 # scripts #
@@ -101,8 +115,8 @@ shell_scripts = exact-tandems
 all_scripts = $(perl_scripts) $(shell_scripts)
 
 # Obsolete stuff
-EXTRA_DIST = scripts/run-mummer1.sh scripts/run-mummer3.sh	\
-             scripts/mapview.pl scripts/nucmer2xfig.pl
+EXTRA_DIST += scripts/run-mummer1.sh scripts/run-mummer3.sh	\
+              scripts/mapview.pl scripts/nucmer2xfig.pl
 
 libs_scripts = $(patsubst %,.libs/%,$(all_scripts))
 bin_SCRIPTS += $(libs_scripts)

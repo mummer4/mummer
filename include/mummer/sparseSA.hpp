@@ -9,6 +9,7 @@
 #include <type_traits>
 #include <limits.h>
 #include <cstring>
+#include <cassert>
 
 
 namespace mummer {
@@ -46,39 +47,71 @@ static const unsigned int BITADD[256] = {
 // than or equal to 255 are stored in a sorted array.
 // Simulates a vector<int> LCP;
 struct vec_uchar {
+  typedef unsigned char small_type;
+  typedef unsigned int  large_type;
   struct item_t{
     item_t() = default;
-    item_t(size_t i, int v) : idx(i), val(v) { }
-    size_t idx; int val;
-    bool operator < (item_t t) const { return idx < t.idx;  }
+    item_t(size_t i) : idx(i) { }
+    item_t(size_t i, large_type v) : idx(i), val(v) { }
+    size_t idx;
+    large_type val;
+    bool operator < (item_t t) const { return idx < t.idx; }
   };
-  std::vector<unsigned char> vec; // LCP values from 0-65534
-  std::vector<item_t>        M;
+  std::vector<small_type>  vec; // LCP values from 0-65534
+  std::vector<item_t>      M;
+  std::vector<large_type>* sa;
+
+  vec_uchar(std::vector<large_type>& sa_) : vec(sa_.size(), 0), sa(&sa_) { }
   void resize(size_t N) { vec.resize(N, 0); }
+
   // Vector X[i] notation to get LCP values.
-  int operator[] (size_t idx) const {
-    if(vec[idx] == std::numeric_limits<unsigned char>::max())
-      return lower_bound(M.begin(), M.end(), item_t(idx,0))->val;
-    else
-      return vec[idx];
+  large_type operator[] (size_t idx) const {
+    static const large_type max = std::numeric_limits<small_type>::max();
+    const large_type        res = vec[idx];
+    if(res != max) return res;
+    idx = (*sa)[idx];
+    auto it = upper_bound(M.begin(), M.end(), item_t(idx));
+    assert(it != M.begin());
+    --it;
+    return it->val - (idx - it->idx);
   }
   // Actually set LCP values, distingushes large and small LCP
   // values.
-  void set(size_t idx, int v) {
-    if(v >= std::numeric_limits<unsigned char>::max()) {
-      vec.at(idx) = std::numeric_limits<unsigned char>::max();
-      M.push_back(item_t(idx, v));
+  void set(size_t idx, large_type v) {
+    if(v < std::numeric_limits<small_type>::max()) {
+      vec[idx] = v;
+    } else {
+      vec[idx] = std::numeric_limits<small_type>::max();
+      M.push_back(item_t((*sa)[idx], v));
     }
-    else { vec.at(idx) = (unsigned char)v; }
   }
   // Once all the values are set, call init. This will assure the
-  // values >= 255 are sorted by index for fast retrieval.
-  void init() { sort(M.begin(), M.end()); } // std::vector<item_t>(M).swap(M);}
+  // values >= 255 are sorted by index for fast retrieval. The values
+  // are compacted into ranges.
+  void init() {
+    // First sort by end of range [idx, idx + val]
+    sort(M.begin(), M.end(), [](const item_t& a, const item_t& b) -> bool {
+        return a.idx + a.val < b.idx + b.val || (a.idx + a.val == b.idx + b.val && a.idx < b.idx);
+      });
+    // Second, remove elements that are consecutive in a range
+    size_t pidx = 0;
+    large_type pval = 0;
+    auto nend = std::remove_if(M.begin(), M.end(), [&](const item_t& a) -> bool {
+        bool res = a.idx + a.val == pidx + pval && a.idx == pidx + 1;
+        pidx = a.idx;
+        pval = a.val;
+        return res;
+      });
+    M.resize(nend - M.begin());
+    M.shrink_to_fit();
+    // Third, sort by beginning of compacted ranges
+    sort(M.begin(), M.end());
+  }
 
   long index_size_in_bytes() const {
       long indexSize = 0L;
-      indexSize += sizeof(vec) + vec.capacity()*sizeof(unsigned char);
-      indexSize += sizeof(M) + M.capacity()*(sizeof(size_t)+sizeof(int));
+      indexSize += sizeof(vec) + vec.capacity()*sizeof(small_type);
+      indexSize += sizeof(M) + M.capacity()*(sizeof(size_t)+sizeof(large_type));
       return indexSize;
   }
 };
@@ -179,6 +212,7 @@ struct sparseSA {
   // Constructor load sparse suffix array from file
   sparseSA(const char* S_, size_t Slen, const std::string& prefix)
     : S(S_, Slen, 1)
+    , LCP(SA)
   {
     load(prefix);
     S.set_k(K);
@@ -384,15 +418,26 @@ public:
     if(sparseSA::K != 1) return;  // Only valid for full suffix array.
     findMAM(P, min_len, flip_forward, os);
   }
+  void MAM(const std::string& P, int min_len, bool flip_forward, std::vector<match_t>& matches) const {
+    sparseSA::MAM(P, min_len, flip_forward, matches);
+  }
+
 
   // Print MEMs
   void MEM(const std::string &P, int min_len, bool flip_forward, std::ostream& os) const {
     findMEM_each(P, min_len, flip_forward, [&](const match_t& m) { print_match(os, m); });
   }
+  void MEM(const std::string &P, int min_len, bool flip_forward, std::vector<match_t>& matches) const {
+    sparseSA::MEM(P, min_len, flip_forward, matches);
+  }
+
 
   // Print MUMs
   void MUM(const std::string &P, int min_len, bool flip_forward, std::ostream& os) const {
     findMUM_each(P, min_len, flip_forward, [&](const match_t& m) { print_match(os, m); });
+  }
+  void MUM(const std::string &P, int min_len, bool flip_forward, std::vector<match_t>& matches) const {
+    sparseSA::MUM(P, min_len, flip_forward, matches);
   }
 };
 

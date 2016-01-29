@@ -9,6 +9,8 @@
 #include <iomanip>
 
 #include <mummer/sparseSA.hpp>
+#include <mummer/timer.hpp>
+#include <compactsufsort/compactsufsort.hpp>
 
 namespace mummer {
 namespace mummer {
@@ -45,6 +47,7 @@ sparseSA::sparseSA(const char* S_, size_t Slen,
   , N(S.length())
   , logN((long)ceil(log(N/K) / log(2.0)))
   , NKm1(N/K-1)
+  , LCP(SA)
   , hasChild(child_)
   , hasSufLink(suflink_)
   , hasKmer(kmer_)
@@ -96,14 +99,18 @@ long sparseSA::index_size_in_bytes() const {
 // Manzini 2004 to compute the LCP array. Modified to handle sparse
 // suffix arrays and inverse sparse suffix arrays.
 void sparseSA::computeLCP() {
-  long h=0;
-  for(long i = 0; i < N; i+=K) {
-    long m = ISA[i/K];
-    if(m==0) LCP.set(m, 0); // LCP[m]=0;
-    else {
-      long j = SA[m-1];
-      while(i+h < N && j+h < N && S[i+h] == S[j+h])  h++;
+  //  TIME_FUNCTION;
+
+  long h = 0;
+  for(long i = 0; i < N / K; ++i) {
+    const long m = ISA[i];
+    if(m > 0) {
+      const long bj  = SA[m-1];
+      const long bi = i * K;
+      while(bi + h < N && bj + h < N && S[bi + h] == S[bj + h])  ++h;
       LCP.set(m, h); //LCP[m] = h;
+    } else {
+      LCP.set(m, 0); // LCP[m]=0;
     }
     h = std::max(0L, h - K);
   }
@@ -111,9 +118,11 @@ void sparseSA::computeLCP() {
 
 // Child array construction algorithm
 void sparseSA::computeChild() {
-    for(int i = 0; i < N/K; i++){
-        CHILD[i] = -1;
-    }
+  //  TIME_FUNCTION;
+
+  for(int i = 0; i < N/K; i++){
+    CHILD[i] = -1;
+  }
         //Compute up and down values
         int lastIndex  = -1;
         std::stack<int,std::vector<int> > stapelUD;
@@ -136,7 +145,7 @@ void sparseSA::computeChild() {
         while(0 < LCP[stapelUD.top()]){//last row (fix for last character of sequence not being unique
             lastIndex = stapelUD.top();
             stapelUD.pop();
-            if(0 <= LCP[stapelUD.top()] && LCP[stapelUD.top()] != LCP[lastIndex]){
+            if(LCP[stapelUD.top()] != LCP[lastIndex]){
                 CHILD[stapelUD.top()] = lastIndex;
             }
         }
@@ -157,6 +166,8 @@ void sparseSA::computeChild() {
 
 // Look-up table construction algorithm
 void sparseSA::computeKmer() {
+  TIME_FUNCTION;
+
     std::stack<interval_t> intervalStack;
     std::stack<unsigned int> indexStack;
 
@@ -384,6 +395,8 @@ bool sparseSA::load(const std::string &prefix){
 }
 
 void sparseSA::construct(){
+  //  TIME_FUNCTION;
+
     if(K > 1) {
         long bucketNr = 1;
         int *intSA = new int[N/K+1];
@@ -394,49 +407,29 @@ void sparseSA::construct(){
         t_new[N/K] = 0; // Terminate new integer string.
         delete[] BucketBegin;
 
+        throw "Not supported yet";
         // Suffix sort integer text.
-        std::cerr << "# suffixsort()" << std::endl;
-        suffixsort(t_new, intSA, N/K, bucketNr, 0);
-        std::cerr << "# DONE suffixsort()" << std::endl;
+        // std::cerr << "# suffixsort()" << std::endl;
+        // suffixsort(t_new, intSA, N/K, bucketNr, 0);
+        // std::cerr << "# DONE suffixsort()" << std::endl;
 
-        delete[] t_new;
+        // delete[] t_new;
 
-        // Translate suffix array.
-        SA.resize(N/K);
-        for (long i=0; i<N/K; i++) SA[i] = (unsigned int)intSA[i+1] * K;
-        delete[] intSA;
+        // // Translate suffix array.
+        // SA.resize(N/K);
+        // for (long i=0; i<N/K; i++) SA[i] = (unsigned int)intSA[i+1] * K;
+        // delete[] intSA;
 
-        // Build ISA using sparse SA.
-        ISA.resize(N/K);
-        for(long i = 0; i < N/K; i++) { ISA[SA[i]/K] = i; }
+        // // Build ISA using sparse SA.
+        // ISA.resize(N/K);
+        // for(long i = 0; i < N/K; i++) { ISA[SA[i]/K] = i; }
     }
     else {
         SA.resize(N);
         ISA.resize(N);
-        int char2int[UCHAR_MAX+1]; // Map from char to integer alphabet.
-
-        // Zero char2int mapping.
-        for (int i=0; i<=UCHAR_MAX; i++) char2int[i]=0;
-
-        // Determine which characters are used in the string S.
-        for (long i = 0; i < N; i++) char2int[(int)S[i]]=1;
-
-        // Count the size of the alphabet.
-        int alphasz = 0;
-        for(int i=0; i <= UCHAR_MAX; i++) {
-            if (char2int[i]) char2int[i]=alphasz++;
-            else char2int[i] = -1;
-        }
-
-        // Remap the alphabet.
-        for(long i = 0; i < N; i++) ISA[i] = (int)S[i];
-        for (long i = 0; i < N; i++) ISA[i]=char2int[ISA[i]] + 1;
-        // First "character" equals 1 because of above plus one, l=1 in suffixsort().
-        int alphalast = alphasz + 1;
-
-        // Use LS algorithm to construct the suffix array.
-        int *SAint = (int*)(&SA[0]);
-        suffixsort(&ISA[0], SAint , N-1, alphalast, 1);
+        int *SAint = (int*)SA.data();
+        compactsufsort::create((const unsigned char*)(S + 0), SAint, N);
+        for(long i = 0; i < N; ++i) { ISA[SA[i]] = i; }
     }
 
     //    std::cerr << "N=" << N << std::endl;
@@ -813,8 +806,6 @@ void sparseSAMatch::print_match(std::ostream& os, match_t m) const {
   else {
     long refseq=0, refpos=0;
     from_set(m.ref, refseq, refpos); // from_set is slow!!!
-    // printf works faster than count... why? I don't know!!
-    // Because one must disable C++ IO and stdio synchronization
     os << "  " << std::left << std::setw(maxdescrlen + 1) << descr[refseq] << std::right << ' '
        << std::setw(8) << (refpos + 1) << "  "
        << std::setw(8) << (m.query + 1) << "  "

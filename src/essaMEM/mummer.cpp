@@ -2,9 +2,14 @@
 #include <iomanip>
 #include <fstream>
 #include <vector>
+#include <thread>
+#include <mutex>
 
+#include <jellyfish/stream_manager.hpp>
+#include <jellyfish/whole_sequence_parser.hpp>
 #include <mummer/sparseSA.hpp>
 #include <mummer/fasta.hpp>
+#include <thread_pipe.hpp>
 
 #include <getopt.h>
 #include <time.h>
@@ -15,7 +20,10 @@
 
 // NOTE use of special characters ~, `, and $ !!!!!!!!
 
-// using namespace std;
+// To read input in parallel
+typedef jellyfish::stream_manager<const char**>          stream_manager;
+typedef jellyfish::whole_sequence_parser<stream_manager> sequence_parser;
+
 
 void usage(std::string prog);
 
@@ -41,109 +49,99 @@ bool  printSubstring   = false;
 bool  printRevCompForw = false;
 int   K                = 1;
 int   num_threads      = 1;
-int   query_threads    = 1;
+int   query_threads    = 0;
 
-mummer::mummer::sparseSAMatch *sa;
-std::string query_fasta[32];
-int MAX_QUERY_FILES = 32;
-int numQueryFiles = 0;
-
-struct query_arg {
-  int skip0;
-  int skip;
-  int queryFile;
+// Information on matches and write in multi-thread safe
+struct match_info {
+  std::string                          meta;
+  size_t                               len;
+  std::vector<mummer::mummer::match_t> fwd_matches, bwd_matches;
+  void clear() {
+    meta.clear();
+    fwd_matches.clear();
+    bwd_matches.clear();
+  }
 };
 
-void *query_thread(void *arg_) {
-  query_arg *arg = (query_arg *)arg_;
-  std::ifstream data(query_fasta[arg->queryFile].c_str());
-
-  std::vector<mummer::mummer::match_t> matches;
-
-  const bool print = arg->skip == 1;
-
-
-  if(!data.is_open()) { std::cerr << "unable to open " << query_fasta[arg->queryFile] << std::endl; exit(1); }
-
-  int c = data.peek();
-  if(c != '>') {
-    std::cerr << "error, first character must be a '>', got '" << (char)c << "'" << std::endl;
-    exit(1);
-  }
-
-  std::string P, meta, line;
-  for(long seq_cnt = 0 ; c != EOF; seq_cnt++) {
-    P.clear(); meta.clear();
-
-    // Load metadata
-    getline(data, line);
-    size_t start = line.find_first_not_of(" ", 1);
-    if(start != std::string::npos) {
-      size_t end = line.find_first_of(" ", start);
-      meta = line.substr(start, std::min(end, line.size()) - start);
+void print_match_info(std::ostream& os, const match_info& m, const mummer::mummer::sparseSAMatch* sa) {
+    os << "> " << m.meta;
+    if(print_length) os << "\tLen = " << m.len;
+    os << '\n';
+    for(const auto& i : m.fwd_matches)
+      sa->print_match(os, i);
+    if(rev_comp) {
+      os << "> " << m.meta << " Reverse";
+      if(print_length) os << "\tLen = " << m.len;
+      os << '\n';
+      for(const auto& i : m.bwd_matches)
+        sa->print_match(os, i);
     }
-
-    // Load sequence
-    for(c = data.peek(); c != EOF && c != '>'; c = data.peek()) {
-      getline(data, line); // Load one line at a time.
-      long start = 0, end = line.length() - 1;
-      trim(line, start,end);
-      for(long i = start; i <= end; i++) {
-        char c = std::tolower(line[i]);
-        if(nucleotides_only) {
-          switch(c) {
-          case 'a': case 't': case 'g': case 'c': break;
-          default:
-            c = '~';
-          }
-        }
-        P += c;
-      }
-    }
-
-    if(meta.empty()) continue;
-    if(seq_cnt % arg->skip == arg->skip0) {
-      // Process P.
-      //   std::cerr << "# P.length()=" << P.length() << std::endl;
-      if(forward){
-        if(print){
-          if(print_length) std::cout << "> " << meta << "\tLen = " << P.length() << '\n';
-          else std::cout << "> " << meta << '\n';
-        }
-        switch(type) {
-        case MAM: sa->MAM(P, min_len, false, std::cout); break;
-        case MUM: sa->MUM(P, min_len, false, std::cout); break;
-        case MEM: sa->MEM(P, min_len, false, std::cout); break;
-        }
-        if(!print) sa->print_match(std::cout, meta, false);
-      }
-      if(rev_comp) {
-        reverse_complement(P, nucleotides_only);
-        if(print){
-          if(print_length) std::cout << "> " << meta << " Reverse\tLen = " << P.length() << '\n';
-          else std::cout << "> " << meta << " Reverse\n";
-        }
-        switch(type) {
-        case MAM: sa->MAM(P, min_len, printRevCompForw, std::cout); break;
-        case MUM: sa->MUM(P, min_len, printRevCompForw, std::cout); break;
-        case MEM: sa->MEM(P, min_len, printRevCompForw, std::cout); break;
-        }
-        if(!print) sa->print_match(std::cout, meta, true);
-      }
-    }
-  }
-
-  //  std::cerr << "number of M(E/A/U)Ms: " << memCounter << std::endl;
-  pthread_exit(NULL);
-  return 0;
 }
 
-// Added by Simon Gog for testing
-// void write_lock(int i){
-//   std::ofstream lockfile("lock.txt", std::ios_base::trunc);
-// 	lockfile<<i<<std::endl;
-// 	lockfile.close();
-// }
+void query_thread(const mummer::mummer::sparseSAMatch* sa, sequence_parser* parser,
+                  thread_pipe::ostream_buffered* printer) {
+  auto       output_it = printer->begin();
+  match_info match;
+
+  while(true) {
+    // Get a job (a batch of sequences)
+    sequence_parser::job j(*parser);
+    if(j.is_empty()) break;
+
+    // Process each sequence in job
+    for(size_t i = 0; i < j->nb_filled; ++i, ++output_it) {
+
+      // Get meta (header)
+      match.clear();
+      std::string& header = j->data[i].header;
+      size_t start_meta = header.find_first_not_of(" ");
+      if(start_meta == std::string::npos) continue;
+      size_t end_meta = header.find_first_of(" ", start_meta);
+      match.meta = header.substr(start_meta, std::min(end_meta, header.size()) - start_meta);
+
+      // Clean up sequence if nucleotides only
+      std::string& P = j->data[i].seq;
+      match.len = P.size();
+      char* const end = (char*)P.data() + P.size();
+      if(nucleotides_only) {
+        for(char* seq = (char*)P.data(); seq != end; ++seq) {
+          switch(*seq) {
+          case 'a': case 't': case 'g': case 'c': break;
+          case 'A': *seq = 'a'; break;
+          case 'C': *seq = 'c'; break;
+          case 'G': *seq = 'g'; break;
+          case 'T': *seq = 't'; break;
+          default:
+            *seq = '~';
+          }
+        }
+      } else { // !nucleotides_only
+        for(char* seq = (char*)P.data(); seq != end; ++seq)
+          *seq = std::tolower(*seq);
+      }
+
+      // Get matches
+      if(forward) {
+        match.fwd_matches.clear();
+        switch(type) {
+        case MAM: sa->MAM(P, min_len, false, match.fwd_matches); break;
+        case MUM: sa->MUM(P, min_len, false, match.fwd_matches); break;
+        case MEM: sa->MEM(P, min_len, false, match.fwd_matches); break;
+        }
+      }
+      if(rev_comp) {
+        match.bwd_matches.clear();
+        reverse_complement(P, nucleotides_only);
+        switch(type) {
+        case MAM: sa->MAM(P, min_len, printRevCompForw, match.bwd_matches); break;
+        case MUM: sa->MUM(P, min_len, printRevCompForw, match.bwd_matches); break;
+        case MEM: sa->MEM(P, min_len, printRevCompForw, match.bwd_matches); break;
+        }
+      }
+      print_match_info(*output_it, match, sa);
+    }
+  }
+}
 
 int main(int argc, char* argv[]) {
   std::ios::sync_with_stdio(false);
@@ -212,19 +210,20 @@ int main(int argc, char* argv[]) {
       }
     }
   }
-  if (argc - optind < 2 || argc - optind >  MAX_QUERY_FILES + 1) usage(argv[0]);
+  if (argc - optind < 2) usage(argv[0]);
 
   if(K != 1 && type != MEM) { std::cerr << "-k option valid only for -maxmatch" << std::endl; exit(1); }
   if(num_threads <= 0) { std::cerr << "invalid number of threads specified" << std::endl; exit(1); }
+  if(query_threads <= 0) { query_threads = std::thread::hardware_concurrency(); }
 
   std::string ref_fasta = argv[optind];
   int argNumber = optind+1;
-  numQueryFiles = 0;
-  while(argNumber < argc){
-      query_fasta[numQueryFiles] = argv[argNumber];
-      numQueryFiles++;
-      argNumber++;
-  }
+  // numQueryFiles = 0;
+  // while(argNumber < argc){
+  //     query_fasta[numQueryFiles] = argv[argNumber];
+  //     numQueryFiles++;
+  //     argNumber++;
+  // }
 
   std::string ref;
 
@@ -277,7 +276,7 @@ int main(int argc, char* argv[]) {
       rev_comp = true;
   if(setRevComp)
       forward = false;
-  sa = new mummer::mummer::sparseSAMatch(ref, refdescr, startpos, _4column, K, suflink, child, kmer>0, sparseMult, kmer, printSubstring, nucleotides_only);
+  std::unique_ptr<mummer::mummer::sparseSAMatch> sa(new mummer::mummer::sparseSAMatch(ref, refdescr, startpos, _4column, K, suflink, child, kmer>0, sparseMult, kmer, printSubstring, nucleotides_only));
   if(!load.empty()){
     if(sa->load(load)){
       std::cerr << "index loaded succesfully\n"
@@ -323,48 +322,20 @@ int main(int argc, char* argv[]) {
       sa->save(save);
   }
 
-  // clock_t start = clock();
-  // rusage m_ruse1, m_ruse2;
-  // getrusage(RUSAGE_SELF, &m_ruse1);
+  // Open input files
+  stream_manager  streams((const char**)(argv + argNumber), (const char**)(argv + argc));
+  sequence_parser               parser(4 * query_threads, 10, 1, streams);
+  thread_pipe::ostream_buffered output(std::cout);
 
-  pthread_attr_t attr;  pthread_attr_init(&attr);
-  pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
-  for(int idx = 0; idx < numQueryFiles; idx++){
-    std::vector<query_arg> args(query_threads);
-    std::vector<pthread_t> thread_ids(query_threads);
+  // Launch query threads
+  std::vector<std::thread> threads;
+  for(int i = 0; i < query_threads; ++i)
+    threads.push_back(std::thread(query_thread, sa.get(), &parser, &output));
 
-    // Initialize additional thread data.
-    for(int i = 0; i < query_threads; i++) {
-        args[i].skip = query_threads;
-        args[i].skip0 = i;
-        args[i].queryFile = idx;
-    }
-
-    // Create joinable threads to find MEMs.
-    for(int i = 0; i < query_threads; i++)
-        pthread_create(&thread_ids[i], &attr, query_thread, (void *)&args[i]);
-
-    // Wait for all threads to terminate.
-    for(int i = 0; i < query_threads; i++)
-        pthread_join(thread_ids[i], NULL);
-  }
-
-  // clock_t end = clock();
-  // getrusage(RUSAGE_SELF, &m_ruse2);
-  // double wall_time = (double)( end - start ) /CLOCKS_PER_SEC;
-  // std::cerr << "mapping: done" << std::endl;
-  // std::cerr << "time for mapping (wall time): " << wall_time << std::endl;
-  // timeval t1, t2;
-  // t1 = m_ruse1.ru_utime;
-  // t2 = m_ruse2.ru_utime;
-  // double cpu_time = ((double)(t2.tv_sec*1000000 + t2.tv_usec - (t1.tv_sec*1000000 + t1.tv_usec )))/1000.0;
-  // std::cerr << "time for mapping (cpu time): " << cpu_time << std::endl;
-  // t1 = m_ruse1.ru_stime;
-  // t2 = m_ruse2.ru_stime;
-  // double sys_time = ((double)(t2.tv_sec*1000000 + t2.tv_usec - (t1.tv_sec*1000000 + t1.tv_usec )))/1000.0;
-  // std::cerr << "time for mapping (sys time): " << sys_time << std::endl;
-
-  delete sa;
+  // Wait for all threads to terminate.
+  for(auto& th : threads)
+    th.join();
+  output.close();
 }
 
 
