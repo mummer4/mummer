@@ -36,8 +36,11 @@ option("g", "maxgap") {
   description "Set the maximum gap between two adjacent matches in a cluster"
   uint32; default 90 }
 option("l", "minmatch") {
-  description "Set the minimum length of a single match"
+  description "Set the minimum length of a single exact match"
   uint32; default 20 }
+option("L", "minalign") {
+  description "Minimum length of an alignment, after clustering and extension"
+  uint32; default 0 }
 option("nooptimize") {
   description "No alignment score optimization, i.e. if an alignment extension reaches the end of a sequence, it will not backtrack to optimize the alignment score and instead terminate the alignment at the end of the sequence"
   off }
