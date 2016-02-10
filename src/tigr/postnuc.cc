@@ -797,14 +797,19 @@ void validateData
 void printDeltaAlignments(const std::vector<Alignment>& Alignments,
                           const std::string& AId, const long Alen,
                           const std::string& BId, const long Blen,
-                          std::ostream& DeltaFile)
+                          std::ostream& DeltaFile, const long minLen)
 //  Simply output the delta information stored in Alignments to the
 //  given delta file. Free the memory used by Alignments once the
 //  data is successfully output to the file.
 {
-  DeltaFile << '>' << AId << ' ' << BId << ' ' << Alen << ' ' << Blen << '\n';
-
+  bool header = false;
   for(const auto& A : Alignments) {
+    if(std::abs(A.eA - A.sA) < minLen && std::abs(A.eB - A.sB) < minLen)
+      continue;
+    if(!header) {
+      DeltaFile << '>' << AId << ' ' << BId << ' ' << Alen << ' ' << Blen << '\n';
+      header = true;
+    }
     const bool fwd = A.dirB == FORWARD_CHAR;
     DeltaFile << A.sA << ' ' << A.eA << ' '
               << (fwd ? A.sB : revC(A.sB, Blen)) << ' '

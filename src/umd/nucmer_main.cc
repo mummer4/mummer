@@ -88,7 +88,7 @@ int main(int argc, char *argv[]) {
       std::lock_guard<std::mutex> lock (os_mutex);
       assert(Af.Id()[strlen(Af.Id()) - 1] != ' ');
       assert(Bf.Id().back() != ' ');
-      mummer::postnuc::printDeltaAlignments(als, Af.Id(), Af.len(), Bf.Id(), Bf.len(), os);
+      mummer::postnuc::printDeltaAlignments(als, Af.Id(), Af.len(), Bf.Id(), Bf.len(), os, args.minalign_arg);
       if(!os.good())
         nucmer_cmdline::error() << "Error while writing to output delta file '" << args.delta_arg << '\'';
     };

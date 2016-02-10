@@ -246,7 +246,7 @@ bool Read_Sequence(std::istream& is, std::string& T, std::string& name);
 void printDeltaAlignments(const std::vector<Alignment>& Alignments,
                           const std::string& AId, const long Alen,
                           const std::string& BId, const long Blen,
-                          std::ostream& DeltaFile);
+                          std::ostream& DeltaFile, const long minLen = 0);
 
 template<typename FastaRecord>
 inline void printDeltaAlignments(const std::vector<Alignment>& Alignments,
