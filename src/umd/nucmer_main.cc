@@ -15,26 +15,6 @@ struct getrealpath {
   operator const char*() const { return res ? res : path; }
 };
 
-std::string read_sequence(const char* file, std::string& header) {
-  std::string res;
-  std::ifstream is(file);
-  if(!is.good())
-    nucmer_cmdline::error() << "Failed to open file '" << file << '\'';
-  std::string line;
-
-  std::getline(is, line);
-  if(line.size() > 1)
-    header = line.substr(1);
-  else
-    header.clear();
-  while(std::getline(is, line)) {
-    for(const char base : line)
-      res += std::tolower(base);
-    //    res += line;
-  }
-  return res;
-}
-
 int main(int argc, char *argv[]) {
   nucmer_cmdline args(argc, argv);
   mummer::nucmer::Options opts;
