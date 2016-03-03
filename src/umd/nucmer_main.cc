@@ -3,10 +3,10 @@
 #include <climits>
 #include <cstdlib>
 #include <thread>
-#include <mutex>
 #include <memory>
 #include <mummer/nucmer.hpp>
 #include <src/umd/nucmer_cmdline.hpp>
+#include <thread_pipe.hpp>
 
 struct getrealpath {
   const char *path, *res;
@@ -14,6 +14,24 @@ struct getrealpath {
   ~getrealpath() { free((void*)res); }
   operator const char*() const { return res ? res : path; }
 };
+
+typedef jellyfish::stream_manager<const char**>          stream_manager;
+typedef jellyfish::whole_sequence_parser<stream_manager> sequence_parser;
+
+void query_thread(mummer::nucmer::FileAligner* aligner, sequence_parser* parser,
+                  thread_pipe::ostream_buffered* printer, uint32_t minalign) {
+  auto output_it = printer->begin();
+  auto print_function = [&](std::vector<mummer::postnuc::Alignment>&& als,
+                            const mummer::nucmer::FastaRecordPtr& Af, const mummer::nucmer::FastaRecordSeq& Bf) {
+    assert(Af.Id()[strlen(Af.Id()) - 1] != ' ');
+    assert(Bf.Id().back() != ' ');
+    mummer::postnuc::printDeltaAlignments(als, Af.Id(), Af.len(), Bf.Id(), Bf.len(), *output_it, minalign);
+    if(output_it->tellp() > 1024)
+      ++output_it;
+  };
+  aligner->thread_align_file(*parser, print_function);
+  output_it.done();
+}
 
 int main(int argc, char *argv[]) {
   nucmer_cmdline args(argc, argv);
@@ -40,8 +58,8 @@ int main(int argc, char *argv[]) {
   getrealpath real_ref(args.ref_arg), real_qry(args.qry_arg);
   os << real_ref << ' ' << real_qry << '\n'
      << "NUCMER\n";
+  thread_pipe::ostream_buffered output(os);
 
-  std::mutex os_mutex;
   std::unique_ptr<mummer::nucmer::FileAligner> aligner;
   std::ifstream reference;
 
@@ -63,20 +81,21 @@ int main(int argc, char *argv[]) {
     if(args.save_given && !aligner->sa().save(args.save_arg))
       nucmer_cmdline::error() << "Can't save the suffix array to '" << args.save_arg << "'";
 
-    auto print_function = [&](std::vector<mummer::postnuc::Alignment>&& als,
-                              const mummer::nucmer::FastaRecordPtr& Af, const mummer::nucmer::FastaRecordSeq& Bf) {
-      std::lock_guard<std::mutex> lock (os_mutex);
-      assert(Af.Id()[strlen(Af.Id()) - 1] != ' ');
-      assert(Bf.Id().back() != ' ');
-      mummer::postnuc::printDeltaAlignments(als, Af.Id(), Af.len(), Bf.Id(), Bf.len(), os, args.minalign_arg);
-      if(!os.good())
-        nucmer_cmdline::error() << "Error while writing to output delta file '" << args.delta_arg << '\'';
-    };
-    os << std::flush;
+    //    os << std::flush;
 
     const unsigned int nb_threads = args.threads_given ? args.threads_arg : std::thread::hardware_concurrency();
-    aligner->align_file(args.qry_arg, print_function, nb_threads);
+    stream_manager     streams(&args.qry_arg, &args.qry_arg + 1);
+    sequence_parser    parser(4 * nb_threads, 10, 1, streams);
+
+    std::vector<std::thread> threads;
+    for(unsigned int i = 0; i < nb_threads; ++i)
+      threads.push_back(std::thread(query_thread, aligner.get(), &parser, &output, args.minalign_arg));
+
+    for(auto& th : threads)
+      th.join();
   } while(!args.load_given && reference.peek() != EOF);
+  output.close();
+  os.close();
 
   return 0;
 }

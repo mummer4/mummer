@@ -446,7 +446,6 @@ class pipe_output_iterator : public std::iterator<std::output_iterator_tag, type
   typedef pool_iterator<typename Pipe::pool_type, std::output_iterator_tag>    iterator;
 
   iterator m_it;
-  size_t   m_off;
 
 public:
   typedef typename super::value_type        value_type;
@@ -455,12 +454,17 @@ public:
   typedef typename super::reference         reference;
   typedef typename super::iterator_category iterator_category;
 
-  pipe_output_iterator(iterator it) : m_it(it), m_off(0) { }
+  pipe_output_iterator(iterator it) : m_it(it) { }
 
   bool operator==(const pipe_output_iterator& rhs) const { return m_it == rhs.m_it; }
   bool operator!=(const pipe_output_iterator& rhs) const { return m_it != rhs.m_it; }
-  value_type& operator*() { return m_it->elts[m_it->filled]; }
+  value_type& operator*() {
+    auto& x = *m_it;
+    return x.elts[x.filled];
+  }
   value_type* operator->() { return &this->operator*(); }
+  void flush() { if(m_it->filled) ++m_it; }
+  void done() { ++*this; flush(); m_it.release(); }
 
   pipe_output_iterator& operator++() {
     ++m_it->filled;
