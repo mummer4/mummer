@@ -19,13 +19,17 @@ typedef jellyfish::stream_manager<const char**>          stream_manager;
 typedef jellyfish::whole_sequence_parser<stream_manager> sequence_parser;
 
 void query_thread(mummer::nucmer::FileAligner* aligner, sequence_parser* parser,
-                  thread_pipe::ostream_buffered* printer, uint32_t minalign) {
+                  thread_pipe::ostream_buffered* printer, const nucmer_cmdline* args) {
   auto output_it = printer->begin();
+
   auto print_function = [&](std::vector<mummer::postnuc::Alignment>&& als,
                             const mummer::nucmer::FastaRecordPtr& Af, const mummer::nucmer::FastaRecordSeq& Bf) {
     assert(Af.Id()[strlen(Af.Id()) - 1] != ' ');
     assert(Bf.Id().back() != ' ');
-    mummer::postnuc::printDeltaAlignments(als, Af.Id(), Af.len(), Bf.Id(), Bf.len(), *output_it, minalign);
+    if(!args->sam_given)
+      mummer::postnuc::printDeltaAlignments(als, Af.Id(), Af.len(), Bf.Id(), Bf.len(), *output_it, args->minalign_arg);
+    else
+      mummer::postnuc::printSAMAlignments(als, Af, Bf, *output_it, args->minalign_arg);
     if(output_it->tellp() > 1024)
       ++output_it;
   };
@@ -34,6 +38,13 @@ void query_thread(mummer::nucmer::FileAligner* aligner, sequence_parser* parser,
 }
 
 int main(int argc, char *argv[]) {
+  std::ios::sync_with_stdio(false);
+  std::string cmdline(argv[0]); // Save command line
+  for(int i = 1; i < argc; ++i) {
+    cmdline += " ";
+    cmdline += argv[i];
+  }
+
   nucmer_cmdline args(argc, argv);
   mummer::nucmer::Options opts;
   opts.breaklen(args.breaklen_arg)
@@ -50,14 +61,20 @@ int main(int argc, char *argv[]) {
   if(args.mum_flag) opts.mum();
   if(args.maxmatch_flag) opts.maxmatch();
 
-  const std::string delta_file = args.delta_given ? args.delta_arg : args.prefix_arg + ".delta";
-  std::ofstream os(delta_file);
+  const std::string output_file =
+    args.delta_given ? args.delta_arg : (args.sam_given ? args.sam_arg : args.prefix_arg + ".delta");
+  std::ofstream os(output_file);
   if(!os.good())
-    nucmer_cmdline::error() << "Failed to open output delta file '" << delta_file << '\'';
+    nucmer_cmdline::error() << "Failed to open output file '" << output_file << '\'';
 
   getrealpath real_ref(args.ref_arg), real_qry(args.qry_arg);
-  os << real_ref << ' ' << real_qry << '\n'
-     << "NUCMER\n";
+  if(args.sam_given) {
+    os << "@HD VN1.0 SO:unsorted\n"
+       << "@PG ID:nucmer PN:nucmer VN:4.0 CL:\"" << cmdline << "\"\n";
+  } else {
+    os << real_ref << ' ' << real_qry << '\n'
+       << "NUCMER\n";
+  }
   thread_pipe::ostream_buffered output(os);
 
   std::unique_ptr<mummer::nucmer::FileAligner> aligner;
@@ -89,7 +106,7 @@ int main(int argc, char *argv[]) {
 
     std::vector<std::thread> threads;
     for(unsigned int i = 0; i < nb_threads; ++i)
-      threads.push_back(std::thread(query_thread, aligner.get(), &parser, &output, args.minalign_arg));
+      threads.push_back(std::thread(query_thread, aligner.get(), &parser, &output, &args));
 
     for(auto& th : threads)
       th.join();

@@ -823,5 +823,43 @@ void printDeltaAlignments(const std::vector<Alignment>& Alignments,
   }
 }
 
+std::string createCIGAR(const std::vector<long int>& ds, long int start, long int end, long int len) {
+  std::string res;
+  long int    off   = 0;
+  long int    range = 0;
+  if(start > 1) {
+    res += std::to_string(start - 1) + 'S';
+    off += start - 1;
+  }
+  for(const auto& id : ds) {
+    if(std::abs(id) == 1) {
+      // Add together multiple insertions and deletions
+      if(range == 0 || (id < 0 && range < 0) || (id > 0 && range > 0)) {
+        range += id;
+      } else {
+        res += std::to_string(std::abs(range)) + (range > 0 ? 'D' : 'I');
+        if(range < 0)
+          off += std::abs(range);
+        range = 0;
+      }
+    } else { // abs(id) > 1
+      res += std::to_string(std::abs(id - 1)) + 'M';
+      off += id - 1;
+      range = (id > 0 ? 1 : -1);
+      assert(off <= end);
+    }
+  }
+  if(range) {
+    res += std::to_string(std::abs(range)) + (range > 0 ? 'D' : 'I');
+    if(range < 0)
+      off += std::abs(range);
+  }
+  if(off < end)
+    res += std::to_string(end - off) + 'M';
+  if(end < len)
+    res += std::to_string(len - end) + 'S';
+  return res;
+}
+
 } // namespace postnuc
 } // namespace mummer

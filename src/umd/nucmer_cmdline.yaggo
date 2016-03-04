@@ -56,6 +56,9 @@ option("p", "prefix") {
 option("delta") {
   description "Output delta file to PATH (instead of PREFIX.delta)"
   c_string; typestr "PATH"; conflict "prefix" }
+option("sam") {
+  description "Output SAM file to PATH"
+  c_string; typestr "PATH"; conflict "prefix", "delta" }
 option("save") {
   description "Save suffix array to files starting with PREFIX"
   string; typestr "PREFIX" }
