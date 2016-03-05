@@ -1,8 +1,8 @@
 nucmer --mum --delta /dev/stdout $D/seed_reads_1.fa $D/seed_reads_0.fa | \
-    ufasta sort -H | test_md5 09a81068d91cb030a350ff5c8a999925
+    ufasta sort -H | test_md5 81fe30ba229be8f0014d754c39cd3287
 
 nucmer --maxmatch --delta /dev/stdout $D/seed_reads_1.fa $D/seed_reads_0.fa | \
-    ufasta sort -H | test_md5 d782ac6370f1d285828292ecbe8d7705
+    ufasta sort -H | test_md5 fa61620d01b700f476b6a19d3af28056
 
 nucmer --maxmatch --delta /dev/stdout -L 90 $D/seed_reads_1.fa $D/seed_reads_0.fa | \
-    ufasta sort -H | test_md5 7f0dfdaf740f1a1889a28c0735d0ec46
+    ufasta sort -H | test_md5 ff9433627943d8ededbb70dcfa80b3dd

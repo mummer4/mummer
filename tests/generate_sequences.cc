@@ -26,6 +26,17 @@ unsigned int sesab(char c) {
   }
   return 0;
 }
+char comp(char c) {
+  switch(c) {
+  case 'a': return 't';
+  case 'c': return 'g';
+  case 'g': return 'c';
+  case 't': return 'a';
+  default:
+    return 'n';
+  }
+}
+
 
 std::string sequence(size_t len) {
   std::uniform_int_distribution<int> dist(0, 3);
@@ -41,6 +52,17 @@ void write_sequence(std::ostream& os, const std::string& seq) {
     os << seq.substr(i, len) << '\n';
 }
 
+void rev_comp(std::string& s) {
+  size_t i = 0, j = s.size() - 1;
+  for( ; i < j; ++i, --j) {
+    char t = comp(s[i]);
+    s[i] = comp(s[j]);
+    s[j] = t;
+  }
+  if(i == j)
+    s[i] = comp(s[i]);
+}
+
 void generate_reads(const std::string& genome, size_t number, size_t length, unsigned int error, std::ostream& os) {
   std::string errors;
   std::uniform_int_distribution<unsigned int> has_error(0, 99);
@@ -48,10 +70,13 @@ void generate_reads(const std::string& genome, size_t number, size_t length, uns
   std::uniform_int_distribution<size_t> position(0, genome.size() - length);
   std::uniform_int_distribution<unsigned int> subst(1, 3);
   std::uniform_int_distribution<unsigned int> insertion(0, 3);
+  std::uniform_int_distribution<unsigned int> reverse(0, 1);
 
   for(size_t i = 0; i < number; ++i) {
     errors.clear();
     std::string seq = genome.substr(position(rand_gen), length);
+    if(reverse(rand_gen))
+      rev_comp(seq);
     for(size_t j = 0; j < seq.size(); ++j) {
       if(has_error(rand_gen) < error) {
         switch(error_type(rand_gen)) {

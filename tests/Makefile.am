@@ -1,7 +1,7 @@
 ######################################################
 # Build helper programs and scripts used for testing #
 ######################################################
-check_PROGRAMS += %D%/generate_sequences %D%/ufasta
+check_PROGRAMS += %D%/generate_sequences %D%/ufasta %D%/check_cigar
 check_SCRIPTS += %D%/testsh
 CLEANFILES += $(check_SCRIPTS)
 
@@ -26,6 +26,11 @@ YAGGO_BUILT += %D%/generate_sequences_cmdline.hpp
  %D%/ufasta_src/ufasta.cc %D%/ufasta_src/common.hpp
 %C%_ufasta_CPPFLAGS = $(CPPFLAGS) -I%D%/ufasta_src -I$(srcdir)/tests/ufasta_src
 YAGGO_BUILT += %D%/ufasta_src/dsort_cmdline.hpp %D%/ufasta_src/sort_cmdline.hpp
+
+# Build check_cigar, to check validity of cigar strings.
+%C%_check_cigar_SOURCES = %D%/check_cigar.cc
+%C%_check_cigar_CPPFLAGS = $(CPPFLAGS) -I%D%
+YAGGO_BUILT += %D%/check_cigar_cmdline.hpp
 
 ####################################
 # Generate pseudo random sequences #
@@ -52,7 +57,7 @@ TEST_EXTENSIONS += .sh
 SH_LOG_COMPILER = %D%/testsh
 
 # List of tests to run
-script_tests = %D%/save_load.sh %D%/batch.sh %D%/mummer.sh %D%/nucmer.sh
+script_tests = %D%/save_load.sh %D%/batch.sh %D%/mummer.sh %D%/nucmer.sh %D%/sam.sh
 EXTRA_DIST += $(script_tests)
 TESTS += $(script_tests)
 

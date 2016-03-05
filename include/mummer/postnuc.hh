@@ -360,15 +360,13 @@ template<typename FR1, typename FR2>
 void printSAMAlignments(const std::vector<Alignment>& Alignments,
                         const FR1& A, const FR2& B,
                         std::ostream& SAMFile, const long minLen = 0) {
-  //  static_assert(decltype(B.seq())::toto, "B.seq()");
   for(const auto& Al : Alignments) {
     if(std::abs(Al.eA - Al.sA) < minLen && std::abs(Al.eB - Al.sB) < minLen)
       continue;
     const bool fwd = Al.dirB == FORWARD_CHAR;
-    SAMFile << A.Id()
+    SAMFile << B.Id()
             << (fwd ? " 0 " : " 16 ")
-            << B.Id() << ' '
-            << (fwd ? Al.sB : revC(Al.sB, B.len()))
+            << A.Id() << ' ' << Al.sA
             << " 255 "
             << createCIGAR(Al.delta, Al.sB, Al.eB, B.len())
             << " * 0 0 " << (B.seq() + 1) << " * NM:i:" << Al.Errors

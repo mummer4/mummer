@@ -804,7 +804,7 @@ void printDeltaAlignments(const std::vector<Alignment>& Alignments,
 {
   bool header = false;
   for(const auto& A : Alignments) {
-    if(std::abs(A.eA - A.sA) < minLen && std::abs(A.eB - A.sB) < minLen)
+    if(std::abs(A.eA - A.sA) + 1 < minLen && std::abs(A.eB - A.sB) + 1 < minLen)
       continue;
     if(!header) {
       DeltaFile << '>' << AId << ' ' << BId << ' ' << Alen << ' ' << Blen << '\n';
@@ -836,18 +836,19 @@ std::string createCIGAR(const std::vector<long int>& ds, long int start, long in
       // Add together multiple insertions and deletions
       if(range == 0 || (id < 0 && range < 0) || (id > 0 && range > 0)) {
         range += id;
-      } else {
-        res += std::to_string(std::abs(range)) + (range > 0 ? 'D' : 'I');
-        if(range < 0)
-          off += std::abs(range);
-        range = 0;
+        continue;
       }
-    } else { // abs(id) > 1
-      res += std::to_string(std::abs(id - 1)) + 'M';
-      off += id - 1;
-      range = (id > 0 ? 1 : -1);
-      assert(off <= end);
     }
+    if(range) {
+      res += std::to_string(std::abs(range)) + (range > 0 ? 'D' : 'I');
+      if(range < 0)
+        off += std::abs(range);
+      range = 0;
+    }
+    res += std::to_string(std::abs(id) - 1) + 'M';
+    off += std::abs(id) - 1;
+    range = (id > 0 ? 1 : -1);
+    assert(off <= end);
   }
   if(range) {
     res += std::to_string(std::abs(range)) + (range > 0 ? 'D' : 'I');
