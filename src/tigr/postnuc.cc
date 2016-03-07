@@ -862,5 +862,40 @@ std::string createCIGAR(const std::vector<long int>& ds, long int start, long in
   return res;
 }
 
+// Create MD string for SAM format.
+std::string createMD(const Alignment& al, const char* ref,
+                     const char* qry, size_t qry_len) {
+  auto        it           = error_iterator_type(al, ref, qry, qry_len);
+  const auto  it_end       = error_iterator_type(al, ref);
+  auto pos                 = al.sB - 1; // Position of last 'event', 0-based
+  bool        pos_deletion = false;
+  std::string res;
+
+  for( ; it != it_end; ++it) {
+    switch(it->type) {
+    case NONE: break; // Error! Should not happen! Ignore for now.
+    case MISMATCH:
+    case INSERTION:
+      res          += std::to_string(it->posB - pos) + it->baseB;
+      pos_deletion  = false;
+      pos           = it->posB;
+      break;
+    case DELETION:
+      if(it->posB == pos + 1 && pos_deletion) {
+        res += it->baseB;
+      } else {
+        res          += std::to_string(it->posB - pos) + '^' + it->baseB;
+        pos_deletion  = true;
+      }
+      pos           = it->posB;
+      break;
+    }
+  }
+  // if(end < pos) error!
+  res += std::to_string(al.eB - pos);
+
+  return res;
+}
+
 } // namespace postnuc
 } // namespace mummer

@@ -261,7 +261,8 @@ void printSAMAlignments(const std::vector<Alignment>& Alignments,
                         const FR1& A, const FR2& B,
                         std::ostream& SAMFile, const long minLen = 0);
 std::string createCIGAR(const std::vector<long int>& ds, long int start, long int end, long int len);
-
+std::string createMD(const Alignment& al, const char* ref,
+                     const char* qry, size_t qry_len);
 
 template<typename FastaRecord>
 void printSyntenys(const std::vector<Synteny<FastaRecord> >& Syntenys, const FastaRecord& Bf, std::ostream& ClusterFile);
@@ -369,7 +370,9 @@ void printSAMAlignments(const std::vector<Alignment>& Alignments,
             << A.Id() << ' ' << Al.sA
             << " 255 "
             << createCIGAR(Al.delta, Al.sB, Al.eB, B.len())
-            << " * 0 0 " << (B.seq() + 1) << " * NM:i:" << Al.Errors
+            << " * 0 0 " << (B.seq() + 1)
+            << " * NM:i:" << Al.Errors
+            << " MD:Z:" << createMD(Al, A.seq(), B.seq(), B.len())
             << '\n';
   }
 }
