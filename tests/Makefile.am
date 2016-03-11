@@ -71,3 +71,4 @@ CLEANDIRS += $(patsubst %D%/%.sh,%D%/%,$(script_tests))
 
 %D%/mummer.log: %D%/data/seed_reads_0.fa %D%/data/seed_reads_1.fa
 %D%/nucmer.log: %D%/data/seed_reads_0.fa %D%/data/seed_reads_1.fa
+%D%/sam.log: %D%/data/seed_reads_0.fa %D%/data/seed_reads_1.fa

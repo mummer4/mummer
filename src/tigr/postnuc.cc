@@ -28,32 +28,38 @@ std::ostream& operator<<(std::ostream& os, const Alignment& al) {
 }
 
 error_iterator_type& error_iterator_type::operator++()  {
-  while(m_error.posA < m_endA) {
-    if(m_k >= m_al.delta.size() || m_i != std::abs(m_al.delta[m_k])) { // not at an indel
-      m_error.baseA       = *m_ref;
-      m_error.baseB       = m_al.dirB == 1 ? *m_qry : comp(*m_qry);
-      const bool mismatch = m_error.baseA != m_error.baseB;
-      ++m_i;
-      ++m_ref;
-      m_qry        += m_al.dirB;
-      ++m_error.posA;
-      m_error.posB += m_al.dirB;
-      if(mismatch) {
+  switch(m_error.type) {
+  case NONE:
+  case MISMATCH:
+    ++m_error.dst;
+    ++m_error.ref;
+    m_error.qry += m_al.dirB;
+    break;
+
+  case INSERTION:
+    m_error.dst = 1;
+    ++m_k;
+    ++m_error.ref;
+    break;
+
+  case DELETION:
+    m_error.dst = 1;
+    ++m_k;
+    m_error.qry += m_al.dirB;
+    break;
+  }
+
+  while(m_error.ref < m_ref_end) {
+    if(m_k >= m_al.delta.size() || m_error.dst != std::abs(m_al.delta[m_k])) { // not at an indel
+      if(*m_error.ref != (m_al.dirB == 1 ? *m_error.qry : comp(*m_error.qry))) {
         m_error.type = MISMATCH;
         break;
       }
+      ++m_error.dst;
+      ++m_error.ref;
+      m_error.qry += m_al.dirB;
     } else { // indel
-      if(m_al.delta[m_k] > 0) { // insertion in reference
-        m_error.type = INSERTION;
-        ++m_error.posA;
-        ++m_ref;
-      } else {
-        m_error.type  = DELETION;
-        m_error.posB += m_al.dirB;
-        m_qry        += m_al.dirB;
-      }
-      m_i = 1;
-      ++m_k;
+      m_error.type = m_al.delta[m_k] > 0 ? INSERTION : DELETION;
       break;
     }
   }
@@ -865,34 +871,43 @@ std::string createCIGAR(const std::vector<long int>& ds, long int start, long in
 // Create MD string for SAM format.
 std::string createMD(const Alignment& al, const char* ref,
                      const char* qry, size_t qry_len) {
-  auto        it           = error_iterator_type(al, ref, qry, qry_len);
-  const auto  it_end       = error_iterator_type(al, ref);
-  auto pos                 = al.sB - 1; // Position of last 'event', 0-based
-  bool        pos_deletion = false;
+  auto        it          = error_iterator_type(al, ref, qry, qry_len);
+  const auto  it_end      = error_iterator_type(al, ref);
+  bool        in_deletion = false;
+  long        pos         = 0;
+  long        prev_dst    = 0;
   std::string res;
 
   for( ; it != it_end; ++it) {
+    const long diff = it->dst - prev_dst;
     switch(it->type) {
     case NONE: break; // Error! Should not happen! Ignore for now.
     case MISMATCH:
+      res          += std::to_string(diff - 1) + *it->ref;
+      in_deletion  = false;
+      pos += diff;
+      prev_dst = it->dst;
+      break;
     case INSERTION:
-      res          += std::to_string(it->posB - pos) + it->baseB;
-      pos_deletion  = false;
-      pos           = it->posB;
+      prev_dst = 0;
+      if(!in_deletion || it->dst > 1) {
+        res += std::to_string(diff - 1) + '^' + *it->ref;
+        in_deletion = true;
+      } else {
+        res += *it->ref;
+      }
+      pos += diff;
       break;
     case DELETION:
-      if(it->posB == pos + 1 && pos_deletion) {
-        res += it->baseB;
-      } else {
-        res          += std::to_string(it->posB - pos) + '^' + it->baseB;
-        pos_deletion  = true;
-      }
-      pos           = it->posB;
+      // Kind of ignore that event. Nothing is reported in the MD
+      // string, it looks like a match.
+      prev_dst     = -diff + 1;
+      in_deletion  = false;
       break;
     }
   }
   // if(end < pos) error!
-  res += std::to_string(al.eB - pos);
+  res += std::to_string(al.eA - pos);
 
   return res;
 }

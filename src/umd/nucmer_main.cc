@@ -21,15 +21,16 @@ typedef jellyfish::whole_sequence_parser<stream_manager> sequence_parser;
 void query_thread(mummer::nucmer::FileAligner* aligner, sequence_parser* parser,
                   thread_pipe::ostream_buffered* printer, const nucmer_cmdline* args) {
   auto output_it = printer->begin();
+  const bool sam = args->sam_short_given || args->sam_long_given;
 
   auto print_function = [&](std::vector<mummer::postnuc::Alignment>&& als,
                             const mummer::nucmer::FastaRecordPtr& Af, const mummer::nucmer::FastaRecordSeq& Bf) {
     assert(Af.Id()[strlen(Af.Id()) - 1] != ' ');
     assert(Bf.Id().back() != ' ');
-    if(!args->sam_given)
+    if(!sam)
       mummer::postnuc::printDeltaAlignments(als, Af.Id(), Af.len(), Bf.Id(), Bf.len(), *output_it, args->minalign_arg);
     else
-      mummer::postnuc::printSAMAlignments(als, Af, Bf, *output_it, args->minalign_arg);
+      mummer::postnuc::printSAMAlignments(als, Af, Bf, *output_it, args->sam_long_given, args->minalign_arg);
     if(output_it->tellp() > 1024)
       ++output_it;
   };
@@ -62,13 +63,16 @@ int main(int argc, char *argv[]) {
   if(args.maxmatch_flag) opts.maxmatch();
 
   const std::string output_file =
-    args.delta_given ? args.delta_arg : (args.sam_given ? args.sam_arg : args.prefix_arg + ".delta");
+    args.delta_given ? args.delta_arg
+    : (args.sam_short_given ? args.sam_short_arg
+       : (args.sam_long_given ? args.sam_long_arg
+          : args.prefix_arg + ".delta"));
   std::ofstream os(output_file);
   if(!os.good())
     nucmer_cmdline::error() << "Failed to open output file '" << output_file << '\'';
 
   getrealpath real_ref(args.ref_arg), real_qry(args.qry_arg);
-  if(args.sam_given) {
+  if(args.sam_short_given || args.sam_long_given) {
     os << "@HD VN1.0 SO:unsorted\n"
        << "@PG ID:nucmer PN:nucmer VN:4.0 CL:\"" << cmdline << "\"\n";
   } else {
