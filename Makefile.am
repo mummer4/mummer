@@ -72,6 +72,9 @@ noinst_HEADERS += include/compactsufsort/compactsufsort.hpp		\
                   include/compactsufsort/compactsufsort_imp.hpp		\
                   include/compactsufsort/divsufsort_private.h		\
                   include/compactsufsort/sssort_imp.hpp
+noinst_HEADERS += include/mummer/48bit_index.hpp		\
+                  include/mummer/48bit_iterator.hpp		\
+                  include/mummer/const_iterator_traits.hpp
 
 ###########
 # essaMEM #

@@ -50,8 +50,8 @@ struct vector_32_48 {
   std::vector<int>          small; // Suffix array.
   fortyeight_index<int64_t> large;
   bool is_small;
-  void resize(size_t N) {
-    is_small = N < ((size_t)1 << 31);
+  void resize(size_t N, bool force_large = false) {
+    is_small = !force_large && (N < ((size_t)1 << 31));
     if(is_small)
       small.resize(N);
     else
@@ -244,7 +244,7 @@ struct sparseSA {
     : sparseSA(S_.c_str(), S_.length(), prefix)
   { }
 
-  static sparseSA create_auto(const char* S, size_t Slen, int min_len, bool nucleotidesOnly_, int K = 1);
+  static sparseSA create_auto(const char* S, size_t Slen, int min_len, bool nucleotidesOnly_, int K = 1, bool off48 = false);
   // static sparseSA create_auto(const std::string& S, int min_len, bool nucleotidesOnly_, int K = 1) {
   //   return create_auto(S.c_str(), S.length(), min_len, nucleotidesOnly_, K);
   // }
@@ -406,7 +406,7 @@ struct sparseSA {
   bool load(const std::string &prefix);
 
   //construct
-  void construct();
+  void construct(bool off48 = false);
 };
 
 // Like the sparseSA, but also know the position of the sub-sequences

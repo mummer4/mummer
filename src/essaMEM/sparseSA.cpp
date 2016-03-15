@@ -56,7 +56,8 @@ sparseSA::sparseSA(const char* S_, size_t Slen,
   , nucleotidesOnly(nucleotidesOnly_)
 { }
 
-sparseSA sparseSA::create_auto(const char* S, size_t Slen, int min_len, bool nucleotidesOnly_, int K) {
+sparseSA sparseSA::create_auto(const char* S, size_t Slen, int min_len, bool nucleotidesOnly_, int K,
+                               bool off48) {
   const bool suflink    = K < 4;
   const bool child      = K >= 4;
   int        sparseMult = 1;
@@ -68,7 +69,7 @@ sparseSA sparseSA::create_auto(const char* S, size_t Slen, int min_len, bool nuc
   const int kmer = std::max(0,std::min(10,min_len - sparseMult*K + 1));
   sparseSA res(S, Slen, true /* 4column */, K, suflink, child, kmer>0, sparseMult,
                kmer, nucleotidesOnly_);
-  res.construct();
+  res.construct(off48);
   return res;
 }
 
@@ -397,7 +398,7 @@ bool sparseSA::load(const std::string &prefix){
     return true;
 }
 
-void sparseSA::construct(){
+void sparseSA::construct(bool off48){
   //  TIME_FUNCTION;
 
     if(K > 1) {
@@ -428,15 +429,15 @@ void sparseSA::construct(){
         // for(long i = 0; i < N/K; i++) { ISA[SA[i]/K] = i; }
     }
     else {
-        SA.resize(N);
-        ISA.resize(N);
-        if(SA.is_small) {
-          compactsufsort::create((const unsigned char*)(S + 0), (int*)SA.small.data(), N);
-          for(long i = 0; i < N; ++i) { ISA.small[SA.small[i]] = i; }
-        } else {
-          compactsufsort::create((const unsigned char*)(S + 0), SA.large.begin(), N);
-          for(long i = 0; i < N; ++i) { ISA.large[SA.large[i]] = i; }
-        }
+      SA.resize(N, off48);
+      ISA.resize(N, off48);
+      if(SA.is_small) {
+        compactsufsort::create((const unsigned char*)(S + 0), (int*)SA.small.data(), N);
+        for(long i = 0; i < N; ++i) { ISA.small[SA.small[i]] = i; }
+      } else {
+        compactsufsort::create((const unsigned char*)(S + 0), SA.large.begin(), N);
+        for(long i = 0; i < N; ++i) { ISA.large[SA.large[i]] = i; }
+      }
     }
 
     //    std::cerr << "N=" << N << std::endl;
