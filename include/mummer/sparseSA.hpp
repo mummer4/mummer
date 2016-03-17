@@ -11,6 +11,8 @@
 #include <cstring>
 #include <cassert>
 
+#include "48bit_index.hpp"
+
 
 namespace mummer {
 namespace mummer {
@@ -43,6 +45,27 @@ static const unsigned int BITADD[256] = {
   UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,//240-249
   UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX };//250-255
 
+// Either a vector of 32-bits offsets, or 48-bits.
+struct vector_32_48 {
+  std::vector<int>          small; // Suffix array.
+  fortyeight_index<int64_t> large;
+  bool is_small;
+  void resize(size_t N, bool force_large = false) {
+    is_small = !force_large && (N < ((size_t)1 << 31));
+    if(is_small)
+      small.resize(N);
+    else
+      large.resize(N);
+  }
+  size_t size() const {
+    return is_small ? small.size() : large.size();
+  }
+  long operator[](size_t i) const {
+    return is_small ? small[i] : large[i];
+  }
+};
+
+
 // Stores the LCP array in an unsigned char (0-255).  Values larger
 // than or equal to 255 are stored in a sorted array.
 // Simulates a vector<int> LCP;
@@ -59,9 +82,9 @@ struct vec_uchar {
   };
   std::vector<small_type>  vec; // LCP values from 0-65534
   std::vector<item_t>      M;
-  std::vector<large_type>* sa;
+  vector_32_48*            sa;
 
-  vec_uchar(std::vector<large_type>& sa_) : vec(sa_.size(), 0), sa(&sa_) { }
+  vec_uchar(vector_32_48& sa_) : vec(sa_.size(), 0), sa(&sa_) { }
   void resize(size_t N) { vec.resize(N, 0); }
 
   // Vector X[i] notation to get LCP values.
@@ -185,8 +208,8 @@ struct sparseSA {
   long                      N;  //!< Length of the sequence.
   long                      logN; // ceil(log(N))
   long                      NKm1; // N/K - 1
-  std::vector<unsigned int> SA; // Suffix array.
-  std::vector<int>          ISA; // Inverse suffix array.
+  vector_32_48              SA; // Suffix array.
+  vector_32_48              ISA; // Inverse suffix array
   vec_uchar                 LCP; // Simulates a vector<int> LCP.
   std::vector<int>          CHILD; //child table
   std::vector<saTuple_t>    KMR;
@@ -221,7 +244,7 @@ struct sparseSA {
     : sparseSA(S_.c_str(), S_.length(), prefix)
   { }
 
-  static sparseSA create_auto(const char* S, size_t Slen, int min_len, bool nucleotidesOnly_, int K = 1);
+  static sparseSA create_auto(const char* S, size_t Slen, int min_len, bool nucleotidesOnly_, int K = 1, bool off48 = false);
   // static sparseSA create_auto(const std::string& S, int min_len, bool nucleotidesOnly_, int K = 1) {
   //   return create_auto(S.c_str(), S.length(), min_len, nucleotidesOnly_, K);
   // }
@@ -233,8 +256,9 @@ struct sparseSA {
   //build look-up table for sa intervals of kmers up to some depth
   void computeKmer();
 
+  // Not used at this point
   // Radix sort required to construct transformed text for sparse SA construction.
-  void radixStep(int *t_new, int *SA, long &bucketNr, long *BucketBegin, long l, long r, long h);
+  // void radixStep(int *t_new, int *SA, long &bucketNr, long *BucketBegin, long l, long r, long h);
 
   // Binary search for left boundry of interval.
   inline long bsearch_left(char c, long i, long s, long e) const;
@@ -382,7 +406,7 @@ struct sparseSA {
   bool load(const std::string &prefix);
 
   //construct
-  void construct();
+  void construct(bool off48 = false);
 };
 
 // Like the sparseSA, but also know the position of the sub-sequences

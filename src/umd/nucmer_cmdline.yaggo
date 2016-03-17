@@ -80,6 +80,9 @@ option("t", "threads") {
 option("banded") {
   description "Enforce absolute banding of dynamic programming matrix based on diagdiff parameter"
   off; hidden }
+option("large") {
+  description "Force the use of large offsets"
+  off; hidden }
 
 arg("ref") {
   description "Reference sequence file"
