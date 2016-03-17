@@ -11,18 +11,15 @@ class sequence : public jellyfish::cooperative_pool2<sequence, int> {
 
   const uint32_t        max_;
   std::vector<uint32_t> cur_;
-  const uint32_t        producers_;
 
 public:
   sequence(uint32_t producers, uint32_t threads, uint32_t max)
     : super(producers, 4 * threads)
     , max_(max)
     , cur_(producers, 0)
-    , producers_(producers)
   { }
 
   bool produce(uint32_t i, int& e) {
-    assert(i < producers_);
     auto& cur = cur_[i];
     if(cur < max_) {
       e = i * max_ + cur++;

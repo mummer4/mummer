@@ -107,42 +107,40 @@ struct Alignment
 // reference., DELETION means there is one less base in the reference.
 enum error_type { NONE, INSERTION, DELETION, MISMATCH };
 struct error_description_type {
-  error_type type;              // The type of the error
-  long       posA, posB;        // Position (0-based) in ref and qry of the error.
-  char       baseA, baseB;      // These are equal to ref[posA] and
-                                // qry[posB], or comp(qry[posB]) if
-                                // dirB == -1.
-   // char*      ptrA; // ptr into reference and query
-   // char*      ptrB; // if type == MISMATCH, *ptrA != *ptrB
+  error_type  type;             // The type of the error
+  const char* ref;              // Pointer in the reference of the error
+  const char* qry;              // Idem qry
+  long        dst;              // Distance to previous indel or start of sequences
+
+  // For a mismatch, *ref != *qry. For an INSERTION, qry is the
+  // position in the qry sequence where to insert the extra base,
+  // which is *ref. Idem for DELETION.
+  //
+  // dst is the distance to the previous indel. So dst >= 1 and dst-1
+  // is equal to the number of matching and mismatching bases since the start or the
+  // previous indel.
 };
 class error_iterator_type : public std::iterator<std::input_iterator_tag, error_description_type> {
   const Alignment&       m_al;
   error_description_type m_error;
-  const long             m_endA;
-  const char*            m_ref;
-  const char*            m_qry;
+  const char*            m_ref_end;
   size_t                 m_k;   // index in delta
-  long                   m_i;   // relative index in reference, in between indels
 public:
-  // Create an iterator at beginning of error
+  // Create an iterator at beginning of error. ref and qry pointer
+  // points char before the start of sequence (i.e. as in 1-base
+  // indexing).
   error_iterator_type(const Alignment& al, const char* ref, const char* qry, size_t qry_len)
     : m_al(al)
-    , m_error{ NONE, al.sA - 2, al.dirB == 1 ? al.sB - 2 : (long)qry_len - al.sB + 1}
-    , m_endA(al.eA - 1)
-    , m_ref(ref + al.sA - 1)
-    , m_qry(qry + (al.dirB == 1 ? al.sB - 1 : qry_len - al.sB))
+    , m_error{ NONE, ref + al.sA - 1, qry + (al.dirB == 1 ? al.sB - 1 : (long)qry_len - al.sB + 2), 0 }
+    , m_ref_end(ref + al.eA + 1)
     , m_k(0)
-    , m_i(1)
   { ++*this; }
   // Create an iterator at end
   error_iterator_type(const Alignment& al, const char* ref)
     : m_al(al)
-    , m_error{NONE, 0, 0}
-    , m_endA(1)
-    , m_ref(ref + al.eA)
-    , m_qry(nullptr)
+    , m_error{NONE, ref + al.eA + 1, nullptr, 0}
+    , m_ref_end(nullptr)
     , m_k(0)
-    , m_i(1)
   { }
   static char comp(char b) {
     switch(b) {
@@ -154,8 +152,8 @@ public:
     }
   }
 
-  bool operator==(const error_iterator_type& rhs) const { return m_ref == rhs.m_ref; }
-  bool operator!=(const error_iterator_type& rhs) const { return m_ref != rhs.m_ref; }
+  bool operator==(const error_iterator_type& rhs) const { return m_error.ref == rhs.m_error.ref; }
+  bool operator!=(const error_iterator_type& rhs) const { return m_error.ref != rhs.m_error.ref; }
   const error_description_type& operator*() const { return m_error; }
   const error_description_type* operator->() const { return &m_error; }
   error_iterator_type& operator++();
@@ -255,6 +253,14 @@ inline void printDeltaAlignments(const std::vector<Alignment>& Alignments,
   printDeltaAlignments(Alignments, Af.Id(), Af.len(), Bf.Id(), Bf.len(), DeltaFile);
 }
 
+// Print alignments in SAM format
+template<typename FR1, typename FR2>
+void printSAMAlignments(const std::vector<Alignment>& Alignments,
+                        const FR1& A, const FR2& B,
+                        std::ostream& SAMFile, bool long_format, const long minLen = 0);
+std::string createCIGAR(const std::vector<long int>& ds, long int start, long int end, long int len);
+std::string createMD(const Alignment& al, const char* ref,
+                     const char* qry, size_t qry_len);
 
 template<typename FastaRecord>
 void printSyntenys(const std::vector<Synteny<FastaRecord> >& Syntenys, const FastaRecord& Bf, std::ostream& ClusterFile);
@@ -348,6 +354,29 @@ void printSyntenys(const std::vector<Synteny<FastaRecord> > & Syntenys, const Fa
     }
   }
 }
+
+template<typename FR1, typename FR2>
+void printSAMAlignments(const std::vector<Alignment>& Alignments,
+                        const FR1& A, const FR2& B,
+                        std::ostream& SAMFile, bool long_format,
+                        const long minLen = 0) {
+  for(const auto& Al : Alignments) {
+    if(std::abs(Al.eA - Al.sA) < minLen && std::abs(Al.eB - Al.sB) < minLen)
+      continue;
+    const bool fwd = Al.dirB == FORWARD_CHAR;
+    SAMFile << B.Id()
+            << (fwd ? " 0 " : " 16 ")
+            << A.Id() << ' ' << Al.sA
+            << " 255 "
+            << createCIGAR(Al.delta, Al.sB, Al.eB, B.len())
+            << " * 0 0 " << (long_format ? B.seq() + 1 : "*")
+            << " * NM:i:" << Al.Errors;
+    if(long_format)
+      SAMFile << " MD:Z:" << createMD(Al, A.seq(), B.seq(), B.len());
+    SAMFile << '\n';
+  }
+}
+
 
 } // namespace postnuc
 } // namespace mummer

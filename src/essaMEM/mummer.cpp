@@ -141,6 +141,7 @@ void query_thread(const mummer::mummer::sparseSAMatch* sa, sequence_parser* pars
       print_match_info(*output_it, match, sa);
     }
   }
+  output_it.done();
 }
 
 int main(int argc, char* argv[]) {

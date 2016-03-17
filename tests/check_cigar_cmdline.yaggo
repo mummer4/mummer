@@ -1,0 +1,11 @@
+purpose "Check the cigar string of a SAM file"
+
+arg("sam") {
+  description "SAM file"
+  c_string; typestr "PATH" }
+arg("ref") {
+  description "Reference fasta file"
+  c_string; typestr "PATH" }
+arg("qry") {
+  description "Query fasta file"
+  c_string; typestr "PATH" }

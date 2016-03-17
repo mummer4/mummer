@@ -38,6 +38,7 @@ struct stringstream_wrapper {
   stringstream_wrapper() : p_(new std::stringstream) { }
   ~stringstream_wrapper() { delete p_; }
   operator std::ostream&() { return *p_; }
+  ssize_t tellp() { return p_->tellp(); }
 };
 template<typename T>
 std::ostream& operator<<(stringstream_wrapper& os, const T& x) {
@@ -48,8 +49,12 @@ class ostream_buffered : public consumer<ostream_buffered, stringstream_wrapper>
 public:
   ostream_buffered(std::ostream& os) : os_(os) { }
   bool operator()(stringstream_wrapper& e) {
-    bool res = !(os_ << e.p_->rdbuf());
-    e.p_->str("");
+    bool res = false;
+    auto rdbuf = e.p_->rdbuf();
+    if(rdbuf->in_avail()) {
+      res = !(os_ << rdbuf);
+      e.p_->str("");
+    }
     return res;
   }
 };

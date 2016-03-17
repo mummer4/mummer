@@ -56,7 +56,8 @@ sparseSA::sparseSA(const char* S_, size_t Slen,
   , nucleotidesOnly(nucleotidesOnly_)
 { }
 
-sparseSA sparseSA::create_auto(const char* S, size_t Slen, int min_len, bool nucleotidesOnly_, int K) {
+sparseSA sparseSA::create_auto(const char* S, size_t Slen, int min_len, bool nucleotidesOnly_, int K,
+                               bool off48) {
   const bool suflink    = K < 4;
   const bool child      = K >= 4;
   int        sparseMult = 1;
@@ -68,31 +69,32 @@ sparseSA sparseSA::create_auto(const char* S, size_t Slen, int min_len, bool nuc
   const int kmer = std::max(0,std::min(10,min_len - sparseMult*K + 1));
   sparseSA res(S, Slen, true /* 4column */, K, suflink, child, kmer>0, sparseMult,
                kmer, nucleotidesOnly_);
-  res.construct();
+  res.construct(off48);
   return res;
 }
 
 long sparseSA::index_size_in_bytes() const {
-      long indexSize = 0L;
-      indexSize += sizeof(sparseMult);
-      indexSize += sizeof(hasSufLink);
-      indexSize += sizeof(hasChild);
-      indexSize += sizeof(K);
-      indexSize += sizeof(NKm1);
-      indexSize += sizeof(logN);
-      indexSize += sizeof(N);
-      indexSize += sizeof(_4column);
-      indexSize += sizeof(hasKmer);
-      indexSize += sizeof(kMerSize);
-      indexSize += sizeof(kMerTableSize);
-      indexSize += sizeof(nucleotidesOnly);
-      indexSize += S.capacity();
-      indexSize += sizeof(SA) + SA.capacity()*sizeof(unsigned int);
-      indexSize += sizeof(ISA) + ISA.capacity()*sizeof(int);
-      indexSize += sizeof(CHILD) + CHILD.capacity()*sizeof(int);
-      indexSize += sizeof(KMR) + KMR.capacity()*(2*sizeof(unsigned int));
-      indexSize += LCP.index_size_in_bytes();
-      return indexSize;
+  throw std::runtime_error("TODO: broken");
+      // long indexSize = 0L;
+      // indexSize += sizeof(sparseMult);
+      // indexSize += sizeof(hasSufLink);
+      // indexSize += sizeof(hasChild);
+      // indexSize += sizeof(K);
+      // indexSize += sizeof(NKm1);
+      // indexSize += sizeof(logN);
+      // indexSize += sizeof(N);
+      // indexSize += sizeof(_4column);
+      // indexSize += sizeof(hasKmer);
+      // indexSize += sizeof(kMerSize);
+      // indexSize += sizeof(kMerTableSize);
+      // indexSize += sizeof(nucleotidesOnly);
+      // indexSize += S.capacity();
+      // indexSize += sizeof(SA) + SA.capacity()*sizeof(unsigned int);
+      // indexSize += sizeof(ISA) + ISA.capacity()*sizeof(int);
+      // indexSize += sizeof(CHILD) + CHILD.capacity()*sizeof(int);
+      // indexSize += sizeof(KMR) + KMR.capacity()*(2*sizeof(unsigned int));
+      // indexSize += LCP.index_size_in_bytes();
+      // return indexSize;
 }
 
 // Uses the algorithm of Kasai et al 2001 which was described in
@@ -262,13 +264,24 @@ void sparseSA::computeKmer() {
     }
 }
 
-//TODO: add error handling and messages
+bool save_vector_32_48(const std::string& path, const vector_32_48& data) {
+  std::ofstream os(path.c_str(), std::ios::binary);
+  size_t        size     = data.size();
+  size_t        is_small = data.is_small;
+  os.write((const char*)&size, sizeof(size));
+  os.write((const char*)&is_small, sizeof(is_small));
+  if(is_small) {
+    os.write((const char*)data.small.data(), size * sizeof(int));
+  } else {
+    os.write((const char*)data.large.m_base32, size * sizeof(uint32_t));
+    os.write((const char*)data.large.m_base16, size * sizeof(uint16_t));
+  }
+  return os.good();
+}
+
 bool sparseSA::save(const std::string &prefix) const {
-  const std::string basic = prefix;
-  const std::string aux = basic + ".aux";
-  const std::string sa = basic + ".sa";
-  const std::string lcp = basic + ".lcp";
   { //print auxiliary information
+    const std::string aux = prefix + ".aux";
     std::ofstream aux_s (aux.c_str(), std::ios::binary);
     aux_s.write((const char*)&N,sizeof(N));
     aux_s.write((const char*)&K,sizeof(K));
@@ -281,13 +294,12 @@ bool sparseSA::save(const std::string &prefix) const {
     if(!aux_s.good()) return false;
   }
   { //print sa
-    std::ofstream sa_s (sa.c_str(), std::ios::binary);
-    unsigned int sizeSA = SA.size();
-    sa_s.write((const char*)&sizeSA,sizeof(sizeSA));
-    sa_s.write((const char*)&SA[0],sizeSA*sizeof(unsigned int));
-    if(!sa_s.good()) return false;
+    const std::string sa = prefix + ".sa";
+    if(!save_vector_32_48(sa, SA))
+      return false;
   }
   { //print LCP
+    const std::string lcp = prefix + ".lcp";
     std::ofstream lcp_s (lcp.c_str(), std::ios::binary);
     unsigned int sizeLCP = LCP.vec.size();
     unsigned int sizeM = LCP.M.size();
@@ -298,15 +310,12 @@ bool sparseSA::save(const std::string &prefix) const {
     if(!lcp_s.good()) return false;
   }
   if(hasSufLink){ //print ISA if nec
-    const std::string isa = basic + ".isa";
-    std::ofstream isa_s (isa.c_str(), std::ios::binary);
-    unsigned int sizeISA = ISA.size();
-    isa_s.write((const char*)&sizeISA,sizeof(sizeISA));
-    isa_s.write((const char*)&ISA[0],sizeISA*sizeof(int));
-    if(!isa_s.good()) return false;
+    const std::string isa = prefix + ".isa";
+    if(!save_vector_32_48(isa, ISA))
+       return false;
   }
   if(hasChild){ //print child if nec
-    const std::string child = basic + ".child";
+    const std::string child = prefix + ".child";
     std::ofstream child_s (child.c_str(), std::ios::binary);
     unsigned int sizeCHILD = CHILD.size();
     child_s.write((const char*)&sizeCHILD,sizeof(sizeCHILD));
@@ -314,7 +323,7 @@ bool sparseSA::save(const std::string &prefix) const {
     if(!child_s.good()) return false;
   }
   if(hasKmer){ //print kmer if nec
-    const std::string kmer = basic + ".kmer";
+    const std::string kmer = prefix + ".kmer";
     std::ofstream kmer_s (kmer.c_str(), std::ios::binary);
     unsigned int sizeKMR = KMR.size();
     kmer_s.write((const char*)&sizeKMR,sizeof(sizeKMR));
@@ -324,13 +333,25 @@ bool sparseSA::save(const std::string &prefix) const {
   return true;
 }
 
-bool sparseSA::load(const std::string &prefix){
-    const std::string basic = prefix;
-    const std::string aux   = basic + ".aux";
-    const std::string sa    = basic + ".sa";
-    const std::string lcp   = basic + ".lcp";
+bool load_vector_32_48(const std::string& path, vector_32_48& data) {
+  std::ifstream is(path.c_str(), std::ios::binary);
+  size_t        size;
+  size_t        is_small;
+  is.read((char*)&size, sizeof(size));
+  is.read((char*)&is_small, sizeof(is_small));
+  data.resize(size, !is_small);
+  if(is_small) {
+    is.read((char*)data.small.data(), size * sizeof(int));
+  } else {
+    is.read((char*)data.large.m_base32, size * sizeof(uint32_t));
+    is.read((char*)data.large.m_base16, size * sizeof(uint16_t));
+  }
+  return is.good();
+}
 
+bool sparseSA::load(const std::string &prefix){
     { // Load auxiliary infomation
+      const std::string aux   = prefix + ".aux";
       std::ifstream     aux_s (aux.c_str(), std::ios::binary);
       aux_s.read((char*)&N,sizeof(N));
       aux_s.read((char*)&K,sizeof(K));
@@ -343,14 +364,12 @@ bool sparseSA::load(const std::string &prefix){
       if(!aux_s.good()) return false;
     }
     { //read sa
-      std::ifstream sa_s (sa.c_str(), std::ios::binary);
-      unsigned int  sizeSA;
-      sa_s.read((char*)&sizeSA,sizeof(sizeSA));
-      SA.resize(sizeSA);
-      sa_s.read((char*)&SA[0],sizeSA*sizeof(unsigned int));
-      if(!sa_s.good()) return false;
+      const std::string sa    = prefix + ".sa";
+      if(!load_vector_32_48(sa, SA))
+        return false;
     }
     { //read LCP
+      const std::string lcp   = prefix + ".lcp";
       std::ifstream lcp_s (lcp.c_str(), std::ios::binary);
       unsigned int  sizeLCP;
       unsigned int  sizeM;
@@ -363,16 +382,12 @@ bool sparseSA::load(const std::string &prefix){
       if(!lcp_s.good()) return false;
     }
     if(hasSufLink){ //read ISA if nec
-      const std::string isa = basic + ".isa";
-      std::ifstream     isa_s (isa.c_str(), std::ios::binary);
-      unsigned int      sizeISA;
-      isa_s.read((char*)&sizeISA,sizeof(sizeISA));
-      ISA.resize(sizeISA);
-      isa_s.read((char*)&ISA[0],sizeISA*sizeof(int));
-      if(!isa_s.good()) return false;
+      const std::string isa = prefix + ".isa";
+      if(!load_vector_32_48(isa, ISA))
+        return false;
     }
     if(hasChild){ //read child if nec
-      const std::string child = basic + ".child";
+      const std::string child = prefix + ".child";
       std::ifstream     child_s (child.c_str(), std::ios::binary);
       unsigned int      sizeCHILD;
       child_s.read((char*)&sizeCHILD,sizeof(sizeCHILD));
@@ -381,7 +396,7 @@ bool sparseSA::load(const std::string &prefix){
       if(!child_s.good()) return false;
     }
     if(hasKmer){ //read kmer table if nec
-      const std::string kmer = basic + ".kmer";
+      const std::string kmer = prefix + ".kmer";
       std::ifstream     kmer_s (kmer.c_str(), std::ios::binary);
       unsigned int      sizeKMR;
       kmer_s.read((char*)&sizeKMR,sizeof(sizeKMR));
@@ -394,18 +409,18 @@ bool sparseSA::load(const std::string &prefix){
     return true;
 }
 
-void sparseSA::construct(){
+void sparseSA::construct(bool off48){
   //  TIME_FUNCTION;
 
     if(K > 1) {
-        long bucketNr = 1;
-        int *intSA = new int[N/K+1];
-        for(int i = 0; i < N/K; i++) intSA[i] = i; // Init SA.
-        int* t_new = new int[N/K+1];
-        long* BucketBegin = new long[256]; // array to save current bucket beginnings
-        radixStep(t_new, intSA, bucketNr, BucketBegin, 0, N/K-1, 0); // start radix sort
-        t_new[N/K] = 0; // Terminate new integer string.
-        delete[] BucketBegin;
+        // long bucketNr = 1;
+        // int *intSA = new int[N/K+1];
+        // for(int i = 0; i < N/K; i++) intSA[i] = i; // Init SA.
+        // int* t_new = new int[N/K+1];
+        // long* BucketBegin = new long[256]; // array to save current bucket beginnings
+        // radixStep(t_new, intSA, bucketNr, BucketBegin, 0, N/K-1, 0); // start radix sort
+        // t_new[N/K] = 0; // Terminate new integer string.
+        // delete[] BucketBegin;
 
         throw "Not supported yet";
         // Suffix sort integer text.
@@ -425,11 +440,15 @@ void sparseSA::construct(){
         // for(long i = 0; i < N/K; i++) { ISA[SA[i]/K] = i; }
     }
     else {
-        SA.resize(N);
-        ISA.resize(N);
-        int *SAint = (int*)SA.data();
-        compactsufsort::create((const unsigned char*)(S + 0), SAint, N);
-        for(long i = 0; i < N; ++i) { ISA[SA[i]] = i; }
+      SA.resize(N, off48);
+      ISA.resize(N, off48);
+      if(SA.is_small) {
+        compactsufsort::create((const unsigned char*)(S + 0), (int*)SA.small.data(), N);
+        for(long i = 0; i < N; ++i) { ISA.small[SA.small[i]] = i; }
+      } else {
+        compactsufsort::create((const unsigned char*)(S + 0), SA.large.begin(), N);
+        for(long i = 0; i < N; ++i) { ISA.large[SA.large[i]] = i; }
+      }
     }
 
     //    std::cerr << "N=" << N << std::endl;
@@ -440,11 +459,7 @@ void sparseSA::construct(){
     computeLCP();  // SA + ISA -> LCP
     LCP.init();
     if(!hasSufLink){
-      {
-          std::vector<int> tmp;
-          ISA.swap(tmp);
-      }
-    //ISA.clear();
+      //ISA.clear(); // TODO: clear in vector32_48
     }
     if(hasChild){
         CHILD.resize(N/K);
@@ -467,51 +482,51 @@ void sparseSA::construct(){
 // Recurse until big-K size prefixes are sorted. Adapted from the C++
 // source code for the wordSA implementation from the following paper:
 // Ferragina and Fischer. Suffix Arrays on Words. CPM 2007.
-void sparseSA::radixStep(int *t_new, int *SA, long &bucketNr, long *BucketBegin, long l, long r, long h) {
-  if(h >= K) return;
-  // first pass: count
-  std::vector<long> Sigma(256, 0); // Sigma counts occurring characters in bucket
-  for (long i = l; i <= r; i++) Sigma[ S[ SA[i]*K + h ] ]++; // count characters
-  BucketBegin[0] = l; for (long i = 1; i < 256; i++) { BucketBegin[i] = Sigma[i-1] + BucketBegin[i-1]; } // accumulate
+// void sparseSA::radixStep(int *t_new, int *SA, long &bucketNr, long *BucketBegin, long l, long r, long h) {
+//   if(h >= K) return;
+//   // first pass: count
+//   std::vector<long> Sigma(256, 0); // Sigma counts occurring characters in bucket
+//   for (long i = l; i <= r; i++) Sigma[ S[ SA[i]*K + h ] ]++; // count characters
+//   BucketBegin[0] = l; for (long i = 1; i < 256; i++) { BucketBegin[i] = Sigma[i-1] + BucketBegin[i-1]; } // accumulate
 
-  // second pass: move (this variant does *not* need an additional array!)
-  unsigned char currentKey = 0;    // character of current bucket
-  long end = l-1+Sigma[currentKey]; // end of current bucket
-  long pos = l;                     // 'pos' is current position in bucket
-  while (1) {
-    if (pos > end) { // Reached the end of the bucket.
-      if (currentKey == 255) break; // Last character?
-      currentKey++; // Advance to next characer.
-      pos = BucketBegin[currentKey]; // Next bucket start.
-      end += Sigma[currentKey]; // Next bucket end.
-    }
-    else {
-      // American flag sort of McIlroy et al. 1993. BucketBegin keeps
-      // track of current position where to add to bucket set.
-      int tmp = SA[ BucketBegin[(int) S[ SA[pos]*K + h ] ] ];
-      SA[ BucketBegin[(int) S[ SA[pos]*K + h] ]++ ] = SA[pos];  // Move bucket beginning to the right, and replace
-      SA[ pos ] = tmp; // Save value at bucket beginning.
-      if (S[ SA[pos]*K + h ] == currentKey) pos++; // Advance to next position if the right character.
-    }
-  }
-  // recursively refine buckets and calculate new text:
-  long beg = l; end = l-1;
-  for (long i = 1; i < 256; i++) { // step through Sigma to find bucket borders
-    end += Sigma[i];
-    if (beg <= end) {
-      if(h == K-1) {
-	for (long j = beg; j <= end; j++) {
-	  t_new[ SA[j] ] = bucketNr; // set new text
-	}
-	bucketNr++;
-      }
-      else {
-	radixStep(t_new, SA, bucketNr, BucketBegin, beg, end, h+1); // recursive refinement
-      }
-      beg = end + 1; // advance to next bucket
-    }
-  }
-}
+//   // second pass: move (this variant does *not* need an additional array!)
+//   unsigned char currentKey = 0;    // character of current bucket
+//   long end = l-1+Sigma[currentKey]; // end of current bucket
+//   long pos = l;                     // 'pos' is current position in bucket
+//   while (1) {
+//     if (pos > end) { // Reached the end of the bucket.
+//       if (currentKey == 255) break; // Last character?
+//       currentKey++; // Advance to next characer.
+//       pos = BucketBegin[currentKey]; // Next bucket start.
+//       end += Sigma[currentKey]; // Next bucket end.
+//     }
+//     else {
+//       // American flag sort of McIlroy et al. 1993. BucketBegin keeps
+//       // track of current position where to add to bucket set.
+//       int tmp = SA[ BucketBegin[(int) S[ SA[pos]*K + h ] ] ];
+//       SA[ BucketBegin[(int) S[ SA[pos]*K + h] ]++ ] = SA[pos];  // Move bucket beginning to the right, and replace
+//       SA[ pos ] = tmp; // Save value at bucket beginning.
+//       if (S[ SA[pos]*K + h ] == currentKey) pos++; // Advance to next position if the right character.
+//     }
+//   }
+//   // recursively refine buckets and calculate new text:
+//   long beg = l; end = l-1;
+//   for (long i = 1; i < 256; i++) { // step through Sigma to find bucket borders
+//     end += Sigma[i];
+//     if (beg <= end) {
+//       if(h == K-1) {
+// 	for (long j = beg; j <= end; j++) {
+// 	  t_new[ SA[j] ] = bucketNr; // set new text
+// 	}
+// 	bucketNr++;
+//       }
+//       else {
+// 	radixStep(t_new, SA, bucketNr, BucketBegin, beg, end, h+1); // recursive refinement
+//       }
+//       beg = end + 1; // advance to next bucket
+//     }
+//   }
+// }
 
 // Binary search for left boundry of interval.
 long sparseSA::bsearch_left(char c, long i, long s, long e) const {
