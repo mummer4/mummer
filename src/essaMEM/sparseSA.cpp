@@ -7,6 +7,7 @@
 #include <string.h>
 #include <fstream>
 #include <iomanip>
+#include <stdexcept>
 
 #include <mummer/sparseSA.hpp>
 #include <mummer/timer.hpp>
