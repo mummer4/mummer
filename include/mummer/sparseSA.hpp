@@ -85,6 +85,11 @@ struct vec_uchar {
   vector_32_48*            sa;
 
   vec_uchar(vector_32_48& sa_) : vec(sa_.size(), 0), sa(&sa_) { }
+  vec_uchar(vec_uchar&& rhs, vector_32_48& sa_)
+    : vec(std::move(rhs.vec))
+    , M(std::move(rhs.M))
+    , sa(&sa_)
+  { }
   void resize(size_t N) { vec.resize(N, 0); }
 
   // Vector X[i] notation to get LCP values.
@@ -242,6 +247,23 @@ struct sparseSA {
   }
   sparseSA(const std::string& S_, const std::string& prefix)
     : sparseSA(S_.c_str(), S_.length(), prefix)
+  { }
+  sparseSA(sparseSA&& rhs)
+    : _4column(rhs._4column)
+    , K(rhs.K)
+    , S(rhs.S)
+    , N(rhs.N)
+    , logN(rhs.logN)
+    , NKm1(rhs.NKm1)
+    , SA(std::move(rhs.SA))
+    , ISA(std::move(rhs.ISA))
+    , LCP(std::move(rhs.LCP), SA)
+    , CHILD(std::move(rhs.CHILD))
+    , KMR(std::move(rhs.KMR))
+    , hasKmer(rhs.hasKmer)
+    , kMerTableSize(rhs.kMerTableSize)
+    , sparseMult(rhs.sparseMult)
+    , nucleotidesOnly(rhs.nucleotidesOnly)
   { }
 
   static sparseSA create_auto(const char* S, size_t Slen, int min_len, bool nucleotidesOnly_, int K = 1, bool off48 = false);

@@ -370,6 +370,7 @@ bool sparseSA::load(const std::string &prefix){
         return false;
     }
     { //read LCP
+      LCP.sa = &SA;
       const std::string lcp   = prefix + ".lcp";
       std::ifstream lcp_s (lcp.c_str(), std::ios::binary);
       unsigned int  sizeLCP;
