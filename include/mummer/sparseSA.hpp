@@ -78,7 +78,8 @@ struct vec_uchar {
     item_t(size_t i, large_type v) : idx(i), val(v) { }
     size_t idx;
     large_type val;
-    bool operator < (item_t t) const { return idx < t.idx; }
+    bool operator < (const item_t& t) const { return idx < t.idx; }
+    bool operator==(const item_t& t) const { return idx == t.idx && val == t.val; }
   };
   std::vector<small_type>  vec; // LCP values from 0-65534
   std::vector<item_t>      M;
@@ -159,6 +160,9 @@ struct saTuple_t {
     saTuple_t(unsigned int l, unsigned int r): left(l), right(r) {}
     unsigned int left;
     unsigned int right;
+  bool operator==(const saTuple_t& rhs) const {
+    return left == rhs.left && right == rhs.right;
+  }
 };
 
 // depth : [start...end]
@@ -260,7 +264,10 @@ struct sparseSA {
     , LCP(std::move(rhs.LCP), SA)
     , CHILD(std::move(rhs.CHILD))
     , KMR(std::move(rhs.KMR))
+    , hasChild(rhs.hasChild)
+    , hasSufLink(rhs.hasSufLink)
     , hasKmer(rhs.hasKmer)
+    , kMerSize(rhs.kMerSize)
     , kMerTableSize(rhs.kMerTableSize)
     , sparseMult(rhs.sparseMult)
     , nucleotidesOnly(rhs.nucleotidesOnly)
