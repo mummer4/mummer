@@ -7,6 +7,7 @@
 #include <string.h>
 #include <fstream>
 #include <iomanip>
+#include <stdexcept>
 
 #include <mummer/sparseSA.hpp>
 #include <mummer/timer.hpp>
@@ -287,10 +288,13 @@ bool sparseSA::save(const std::string &prefix) const {
     aux_s.write((const char*)&K,sizeof(K));
     aux_s.write((const char*)&logN,sizeof(logN));
     aux_s.write((const char*)&NKm1,sizeof(NKm1));
+    aux_s.write((const char*)&_4column,sizeof(_4column));
     aux_s.write((const char*)&hasSufLink,sizeof(hasSufLink));
     aux_s.write((const char*)&hasChild,sizeof(hasChild));
     aux_s.write((const char*)&hasKmer,sizeof(hasKmer));
     aux_s.write((const char*)&kMerSize,sizeof(kMerSize));
+    aux_s.write((const char*)&sparseMult,sizeof(sparseMult));
+    aux_s.write((const char*)&nucleotidesOnly,sizeof(nucleotidesOnly));
     if(!aux_s.good()) return false;
   }
   { //print sa
@@ -357,10 +361,13 @@ bool sparseSA::load(const std::string &prefix){
       aux_s.read((char*)&K,sizeof(K));
       aux_s.read((char*)&logN,sizeof(logN));
       aux_s.read((char*)&NKm1,sizeof(NKm1));
+      aux_s.read((char*)&_4column,sizeof(_4column));
       aux_s.read((char*)&hasSufLink,sizeof(hasSufLink));
       aux_s.read((char*)&hasChild,sizeof(hasChild));
       aux_s.read((char*)&hasKmer,sizeof(hasKmer));
       aux_s.read((char*)&kMerSize,sizeof(kMerSize));
+      aux_s.read((char*)&sparseMult,sizeof(sparseMult));
+      aux_s.read((char*)&nucleotidesOnly,sizeof(nucleotidesOnly));
       if(!aux_s.good()) return false;
     }
     { //read sa
@@ -369,6 +376,7 @@ bool sparseSA::load(const std::string &prefix){
         return false;
     }
     { //read LCP
+      LCP.sa = &SA;
       const std::string lcp   = prefix + ".lcp";
       std::ifstream lcp_s (lcp.c_str(), std::ios::binary);
       unsigned int  sizeLCP;

@@ -23,6 +23,16 @@ struct fortyeight_index {
     , m_base32(new uint32_t[(s * 3 + 1) / 2 + 3])
     , m_base16((uint16_t*)(m_base32 + s))
   { }
+  fortyeight_index(fortyeight_index&& rhs)
+    : m_size(rhs.m_size)
+    , m_base32(rhs.m_base32)
+    , m_base16(rhs.m_base16)
+  {
+    rhs.m_size   = 0;
+    rhs.m_base32 = nullptr;
+    rhs.m_base16 = nullptr;
+  }
+  fortyeight_index(const fortyeight_index& rhs) = delete;
 
   // Discard all data
   void resize(size_t s) {

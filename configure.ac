@@ -1,4 +1,4 @@
-AC_INIT([MUMmer], [3.9.2alpha], [gmarcais@umd.edu])
+AC_INIT([MUMmer], [3.9.3alpha], [gmarcais@umd.edu])
 AC_CANONICAL_HOST
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([subdir-objects foreign parallel-tests color-tests])
