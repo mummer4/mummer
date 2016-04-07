@@ -359,7 +359,7 @@ template<typename FR1, typename FR2>
 void printSAMAlignments(const std::vector<Alignment>& Alignments,
                         const FR1& A, const FR2& B,
                         std::ostream& SAMFile, bool long_format,
-                        const long minLen = 0) {
+                        const long minLen) {
   for(const auto& Al : Alignments) {
     if(std::abs(Al.eA - Al.sA) < minLen && std::abs(Al.eB - Al.sB) < minLen)
       continue;
