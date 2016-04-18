@@ -43,8 +43,11 @@ YAGGO_BUILT += %D%/check_cigar_cmdline.hpp
 # seed_reads_*.fa are pseudo-random sequences. They are identical
 # every time. Used for testing identical results with older version of
 # MUMmer.
-%D%/data/seed_reads%0.fa %D%/data/seed_reads%1.fa: %D%/generate_sequences
-	$(AM_V_GEN)mkdir -p $(dir $@); %D%/generate_sequences -p %D%/data/seed --seed 1348091448 -G 1M --numbers 1000 --numbers 1000
+%D%/data/seed_reads%0.fa %D%/data/seed_reads%1.fa %D%/data/seed_reads%2.fa: %D%/generate%sequences
+	$(AM_V_GEN)mkdir -p $(dir $@); %D%/generate_sequences -p %D%/data/seed --seed 1348091448 -G 1M \
+	  --errors 1 --lengths 100 --numbers 1000 \
+	  --errors 5 --lengths 1000 --numbers 1000 \
+	  --errors 2 --lengths 50k --numbers 10
 
 # Clean data directory
 CLEANDIRS += %D%/data
@@ -57,7 +60,7 @@ TEST_EXTENSIONS += .sh
 SH_LOG_COMPILER = %D%/testsh
 
 # List of tests to run
-script_tests = %D%/save_load.sh %D%/batch.sh %D%/mummer.sh %D%/nucmer.sh %D%/sam.sh
+script_tests = %D%/save_load.sh %D%/batch.sh %D%/mummer.sh %D%/nucmer.sh %D%/sam.sh %D%/genome.sh
 EXTRA_DIST += $(script_tests)
 TESTS += $(script_tests)
 
@@ -72,3 +75,4 @@ CLEANDIRS += $(patsubst %D%/%.sh,%D%/%,$(script_tests))
 %D%/mummer.log: %D%/data/seed_reads_0.fa %D%/data/seed_reads_1.fa
 %D%/nucmer.log: %D%/data/seed_reads_0.fa %D%/data/seed_reads_1.fa
 %D%/sam.log: %D%/data/seed_reads_0.fa %D%/data/seed_reads_1.fa
+%D%/genome.log: %D%/data/seed_reads_2.fa

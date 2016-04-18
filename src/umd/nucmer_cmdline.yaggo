@@ -14,6 +14,9 @@ option("mum") {
 option("maxmatch") {
   description "Use all anchor matches regardless of their uniqueness"
   off; conflict "mum" }
+option("G", "genome") {
+  description "Map genome to genome (long query sequences)"
+  off }
 option("b", "breaklen") {
   description "Set the distance an alignment extension will attempt to extend poor scoring regions before giving up"
   uint32; default 200 }

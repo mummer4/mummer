@@ -198,13 +198,15 @@ struct merge_syntenys {
     , aligner(break_len, banding, matrix_type)
   { }
 
-  template<typename FR1, typename FR2, typename ClustersOut, typename MatchesOut>
-  void processSyntenys_each(std::vector<Synteny<FR1> >& Syntenys, const FR2& Bf,
+  //  template<typename FR1, typename FR2, typename ClustersOut, typename MatchesOut>
+  template<typename Container, typename FR2, typename ClustersOut, typename MatchesOut>
+  void processSyntenys_each(Container& Syntenys, const FR2& Bf,
                             ClustersOut clusters, MatchesOut matches) const;
-  template<typename FR1, typename FR2, typename MatchesOut>
-  void processSyntenys_each(std::vector<Synteny<FR1> >& Syntenys, const FR2& Bf,
+  //  template<typename FR1, typename FR2, typename MatchesOut>
+  template<typename Container, typename FR2, typename MatchesOut>
+  void processSyntenys_each(Container& Syntenys, const FR2& Bf,
                             MatchesOut matches) const {
-    processSyntenys_each(Syntenys, Bf, [](const std::vector<Synteny<FR1> >& s, const FR2& Bf) { },
+    processSyntenys_each(Syntenys, Bf, [](const Container& s, const FR2& Bf) { },
                          matches);
   }
   bool extendBackward(std::vector<Alignment> & Alignments, std::vector<Alignment>::iterator CurrAp,
@@ -291,8 +293,9 @@ inline long int revC
 //
 // Implementation of templated methods
 //
-template<typename FR1, typename FR2, typename ClustersOut, typename MatchesOut>
-void merge_syntenys::processSyntenys_each(std::vector<Synteny<FR1> >& Syntenys, const FR2& Bf,
+//template<typename FR1, typename FR2, typename ClustersOut, typename MatchesOut>
+template<typename Container, typename FR2, typename ClustersOut, typename MatchesOut>
+void merge_syntenys::processSyntenys_each(Container& Syntenys, const FR2& Bf,
                                           ClustersOut clusters, MatchesOut matches) const
 
 //  For each syntenic region with clusters, extend the clusters to

@@ -102,18 +102,20 @@ int main(int argc, char *argv[]) {
     if(args.save_given && !aligner->sa().save(args.save_arg))
       nucmer_cmdline::error() << "Can't save the suffix array to '" << args.save_arg << "'";
 
-    //    os << std::flush;
+    if(args.genome_flag) {
+      nucmer_cmdline::error() << "Genome flag not implemented yet";
+    } else {
+      const unsigned int nb_threads = args.threads_given ? args.threads_arg : std::thread::hardware_concurrency();
+      stream_manager     streams(&args.qry_arg, &args.qry_arg + 1);
+      sequence_parser    parser(4 * nb_threads, 10, 1, streams);
 
-    const unsigned int nb_threads = args.threads_given ? args.threads_arg : std::thread::hardware_concurrency();
-    stream_manager     streams(&args.qry_arg, &args.qry_arg + 1);
-    sequence_parser    parser(4 * nb_threads, 10, 1, streams);
+      std::vector<std::thread> threads;
+      for(unsigned int i = 0; i < nb_threads; ++i)
+        threads.push_back(std::thread(query_thread, aligner.get(), &parser, &output, &args));
 
-    std::vector<std::thread> threads;
-    for(unsigned int i = 0; i < nb_threads; ++i)
-      threads.push_back(std::thread(query_thread, aligner.get(), &parser, &output, &args));
-
-    for(auto& th : threads)
-      th.join();
+      for(auto& th : threads)
+        th.join();
+    } // Not large
   } while(!args.load_given && reference.peek() != EOF);
   output.close();
   os.close();
