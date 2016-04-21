@@ -141,7 +141,7 @@ int ClusterMatches::Cluster_each_long(Match_t * A, int N, Output out) const {
 
   //  Use Union-Find to create connected-components based on
   //  separation and similar diagonals between matches
-  DisjointSets UF(N);
+  DisjointSets UF(N + 1);
 
   openmp_qsort(A + 1, A + N + 1, By_Start2);
   N = Filter_Matches (A + 1, N);
@@ -173,13 +173,19 @@ int ClusterMatches::Cluster_each_long(Match_t * A, int N, Output out) const {
 
   // Determine and process clusters
   int cluster_size, print_ct = 0;
-  for (int i = 1;  i <= N;  i += cluster_size) {
-    int j;
-    for  (j = i + 1;  j <= N && A [i] . cluster_id == A [j] . cluster_id;  j ++)
-      ;
-    cluster_size = j - i;
-    print_ct += Process_Cluster (A + i, cluster_size, out);
+#pragma omp parallel
+  {
+#pragma omp single
+    for (int i = 1;  i <= N;  i += cluster_size) {
+      int j;
+      for  (j = i + 1;  j <= N && A [i] . cluster_id == A [j] . cluster_id;  j ++)
+        ;
+      cluster_size = j - i;
+#pragma omp task firstprivate(i, cluster_size) shared(out)
+      print_ct += Process_Cluster (A + i, cluster_size, out);
+    }
   }
+
   return print_ct;
 }
 

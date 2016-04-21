@@ -21,8 +21,8 @@ EXTRA_CXXFLAGS="-std=c++0x"
 AC_SUBST([EXTRA_CXXFLAGS])
 
 # Check for openmp
-AX_OPENMP([AC_DEFINE(HAVE_OPENMP,1,[Define if OpenMP is enabled])],
-          [AC_MSG_FAILURE([OPENMP is not supported by your compiler])])
+AX_OPENMP([AC_DEFINE(HAVE_OPENMP,1,[Define if OpenMP is enabled])])
+#          [AC_MSG_FAILURE([OPENMP is not supported by your compiler])])
 EXTRA_CXXFLAGS="$EXTRA_CXXFLAGS $OPENMP_CXXFLAGS"
 
 # Check for yaggo

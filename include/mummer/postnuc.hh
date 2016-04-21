@@ -8,6 +8,8 @@
 #include <cstring>
 #include <memory>
 #include <iomanip>
+#include <atomic>
+
 #include "tigrinc.hh"
 #include "sw_align.hh"
 
@@ -52,6 +54,7 @@ struct Synteny
   std::vector<Cluster> clusters; // the ordered set of clusters between A and B
   Synteny() = default;
   Synteny(const FastaRecord* Af) : AfP(Af) { }
+  bool operator<(const Synteny& rhs) const { return *AfP < *rhs.AfP; }
 };
 
 struct Alignment
@@ -198,17 +201,29 @@ struct merge_syntenys {
     , aligner(break_len, banding, matrix_type)
   { }
 
-  //  template<typename FR1, typename FR2, typename ClustersOut, typename MatchesOut>
+  // Process all syntenys in a container
   template<typename Container, typename FR2, typename ClustersOut, typename MatchesOut>
   void processSyntenys_each(Container& Syntenys, const FR2& Bf,
                             ClustersOut clusters, MatchesOut matches) const;
-  //  template<typename FR1, typename FR2, typename MatchesOut>
   template<typename Container, typename FR2, typename MatchesOut>
   void processSyntenys_each(Container& Syntenys, const FR2& Bf,
                             MatchesOut matches) const {
     processSyntenys_each(Syntenys, Bf, [](const Container& s, const FR2& Bf) { },
                          matches);
   }
+
+  // Process all syntenys in a container in parallel
+  template<typename Container, typename FR2, typename ClustersOut, typename MatchesOut>
+  void processSyntenys_long_each(Container& Syntenys, const FR2& Bf,
+                                 ClustersOut clusters, MatchesOut matches) const;
+  // Process all syntenys in a container in parallel
+  template<typename Container, typename FR2, typename MatchesOut>
+  void processSyntenys_long_each(Container& Syntenys, const FR2& Bf,
+                                 MatchesOut matches) const {
+    processSyntenys_long_each(Syntenys, Bf, [](const Container& s, const FR2& Bf) { },
+                              matches);
+  }
+
   bool extendBackward(std::vector<Alignment> & Alignments, std::vector<Alignment>::iterator CurrAp,
                       std::vector<Alignment>::iterator TargetAp, const char * A, const char * B) const;
 
@@ -293,7 +308,6 @@ inline long int revC
 //
 // Implementation of templated methods
 //
-//template<typename FR1, typename FR2, typename ClustersOut, typename MatchesOut>
 template<typename Container, typename FR2, typename ClustersOut, typename MatchesOut>
 void merge_syntenys::processSyntenys_each(Container& Syntenys, const FR2& Bf,
                                           ClustersOut clusters, MatchesOut matches) const
@@ -306,18 +320,55 @@ void merge_syntenys::processSyntenys_each(Container& Syntenys, const FR2& Bf,
 //  been produced.
 
 {
-  //  std::vector<Alignment> alignments;
-
   //-- For all the contained syntenys
   for(auto& CurrSp : Syntenys) {
-      //-- If no clusters, ignore
-      if(CurrSp.clusters.empty()) continue;
+    //-- If no clusters, ignore
+    if(CurrSp.clusters.empty()) continue;
+    //-- Extend clusters and create the alignment information
+    //      alignments.clear();
+    std::vector<Alignment> alignments;
+    extendClusters (CurrSp.clusters, CurrSp.AfP->seq(), CurrSp.AfP->len(), Bf.seq(), Bf.len(), alignments);
+    //-- Output the alignment data to the delta file
+    matches(std::move(alignments), *CurrSp.AfP, Bf);
+  }
+
+  //-- Create the cluster information
+  clusters(Syntenys, Bf);
+  Syntenys.clear();
+}
+
+template<typename Container, typename FR2, typename ClustersOut, typename MatchesOut>
+void merge_syntenys::processSyntenys_long_each(Container& Syntenys, const FR2& Bf,
+                                               ClustersOut clusters, MatchesOut matches) const
+
+//  For each syntenic region with clusters, extend the clusters to
+//  expand total alignment coverage. Only should be called once all
+//  the clusters for the contained syntenic regions have been stored
+//  in the data structure. Frees the memory used by the the syntenic
+//  regions once the output of extendClusters and flushSyntenys has
+//  been produced.
+
+{
+  std::atomic<size_t> pos(0);
+  const auto end = Syntenys.end();
+
+#pragma omp parallel
+  {
+    auto CurrSp = Syntenys.begin();
+    size_t prev = 0;
+
+    while(true) {
+      const size_t npos = pos++;
+      for( ; prev < npos && CurrSp != end; ++prev, ++CurrSp) ; // Advance
+      if(CurrSp == end) break;
+      if(CurrSp->clusters.empty()) continue;
       //-- Extend clusters and create the alignment information
       //      alignments.clear();
       std::vector<Alignment> alignments;
-      extendClusters (CurrSp.clusters, CurrSp.AfP->seq(), CurrSp.AfP->len(), Bf.seq(), Bf.len(), alignments);
+      extendClusters (CurrSp->clusters, CurrSp->AfP->seq(), CurrSp->AfP->len(), Bf.seq(), Bf.len(), alignments);
       //-- Output the alignment data to the delta file
-      matches(std::move(alignments), *CurrSp.AfP, Bf);
+      matches(std::move(alignments), *CurrSp->AfP, Bf);
+    }
   }
 
   //-- Create the cluster information

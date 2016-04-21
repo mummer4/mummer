@@ -57,9 +57,10 @@ TEST(Nucmer, PairSequences) {
   s2[25] = (s2[25] == 'a' ? 'c' : 'a'); // substitution
   EXPECT_EQ((size_t)999, s1.size());
   EXPECT_EQ((size_t)999, s2.size());
-
+  std::istringstream refstream(s1);
   mummer::nucmer::Options opts;
   opts.minmatch(10).mincluster(15);
+
   const auto a = mummer::nucmer::align_sequences(s1.c_str(), s1.length(),
                                                  s2.c_str(), s2.length(), opts);
 
@@ -77,4 +78,26 @@ TEST(Nucmer, PairSequences) {
   // for(const auto& al : a)
   //   assert_good_alignment(al, s1, s2);
 }
+
+TEST(Nucmer, LongSequences) {
+  const std::string s1 = sequence(1000);
+  const std::string s2 = s1.substr(900) + sequence(900);
+
+  std::istringstream refstream(std::string(">ref\n") + s1);
+  mummer::nucmer::Options opts;
+  mummer::nucmer::FileAligner falign(refstream, opts);
+  const mummer::nucmer::FastaRecordSeq query_record(s2, "query");
+
+  //  std::vector<mummer::postnuc::Alignment> a2;
+  int nb = 0;
+  auto append_matches = [&](std::vector<mummer::postnuc::Alignment>&& al,
+                       const mummer::nucmer::FastaRecordPtr& ref,
+                       const mummer::nucmer::FastaRecordSeq& query) {
+    ++nb;
+  };
+  falign.align_long_sequences(query_record, append_matches);
+  EXPECT_GT(nb, 0);
+
+} // Nucmer.LongSequences
+
 } // empty namespace

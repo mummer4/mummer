@@ -38,6 +38,27 @@ void query_thread(mummer::nucmer::FileAligner* aligner, sequence_parser* parser,
   output_it.done();
 }
 
+void query_long(mummer::nucmer::FileAligner* aligner, sequence_parser* parser,
+                thread_pipe::ostream_buffered* printer, const nucmer_cmdline* args) {
+  auto output_it = printer->begin();
+  auto print_function = [&](std::vector<mummer::postnuc::Alignment>&& als,
+                            const mummer::nucmer::FastaRecordPtr& Af, const mummer::nucmer::FastaRecordSeq& Bf) {
+    mummer::postnuc::printDeltaAlignments(als, Af.Id(), Af.len(), Bf.Id(), Bf.len(), *output_it, args->minalign_arg);
+    if(output_it->tellp() > 1024)
+      ++output_it;
+  };
+
+  while(true) {
+    sequence_parser::job j(*parser);
+    if(j.is_empty()) break;
+    for(size_t i = 0; i < j->nb_filled; ++i) {
+      mummer::nucmer::FastaRecordSeq Query(j->data[i].seq.c_str(), j->data[i].seq.length(), j->data[i].header.c_str());
+      aligner->align_long_sequences(Query, print_function);
+    }
+  }
+  output_it.done();
+}
+
 int main(int argc, char *argv[]) {
   std::ios::sync_with_stdio(false);
   std::string cmdline(argv[0]); // Save command line
@@ -102,9 +123,8 @@ int main(int argc, char *argv[]) {
     if(args.save_given && !aligner->sa().save(args.save_arg))
       nucmer_cmdline::error() << "Can't save the suffix array to '" << args.save_arg << "'";
 
-    if(args.genome_flag) {
-      nucmer_cmdline::error() << "Genome flag not implemented yet";
-    } else {
+    stream_manager     streams(&args.qry_arg, &args.qry_arg + 1);
+    if(!args.genome_flag) {
       const unsigned int nb_threads = args.threads_given ? args.threads_arg : std::thread::hardware_concurrency();
       stream_manager     streams(&args.qry_arg, &args.qry_arg + 1);
       sequence_parser    parser(4 * nb_threads, 10, 1, streams);
@@ -115,7 +135,11 @@ int main(int argc, char *argv[]) {
 
       for(auto& th : threads)
         th.join();
-    } // Not large
+    } else {
+      // Genome flag on
+      sequence_parser    parser(4, 1, 1, streams);
+      query_long(aligner.get(), &parser, &output, &args);
+    }
   } while(!args.load_given && reference.peek() != EOF);
   output.close();
   os.close();
