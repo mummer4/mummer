@@ -102,20 +102,24 @@ long sparseSA::index_size_in_bytes() const {
 // Manzini 2004 to compute the LCP array. Modified to handle sparse
 // suffix arrays and inverse sparse suffix arrays.
 void sparseSA::computeLCP() {
-  //  TIME_FUNCTION;
+  TIME_FUNCTION;
 
-  long h = 0;
-  for(long i = 0; i < N / K; ++i) {
-    const long m = ISA[i];
-    if(m > 0) {
-      const long bj  = SA[m-1];
-      const long bi = i * K;
-      while(bi + h < N && bj + h < N && S[bi + h] == S[bj + h])  ++h;
-      LCP.set(m, h); //LCP[m] = h;
-    } else {
-      LCP.set(m, 0); // LCP[m]=0;
+#pragma omp parallel
+  {
+    long h = 0;
+#pragma omp for schedule(static)
+    for(long i = 0; i < N / K; ++i) {
+      const long m = ISA[i];
+      if(m > 0) {
+        const long bj  = SA[m-1];
+        const long bi = i * K;
+        while(bi + h < N && bj + h < N && S[bi + h] == S[bj + h])  ++h;
+        LCP.set(m, h); //LCP[m] = h;
+      } else {
+        LCP.set(m, 0); // LCP[m]=0;
+      }
+      h = std::max(0L, h - K);
     }
-    h = std::max(0L, h - K);
   }
 }
 
@@ -452,9 +456,11 @@ void sparseSA::construct(bool off48){
       ISA.resize(N, off48);
       if(SA.is_small) {
         compactsufsort::create((const unsigned char*)(S + 0), (int*)SA.small.data(), N);
+#pragma omp parallel for
         for(long i = 0; i < N; ++i) { ISA.small[SA.small[i]] = i; }
       } else {
         compactsufsort::create((const unsigned char*)(S + 0), SA.large.begin(), N);
+#pragma omp parallel for
         for(long i = 0; i < N; ++i) { ISA.large[SA.large[i]] = i; }
       }
     }

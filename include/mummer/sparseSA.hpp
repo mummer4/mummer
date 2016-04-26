@@ -12,6 +12,7 @@
 #include <cassert>
 
 #include "48bit_index.hpp"
+#include "openmp_qsort.hpp"
 
 
 namespace mummer {
@@ -111,6 +112,7 @@ struct vec_uchar {
       vec[idx] = v;
     } else {
       vec[idx] = std::numeric_limits<small_type>::max();
+#pragma omp critical(SetLCP)
       M.push_back(item_t((*sa)[idx], v));
     }
   }
@@ -119,9 +121,15 @@ struct vec_uchar {
   // are compacted into ranges.
   void init() {
     // First sort by end of range [idx, idx + val]
-    sort(M.begin(), M.end(), [](const item_t& a, const item_t& b) -> bool {
-        return a.idx + a.val < b.idx + b.val || (a.idx + a.val == b.idx + b.val && a.idx < b.idx);
-      });
+    auto first_sort = [](const item_t& a, const item_t& b) -> bool {
+      return a.idx + a.val < b.idx + b.val || (a.idx + a.val == b.idx + b.val && a.idx < b.idx);
+    };
+#ifdef _OPENMP
+    openmp_qsort(M.begin(), M.end(), first_sort);
+#else
+    sort(M.begin(), M.end(), first_sort);
+#endif
+
     // Second, remove elements that are consecutive in a range
     size_t pidx = 0;
     large_type pval = 0;
@@ -134,7 +142,11 @@ struct vec_uchar {
     M.resize(nend - M.begin());
     M.shrink_to_fit();
     // Third, sort by beginning of compacted ranges
+#ifdef _OPENMP
+    openmp_qsort(M.begin(), M.end());
+#else
     sort(M.begin(), M.end());
+#endif
   }
 
   long index_size_in_bytes() const {

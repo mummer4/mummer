@@ -19,13 +19,13 @@ struct SA {
   typedef typename const_iterator_traits<SAIDPTR>::type CSAIDPTR;
   static const size_t                                   ALPHABET_SIZE = alphabet_traits<CHARPTR>::size;
 
-  static SAIDX& bucket(SAIDX* b, saint_t c0) {
+  inline static SAIDX& bucket(SAIDX* b, saint_t c0) {
     return b[c0];
   }
-  static SAIDX& bucket(SAIDX* b, saint_t c0, saint_t c1) {
+  inline static SAIDX& bucket(SAIDX* b, saint_t c0, saint_t c1) {
     return b[c1 * ALPHABET_SIZE + c0];
   }
-  static SAIDX& bucket_star(SAIDX* b, saint_t c0, saint_t c1) {
+  inline static SAIDX& bucket_star(SAIDX* b, saint_t c0, saint_t c1) {
     return b[c0 * ALPHABET_SIZE + c1];
   }
 
@@ -35,27 +35,20 @@ struct SA {
   sort_typeBstar(CHARPTR T, SAIDPTR SA,
                  SAIDX *bucket_A, SAIDX *bucket_B,
                  SAIDX n) {
-    SAIDPTR PAb, ISAb, buf;
-
-#ifdef _OPENMP
-    SAIDPTR curbuf;
-    SAIDX l;
-#endif
-    SAIDX i, j, k, t, m, bufsize;
+    SAIDPTR PAb, ISAb;
+    SAIDX   j, t, m;
     saint_t c0, c1;
-#ifdef _OPENMP
-    saint_t d0, d1;
-    int tmp;
-#endif
 
     /* Initialize bucket arrays. */
-    for(i = 0; i < (SAIDX)ALPHABET_SIZE; ++i) { bucket_A[i] = 0; }
-    for(i = 0; i < (SAIDX)ALPHABET_SIZE * (SAIDX)ALPHABET_SIZE; ++i) { bucket_B[i] = 0; }
+    for(SAIDX i = 0; i < (SAIDX)ALPHABET_SIZE; ++i) { bucket_A[i] = 0; }
+    for(SAIDX i = 0; i < (SAIDX)ALPHABET_SIZE * (SAIDX)ALPHABET_SIZE; ++i) { bucket_B[i] = 0; }
 
     /* Count the number of occurrences of the first one or two characters of each
        type A, B and B* suffix. Moreover, store the beginning position of all
        type B* suffixes into the array SA. */
-    for(i = n - 1, m = n, c0 = T[n - 1]; 0 <= i;) {
+    m  = n;
+    c0 = T[n - 1];
+    for(int i = n - 1; 0 <= i; ) {
       /* type A suffix. */
       do { ++bucket(bucket_A, c1 = c0); } while((0 <= --i) && ((c0 = T[i]) >= c1));
       if(0 <= i) {
@@ -76,7 +69,8 @@ struct SA {
     */
 
     /* Calculate the index of start/end point of each bucket. */
-    for(c0 = 0, i = 0, j = 0; c0 < (saint_t)ALPHABET_SIZE; ++c0) {
+    c0 = 0;
+    for(int i = 0, j = 0; c0 < (saint_t)ALPHABET_SIZE; ++c0) {
       t = i + bucket(bucket_A, c0);
       bucket(bucket_A, c0) = i + j; /* start point */
       i = t + bucket(bucket_B, c0, c0);
@@ -90,7 +84,7 @@ struct SA {
     if(0 < m) {
       /* Sort the type B* suffixes by their first two characters. */
       PAb = SA + n - m; ISAb = SA + m;
-      for(i = m - 2; 0 <= i; --i) {
+      for(SAIDX i = m - 2; 0 <= i; --i) {
         t = PAb[i], c0 = T[t], c1 = T[t + 1];
         SA[--bucket_star(bucket_B, c0, c1)] = i;
       }
@@ -99,14 +93,16 @@ struct SA {
 
       /* Sort the type B* substrings using sssort. */
 #ifdef _OPENMP
-      tmp = omp_get_max_threads();
-      buf = SA + m, bufsize = (n - (2 * m)) / tmp;
-      c0 = ALPHABET_SIZE - 2, c1 = ALPHABET_SIZE - 1, j = m;
-#pragma omp parallel default(shared) private(curbuf, k, l, d0, d1, tmp)
+      SAIDPTR buf     = SA + m;
+      SAIDX   bufsize = (n - (2 * m)) / omp_get_max_threads();
+      c0 = ALPHABET_SIZE - 2;
+      c1 = ALPHABET_SIZE - 1;
+      j = m;
+#pragma omp parallel default(shared)
       {
-        tmp = omp_get_thread_num();
-        curbuf = buf + tmp * bufsize;
-        k = 0;
+        SAIDPTR curbuf = buf + omp_get_thread_num() * bufsize;
+        SAIDX l, k = 0;
+        saint_t d0, d1;
         for(;;) {
 #pragma omp critical(sssort_lock)
           {
@@ -128,8 +124,10 @@ struct SA {
         }
       }
 #else
-      buf = SA + m, bufsize = n - (2 * m);
+      SAIDPTR buf     = SA + m;
+      SAIDX   bufsize = n - (2 * m);
       for(c0 = ALPHABET_SIZE - 2, j = m; 0 < j; --c0) {
+        SAIDX i;
         for(c1 = ALPHABET_SIZE - 1; c0 < c1; j = i, --c1) {
           i = bucket_star(bucket_B, c0, c1);
           if(1 < (j - i)) {
@@ -141,7 +139,7 @@ struct SA {
 #endif
 
       /* Compute ranks of type B* substrings. */
-      for(i = m - 1; 0 <= i; --i) {
+      for(SAIDX i = m - 1; 0 <= i; --i) {
         if(0 <= SA[i]) {
           j = i;
           do { ISAb[SA[i]] = i; } while((0 <= --i) && (0 <= SA[i]));
@@ -157,7 +155,9 @@ struct SA {
       tr<SAIDPTR>::sort(ISAb, SA, m, (SAIDX)1);
 
       /* Set the sorted order of tyoe B* suffixes. */
-      for(i = n - 1, j = m, c0 = T[n - 1]; 0 <= i;) {
+      j = m;
+      c0 = T[n - 1];
+      for(SAIDX i = n - 1; 0 <= i;) {
         for(--i, c1 = c0; (0 <= i) && ((c0 = T[i]) >= c1); --i, c1 = c0) { }
         if(0 <= i) {
           t = i;
@@ -168,8 +168,9 @@ struct SA {
 
       /* Calculate the index of start/end point of each bucket. */
       bucket(bucket_B, ALPHABET_SIZE - 1, ALPHABET_SIZE - 1) = n; /* end point */
-      for(c0 = ALPHABET_SIZE - 2, k = m - 1; 0 <= c0; --c0) {
-        i = bucket(bucket_A, c0 + 1) - 1;
+      c0 = ALPHABET_SIZE - 2;
+      for(SAIDX k = m - 1; 0 <= c0; --c0) {
+        SAIDX i = bucket(bucket_A, c0 + 1) - 1;
         for(c1 = ALPHABET_SIZE - 1; c0 < c1; --c1) {
           t = i - bucket(bucket_B, c0, c1);
           bucket(bucket_B, c0, c1) = i; /* end point */
