@@ -1486,7 +1486,7 @@ bool  Read_String
    if  (Ch != '>')
        return  false;
 
-   fgets (Line, MAX_LINE, fp);
+   if(!fgets (Line, MAX_LINE, fp)) return false;
    Len = strlen (Line);
    assert (Len > 0 && Line [Len - 1] == '\n');
    Line [Len - 1] = '\0';

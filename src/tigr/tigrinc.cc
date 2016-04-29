@@ -332,7 +332,7 @@ bool Read_String  (FILE * fp, char * & T, long int & Size, char Name [],
    if  (Ch == EOF)
        return  false;
 
-   fgets (Line, MAX_LINE, fp);
+   if(!fgets (Line, MAX_LINE, fp)) return false;
    Len = strlen (Line);
    assert (Len > 0 && Line [Len - 1] == '\n');
    P = strtok (Line, " \t\n");
