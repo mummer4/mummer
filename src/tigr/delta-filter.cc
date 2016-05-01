@@ -53,17 +53,37 @@ void PrintHelp(const char * s);
 //------------------------------------------------------------ PrintUsage ----//
 void PrintUsage(const char * s);
 
+//----------------------------------------------------------- FilterDelta ----//
+int FilterDelta(std::istream& is, float min_len, float min_idy);
 
 //========================================================= Function Defs ====//
 int main(int argc, char ** argv)
 {
-  DeltaGraph_t graph;
   srand(1);
 
   //-- Command line parsing
   ParseArgs(argc, argv);
 
+  // Optimization: if only filtering by identity or length, stream
+  // through, do not create graph.
+  const bool stream = !(OPT_MinUnique > 0) && !OPT_QLIS && !OPT_RLIS && !OPT_GLIS && !OPT_MtoM && !OPT_1to1;
+  const bool noop = stream && !(OPT_MinIdentity > 0) && !(OPT_MinLength);
+  if(stream) {
+    std::ifstream is(OPT_AlignName);
+    if(!is.good()) {
+      std::cerr << "Error opening delta file '" << OPT_AlignName << "'" << std::endl;
+      return EXIT_FAILURE;
+    }
+
+    if(noop) { // No operation! Copy input to output
+      std::cout << is.rdbuf();
+      return EXIT_SUCCESS;
+    }
+    return FilterDelta(is, OPT_MinLength, OPT_MinIdentity);
+  }
+
   //-- Build the alignment graph from the delta file
+  DeltaGraph_t graph;
   graph.build(OPT_AlignName, true);
 
   //-- Identity requirements
@@ -255,4 +275,46 @@ void PrintUsage(const char * s)
   cerr
     << "\nUSAGE: " << s << "  [options]  <deltafile>\n\n";
   return;
+}
+
+//----------------------------------------------------------- FilterDelta ----//
+int FilterDelta(std::istream& is, float min_len, float min_idy) {
+  std::string line;
+  // Print header unmodified
+  std::getline(is, line);
+  std::cout << line << '\n';
+  std::getline(is, line);
+  const bool promer = line == PROMER_STRING;
+  if(!promer && line != NUCMER_STRING) {
+    std::cerr << "Unsupported format '" << line << "'\n";
+    return EXIT_FAILURE;
+  }
+  std::cout << line << '\n';
+
+  int c = is.peek();
+  if(c != '>') {
+    std::cerr << "Invalid format. Expected '>' got '" << c << "'\n";
+    return EXIT_FAILURE;
+  }
+
+  DeltaRecord_t record;
+  DeltaAlignment_t alignment;
+
+  while(c != EOF) {
+    is >> record;
+    bool first = true;
+    for(c = is.peek(); c != '>' && c != EOF; c = is.peek()) {
+      alignment.read(is, promer, true);
+      if(alignment.idy < min_idy ||
+         std::abs(alignment.eR - alignment.sR) + 1 < min_len ||
+         std::abs(alignment.eQ - alignment.sQ) + 1 < min_len)
+        continue;
+      if(first) {
+        std::cout << record << '\n';
+        first = false;
+      }
+      std::cout << alignment;
+    }
+  }
+  return EXIT_SUCCESS;
 }

@@ -65,7 +65,7 @@ TEST_EXTENSIONS += .sh
 SH_LOG_COMPILER = %D%/testsh
 
 # List of tests to run
-script_tests = %D%/save_load.sh %D%/batch.sh %D%/mummer.sh %D%/nucmer.sh %D%/sam.sh %D%/genome.sh
+script_tests = %D%/save_load.sh %D%/batch.sh %D%/mummer.sh %D%/nucmer.sh %D%/sam.sh %D%/genome.sh %D%/delta-filter.sh
 EXTRA_DIST += $(script_tests)
 TESTS += $(script_tests)
 
@@ -81,3 +81,4 @@ CLEANDIRS += $(patsubst %D%/%.sh,%D%/%,$(script_tests))
 %D%/nucmer.log: %D%/data/seed_reads_0.fa %D%/data/seed_reads_1.fa
 %D%/sam.log: %D%/data/seed_reads_0.fa %D%/data/seed_reads_1.fa
 %D%/genome.log: %D%/data/seed_reads_2.fa
+%D%/delta-filter.log: %D%/data/small_reads_0.fa %D%/data/small_reads_1.fa

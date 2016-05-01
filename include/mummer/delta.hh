@@ -64,8 +64,22 @@ struct DeltaAlignment_t
     idy = sim = stp = 0;
     deltas.clear ( );
   }
-};
 
+  // Read one alignment
+  inline bool read_nucmer(std::istream& is, const bool read_deltas = true) { return read(is, false, read_deltas); }
+  inline bool read_promer(std::istream& is, const bool read_deltas = true) { return read(is, true, read_deltas); }
+  bool read(std::istream& is, const bool promer, const bool read_deltas = true);
+};
+inline std::istream& operator>>(std::istream& is, DeltaAlignment_t& a) {
+  a.read_nucmer(is);
+  return is;
+}
+inline std::ostream& operator<<(std::ostream& os, const DeltaAlignment_t& a) {
+  os << a.sR << ' ' << a.eR << ' ' << a.sQ << ' ' << a.eQ << ' ' << a.idyc << ' ' << a.simc << ' ' << a.stpc << '\n';
+  for(auto d : a.deltas)
+    os << d << '\n';
+  return os;
+}
 
 
 //===================================================== DeltaRecord_t ==========
@@ -91,9 +105,17 @@ struct DeltaRecord_t
     lenR = lenQ = 0;
     aligns.clear ( );
   }
+
+  bool read(std::istream& is);
 };
+inline std::istream& operator>>(std::istream& is, DeltaRecord_t& r) {
+  r.read(is);
+  return is;
+}
 
-
+inline std::ostream& operator<<(std::ostream& os, const DeltaRecord_t& r) {
+  return os << '>' << r.idR << ' ' << r.idQ << ' ' << r.lenR << ' ' << r.lenQ;
+}
 
 //===================================================== DeltaReader_t ==========
 //! \brief Delta encoded file reader class

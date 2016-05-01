@@ -195,6 +195,68 @@ bool UpdateBest
   return true;
 }
 
+// === DeltaAlignment_t ===
+// --- read
+bool DeltaAlignment_t::read(std::istream& is, const bool promer, const bool read_deltas) {
+  long delta;
+  float total;
+
+  //-- Make way for the new alignment
+  clear ();
+
+  //-- Read the alignment header
+  is >> sR;
+  is >> eR;
+  is >> sQ;
+  is >> eQ;
+  is >> idyc;
+  is >> simc;
+  is >> stpc;
+  if ( sR <= 0  ||  eR <= 0  ||
+       sQ <= 0  ||  eQ <= 0  ||
+       idyc < 0  ||  simc < 0  ||  stpc < 0 )
+    is.setstate (ios::failbit);
+  if(!is.good()) return false;
+
+  total = std::abs(eR - sR) + 1.0;
+  if ( promer )
+    total /= 3.0;
+
+  //-- Get all the deltas
+  do {
+      is >> delta;
+      if(!is.good()) return false;
+
+      if ( delta < 0 )
+	total ++;
+      if ( read_deltas )
+	deltas.push_back (delta);
+    } while ( delta != 0 );
+
+  //-- Flush the remaining whitespace
+  while ( is.get () != '\n' );
+
+  //-- Calculate the identity, similarity and stopity
+  idy = (total - (float)idyc) / total * 100.0;
+  sim = (total - (float)simc) / total * 100.0;
+  stp = (float)stpc / (total * 2.0) * 100.0;
+  return true;
+}
+
+// === DeltaRecord_t ===
+// --- read
+bool DeltaRecord_t::read(std::istream& is) {
+  if(is.peek() == '>') is.get();
+  is >> idR;
+  is >> idQ;
+  is >> lenR;
+  is >> lenQ;
+  if ( lenR <= 0  ||  lenQ <= 0 ) {
+    is.setstate (ios::failbit);
+    return false;
+  }
+  return true;
+}
 
 //===================================================== DeltaReader_t ==========
 //----------------------------------------------------- open -------------------
@@ -227,49 +289,7 @@ void DeltaReader_t::open
 void DeltaReader_t::readNextAlignment
 (DeltaAlignment_t & align, const bool read_deltas)
 {
-  long delta;
-  float total;
-
-  //-- Make way for the new alignment
-  align.clear ();
-
-  //-- Read the alignment header
-  delta_stream_m >> align.sR;
-  delta_stream_m >> align.eR;
-  delta_stream_m >> align.sQ;
-  delta_stream_m >> align.eQ;
-  delta_stream_m >> align.idyc;
-  delta_stream_m >> align.simc;
-  delta_stream_m >> align.stpc;
-  if ( align.sR <= 0  ||  align.eR <= 0  ||
-       align.sQ <= 0  ||  align.eQ <= 0  ||
-       align.idyc < 0  ||  align.simc < 0  ||  align.stpc < 0 )
-    delta_stream_m.setstate (ios::failbit);
-  checkStream ();
-
-  total = labs(align.eR - align.sR) + 1.0;
-  if ( data_type_m == PROMER_STRING )
-    total /= 3.0;
-
-  //-- Get all the deltas
-  do
-    {
-      delta_stream_m >> delta;
-      checkStream ();
-
-      if ( delta < 0 )
-	total ++;
-      if ( read_deltas )
-	align.deltas.push_back (delta);
-    } while ( delta != 0 );
-
-  //-- Flush the remaining whitespace
-  while ( delta_stream_m.get () != '\n' );
-
-  //-- Calculate the identity, similarity and stopity
-  align.idy = (total - (float)align.idyc) / total * 100.0;
-  align.sim = (total - (float)align.simc) / total * 100.0;
-  align.stp = (float)align.stpc / (total * 2.0) * 100.0;
+  align.read(delta_stream_m, data_type_m == PROMER_STRING, read_deltas);
 }
 
 
@@ -285,13 +305,7 @@ bool DeltaReader_t::readNextRecord (const bool read_deltas)
   is_record_m = true;
 
   //-- Read the record header
-  delta_stream_m.get ();
-  delta_stream_m >> record_m.idR;
-  delta_stream_m >> record_m.idQ;
-  delta_stream_m >> record_m.lenR;
-  delta_stream_m >> record_m.lenQ;
-  if ( record_m.lenR <= 0  ||  record_m.lenQ <= 0 )
-    delta_stream_m.setstate (ios::failbit);
+  delta_stream_m >> record_m;
   checkStream ();
 
   //-- Flush the remaining whitespace
