@@ -86,6 +86,9 @@ option("large") {
 option("G", "genome") {
   description "Map genome to genome (long query sequences)"
   off; hidden }
+option("M", "max-chunk") {
+  description "Max chunk. Stop adding sequence for a thread if more than MAX already."
+  uint64; typestr "MAX"; default 50000; hidden }
 
 arg("ref") {
   description "Reference sequence file"

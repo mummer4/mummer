@@ -127,7 +127,7 @@ int main(int argc, char *argv[]) {
     if(!args.genome_flag) {
       const unsigned int nb_threads = args.threads_given ? args.threads_arg : std::thread::hardware_concurrency();
       stream_manager     streams(&args.qry_arg, &args.qry_arg + 1);
-      sequence_parser    parser(4 * nb_threads, 10, 1, streams);
+      sequence_parser    parser(4 * nb_threads, 10, args.max_chunk_arg, 1, streams);
 
       std::vector<std::thread> threads;
       for(unsigned int i = 0; i < nb_threads; ++i)

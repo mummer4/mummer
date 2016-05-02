@@ -32,6 +32,7 @@ class whole_sequence_parser : public jellyfish::cooperative_pool2<whole_sequence
   };
   cpp_array<stream_status> streams_;
   StreamIterator&          streams_iterator_;
+  const size_t             max_sequence_;
   size_t                   files_read_; // nb of files read
   size_t                   reads_read_; // nb of reads read
 
@@ -41,13 +42,14 @@ public:
   /// larger than the number of thread expected to read from this
   /// class. nb_sequences is the number of sequences to read into a
   /// buffer. 'begin' and 'end' are iterators to a range of istream.
-  whole_sequence_parser(uint32_t size, uint32_t nb_sequences,
-                        uint32_t max_producers, StreamIterator& streams) :
-    super(max_producers, size),
-    streams_(max_producers),
-    streams_iterator_(streams),
-    files_read_(0),
-    reads_read_(0)
+  whole_sequence_parser(uint32_t size, uint32_t nb_sequences, size_t max_sequence,
+                        uint32_t max_producers, StreamIterator& streams)
+    : super(max_producers, size)
+    , streams_(max_producers)
+    , streams_iterator_(streams)
+    , max_sequence_(max_sequence)
+    , files_read_(0)
+    , reads_read_(0)
   {
     for(auto it = super::element_begin(); it != super::element_end(); ++it) {
       it->nb_filled = 0;
@@ -58,6 +60,13 @@ public:
       open_next_file(streams_[i]);
     }
   }
+
+  whole_sequence_parser(uint32_t size, uint32_t nb_sequences,
+                        uint32_t max_producers, StreamIterator& streams)
+    : whole_sequence_parser(size, nb_sequences, std::numeric_limits<size_t>::max(),
+                            max_producers, streams)
+  { }
+
 
   inline bool produce(uint32_t i, sequence_list& buff) {
     stream_status& st = streams_[i];
@@ -110,10 +119,11 @@ protected:
   }
 
   void read_fasta(stream_status& st, sequence_list& buff) {
-    size_t&      nb_filled = buff.nb_filled;
-    const size_t data_size = buff.data.size();
+    size_t&      nb_filled     = buff.nb_filled;
+    size_t       sequence_read = 0;
+    const size_t data_size     = buff.data.size();
 
-    for(nb_filled = 0; nb_filled < data_size && st.stream->peek() != EOF; ++nb_filled) {
+    for(nb_filled = 0; nb_filled < data_size && sequence_read < max_sequence_ && st.stream->peek() != EOF; ++nb_filled) {
       ++reads_read_;
       header_sequence_qual& fill_buff = buff.data[nb_filled];
       st.stream->get(); // Skip '>'
@@ -123,14 +133,16 @@ protected:
         std::getline(*st.stream, st.buffer); // Wish there was an easy way to combine the
         fill_buff.seq.append(st.buffer);             // two lines avoiding copying
       }
+      sequence_read += fill_buff.seq.size();
     }
   }
 
   void read_fastq(stream_status& st, sequence_list& buff) {
-    size_t&      nb_filled = buff.nb_filled;
-    const size_t data_size = buff.data.size();
+    size_t&      nb_filled     = buff.nb_filled;
+    size_t       sequence_read = 0;
+    const size_t data_size     = buff.data.size();
 
-    for(nb_filled = 0; nb_filled < data_size && st.stream->peek() != EOF; ++nb_filled) {
+    for(nb_filled = 0; nb_filled < data_size && sequence_read < max_sequence_ && st.stream->peek() != EOF; ++nb_filled) {
       ++reads_read_;
       header_sequence_qual& fill_buff = buff.data[nb_filled];
       st.stream->get(); // Skip '@'
@@ -142,6 +154,7 @@ protected:
       }
       if(!st.stream->good())
         throw std::runtime_error("Truncated fastq file");
+      sequence_read += fill_buff.seq.size();
       st.stream->ignore(std::numeric_limits<std::streamsize>::max(), '\n');
       fill_buff.qual.clear();
       while(fill_buff.qual.size() < fill_buff.seq.size() && st.stream->good()) {
