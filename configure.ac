@@ -21,9 +21,13 @@ EXTRA_CXXFLAGS="-std=c++0x"
 AC_SUBST([EXTRA_CXXFLAGS])
 
 # Check for openmp
-AX_OPENMP([AC_DEFINE(HAVE_OPENMP,1,[Define if OpenMP is enabled])])
-#          [AC_MSG_FAILURE([OPENMP is not supported by your compiler])])
-EXTRA_CXXFLAGS="$EXTRA_CXXFLAGS $OPENMP_CXXFLAGS"
+AC_ARG_ENABLE([openmp], [AS_HELP_STRING([--disable-openmp], [Disable OpenMP, even if available])])
+AS_IF([test "x$enable_openmp" != "xno"],
+      # OpenMP enabled. Check if available
+      [AX_OPENMP([AC_DEFINE(HAVE_OPENMP,1,[Define if OpenMP is enabled])])]
+      [EXTRA_CXXFLAGS="$EXTRA_CXXFLAGS $OPENMP_CXXFLAGS"],
+      # OpenMP disabled. Ignore pragma warnings
+      [EXTRA_CXXFLAGS="$EXTRA_CXXFLAGS -Wno-unknown-pragmas"])
 
 # Check for yaggo
 AC_ARG_VAR([YAGGO], [Yaggo switch parser generator])
