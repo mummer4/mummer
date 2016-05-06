@@ -10,6 +10,7 @@
 #include <stdexcept>
 
 #include <mummer/sparseSA.hpp>
+#include <mummer/sparseSA_imp.hpp>
 #include <mummer/timer.hpp>
 #include <compactsufsort/compactsufsort.hpp>
 
@@ -39,22 +40,12 @@ static size_t max_len(const std::vector<std::string>& descr) {
 //   return S;
 // }
 
-sparseSA::sparseSA(const char* S_, size_t Slen,
+sparseSA::sparseSA(bounded_string&& S_,
                    bool __4column, long K_, bool suflink_, bool child_, bool kmer_, int sparseMult_,
                    int kMerSize_, bool nucleotidesOnly_)
-  : _4column(__4column)
-  , K(K_)
-  , S(S_, Slen, K_)
-  , N(S.length())
-  , logN((long)ceil(log(N/K) / log(2.0)))
-  , NKm1(N/K-1)
+  : sparseSA_aux(S_.length(), K_, __4column, child_, suflink_, kmer_, kMerSize_, sparseMult_, nucleotidesOnly_)
+  , S(S_)
   , LCP(SA)
-  , hasChild(child_)
-  , hasSufLink(suflink_)
-  , hasKmer(kmer_)
-  , kMerSize(kMerSize_)
-  , sparseMult(sparseMult_)
-  , nucleotidesOnly(nucleotidesOnly_)
 { }
 
 sparseSA sparseSA::create_auto(const char* S, size_t Slen, int min_len, bool nucleotidesOnly_, int K,
@@ -102,21 +93,8 @@ long sparseSA::index_size_in_bytes() const {
 // Manzini 2004 to compute the LCP array. Modified to handle sparse
 // suffix arrays and inverse sparse suffix arrays.
 void sparseSA::computeLCP() {
-  //  TIME_FUNCTION;
-
-  long h = 0;
-  for(long i = 0; i < N / K; ++i) {
-    const long m = ISA[i];
-    if(m > 0) {
-      const long bj  = SA[m-1];
-      const long bi = i * K;
-      while(bi + h < N && bj + h < N && S[bi + h] == S[bj + h])  ++h;
-      LCP.set(m, h); //LCP[m] = h;
-    } else {
-      LCP.set(m, 0); // LCP[m]=0;
-    }
-    h = std::max(0L, h - K);
-  }
+  TIME_FUNCTION;
+  sparseSA_imp::computeLCP(LCP, S, SA, ISA, N, K);
 }
 
 // Child array construction algorithm
@@ -265,43 +243,72 @@ void sparseSA::computeKmer() {
     }
 }
 
-bool save_vector_32_48(const std::string& path, const vector_32_48& data) {
-  std::ofstream os(path.c_str(), std::ios::binary);
-  size_t        size     = data.size();
-  size_t        is_small = data.is_small;
+bool vector_32_48::save(std::ostream&& os) const {
+  size_t        size     = this->size();
+  size_t        is_small = this->is_small;
   os.write((const char*)&size, sizeof(size));
   os.write((const char*)&is_small, sizeof(is_small));
   if(is_small) {
-    os.write((const char*)data.small.data(), size * sizeof(int));
+    os.write((const char*)small.data(), size * sizeof(int));
   } else {
-    os.write((const char*)data.large.m_base32, size * sizeof(uint32_t));
-    os.write((const char*)data.large.m_base16, size * sizeof(uint16_t));
+    os.write((const char*)large.m_base32, size * sizeof(uint32_t));
+    os.write((const char*)large.m_base16, size * sizeof(uint16_t));
   }
   return os.good();
 }
 
+bool vector_32_48::load(std::istream&& is) {
+  size_t        size;
+  size_t        is_small;
+  is.read((char*)&size, sizeof(size));
+  is.read((char*)&is_small, sizeof(is_small));
+  resize(size, !is_small);
+  if(is_small) {
+    is.read((char*)small.data(), size * sizeof(int));
+  } else {
+    is.read((char*)large.m_base32, size * sizeof(uint32_t));
+    is.read((char*)large.m_base16, size * sizeof(uint16_t));
+  }
+  return is.good();
+}
+
+bool sparseSA_aux::save(std::ostream&& os) const {
+  os.write((const char*)&N,sizeof(N));
+  os.write((const char*)&K,sizeof(K));
+  os.write((const char*)&logN,sizeof(logN));
+  os.write((const char*)&NKm1,sizeof(NKm1));
+  os.write((const char*)&_4column,sizeof(_4column));
+  os.write((const char*)&hasSufLink,sizeof(hasSufLink));
+  os.write((const char*)&hasChild,sizeof(hasChild));
+  os.write((const char*)&hasKmer,sizeof(hasKmer));
+  os.write((const char*)&kMerSize,sizeof(kMerSize));
+  os.write((const char*)&sparseMult,sizeof(sparseMult));
+  os.write((const char*)&nucleotidesOnly,sizeof(nucleotidesOnly));
+  return os.good();
+}
+
+bool sparseSA_aux::load(std::istream&& is) {
+  is.read((char*)&N,sizeof(N));
+  is.read((char*)&K,sizeof(K));
+  is.read((char*)&logN,sizeof(logN));
+  is.read((char*)&NKm1,sizeof(NKm1));
+  is.read((char*)&_4column,sizeof(_4column));
+  is.read((char*)&hasSufLink,sizeof(hasSufLink));
+  is.read((char*)&hasChild,sizeof(hasChild));
+  is.read((char*)&hasKmer,sizeof(hasKmer));
+  is.read((char*)&kMerSize,sizeof(kMerSize));
+  is.read((char*)&sparseMult,sizeof(sparseMult));
+  is.read((char*)&nucleotidesOnly,sizeof(nucleotidesOnly));
+  return is.good();
+}
+
 bool sparseSA::save(const std::string &prefix) const {
-  { //print auxiliary information
-    const std::string aux = prefix + ".aux";
-    std::ofstream aux_s (aux.c_str(), std::ios::binary);
-    aux_s.write((const char*)&N,sizeof(N));
-    aux_s.write((const char*)&K,sizeof(K));
-    aux_s.write((const char*)&logN,sizeof(logN));
-    aux_s.write((const char*)&NKm1,sizeof(NKm1));
-    aux_s.write((const char*)&_4column,sizeof(_4column));
-    aux_s.write((const char*)&hasSufLink,sizeof(hasSufLink));
-    aux_s.write((const char*)&hasChild,sizeof(hasChild));
-    aux_s.write((const char*)&hasKmer,sizeof(hasKmer));
-    aux_s.write((const char*)&kMerSize,sizeof(kMerSize));
-    aux_s.write((const char*)&sparseMult,sizeof(sparseMult));
-    aux_s.write((const char*)&nucleotidesOnly,sizeof(nucleotidesOnly));
-    if(!aux_s.good()) return false;
-  }
-  { //print sa
-    const std::string sa = prefix + ".sa";
-    if(!save_vector_32_48(sa, SA))
-      return false;
-  }
+  //print auxiliary information
+  if(!sparseSA_aux::save(prefix + ".aux"))
+    return false;
+  //print sa
+  if(!SA.save(prefix + ".sa"))
+    return false;
   { //print LCP
     const std::string lcp = prefix + ".lcp";
     std::ofstream lcp_s (lcp.c_str(), std::ios::binary);
@@ -313,11 +320,8 @@ bool sparseSA::save(const std::string &prefix) const {
     lcp_s.write((const char*)&LCP.M[0],sizeM*sizeof(vec_uchar::item_t));
     if(!lcp_s.good()) return false;
   }
-  if(hasSufLink){ //print ISA if nec
-    const std::string isa = prefix + ".isa";
-    if(!save_vector_32_48(isa, ISA))
-       return false;
-  }
+  if(hasSufLink && !ISA.save(prefix + ".isa")) //print ISA if nec
+    return false;
   if(hasChild){ //print child if nec
     const std::string child = prefix + ".child";
     std::ofstream child_s (child.c_str(), std::ios::binary);
@@ -337,84 +341,51 @@ bool sparseSA::save(const std::string &prefix) const {
   return true;
 }
 
-bool load_vector_32_48(const std::string& path, vector_32_48& data) {
-  std::ifstream is(path.c_str(), std::ios::binary);
-  size_t        size;
-  size_t        is_small;
-  is.read((char*)&size, sizeof(size));
-  is.read((char*)&is_small, sizeof(is_small));
-  data.resize(size, !is_small);
-  if(is_small) {
-    is.read((char*)data.small.data(), size * sizeof(int));
-  } else {
-    is.read((char*)data.large.m_base32, size * sizeof(uint32_t));
-    is.read((char*)data.large.m_base16, size * sizeof(uint16_t));
+bool sparseSA::load(const std::string &prefix) {
+  // Load auxiliary infomation
+  if(!sparseSA_aux::load(prefix + ".aux"))
+    return false;
+  //read sa
+  if(!SA.load(prefix + ".sa"))
+    return false;
+
+  { //read LCP
+    LCP.sa = &SA;
+    const std::string lcp   = prefix + ".lcp";
+    std::ifstream lcp_s (lcp.c_str(), std::ios::binary);
+    unsigned int  sizeLCP;
+    unsigned int  sizeM;
+    lcp_s.read((char*)&sizeLCP,sizeof(sizeLCP));
+    lcp_s.read((char*)&sizeM,sizeof(sizeM));
+    LCP.vec.resize(sizeLCP);
+    LCP.M.resize(sizeM);
+    lcp_s.read((char*)&LCP.vec[0],sizeLCP*sizeof(unsigned char));
+    lcp_s.read((char*)&LCP.M[0],sizeM*sizeof(vec_uchar::item_t));
+    if(!lcp_s.good()) return false;
   }
-  return is.good();
-}
+  if(hasSufLink && !ISA.load(prefix + ".isa")) //read ISA if nec
+    return false;
+  if(hasChild){ //read child if nec
+    const std::string child = prefix + ".child";
+    std::ifstream     child_s (child.c_str(), std::ios::binary);
+    unsigned int      sizeCHILD;
+    child_s.read((char*)&sizeCHILD,sizeof(sizeCHILD));
+    CHILD.resize(sizeCHILD);
+    child_s.read((char*)&CHILD[0],sizeCHILD*sizeof(int));
+    if(!child_s.good()) return false;
+  }
+  if(hasKmer){ //read kmer table if nec
+    const std::string kmer = prefix + ".kmer";
+    std::ifstream     kmer_s (kmer.c_str(), std::ios::binary);
+    unsigned int      sizeKMR;
+    kmer_s.read((char*)&sizeKMR,sizeof(sizeKMR));
+    KMR.resize(sizeKMR);
+    kMerTableSize = sizeKMR;
+    kmer_s.read((char*)&KMR[0],sizeKMR*sizeof(saTuple_t));
+    if(!kmer_s.good()) return false;
+  }
 
-bool sparseSA::load(const std::string &prefix){
-    { // Load auxiliary infomation
-      const std::string aux   = prefix + ".aux";
-      std::ifstream     aux_s (aux.c_str(), std::ios::binary);
-      aux_s.read((char*)&N,sizeof(N));
-      aux_s.read((char*)&K,sizeof(K));
-      aux_s.read((char*)&logN,sizeof(logN));
-      aux_s.read((char*)&NKm1,sizeof(NKm1));
-      aux_s.read((char*)&_4column,sizeof(_4column));
-      aux_s.read((char*)&hasSufLink,sizeof(hasSufLink));
-      aux_s.read((char*)&hasChild,sizeof(hasChild));
-      aux_s.read((char*)&hasKmer,sizeof(hasKmer));
-      aux_s.read((char*)&kMerSize,sizeof(kMerSize));
-      aux_s.read((char*)&sparseMult,sizeof(sparseMult));
-      aux_s.read((char*)&nucleotidesOnly,sizeof(nucleotidesOnly));
-      if(!aux_s.good()) return false;
-    }
-    { //read sa
-      const std::string sa    = prefix + ".sa";
-      if(!load_vector_32_48(sa, SA))
-        return false;
-    }
-    { //read LCP
-      LCP.sa = &SA;
-      const std::string lcp   = prefix + ".lcp";
-      std::ifstream lcp_s (lcp.c_str(), std::ios::binary);
-      unsigned int  sizeLCP;
-      unsigned int  sizeM;
-      lcp_s.read((char*)&sizeLCP,sizeof(sizeLCP));
-      lcp_s.read((char*)&sizeM,sizeof(sizeM));
-      LCP.vec.resize(sizeLCP);
-      LCP.M.resize(sizeM);
-      lcp_s.read((char*)&LCP.vec[0],sizeLCP*sizeof(unsigned char));
-      lcp_s.read((char*)&LCP.M[0],sizeM*sizeof(vec_uchar::item_t));
-      if(!lcp_s.good()) return false;
-    }
-    if(hasSufLink){ //read ISA if nec
-      const std::string isa = prefix + ".isa";
-      if(!load_vector_32_48(isa, ISA))
-        return false;
-    }
-    if(hasChild){ //read child if nec
-      const std::string child = prefix + ".child";
-      std::ifstream     child_s (child.c_str(), std::ios::binary);
-      unsigned int      sizeCHILD;
-      child_s.read((char*)&sizeCHILD,sizeof(sizeCHILD));
-      CHILD.resize(sizeCHILD);
-      child_s.read((char*)&CHILD[0],sizeCHILD*sizeof(int));
-      if(!child_s.good()) return false;
-    }
-    if(hasKmer){ //read kmer table if nec
-      const std::string kmer = prefix + ".kmer";
-      std::ifstream     kmer_s (kmer.c_str(), std::ios::binary);
-      unsigned int      sizeKMR;
-      kmer_s.read((char*)&sizeKMR,sizeof(sizeKMR));
-      KMR.resize(sizeKMR);
-      kMerTableSize = sizeKMR;
-      kmer_s.read((char*)&KMR[0],sizeKMR*sizeof(saTuple_t));
-      if(!kmer_s.good()) return false;
-    }
-
-    return true;
+  return true;
 }
 
 void sparseSA::construct(bool off48){
@@ -452,9 +423,11 @@ void sparseSA::construct(bool off48){
       ISA.resize(N, off48);
       if(SA.is_small) {
         compactsufsort::create((const unsigned char*)(S + 0), (int*)SA.small.data(), N);
+#pragma omp parallel for
         for(long i = 0; i < N; ++i) { ISA.small[SA.small[i]] = i; }
       } else {
         compactsufsort::create((const unsigned char*)(S + 0), SA.large.begin(), N);
+#pragma omp parallel for
         for(long i = 0; i < N; ++i) { ISA.large[SA.large[i]] = i; }
       }
     }

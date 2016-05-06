@@ -1,7 +1,7 @@
 ######################################################
 # Build helper programs and scripts used for testing #
 ######################################################
-check_PROGRAMS += %D%/generate_sequences %D%/ufasta %D%/check_cigar
+check_PROGRAMS += %D%/generate_sequences %D%/ufasta %D%/check_cigar %D%/check_LCP
 check_SCRIPTS += %D%/testsh
 CLEANFILES += $(check_SCRIPTS)
 
@@ -31,6 +31,11 @@ YAGGO_BUILT += %D%/ufasta_src/dsort_cmdline.hpp %D%/ufasta_src/sort_cmdline.hpp
 %C%_check_cigar_SOURCES = %D%/check_cigar.cc
 %C%_check_cigar_CPPFLAGS = $(CPPFLAGS) -I%D%
 YAGGO_BUILT += %D%/check_cigar_cmdline.hpp
+
+# Build check_LCP. Builds LCP from .sa file.
+%C%_check_LCP_SOURCES = %D%/check_LCP.cc
+%C%_check_LCP_CPPFLAGS = $(AM_CPPFLAGS) -I%D%
+YAGGO_BUILT += %D%/check_LCP_cmdline.hpp
 
 ####################################
 # Generate pseudo random sequences #

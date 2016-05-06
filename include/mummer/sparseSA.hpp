@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include <fstream>
 #include <iostream>
 #include <algorithm>
 #include <limits>
@@ -12,6 +13,7 @@
 #include <cassert>
 
 #include "48bit_index.hpp"
+#include "openmp_qsort.hpp"
 
 
 namespace mummer {
@@ -63,6 +65,16 @@ struct vector_32_48 {
   long operator[](size_t i) const {
     return is_small ? small[i] : large[i];
   }
+
+  vector_32_48() = default;
+  vector_32_48(const std::string& path) {
+    load(path);
+  }
+
+  bool save(std::ostream&& os) const;
+  inline bool save(const std::string& path) const { return save(std::ofstream(path)); }
+  bool load(std::istream&& is);
+  inline bool load(const std::string& path) { return load(std::ifstream(path)); }
 };
 
 
@@ -111,6 +123,7 @@ struct vec_uchar {
       vec[idx] = v;
     } else {
       vec[idx] = std::numeric_limits<small_type>::max();
+#pragma omp critical(SetLCP)
       M.push_back(item_t((*sa)[idx], v));
     }
   }
@@ -119,9 +132,16 @@ struct vec_uchar {
   // are compacted into ranges.
   void init() {
     // First sort by end of range [idx, idx + val]
-    sort(M.begin(), M.end(), [](const item_t& a, const item_t& b) -> bool {
-        return a.idx + a.val < b.idx + b.val || (a.idx + a.val == b.idx + b.val && a.idx < b.idx);
-      });
+    auto first_sort = [](const item_t& a, const item_t& b) -> bool {
+      return a.idx + a.val < b.idx + b.val || (a.idx + a.val == b.idx + b.val && a.idx < b.idx);
+    };
+#ifdef _OPENMP
+    openmp_qsort(M.begin(), M.end(), first_sort);
+    assert(std::is_sorted(M.begin(), M.end(), first_sort));
+#else
+    sort(M.begin(), M.end(), first_sort);
+#endif
+
     // Second, remove elements that are consecutive in a range
     size_t pidx = 0;
     large_type pval = 0;
@@ -130,11 +150,16 @@ struct vec_uchar {
         pidx = a.idx;
         pval = a.val;
         return res;
-      });
+  });
     M.resize(nend - M.begin());
     M.shrink_to_fit();
     // Third, sort by beginning of compacted ranges
+#ifdef _OPENMP
+    openmp_qsort(M.begin(), M.end());
+    assert(std::is_sorted(M.begin(), M.end()));
+#else
     sort(M.begin(), M.end());
+#endif
   }
 
   long index_size_in_bytes() const {
@@ -210,33 +235,67 @@ struct bounded_string {
   const char* operator+(size_t offset) const { return s_ + offset; }
 };
 
-struct sparseSA {
-  bool                      _4column; // Use 4 column output format.
-  long                      K;  // suffix sampling, K = 1 every suffix, K = 2 every other suffix, K = 3, every 3rd sffix
+// Auxilliary information about sparseSA
+struct sparseSA_aux {
+  long N;                       //!< Length of the sequence.
+  long K;                       // suffix sampling, K = 1 every suffix, K = 2 every other suffix, K = 3, every 3rd sffix
+  long logN;                    // ceil(log(N))
+  long NKm1;                    // N/K - 1
+  bool _4column;                // Use 4 column output format.
+  bool hasSufLink;
+  bool hasChild;
+  bool hasKmer;
+  long kMerSize;
+  int  sparseMult;
+  bool nucleotidesOnly;
+
+  sparseSA_aux() = default;
+  sparseSA_aux(long N_, long K_,
+               bool __4column, bool child_, bool suflink_, bool kmer_,
+               long kMerSize_, int sparseMult_, bool nucleotidesOnly_)
+    : N(N_)
+    , K(K_)
+    , logN((long)ceil(log(N/K) / log(2.0)))
+    , NKm1(N/K-1)
+    , _4column(__4column)
+    , hasSufLink(suflink_)
+    , hasChild(child_)
+    , hasKmer(kmer_)
+    , kMerSize(kMerSize_)
+    , sparseMult(sparseMult_)
+    , nucleotidesOnly(nucleotidesOnly_)
+  { }
+  sparseSA_aux(const std::string& path) {
+    load(path);
+  }
+
+  bool save(std::ostream&& os) const;
+  bool save(const std::string& path) const { return save(std::ofstream(path)); }
+  bool load(std::istream&& is);
+  bool load(const std::string& path) { return load(std::ifstream(path)); }
+};
+
+struct sparseSA : sparseSA_aux {
   bounded_string            S;  //!< Reference to sequence data.
-  long                      N;  //!< Length of the sequence.
-  long                      logN; // ceil(log(N))
-  long                      NKm1; // N/K - 1
   vector_32_48              SA; // Suffix array.
   vector_32_48              ISA; // Inverse suffix array
   vec_uchar                 LCP; // Simulates a vector<int> LCP.
   std::vector<int>          CHILD; //child table
   std::vector<saTuple_t>    KMR;
 
-  bool hasChild;
-  bool hasSufLink;
   //fields for lookup table of sa intervals to a certain small depth
-  bool hasKmer;
-  long kMerSize;
   long kMerTableSize;
-  int  sparseMult;
-  bool nucleotidesOnly;
 
   long index_size_in_bytes() const ;
 
   // Constructor builds sparse suffix array.
-  sparseSA(const char* S_, size_t Slen, bool __4column, long K_, bool suflink_, bool child_, bool kmer_,
+  sparseSA(bounded_string&& S_, bool __4column, long K_, bool suflink_, bool child_, bool kmer_,
            int sparseMult_, int kMerSize_, bool nucleotidesOnly_);
+  sparseSA(const char* S_, size_t Slen, bool __4column, long K_, bool suflink_, bool child_, bool kmer_,
+           int sparseMult_, int kMerSize_, bool nucleotidesOnly_)
+    : sparseSA(bounded_string(S_, Slen, K_),
+               __4column, K_, suflink_, child_, kmer_, sparseMult_, kMerSize_, nucleotidesOnly_)
+  { }
   sparseSA(const std::string& S_, bool __4column, long K_, bool suflink_, bool child_, bool kmer_,
            int sparseMult_, int kMerSize_, bool nucleotidesOnly_)
     : sparseSA(S_.c_str(), S_.length(), __4column, K_, suflink_, child_, kmer_, sparseMult_, kMerSize_, nucleotidesOnly_)
@@ -253,24 +312,14 @@ struct sparseSA {
     : sparseSA(S_.c_str(), S_.length(), prefix)
   { }
   sparseSA(sparseSA&& rhs)
-    : _4column(rhs._4column)
-    , K(rhs.K)
+    : sparseSA_aux(rhs)
     , S(rhs.S)
-    , N(rhs.N)
-    , logN(rhs.logN)
-    , NKm1(rhs.NKm1)
     , SA(std::move(rhs.SA))
     , ISA(std::move(rhs.ISA))
     , LCP(std::move(rhs.LCP), SA)
     , CHILD(std::move(rhs.CHILD))
     , KMR(std::move(rhs.KMR))
-    , hasChild(rhs.hasChild)
-    , hasSufLink(rhs.hasSufLink)
-    , hasKmer(rhs.hasKmer)
-    , kMerSize(rhs.kMerSize)
     , kMerTableSize(rhs.kMerTableSize)
-    , sparseMult(rhs.sparseMult)
-    , nucleotidesOnly(rhs.nucleotidesOnly)
   { }
 
   static sparseSA create_auto(const char* S, size_t Slen, int min_len, bool nucleotidesOnly_, int K = 1, bool off48 = false);

@@ -67,7 +67,7 @@ TEST_P(SparseSATest, SaveLoad) {
   prefix_unlink prefix("test_save");
 
   const auto sa = mummer::mummer::sparseSA::create_auto(seq.c_str(), seq.size(), 10, true, 1, GetParam());
-  EXPECT_TRUE(sa.save(prefix.path));
+  ASSERT_TRUE(sa.save(prefix.path));
   mummer::mummer::sparseSA sa2(seq.c_str(), seq.size(), prefix.path);
   { SCOPED_TRACE(::testing::Message() << "Loaded SA");
     compareSA(sa, sa2);
