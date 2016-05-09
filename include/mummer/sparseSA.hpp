@@ -82,8 +82,9 @@ struct vector_32_48 {
 // than or equal to 255 are stored in a sorted array.
 // Simulates a vector<int> LCP;
 struct vec_uchar {
-  typedef unsigned char small_type;
-  typedef unsigned int  large_type;
+  typedef unsigned char   small_type;
+  typedef unsigned int    large_type;
+  static const large_type max = std::numeric_limits<small_type>::max();
   struct item_t{
     item_t() = default;
     item_t(size_t i) : idx(i) { }
@@ -103,12 +104,14 @@ struct vec_uchar {
     , M(std::move(rhs.M))
     , sa(&sa_)
   { }
+  vec_uchar(const std::string& path, vector_32_48& sa_) : sa(&sa_) {
+    load(path);
+  }
   void resize(size_t N) { vec.resize(N, 0); }
 
   // Vector X[i] notation to get LCP values.
   large_type operator[] (size_t idx) const {
-    static const large_type max = std::numeric_limits<small_type>::max();
-    const large_type        res = vec[idx];
+    const large_type res = vec[idx];
     if(res != max) return res;
     idx = (*sa)[idx];
     auto it = upper_bound(M.begin(), M.end(), item_t(idx));
@@ -119,10 +122,10 @@ struct vec_uchar {
   // Actually set LCP values, distingushes large and small LCP
   // values.
   void set(size_t idx, large_type v) {
-    if(v < std::numeric_limits<small_type>::max()) {
+    if(v < max) {
       vec[idx] = v;
     } else {
-      vec[idx] = std::numeric_limits<small_type>::max();
+      vec[idx] = max;
 #pragma omp critical(SetLCP)
       M.push_back(item_t((*sa)[idx], v));
     }
@@ -130,37 +133,12 @@ struct vec_uchar {
   // Once all the values are set, call init. This will assure the
   // values >= 255 are sorted by index for fast retrieval. The values
   // are compacted into ranges.
-  void init() {
-    // First sort by end of range [idx, idx + val]
-    auto first_sort = [](const item_t& a, const item_t& b) -> bool {
-      return a.idx + a.val < b.idx + b.val || (a.idx + a.val == b.idx + b.val && a.idx < b.idx);
-    };
-#ifdef _OPENMP
-    openmp_qsort(M.begin(), M.end(), first_sort);
-    assert(std::is_sorted(M.begin(), M.end(), first_sort));
-#else
-    sort(M.begin(), M.end(), first_sort);
-#endif
+  void init();
 
-    // Second, remove elements that are consecutive in a range
-    size_t pidx = 0;
-    large_type pval = 0;
-    auto nend = std::remove_if(M.begin(), M.end(), [&](const item_t& a) -> bool {
-        bool res = a.idx + a.val == pidx + pval && a.idx == pidx + 1;
-        pidx = a.idx;
-        pval = a.val;
-        return res;
-  });
-    M.resize(nend - M.begin());
-    M.shrink_to_fit();
-    // Third, sort by beginning of compacted ranges
-#ifdef _OPENMP
-    openmp_qsort(M.begin(), M.end());
-    assert(std::is_sorted(M.begin(), M.end()));
-#else
-    sort(M.begin(), M.end());
-#endif
-  }
+  bool save(std::ostream&& os) const;
+  inline bool save(const std::string& path) const { return save(std::ofstream(path)); }
+  bool load(std::istream&& is);
+  inline bool load(const std::string& path) { return load(std::ifstream(path)); }
 
   long index_size_in_bytes() const {
       long indexSize = 0L;

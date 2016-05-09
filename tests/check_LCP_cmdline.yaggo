@@ -1,0 +1,8 @@
+description "Build LCP from .sa"
+
+arg("sequence") {
+  description "Sequence fasta file"
+  string; typestr "PATH" }
+arg("prefix") {
+  description "Prefix to suffix array file"
+  string; typestr "PATH" }

@@ -302,6 +302,61 @@ bool sparseSA_aux::load(std::istream&& is) {
   return is.good();
 }
 
+void vec_uchar::init() {
+  // First sort by end of range [idx, idx + val]
+  auto first_sort = [](const item_t& a, const item_t& b) -> bool {
+    return a.idx + a.val < b.idx + b.val || (a.idx + a.val == b.idx + b.val && a.idx < b.idx);
+  };
+#ifdef _OPENMP
+  openmp_qsort(M.begin(), M.end(), first_sort);
+  assert(std::is_sorted(M.begin(), M.end(), first_sort));
+#else
+  sort(M.begin(), M.end(), first_sort);
+#endif
+
+  // Second, remove elements that are consecutive in a range
+  size_t pidx = 0;
+  large_type pval = 0;
+  auto nend = std::remove_if(M.begin(), M.end(), [&](const item_t& a) -> bool {
+      bool res = a.idx + a.val == pidx + pval && a.idx == pidx + 1;
+      pidx = a.idx;
+      pval = a.val;
+      return res;
+    });
+  M.resize(nend - M.begin());
+  M.shrink_to_fit();
+  // Third, sort by beginning of compacted ranges
+#ifdef _OPENMP
+  openmp_qsort(M.begin(), M.end());
+  assert(std::is_sorted(M.begin(), M.end()));
+#else
+  sort(M.begin(), M.end());
+#endif
+}
+
+bool vec_uchar::save(std::ostream&& os) const {
+  const size_t sizeLCP = vec.size();
+  const size_t sizeM   = M.size();
+  os.write((const char*)&sizeLCP, sizeof(sizeLCP));
+  os.write((const char*)&sizeM,   sizeof(sizeM));
+  os.write((const char*)vec.data(), sizeLCP * sizeof(unsigned char));
+  os.write((const char*)M.data(),   sizeM * sizeof(vec_uchar::item_t));
+  return os.good();
+}
+
+bool vec_uchar::load(std::istream&& is) {
+  size_t  sizeLCP;
+  size_t  sizeM;
+  is.read((char*)&sizeLCP, sizeof(sizeLCP));
+  is.read((char*)&sizeM,   sizeof(sizeM));
+  vec.resize(sizeLCP);
+  M.resize(sizeM);
+  is.read((char*)vec.data(), sizeLCP * sizeof(unsigned char));
+  is.read((char*)M.data(),   sizeM * sizeof(vec_uchar::item_t));
+  return is.good();
+}
+
+
 bool sparseSA::save(const std::string &prefix) const {
   //print auxiliary information
   if(!sparseSA_aux::save(prefix + ".aux"))
@@ -309,17 +364,8 @@ bool sparseSA::save(const std::string &prefix) const {
   //print sa
   if(!SA.save(prefix + ".sa"))
     return false;
-  { //print LCP
-    const std::string lcp = prefix + ".lcp";
-    std::ofstream lcp_s (lcp.c_str(), std::ios::binary);
-    unsigned int sizeLCP = LCP.vec.size();
-    unsigned int sizeM = LCP.M.size();
-    lcp_s.write((const char*)&sizeLCP,sizeof(sizeLCP));
-    lcp_s.write((const char*)&sizeM,sizeof(sizeM));
-    lcp_s.write((const char*)&LCP.vec[0],sizeLCP*sizeof(unsigned char));
-    lcp_s.write((const char*)&LCP.M[0],sizeM*sizeof(vec_uchar::item_t));
-    if(!lcp_s.good()) return false;
-  }
+  if(!LCP.save(prefix + ".lcp"))
+    return false;
   if(hasSufLink && !ISA.save(prefix + ".isa")) //print ISA if nec
     return false;
   if(hasChild){ //print child if nec
@@ -348,21 +394,10 @@ bool sparseSA::load(const std::string &prefix) {
   //read sa
   if(!SA.load(prefix + ".sa"))
     return false;
-
-  { //read LCP
-    LCP.sa = &SA;
-    const std::string lcp   = prefix + ".lcp";
-    std::ifstream lcp_s (lcp.c_str(), std::ios::binary);
-    unsigned int  sizeLCP;
-    unsigned int  sizeM;
-    lcp_s.read((char*)&sizeLCP,sizeof(sizeLCP));
-    lcp_s.read((char*)&sizeM,sizeof(sizeM));
-    LCP.vec.resize(sizeLCP);
-    LCP.M.resize(sizeM);
-    lcp_s.read((char*)&LCP.vec[0],sizeLCP*sizeof(unsigned char));
-    lcp_s.read((char*)&LCP.M[0],sizeM*sizeof(vec_uchar::item_t));
-    if(!lcp_s.good()) return false;
-  }
+  //read LCP
+  LCP.sa = &SA;
+  if(!LCP.load(prefix + ".lcp"))
+    return false;
   if(hasSufLink && !ISA.load(prefix + ".isa")) //read ISA if nec
     return false;
   if(hasChild){ //read child if nec

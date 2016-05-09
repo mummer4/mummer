@@ -33,7 +33,7 @@ YAGGO_BUILT += %D%/ufasta_src/dsort_cmdline.hpp %D%/ufasta_src/sort_cmdline.hpp
 YAGGO_BUILT += %D%/check_cigar_cmdline.hpp
 
 # Build check_LCP. Builds LCP from .sa file.
-%C%_check_LCP_SOURCES = %D%/check_LCP.cc
+%C%_check_LCP_SOURCES = %D%/check_LCP.cc src/essaMEM/fasta.cpp
 %C%_check_LCP_CPPFLAGS = $(AM_CPPFLAGS) -I%D%
 YAGGO_BUILT += %D%/check_LCP_cmdline.hpp
 
