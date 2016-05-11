@@ -6,13 +6,15 @@
 #include <chrono>
 #include <atomic>
 #include <ostream>
+#include <iomanip>
+
 
 namespace timer {
 
 typedef std::chrono::steady_clock::time_point time_point;
 typedef std::chrono::microseconds             duration;
-time_point time() { return std::chrono::steady_clock::now(); }
-duration since(const time_point& t) {
+inline time_point time() { return std::chrono::steady_clock::now(); }
+inline duration since(const time_point& t) {
   return std::chrono::duration_cast<duration>(time() - t);
 }
 
