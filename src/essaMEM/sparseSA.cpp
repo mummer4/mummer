@@ -303,15 +303,11 @@ bool sparseSA_aux::load(std::istream&& is) {
 }
 
 void vec_uchar::init() {
-  // First sort by end of range [idx, idx + val]
-  auto first_sort = [](const item_t& a, const item_t& b) -> bool {
-    return a.idx + a.val < b.idx + b.val || (a.idx + a.val == b.idx + b.val && a.idx < b.idx);
-  };
 #ifdef _OPENMP
-  openmp_qsort(M.begin(), M.end(), first_sort);
-  assert(std::is_sorted(M.begin(), M.end(), first_sort));
+  openmp_qsort(M.begin(), M.end(), first_comp);
+  assert(std::is_sorted(M.begin(), M.end(), first_comp));
 #else
-  sort(M.begin(), M.end(), first_sort);
+  sort(M.begin(), M.end(), first_comp);
 #endif
 
   // Second, remove elements that are consecutive in a range
@@ -332,6 +328,42 @@ void vec_uchar::init() {
 #else
   sort(M.begin(), M.end());
 #endif
+}
+
+void vec_uchar::init_merge(const std::vector<item_vector>& Ms) {
+  typedef item_vector::const_iterator iterator_type;
+  struct elt {
+    iterator_type it;
+    iterator_type end;
+  };
+  auto comp = [](const elt& a, const elt& b) -> bool {
+    return first_comp(*b.it, *a.it);
+  };
+  std::vector<elt> heap;
+  for(const auto& x : Ms)
+    if(x.cbegin() != x.cend())
+      heap.push_back(elt{ x.cbegin(), x.cend() });
+  std::make_heap(heap.begin(), heap.end(), comp);
+
+  size_t     pidx = 0;
+  large_type pval = 0;
+  while(!heap.empty()) {
+    std::pop_heap(heap.begin(), heap.end(), comp);
+    const auto  lend = heap.back().end;
+    const auto& fit  = heap.front().it;
+    auto&       lit  = heap.back().it;
+    for( ; lit != lend && (first_comp(*lit, *fit) || *lit == *fit); ++lit) {
+      if(lit->idx + lit->val != pidx + pval || lit->idx != pidx + 1)
+        M.push_back(*lit);
+      pidx = lit->idx;
+      pval = lit->val;
+    }
+    if(lit != lend)
+      std::push_heap(heap.begin(), heap.end(), comp);
+    else
+      heap.pop_back();
+  }
+  openmp_qsort(M.begin(), M.end());
 }
 
 bool vec_uchar::save(std::ostream&& os) const {
@@ -467,13 +499,9 @@ void sparseSA::construct(bool off48){
       }
     }
 
-    //    std::cerr << "N=" << N << std::endl;
-
     LCP.resize(N/K);
-    // std::cerr << "N/K=" << N/K << std::endl;
     // Use algorithm by Kasai et al to construct LCP array.
     computeLCP();  // SA + ISA -> LCP
-    LCP.init();
     if(!hasSufLink){
       //ISA.clear(); // TODO: clear in vector32_48
     }

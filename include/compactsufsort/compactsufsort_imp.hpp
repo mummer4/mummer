@@ -6,6 +6,7 @@
 #include "divsufsort_private.h"
 #include "sssort_imp.hpp"
 #include "trsort_imp.hpp"
+#include <mummer/timer.hpp>
 
 #ifdef _OPENMP
 # include <omp.h>
@@ -19,13 +20,13 @@ struct SA {
   typedef typename const_iterator_traits<SAIDPTR>::type CSAIDPTR;
   static const size_t                                   ALPHABET_SIZE = alphabet_traits<CHARPTR>::size;
 
-  static SAIDX& bucket(SAIDX* b, saint_t c0) {
+  inline static SAIDX& bucket(SAIDX* b, saint_t c0) {
     return b[c0];
   }
-  static SAIDX& bucket(SAIDX* b, saint_t c0, saint_t c1) {
+  inline static SAIDX& bucket(SAIDX* b, saint_t c0, saint_t c1) {
     return b[c1 * ALPHABET_SIZE + c0];
   }
-  static SAIDX& bucket_star(SAIDX* b, saint_t c0, saint_t c1) {
+  inline static SAIDX& bucket_star(SAIDX* b, saint_t c0, saint_t c1) {
     return b[c0 * ALPHABET_SIZE + c1];
   }
 
@@ -49,12 +50,13 @@ struct SA {
 #endif
 
     /* Initialize bucket arrays. */
-    for(i = 0; i < (SAIDX)ALPHABET_SIZE; ++i) { bucket_A[i] = 0; }
-    for(i = 0; i < (SAIDX)ALPHABET_SIZE * (SAIDX)ALPHABET_SIZE; ++i) { bucket_B[i] = 0; }
+    for(SAIDX i = 0; i < (SAIDX)ALPHABET_SIZE; ++i) { bucket_A[i] = 0; }
+    for(SAIDX i = 0; i < (SAIDX)ALPHABET_SIZE * (SAIDX)ALPHABET_SIZE; ++i) { bucket_B[i] = 0; }
 
     /* Count the number of occurrences of the first one or two characters of each
        type A, B and B* suffix. Moreover, store the beginning position of all
        type B* suffixes into the array SA. */
+    { TIME_SCOPE("Count suffixes");
     for(i = n - 1, m = n, c0 = T[n - 1]; 0 <= i;) {
       /* type A suffix. */
       do { ++bucket(bucket_A, c1 = c0); } while((0 <= --i) && ((c0 = T[i]) >= c1));
@@ -69,6 +71,7 @@ struct SA {
       }
     }
     m = n - m;
+    } // time_scope
     /*
       note:
       A type B* suffix is lexicographically smaller than a type B suffix that
@@ -76,6 +79,7 @@ struct SA {
     */
 
     /* Calculate the index of start/end point of each bucket. */
+    { TIME_SCOPE("calculate start/end");
     for(c0 = 0, i = 0, j = 0; c0 < (saint_t)ALPHABET_SIZE; ++c0) {
       t = i + bucket(bucket_A, c0);
       bucket(bucket_A, c0) = i + j; /* start point */
@@ -86,18 +90,22 @@ struct SA {
         i += bucket(bucket_B, c0, c1);
       }
     }
+    } // time_scope
 
     if(0 < m) {
+      { TIME_SCOPE("sort 2 char");
       /* Sort the type B* suffixes by their first two characters. */
       PAb = SA + n - m; ISAb = SA + m;
-      for(i = m - 2; 0 <= i; --i) {
+      for(SAIDX i = m - 2; 0 <= i; --i) {
         t = PAb[i], c0 = T[t], c1 = T[t + 1];
         SA[--bucket_star(bucket_B, c0, c1)] = i;
       }
       t = PAb[m - 1], c0 = T[t], c1 = T[t + 1];
       SA[--bucket_star(bucket_B, c0, c1)] = m - 1;
+      } // time_scope
 
       /* Sort the type B* substrings using sssort. */
+      { TIME_SCOPE("sssort");
 #ifdef _OPENMP
       tmp = omp_get_max_threads();
       buf = SA + m, bufsize = (n - (2 * m)) / tmp;
@@ -139,9 +147,11 @@ struct SA {
         }
       }
 #endif
+      } // time_scope
 
       /* Compute ranks of type B* substrings. */
-      for(i = m - 1; 0 <= i; --i) {
+      { TIME_SCOPE("Ranks B*");
+      for(SAIDX i = m - 1; 0 <= i; --i) {
         if(0 <= SA[i]) {
           j = i;
           do { ISAb[SA[i]] = i; } while((0 <= --i) && (0 <= SA[i]));
@@ -152,11 +162,15 @@ struct SA {
         do { ISAb[SA[i] = ~SA[i]] = j; } while(SA[--i] < 0);
         ISAb[SA[i]] = j;
       }
+      } // time_scope
 
       /* Construct the inverse suffix array of type B* suffixes using trsort. */
+      { TIME_SCOPE("ISA");
       tr<SAIDPTR>::sort(ISAb, SA, m, (SAIDX)1);
+      } // time_scope
 
       /* Set the sorted order of tyoe B* suffixes. */
+      { TIME_SCOPE("sorted order B*");
       for(i = n - 1, j = m, c0 = T[n - 1]; 0 <= i;) {
         for(--i, c1 = c0; (0 <= i) && ((c0 = T[i]) >= c1); --i, c1 = c0) { }
         if(0 <= i) {
@@ -165,8 +179,10 @@ struct SA {
           SA[ISAb[--j]] = ((t == 0) || (1 < (t - i))) ? t : ~t;
         }
       }
+      } // time_scope
 
       /* Calculate the index of start/end point of each bucket. */
+      { TIME_SCOPE("start/end each bucket");
       bucket(bucket_B, ALPHABET_SIZE - 1, ALPHABET_SIZE - 1) = n; /* end point */
       for(c0 = ALPHABET_SIZE - 2, k = m - 1; 0 <= c0; --c0) {
         i = bucket(bucket_A, c0 + 1) - 1;
@@ -182,6 +198,7 @@ struct SA {
         bucket_star(bucket_B, c0, c0 + 1) = i - bucket(bucket_B, c0, c0) + 1; /* start point */
         bucket(bucket_B, c0, c0) = i; /* end point */
       }
+      } // time_scope
     }
 
     return m;

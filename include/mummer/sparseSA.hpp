@@ -94,9 +94,14 @@ struct vec_uchar {
     bool operator < (const item_t& t) const { return idx < t.idx; }
     bool operator==(const item_t& t) const { return idx == t.idx && val == t.val; }
   };
-  std::vector<small_type>  vec; // LCP values from 0-65534
-  std::vector<item_t>      M;
-  vector_32_48*            sa;
+  static inline bool first_comp(const item_t& a, const item_t& b) {
+    return a.idx + a.val < b.idx + b.val || (a.idx + a.val == b.idx + b.val && a.idx < b.idx);
+  }
+
+  typedef std::vector<item_t> item_vector;
+  std::vector<small_type> vec;  // LCP values from 0-65534
+  item_vector             M;
+  vector_32_48*           sa;
 
   vec_uchar(vector_32_48& sa_) : vec(sa_.size(), 0), sa(&sa_) { }
   vec_uchar(vec_uchar&& rhs, vector_32_48& sa_)
@@ -121,19 +126,23 @@ struct vec_uchar {
   }
   // Actually set LCP values, distingushes large and small LCP
   // values.
-  void set(size_t idx, large_type v) {
+  void set(size_t idx, large_type v, item_vector& M_) {
     if(v < max) {
       vec[idx] = v;
     } else {
       vec[idx] = max;
-#pragma omp critical(SetLCP)
-      M.push_back(item_t((*sa)[idx], v));
+      M_.push_back(item_t((*sa)[idx], v));
     }
+  }
+  inline void set(size_t idx, large_type v) {
+    set(idx, v, M);
   }
   // Once all the values are set, call init. This will assure the
   // values >= 255 are sorted by index for fast retrieval. The values
   // are compacted into ranges.
   void init();
+  // Same as init, but for multi-threaded version. Merge M vectors.
+  void init_merge(const std::vector<item_vector>& Ms);
 
   bool save(std::ostream&& os) const;
   inline bool save(const std::string& path) const { return save(std::ofstream(path)); }
