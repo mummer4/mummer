@@ -94,12 +94,12 @@ class FastaRecordSeq {
 
 public:
   FastaRecordSeq(const char* seq, const char* Id = "")
-    : m_seq(seq - 1)
+    : m_seq(seq)
     , m_len(strlen(seq))
     , m_Id(Id)
   { }
   FastaRecordSeq(const char* seq, long int len, const char* Id = "")
-    : m_seq(seq - 1)
+    : m_seq(seq)
     , m_len(len)
     , m_Id(Id)
   {
@@ -113,7 +113,7 @@ public:
 
   const std::string& Id() const { return m_Id; }
   long len() const { return m_len; }
-  const char* seq() const { return m_seq; }
+  const char* seq() const { return m_seq - 1; }
 };
 
 ///////////////////////////////////////////

@@ -395,8 +395,10 @@ private:
   // enough space for the tower. Then in place copy construction of
   // the key from x.
   node* alloc_node() {
-    static thread_local auto rh = imp::random_height<Random, p_>(Random(new_seed()));
-    const int height = std::min(height_upper_bound_, (int)rh());
+    static __thread uint64_t seed = 0;
+    if(__builtin_expect(seed == 0, 0))
+      seed = new_seed();
+    const int height = std::min(height_upper_bound_, imp::random_height<Random, p_>::gen(Random::gen(seed)));
     max_height_ = std::max(max_height_, height);
     node* res   = (node*)operator new(sizeof(node) + height * sizeof(anode));
     res->height.store(height, std::memory_order_relaxed);

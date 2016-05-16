@@ -27,11 +27,14 @@ struct xor_random {
   typedef uint64_t rand_type;
   uint64_t x;
   // xor64
+  static rand_type gen(rand_type& y) {
+    y ^= y << 13;
+    y ^= y >> 7;
+    y ^= y << 17;
+    return y;
+  }
   rand_type operator()() {
-    x ^= x << 13;
-    x ^= x >> 7;
-    x ^= x << 17;
-    return x;
+    return gen(x);
   }
 
   // xor128
@@ -61,18 +64,22 @@ struct random_height;
 template<typename Random>
 struct random_height<Random, 2> {
   Random rng;
-  int operator()() {
-    typename Random::rand_type x = rng();
+  static inline int gen(typename Random::rand_type x) {
     return (x == 0 ? 8*sizeof(typename Random::rand_type) : ctz(x)) + 1;
+  }
+  inline int operator()() {
+    return gen(rng());
   }
   random_height(const Random& rng_ = Random()) : rng(rng_) { }
 };
 template<typename Random>
 struct random_height<Random, 4> {
   Random rng;
-  int operator()() {
-    typename Random::rand_type x = rng();
+  static inline int gen(typename Random::rand_type x) {
     return (x == 0 ? 4 * sizeof(typename Random::rand_type) : ctz(x) >> 1) + 1;
+  }
+  inline int operator()() {
+    return gen(rng());
   }
   random_height(const Random& rng_ = Random()) : rng(rng_) { }
 };

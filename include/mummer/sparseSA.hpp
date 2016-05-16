@@ -11,6 +11,7 @@
 #include <limits.h>
 #include <cstring>
 #include <cassert>
+#include <cmath>
 
 #include "48bit_index.hpp"
 #include "openmp_qsort.hpp"
@@ -242,7 +243,7 @@ struct sparseSA_aux {
                long kMerSize_, int sparseMult_, bool nucleotidesOnly_)
     : N(N_)
     , K(K_)
-    , logN((long)ceil(log(N/K) / log(2.0)))
+    , logN((long)std::ceil(std::log(N/K) / std::log(2.0)))
     , NKm1(N/K-1)
     , _4column(__4column)
     , hasSufLink(suflink_)
