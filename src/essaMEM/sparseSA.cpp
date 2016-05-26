@@ -336,7 +336,7 @@ void vec_uchar::init_merge(const std::vector<item_vector>& Ms) {
     iterator_type it;
     iterator_type end;
   };
-  auto comp = [](const elt& a, const elt& b) -> bool {
+  auto comp = [&](const elt& a, const elt& b) -> bool {
     return first_comp(*b.it, *a.it);
   };
   std::vector<elt> heap;
