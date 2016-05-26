@@ -36,6 +36,9 @@ distclean-local-dirs:
 # yaggo rules
 include yaggo.mk
 
+# For distcheck
+AM_DISTCHECK_CONFIGURE_FLAGS=--enable-perl-binding --enable-ruby-binding --enable-python-binding
+
 ##############################
 # Build library libumdmummer #
 ##############################
@@ -53,6 +56,7 @@ noinst_HEADERS += include/mummer/sparseSA.hpp				\
                   include/mummer/tigrinc.hh include/mummer/nucmer.hpp	\
                   include/mummer/mgaps.hh include/mummer/delta.hh	\
                   include/mummer/sw_alignscore.hh			\
+                  include/mummer/sparseSA_imp.hpp			\
                   include/jellyfish/circular_buffer.hpp			\
                   include/jellyfish/cooperative_pool2.hpp		\
                   include/jellyfish/cpp_array.hpp			\
