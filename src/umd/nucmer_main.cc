@@ -8,6 +8,10 @@
 #include <src/umd/nucmer_cmdline.hpp>
 #include <thread_pipe.hpp>
 
+#ifdef _OPENMP
+#include <omp.h>
+#endif
+
 struct getrealpath {
   const char *path, *res;
   getrealpath(const char* p) : path(p), res(realpath(p, nullptr)) { }
@@ -124,17 +128,28 @@ int main(int argc, char *argv[]) {
       nucmer_cmdline::error() << "Can't save the suffix array to '" << args.save_arg << "'";
 
     stream_manager     streams(&args.qry_arg, &args.qry_arg + 1);
+    const unsigned int nb_threads = args.threads_given ? args.threads_arg : std::thread::hardware_concurrency();
+#ifdef _OPENMP
+    if(args.threads_given) omp_set_num_threads(nb_threads);
+#endif // _OPENMP
+
     if(!args.genome_flag) {
-      const unsigned int nb_threads = args.threads_given ? args.threads_arg : std::thread::hardware_concurrency();
       stream_manager     streams(&args.qry_arg, &args.qry_arg + 1);
       sequence_parser    parser(4 * nb_threads, 10, args.max_chunk_arg, 1, streams);
 
+#ifdef _OPENMP
+#pragma omp parallel
+      {
+        query_thread(aligner.get(), &parser, &output, &args);
+      }
+#else // _OPENMP
       std::vector<std::thread> threads;
       for(unsigned int i = 0; i < nb_threads; ++i)
         threads.push_back(std::thread(query_thread, aligner.get(), &parser, &output, &args));
 
       for(auto& th : threads)
         th.join();
+#endif // _OPENMP
     } else {
       // Genome flag on
       sequence_parser    parser(4, 1, 1, streams);
