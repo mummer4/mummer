@@ -251,10 +251,8 @@ struct tr {
             trbudget_t *budget) {
 #define STACK_SIZE TR_STACKSIZE
     std::tuple<CSAIDPTR, SAIDPTR, SAIDPTR, saint_t, saint_t> stack[STACK_SIZE];
-    SAIDPTR a, b, c;
-    SAIDX v, x = 0;
-    SAIDX incr = ISAd - ISA;
-    saint_t limit, next;
+    const SAIDX incr = ISAd - ISA;
+    saint_t limit; //, next;
     saint_t ssize, trlink = -1;
 
     for(ssize = 0, limit = ilg(last - first);;) {
@@ -262,14 +260,17 @@ struct tr {
       if(limit < 0) {
         if(limit == -1) {
           /* tandem repeat partition */
+          SAIDPTR a, b;
           partition(ISAd - incr, first, first, last, &a, &b, last - SA - 1);
 
           /* update ranks */
           if(a < last) {
-            for(c = first, v = a - SA - 1; c < a; ++c) { ISA[*c] = v; }
+            const SAIDX v = a - SA - 1;
+            for(SAIDPTR c = first; c < a; ++c) { ISA[*c] = v; }
           }
           if(b < last) {
-            for(c = a, v = b - SA - 1; c < b; ++c) { ISA[*c] = v; }
+            const SAIDX v = b - SA - 1;
+            for(SAIDPTR c = a; c < b; ++c) { ISA[*c] = v; }
           }
 
           /* push */
@@ -301,7 +302,7 @@ struct tr {
           }
         } else if(limit == -2) {
           /* tandem repeat copy */
-          a = std::get<1>(stack[--ssize]), b = std::get<2>(stack[ssize]);
+          SAIDPTR a = std::get<1>(stack[--ssize]), b = std::get<2>(stack[ssize]);
           if(std::get<3>(stack[ssize]) == 0) {
             copy(ISA, SA, first, a, b, last, ISAd - ISA);
           } else {
@@ -313,14 +314,17 @@ struct tr {
         } else {
           /* sorted partition */
           if(0 <= *first) {
-            a = first;
+            SAIDPTR a = first;
             do { ISA[*a] = a - SA; } while((++a < last) && (0 <= *a));
             first = a;
           }
           if(first < last) {
-            a = first; do { *a = ~*a; } while(*++a < 0);
-            next = (ISA[*a] != ISAd[*a]) ? ilg(a - first + 1) : -1;
-            if(++a < last) { for(b = first, v = a - SA - 1; b < a; ++b) { ISA[*b] = v; } }
+            SAIDPTR a = first; do { *a = ~*a; } while(*++a < 0);
+            saint_t next = (ISA[*a] != ISAd[*a]) ? ilg(a - first + 1) : -1;
+            if(++a < last) {
+              const SAIDX v = a - SA - 1;
+              for(SAIDPTR b = first; b < a; ++b) { ISA[*b] = v; }
+            }
 
             /* push */
             if(budget->check(a - first)) {
@@ -360,26 +364,31 @@ struct tr {
 
       if(limit-- == 0) {
         heapsort(ISAd, first, last - first);
-        for(a = last - 1; first < a; a = b) {
-          for(x = ISAd[*a], b = a - 1; (first <= b) && (ISAd[*b] == x); --b) { *b = ~*b; }
+        for(SAIDPTR a = last - 1; first < a; ) {
+          const SAIDX x = ISAd[*a];
+          for(--a; (first <= a) && (ISAd[*a] == x); --a) { *a = ~*a; }
         }
         limit = -3;
         continue;
       }
 
       /* choose pivot */
-      a = pivot(ISAd, first, last);
+      SAIDPTR b, a = pivot(ISAd, first, last);
       swap(*first, *a);
-      v = ISAd[*first];
+      SAIDX pivot = ISAd[*first];
 
       /* partition */
-      partition(ISAd, first, first + 1, last, &a, &b, v);
+      partition(ISAd, first, first + 1, last, &a, &b, pivot);
       if((last - first) != (b - a)) {
-        next = (ISA[*a] != v) ? ilg(b - a) : -1;
+        saint_t next = (ISA[*a] != pivot) ? ilg(b - a) : -1;
 
         /* update ranks */
-        for(c = first, v = a - SA - 1; c < a; ++c) { ISA[*c] = v; }
-        if(b < last) { for(c = a, v = b - SA - 1; c < b; ++c) { ISA[*c] = v; } }
+        const SAIDX v = a - SA - 1;
+        for(SAIDPTR c = first; c < a; ++c) { ISA[*c] = v; }
+        if(b < last) {
+          const SAIDX v = b - SA - 1;
+          for(SAIDPTR c = a; c < b; ++c) { ISA[*c] = v; }
+        }
 
         /* push */
         if((1 < (b - a)) && (budget->check(b - a))) {

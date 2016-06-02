@@ -6,11 +6,14 @@
 #include <thread>
 #include <limits>
 #include <memory>
+#include <mutex>
+
 #include <mummer/sparseSA.hpp>
 #include <mummer/mgaps.hh>
 #include <mummer/postnuc.hh>
 #include <jellyfish/stream_manager.hpp>
 #include <jellyfish/whole_sequence_parser.hpp>
+#include <mt_skip_list/set.hpp>
 
 namespace mummer {
 namespace nucmer {
@@ -91,23 +94,26 @@ class FastaRecordSeq {
 
 public:
   FastaRecordSeq(const char* seq, const char* Id = "")
-    : m_seq(seq - 1)
+    : m_seq(seq)
     , m_len(strlen(seq))
     , m_Id(Id)
   { }
   FastaRecordSeq(const char* seq, long int len, const char* Id = "")
-    : m_seq(seq - 1)
+    : m_seq(seq)
     , m_len(len)
     , m_Id(Id)
   {
     assert(strlen(seq) == (size_t)len);
   }
+  FastaRecordSeq(const std::string& seq, const char* Id = "")
+    : FastaRecordSeq(seq.c_str(), seq.size(), Id)
+  { }
   FastaRecordSeq(FastaRecordSeq&& rhs) = default;
   FastaRecordSeq& operator=(FastaRecordSeq&& rhs) = default;
 
   const std::string& Id() const { return m_Id; }
   long len() const { return m_len; }
-  const char* seq() const { return m_seq; }
+  const char* seq() const { return m_seq - 1; }
 };
 
 ///////////////////////////////////////////
@@ -208,6 +214,7 @@ public:
     return m_info.headers.c_str() + m_info.records[m_id].header;
   }
   bool operator==(const FastaRecordPtr& rhs) const { return m_id == rhs.m_id; }
+  bool operator<(const FastaRecordPtr& rhs) const { return m_id < rhs.m_id; }
 };
 
 
@@ -240,6 +247,9 @@ public:
                   opts.use_extent)
     , m_options(opts)
   { }
+  FileAligner(std::istream& is, Options opts = Options())
+    : FileAligner(is, std::numeric_limits<size_t>::max(), opts)
+  { }
   FileAligner(sequence_info&& reference_info, mummer::sparseSA&& sa, Options opts = Options())
     : m_reference_info(std::move(reference_info))
     , m_sa(std::move(sa))
@@ -265,14 +275,15 @@ public:
   template<typename AlignmentOut>
   void align_file(const char* query_path, AlignmentOut alignments, unsigned int threads = std::thread::hardware_concurrency()) const;
 
-  typedef jellyfish::stream_manager<const char**>          stream_manager;
-  typedef jellyfish::whole_sequence_parser<stream_manager> sequence_parser;
-  template<typename AlignmentOut>
-  static void trampoline_align_file(const FileAligner* self, sequence_parser* parser, AlignmentOut alignments) {
+  template<typename Parser, typename AlignmentOut>
+  static void trampoline_align_file(const FileAligner* self, Parser* parser, AlignmentOut alignments) {
     self->thread_align_file(*parser, alignments);
   }
+  template<typename Parser, typename AlignmentOut>
+  void thread_align_file(Parser& parser, AlignmentOut alignments) const;
+
   template<typename AlignmentOut>
-  void thread_align_file(sequence_parser& parser, AlignmentOut alignments) const;
+  void align_long_sequences(const FastaRecordSeq& query, AlignmentOut alignments) const;
 };
 
 //
@@ -351,6 +362,8 @@ public:
 
 template<typename AlignmentOut>
 void FileAligner::align_file(const char* query_path, AlignmentOut alignments, unsigned int nb_threads) const {
+  typedef jellyfish::stream_manager<const char**>          stream_manager;
+  typedef jellyfish::whole_sequence_parser<stream_manager> sequence_parser;
   stream_manager  streams(&query_path, &query_path + 1);
   sequence_parser parser(4 * nb_threads, 10, 1, streams);
 
@@ -362,8 +375,8 @@ void FileAligner::align_file(const char* query_path, AlignmentOut alignments, un
     th.join();
 }
 
-template<typename AlignmentOut>
-void FileAligner::thread_align_file(sequence_parser& parser, AlignmentOut alignments) const {
+template<typename Parser, typename AlignmentOut>
+void FileAligner::thread_align_file(Parser& parser, AlignmentOut alignments) const {
   typedef postnuc::Synteny<FastaRecordPtr> synteny_type;
   std::vector<mgaps::Match_t>       fwd_matches(1), bwd_matches(1);
   std::vector<synteny_type>         syntenys;
@@ -410,7 +423,7 @@ void FileAligner::thread_align_file(sequence_parser& parser, AlignmentOut alignm
   };
 
   while(true) {
-    sequence_parser::job j(parser);
+    typename Parser::job j(parser);
     if(j.is_empty()) break;
 
     for(size_t i = 0; i < j->nb_filled; ++i) {
@@ -456,6 +469,83 @@ void FileAligner::thread_align_file(sequence_parser& parser, AlignmentOut alignm
     }
   }
 
+}
+
+template<typename AlignmentOut>
+void FileAligner::align_long_sequences(const FastaRecordSeq& query, AlignmentOut alignments) const {
+  typedef postnuc::Synteny<FastaRecordPtr>  synteny_type;
+  typedef mt_skip_list::set<FastaRecordPtr> record_container;
+  typedef mt_skip_list::set<synteny_type>   synteny_container;
+
+  std::vector<mgaps::Match_t>       fwd_matches(1), bwd_matches(1);
+  record_container                  records;
+  synteny_container                 syntenys;
+  char                              cluster_dir;
+  const postnuc::merge_syntenys     merger(m_options.do_delta, m_options.do_extend,
+                                           m_options.to_seqend, m_options.do_shadows,
+                                           m_options.break_len, m_options.banding,
+                                           sw_align::NUCLEOTIDE);
+  std::mutex                        clusters_mtx;
+
+  // append_cluster maybe called by multiple threads at once
+  auto append_cluster = [&](const mgaps::cluster_type& cluster) {
+    for(size_t i = 0; i < cluster.size(); ) { // i increment in inner loop
+      postnuc::Cluster cl(cluster_dir);
+      // Re-map the reference coordinate back to its original sequence
+      const auto record  = m_reference_info.find(cluster[i].Start1);
+      const long offset  = record.seq_offset();
+      const long end     = offset + record.len();
+
+      // Iterator to newly inserted or existing synteny object for that record
+      auto record_it = records.insert(std::move(record));
+      auto synteny = syntenys.emplace(&*record_it.first).first;
+
+      for( ; i < cluster.size(); ++i) { // Add matches to current cluster until find a different reference
+        const auto& m   = cluster[i];
+        const long  sA  = m.Start1 + m.Simple_Adj;
+        if(sA <= offset || sA > end) // Match to a different reference
+          break;
+        cl.matches.push_back({ sA - offset, m.Start2 + m.Simple_Adj, m.Len - m.Simple_Adj });
+        assert(cl.matches.back().sA >= 1 && cl.matches.back().sA + cl.matches.back().len - 1 <= record.len());
+        assert(cl.matches.back().sB >= 1 && cl.matches.back().sB + cl.matches.back().len - 1 <= query.len());
+      }
+      { std::lock_guard<std::mutex> lck(clusters_mtx);
+        synteny->clusters.push_back(std::move(cl));
+      }
+    }
+  };
+
+  fwd_matches.resize(1);
+  bwd_matches.resize(1);
+  syntenys.clear();
+  records.clear();
+
+  if(m_options.orientation & FORWARD) {
+    auto append_matches = [&](const mummer::match_t& m) { fwd_matches.push_back({ m.ref + 1, m.query + 1, m.len }); };
+    switch(m_options.match) {
+    case MUM: m_sa.findMUM_each(query.seq() + 1, query.len(), m_options.min_len, false, append_matches); break;
+    case MUMREFERENCE: m_sa.findMAM_each(query.seq() + 1, query.len(), m_options.min_len, false, append_matches); break;
+    case MAXMATCH: m_sa.findMEM_each(query.seq() + 1, query.len(), m_options.min_len, false, append_matches); break;
+    }
+    cluster_dir = postnuc::FORWARD_CHAR;
+    m_clusterer.Cluster_each_long(fwd_matches.data(), fwd_matches.size() - 1, append_cluster);
+  }
+
+  if(m_options.orientation & REVERSE) {
+    std::string rquery(query.seq() + 1, query.len());
+    reverse_complement(rquery);
+    auto append_matches = [&](const mummer::match_t& m) {
+      bwd_matches.push_back({ m.ref + 1, m.query + 1, m.len });
+    };
+    switch(m_options.match) {
+    case MUM: m_sa.findMUM_each(rquery, m_options.min_len, false, append_matches); break;
+    case MUMREFERENCE: m_sa.findMAM_each(rquery, m_options.min_len, false, append_matches); break;
+    case MAXMATCH: m_sa.findMEM_each(rquery, m_options.min_len, false, append_matches); break;
+    }
+    cluster_dir = postnuc::REVERSE_CHAR;
+    m_clusterer.Cluster_each_long(bwd_matches.data(), bwd_matches.size() - 1, append_cluster);
+  }
+  merger.processSyntenys_long_each(syntenys, query, alignments);
 }
 
 } // namespace nucmer

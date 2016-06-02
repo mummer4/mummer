@@ -25,8 +25,8 @@ TESTS += $(unittests_programs)
 
 %C%_test_all_SOURCES = %D%/test_nucmer.cc				\
  %D%/test_cooperative_pool2.cc %D%/test_whole_sequence_parser.cc	\
- %D%/test_sparse_sa.cc
+ %D%/test_sparse_sa.cc %D%/test_qsort.cc
 %C%_test_all_LDADD = $(LDADD) %D%/libgtest_main.la
-%C%_test_all_CXXFLAGS = -I$(srcdir)/unittests
+%C%_test_all_CXXFLAGS = $(AM_CXXFLAGS) -I$(srcdir)/unittests
 
 

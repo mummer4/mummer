@@ -1,0 +1,17 @@
+description "Build LCP from .sa"
+
+option("o", "output") {
+  description "Output LCP"
+  string; typestr "PATH" }
+option("i", "int") {
+  description "LCP size is an int, not size_t"
+  off }
+option("s", "short") {
+  description "No expensive computation"
+  off }
+arg("sequence") {
+  description "Sequence fasta file"
+  string; typestr "PATH" }
+arg("prefix") {
+  description "Prefix to suffix array file"
+  string; typestr "PATH" }

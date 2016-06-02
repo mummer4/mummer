@@ -3,6 +3,8 @@
 
 #include <iostream>
 #include <cassert>
+#include <mummer/dset.hpp>
+#include <mummer/openmp_qsort.hpp>
 
 namespace mummer {
 namespace mgaps {
@@ -49,6 +51,10 @@ struct ClusterMatches {
 
   template<typename Output>
   int Cluster_each(Match_t * A, UnionFind& UF, int N, Output out) const;
+
+  // Like Cluster_each, but adapted for long query with many matches.
+  template<typename Output>
+  int Cluster_each_long(Match_t * A, int N, Output out) const;
 
   //  Process matches  A [1 .. N]  and append them to clusters
   int  Process_Matches(Match_t * A, UnionFind& UF, int N, clusters_type& clusters) const {
@@ -125,6 +131,61 @@ int ClusterMatches::Cluster_each(Match_t * A, UnionFind& UF, int N, Output out) 
     cluster_size = j - i;
     print_ct += Process_Cluster (A + i, cluster_size, out);
   }
+  return print_ct;
+}
+
+template<typename Output>
+int ClusterMatches::Cluster_each_long(Match_t * A, int N, Output out) const {
+  //  Process matches  A [1 .. N]  and output them after
+  //  a line containing  label .
+
+  //  Use Union-Find to create connected-components based on
+  //  separation and similar diagonals between matches
+  DisjointSets UF(N + 1);
+
+  openmp_qsort(A + 1, A + N + 1, By_Start2);
+  N = Filter_Matches (A + 1, N);
+
+#pragma omp parallel for schedule(dynamic)
+  for  (int i = 1;  i < N;  i ++) {
+    long int i_end  = A [i] . Start2 + A [i] . Len;
+    long int i_diag = A [i] . Start2 - A [i] . Start1;
+
+    for  (int j = i + 1;  j <= N;  j ++) {
+      long int sep = A [j] . Start2 - i_end;
+      if  (sep > Max_Separation)
+        break;
+
+      long int diag_diff = std::abs ((A [j] . Start2 - A [j] . Start1) - i_diag);
+      if  (diag_diff <= std::max(Fixed_Separation, (int)(Separation_Factor * sep)))
+        UF.union_sets(UF.find(i), UF.find(j));
+    }
+  }
+
+  //  Set the cluster id of each match and reset Good flag
+#pragma omp parallel for
+  for  (int i = 1;  i <= N;  i ++) {
+    A [i] . cluster_id = UF.find (i);
+    assert(A[i].cluster_id > 0);
+    A[i].Good = false;
+  }
+  openmp_qsort(A + 1, A + N + 1, By_Cluster);
+
+  // Determine and process clusters
+  int cluster_size, print_ct = 0;
+#pragma omp parallel
+  {
+#pragma omp single
+    for (int i = 1;  i <= N;  i += cluster_size) {
+      int j;
+      for  (j = i + 1;  j <= N && A [i] . cluster_id == A [j] . cluster_id;  j ++)
+        ;
+      cluster_size = j - i;
+#pragma omp task firstprivate(i, cluster_size) shared(out)
+      print_ct += Process_Cluster (A + i, cluster_size, out);
+    }
+  }
+
   return print_ct;
 }
 

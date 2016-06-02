@@ -1,4 +1,4 @@
-AC_INIT([MUMmer], [3.9.3alpha], [gmarcais@umd.edu])
+AC_INIT([MUMmer], [3.9.4alpha], [gmarcais@umd.edu])
 AC_CANONICAL_HOST
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([subdir-objects foreign parallel-tests color-tests])
@@ -19,6 +19,15 @@ CXXFLAGS="-std=c++0x $CXXFLAGS"
 AS_IF([test x$cxxflags_given = xno], [CXXFLAGS="-DNDEBUG $CXXFLAGS"])
 EXTRA_CXXFLAGS="-std=c++0x"
 AC_SUBST([EXTRA_CXXFLAGS])
+
+# Check for openmp
+AC_ARG_ENABLE([openmp], [AS_HELP_STRING([--disable-openmp], [Disable OpenMP, even if available])])
+AS_IF([test "x$enable_openmp" != "xno"],
+      # OpenMP enabled. Check if available
+      [AX_OPENMP([AC_DEFINE(HAVE_OPENMP,1,[Define if OpenMP is enabled])])]
+      [EXTRA_CXXFLAGS="$EXTRA_CXXFLAGS $OPENMP_CXXFLAGS"],
+      # OpenMP disabled. Ignore pragma warnings
+      [EXTRA_CXXFLAGS="$EXTRA_CXXFLAGS -Wno-unknown-pragmas"])
 
 # Check for yaggo
 AC_ARG_VAR([YAGGO], [Yaggo switch parser generator])
@@ -94,8 +103,11 @@ AM_CONDITIONAL([PERL_BINDING], [test -n "$enable_perl_binding" -a x$enable_perl_
 AM_COND_IF([PERL_BINDING],
            [AS_IF([test "x$enable_perl_binding" != xyes], [PERL_EXT_LIB=$enable_perl_binding],
                   [test "x$prefix" != xNONE], [PERL_EXT_LIB=$libdir/perl])]
-           [AX_PERL_EXT]
            [need_shared_libraries=yes])
+# Look for Perl even if no binding desired. It is required for some
+# scripts (e.g. mummerplot)
+AX_PERL_EXT
+AS_IF([test x"$PERL" = x], [AC_MSG_ERROR([Perl5 not found])])
 
 # Check that shared libraries are enabled if needed by SWIG bindings
 AS_IF([test "x$need_shared_libraries" = xyes -a "x$enable_shared" = xno],

@@ -50,6 +50,7 @@ bool  printRevCompForw = false;
 int   K                = 1;
 int   num_threads      = 1;
 int   query_threads    = 0;
+size_t max_chunk       = 50000;
 
 // Information on matches and write in multi-thread safe
 struct match_info {
@@ -174,6 +175,7 @@ int main(int argc, char* argv[]) {
       {"kmer", 1, 0, 0}, // 18
       {"save", 1, 0, 0}, // 19
       {"load", 1, 0, 0}, // 20
+      {"max-chunk", 1, 0, 0}, // 21
       {0, 0, 0, 0}
     };
     int longindex = -1;
@@ -207,6 +209,7 @@ int main(int argc, char* argv[]) {
       case 18: kmer = atoi(optarg); automaticKmer = false; break;
       case 19: save = optarg; break;
       case 20: load = optarg; break;
+      case 21: max_chunk = atoi(optarg); break;
       default: break;
       }
     }
@@ -325,7 +328,7 @@ int main(int argc, char* argv[]) {
 
   // Open input files
   stream_manager  streams((const char**)(argv + argNumber), (const char**)(argv + argc));
-  sequence_parser               parser(4 * query_threads, 10, 1, streams);
+  sequence_parser               parser(4 * query_threads, 10, max_chunk, 1, streams);
   thread_pipe::ostream_buffered output(std::cout);
 
   // Launch query threads
