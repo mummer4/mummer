@@ -103,8 +103,11 @@ AM_CONDITIONAL([PERL_BINDING], [test -n "$enable_perl_binding" -a x$enable_perl_
 AM_COND_IF([PERL_BINDING],
            [AS_IF([test "x$enable_perl_binding" != xyes], [PERL_EXT_LIB=$enable_perl_binding],
                   [test "x$prefix" != xNONE], [PERL_EXT_LIB=$libdir/perl])]
-           [AX_PERL_EXT]
            [need_shared_libraries=yes])
+# Look for Perl even if no binding desired. It is required for some
+# scripts (e.g. mummerplot)
+AX_PERL_EXT
+AS_IF([test x"$PERL" = x], [AC_MSG_ERROR([Perl5 not found])])
 
 # Check that shared libraries are enabled if needed by SWIG bindings
 AS_IF([test "x$need_shared_libraries" = xyes -a "x$enable_shared" = xno],
