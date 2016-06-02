@@ -275,14 +275,12 @@ public:
   template<typename AlignmentOut>
   void align_file(const char* query_path, AlignmentOut alignments, unsigned int threads = std::thread::hardware_concurrency()) const;
 
-  typedef jellyfish::stream_manager<const char**>          stream_manager;
-  typedef jellyfish::whole_sequence_parser<stream_manager> sequence_parser;
-  template<typename AlignmentOut>
-  static void trampoline_align_file(const FileAligner* self, sequence_parser* parser, AlignmentOut alignments) {
+  template<typename Parser, typename AlignmentOut>
+  static void trampoline_align_file(const FileAligner* self, Parser* parser, AlignmentOut alignments) {
     self->thread_align_file(*parser, alignments);
   }
-  template<typename AlignmentOut>
-  void thread_align_file(sequence_parser& parser, AlignmentOut alignments) const;
+  template<typename Parser, typename AlignmentOut>
+  void thread_align_file(Parser& parser, AlignmentOut alignments) const;
 
   template<typename AlignmentOut>
   void align_long_sequences(const FastaRecordSeq& query, AlignmentOut alignments) const;
@@ -364,6 +362,8 @@ public:
 
 template<typename AlignmentOut>
 void FileAligner::align_file(const char* query_path, AlignmentOut alignments, unsigned int nb_threads) const {
+  typedef jellyfish::stream_manager<const char**>          stream_manager;
+  typedef jellyfish::whole_sequence_parser<stream_manager> sequence_parser;
   stream_manager  streams(&query_path, &query_path + 1);
   sequence_parser parser(4 * nb_threads, 10, 1, streams);
 
@@ -375,8 +375,8 @@ void FileAligner::align_file(const char* query_path, AlignmentOut alignments, un
     th.join();
 }
 
-template<typename AlignmentOut>
-void FileAligner::thread_align_file(sequence_parser& parser, AlignmentOut alignments) const {
+template<typename Parser, typename AlignmentOut>
+void FileAligner::thread_align_file(Parser& parser, AlignmentOut alignments) const {
   typedef postnuc::Synteny<FastaRecordPtr> synteny_type;
   std::vector<mgaps::Match_t>       fwd_matches(1), bwd_matches(1);
   std::vector<synteny_type>         syntenys;
@@ -423,7 +423,7 @@ void FileAligner::thread_align_file(sequence_parser& parser, AlignmentOut alignm
   };
 
   while(true) {
-    sequence_parser::job j(parser);
+    typename Parser::job j(parser);
     if(j.is_empty()) break;
 
     for(size_t i = 0; i < j->nb_filled; ++i) {

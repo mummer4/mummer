@@ -95,4 +95,5 @@ arg("ref") {
   c_string; typestr "path" }
 arg("qry") {
   description "Query sequence file"
-  c_string; typestr "path" }
+  c_string; typestr "path"
+  multiple; }

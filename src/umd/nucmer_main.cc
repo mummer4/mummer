@@ -19,7 +19,8 @@ struct getrealpath {
   operator const char*() const { return res ? res : path; }
 };
 
-typedef jellyfish::stream_manager<const char**>          stream_manager;
+typedef std::vector<const char*>::const_iterator         path_iterator;
+typedef jellyfish::stream_manager<path_iterator>         stream_manager;
 typedef jellyfish::whole_sequence_parser<stream_manager> sequence_parser;
 
 void query_thread(mummer::nucmer::FileAligner* aligner, sequence_parser* parser,
@@ -92,17 +93,22 @@ int main(int argc, char *argv[]) {
     : (args.sam_short_given ? args.sam_short_arg
        : (args.sam_long_given ? args.sam_long_arg
           : args.prefix_arg + ".delta"));
-  std::ofstream os(output_file);
-  if(!os.good())
-    nucmer_cmdline::error() << "Failed to open output file '" << output_file << '\'';
+  std::ofstream os;
+  if(!args.qry_arg.empty()) {
+    if(args.qry_arg.size() != 1 && !(args.sam_short_given || args.sam_long_given))
+      nucmer_cmdline::error() << "Multiple query file is only supported with the SAM output format";
+    os.open(output_file);
+    if(!os.good())
+      nucmer_cmdline::error() << "Failed to open output file '" << output_file << '\'';
 
-  getrealpath real_ref(args.ref_arg), real_qry(args.qry_arg);
-  if(args.sam_short_given || args.sam_long_given) {
-    os << "@HD VN1.0 SO:unsorted\n"
-       << "@PG ID:nucmer PN:nucmer VN:4.0 CL:\"" << cmdline << "\"\n";
-  } else {
-    os << real_ref << ' ' << real_qry << '\n'
-       << "NUCMER\n";
+    getrealpath real_ref(args.ref_arg), real_qry(args.qry_arg[0]);
+    if(args.sam_short_given || args.sam_long_given) {
+      os << "@HD VN1.0 SO:unsorted\n"
+         << "@PG ID:nucmer PN:nucmer VN:4.0 CL:\"" << cmdline << "\"\n";
+    } else {
+      os << real_ref << ' ' << real_qry << '\n'
+         << "NUCMER\n";
+    }
   }
   thread_pipe::ostream_buffered output(os);
 
@@ -127,14 +133,13 @@ int main(int argc, char *argv[]) {
     if(args.save_given && !aligner->sa().save(args.save_arg))
       nucmer_cmdline::error() << "Can't save the suffix array to '" << args.save_arg << "'";
 
-    stream_manager     streams(&args.qry_arg, &args.qry_arg + 1);
+    stream_manager     streams(args.qry_arg.cbegin(), args.qry_arg.cend());
     const unsigned int nb_threads = args.threads_given ? args.threads_arg : std::thread::hardware_concurrency();
 #ifdef _OPENMP
     if(args.threads_given) omp_set_num_threads(nb_threads);
 #endif // _OPENMP
 
     if(!args.genome_flag) {
-      stream_manager     streams(&args.qry_arg, &args.qry_arg + 1);
       sequence_parser    parser(4 * nb_threads, 10, args.max_chunk_arg, 1, streams);
 
 #ifdef _OPENMP
