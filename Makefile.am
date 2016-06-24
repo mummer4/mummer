@@ -10,6 +10,7 @@ AM_LDFLAGS = -lpthread
 # Pre-declare all used variables.
 bin_PROGRAMS =
 bin_SCRIPTS =
+pkglibexec_PROGRAMS =
 noinst_SCRIPTS =
 noinst_HEADERS =
 EXTRA_DIST =
@@ -20,6 +21,9 @@ check_SCRIPTS =
 TESTS =
 TEST_EXTENSIONS =
 BUILT_SOURCES =
+
+# Where to install
+script_libdir = $(pkglibdir)
 
 # Special cleaning rules. Like CLEANFILES and DISTCLEANFILES, but for
 # directories.
@@ -93,9 +97,10 @@ mummer_SOURCES = src/essaMEM/fasta.cpp src/essaMEM/mummer.cpp
 ########
 # tigr #
 ########
-bin_PROGRAMS += mgaps postnuc show-coords show-aligns show-snps	\
-                show-tiling show-diff repeat-match annotate	\
-                combineMUMs delta-filter prepro postpro
+bin_PROGRAMS += show-coords show-aligns show-snps show-tiling	\
+                show-diff repeat-match annotate combineMUMs	\
+                delta-filter
+pkglibexec_PROGRAMS += mgaps postnuc prepro postpro
 mgaps_SOURCES = src/tigr/mgaps_main.cc
 postnuc_SOURCES = src/tigr/postnuc_main.cc
 show_coords_SOURCES = src/tigr/show-coords.cc src/tigr/delta.cc
@@ -121,7 +126,7 @@ EXTRA_DIST += src/tigr/gaps.cc
 # what LIBTOOLS does.
 
 # List of scripts to install
-perl_scripts = mummerplot dnadiff
+perl_scripts = mummerplot dnadiff promer
 shell_scripts = exact-tandems
 all_scripts = $(perl_scripts) $(shell_scripts)
 
@@ -139,10 +144,13 @@ CLEANFILES += $(libs_scripts) $(all_scripts)
 # Rules to generate the scripts, in .libs and in build directory.
 script_inst_subst  = sed -e 's,[@]PERL[@],$(PERL),g' \
                        -e 's,[@]BIN_DIR[@],$(bindir),g' \
-                       -e 's,[@]LIB_DIR[@],$(script_libdir),g'
+                       -e 's,[@]LIB_DIR[@],$(script_libdir),g' \
+	               -e 's,[@]LIBEXEC_DIR[@],$(pkglibexecdir),g'
 script_local_subst = sed -e 's,[@]PERL[@],$(PERL),g' \
                        -e 's,[@]BIN_DIR[@],$(abs_builddir),g' \
-                       -e 's,[@]LIB_DIR[@],$(abs_srcdir)/scripts,g'
+                       -e 's,[@]LIB_DIR[@],$(abs_srcdir)/scripts,g' \
+	               -e 's,[@]LIBEXEC_DIR[@],$(abs_builddir),g'
+
 .libs/%: scripts/%.pl
 	@mkdir -p $(dir $@) && $(script_inst_subst) < $< > $@
 %: scripts/%.pl
@@ -154,7 +162,6 @@ script_local_subst = sed -e 's,[@]PERL[@],$(PERL),g' \
 
 # Supporting modules
 script_lib_SCRIPTS = scripts/Foundation.pm scripts/tandem-repeat.awk
-script_libdir = $(libdir)/mummer
 EXTRA_DIST += $(script_lib_SCRIPTS)
 
 #######
