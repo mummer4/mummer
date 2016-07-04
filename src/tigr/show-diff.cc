@@ -10,6 +10,7 @@
 
 #include <mummer/delta.hh>
 #include <mummer/tigrinc.hh>
+#include <mummer/redirect_to_pager.hpp>
 #include <string>
 #include <cstdlib>
 #include <cassert>
@@ -112,6 +113,7 @@ int main(int argc, char **argv)
   graph.clean();
 
   //-- Output diff
+  stdio_launch_pager redirect_to_pager;
   PrintDiff(graph);
 
   return EXIT_SUCCESS;

@@ -15,6 +15,7 @@
 
 #include <mummer/delta.hh>
 #include <mummer/tigrinc.hh>
+#include <mummer/redirect_to_pager.hpp>
 #include <vector>
 #include <algorithm>
 using namespace std;
@@ -450,6 +451,7 @@ int main
 
 
   //-- Print the tiling path to stdout
+  stdio_launch_pager redirect_to_pager;
   if ( isPrintAlignments )
     printTilingAlignments (Contigs);
   else if ( isPrintXML )

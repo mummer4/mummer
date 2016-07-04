@@ -14,10 +14,13 @@
 //
 //------------------------------------------------------------------------------
 
+#include <sys/ioctl.h>
+
 #include <mummer/delta.hh>
 #include <mummer/tigrinc.hh>
 #include <mummer/translate.hh>
 #include <mummer/sw_alignscore.hh>
+#include <mummer/redirect_to_pager.hpp>
 #include <vector>
 #include <algorithm>
 using namespace std;
@@ -35,7 +38,16 @@ const char PROMER_MISMATCH_CHAR = ' ';
 #define PREFIX_FORMAT "%-10ld "
 
 #define DEFAULT_SCREEN_WIDTH 60
-int Screen_Width = DEFAULT_SCREEN_WIDTH;
+int Screen_Width = 0;
+
+//-- Get screen width from system. If not available, returns the
+//-- default.
+int get_screen_width() {
+  struct winsize w;
+  if(ioctl(1, TIOCGWINSZ, &w) == -1)
+    return DEFAULT_SCREEN_WIDTH;
+  return w.ws_col;
+}
 
 
 
@@ -187,6 +199,8 @@ int main
     if ( isSortByQuery  &&  isSortByReference )
       fprintf (stderr,
                "WARNING: both -r and -q were passed, -q ignored\n");
+    if(Screen_Width == 0)
+      Screen_Width = get_screen_width();
   }
 
   strcpy (InputFileName, argv[optind ++]);
@@ -233,6 +247,7 @@ int main
 
 
   //-- Output the alignments to stdout
+  stdio_launch_pager redirect_to_pager;
   printf("%s %s\n\n", RefFileName, QryFileName);
   for ( i = 0; i < Screen_Width; i ++ ) printf("=");
   printf("\n-- Alignments between %s and %s\n\n", IdR, IdQ);
@@ -240,6 +255,7 @@ int main
   printf("\n");
   for ( i = 0; i < Screen_Width; i ++ ) printf("=");
   printf("\n");
+  fclose(stdout);
 
   return EXIT_SUCCESS;
 }
@@ -535,7 +551,7 @@ void printAlignments
 	      sprintf(Buff2, PREFIX_FORMAT, toFwd (Bpos, SeqLenQ, frameQ));
 	      Pos = LINE_PREFIX_LEN;
 	    }
-	  
+
 	  if ( DATA_TYPE == NUCMER_DATA )
 	    Buff3[Pos] = A[Ai][Apos] == B[Bi][Bpos] ?
 	      NUCMER_MATCH_CHAR : NUCMER_MISMATCH_CHAR;
