@@ -40,6 +40,9 @@ const char PROMER_MISMATCH_CHAR = ' ';
 #define DEFAULT_SCREEN_WIDTH 60
 int Screen_Width = 0;
 
+#define DEFAULT_MARKER_WIDTH 10
+int Marker_Width = DEFAULT_MARKER_WIDTH;
+
 //-- Get screen width from system. If not available, returns the
 //-- default.
 int get_screen_width() {
@@ -115,6 +118,8 @@ void parseDelta
 void printAlignments
      (vector<AlignStats> Aligns, char * R, char * Q);
 
+void print_markers();
+
 void printHelp
      (const char * s);
 
@@ -148,7 +153,7 @@ int main
     optarg = NULL;
 
     while ( !errflg  &&  ((ch = getopt
-                           (argc, argv, "hqrw:x:")) != EOF) )
+                           (argc, argv, "hqrw:x:m:")) != EOF) )
       switch (ch)
         {
         case 'h' :
@@ -170,10 +175,14 @@ int main
 	    {
 	      fprintf(stderr,
 		      "WARNING: invalid screen width %d, using default\n",
-		      DEFAULT_SCREEN_WIDTH);
+		      Screen_Width);
 	      Screen_Width = DEFAULT_SCREEN_WIDTH;
 	    }
 	  break;
+
+        case 'm':
+          Marker_Width = atoi(optarg);
+          break;
 
 	case 'x' :
 	  MATRIX_TYPE = atoi (optarg);
@@ -444,9 +453,10 @@ void printAlignments
 
 
       //-- Generate the alignment
-      printf("-- BEGIN alignment [ %s%d %ld - %ld | %s%d %ld - %ld ]\n\n\n",
+      printf("-- BEGIN alignment [ %s%d %ld - %ld | %s%d %ld - %ld ]\n\n",
 	     frameR > 0 ? "+" : "-", abs(frameR), Ap->sR, Ap->eR,
 	     frameQ > 0 ? "+" : "-", abs(frameQ), Ap->sQ, Ap->eQ);
+      print_markers();
 
       Apos = sR;
       Bpos = sQ;
@@ -475,9 +485,10 @@ void printAlignments
 		{
 		  Buff1[Pos] = Buff2[Pos] = Buff3[Pos] = '\0';
 		  if ( DATA_TYPE == NUCMER_DATA )
-		    printf("%s\n%s\n%s\n\n", Buff1, Buff2, Buff3);
+		    printf("%s\n%s\n%s\n", Buff1, Buff2, Buff3);
 		  else
-		    printf("%s\n%s\n%s\n\n", Buff1, Buff3, Buff2);
+		    printf("%s\n%s\n%s\n", Buff1, Buff3, Buff2);
+                  print_markers();
 		  sprintf(Buff1, PREFIX_FORMAT, toFwd (Apos, SeqLenR, frameR));
 		  sprintf(Buff2, PREFIX_FORMAT, toFwd (Bpos, SeqLenQ, frameQ));
 		  Pos = LINE_PREFIX_LEN;
@@ -506,9 +517,10 @@ void printAlignments
 	    {
 	      Buff1[Pos] = Buff2[Pos] = Buff3[Pos] = '\0';
 	      if ( DATA_TYPE == NUCMER_DATA )
-		printf("%s\n%s\n%s\n\n", Buff1, Buff2, Buff3);
+		printf("%s\n%s\n%s\n", Buff1, Buff2, Buff3);
 	      else
-		printf("%s\n%s\n%s\n\n", Buff1, Buff3, Buff2);
+		printf("%s\n%s\n%s\n", Buff1, Buff3, Buff2);
+              print_markers();
 	      sprintf(Buff1, PREFIX_FORMAT, toFwd (Apos, SeqLenR, frameR));
 	      sprintf(Buff2, PREFIX_FORMAT, toFwd (Bpos, SeqLenQ, frameQ));
 	      Pos = LINE_PREFIX_LEN;
@@ -573,9 +585,9 @@ void printAlignments
 	{
 	  Buff1[Pos] = Buff2[Pos] = Buff3[Pos] = '\0';
 	  if ( DATA_TYPE == NUCMER_DATA )
-	    printf("%s\n%s\n%s\n\n", Buff1, Buff2, Buff3);
+	    printf("%s\n%s\n%s\n", Buff1, Buff2, Buff3);
 	  else
-	    printf("%s\n%s\n%s\n\n", Buff1, Buff3, Buff2);
+	    printf("%s\n%s\n%s\n", Buff1, Buff3, Buff2);
 	  sprintf(Buff1, PREFIX_FORMAT, toFwd (Apos, SeqLenR, frameR));
 	  sprintf(Buff2, PREFIX_FORMAT, toFwd (Bpos, SeqLenQ, frameQ));
 	  Pos = LINE_PREFIX_LEN;
@@ -598,7 +610,23 @@ void printAlignments
   return;
 }
 
+void print_markers() {
+  static const int maximums[7] = {1, 10, 100, 1000, 10000, 100000, 1000000};
+  if(Marker_Width <= 0) {
+    printf("\n");
+    return;
+  }
 
+  const int max = maximums[std::min(6, Marker_Width - 1)];
+  printf("%*s", LINE_PREFIX_LEN, "");
+  for(int i = Marker_Width; i <= Screen_Width - LINE_PREFIX_LEN; i += Marker_Width) {
+    if(i < max)
+      printf("%*d|", Marker_Width - 1, i);
+    else
+      printf("%*s|", Marker_Width - 1, "");
+  }
+  printf("\n");
+}
 
 
 void printHelp
@@ -610,20 +638,21 @@ void printHelp
   fprintf (stderr,
            "\nUSAGE: %s  [options]  <deltafile>  <ref ID>  <qry ID>\n\n", s);
   fprintf (stderr,
-       "-h            Display help information\n"
-       "-q            Sort alignments by the query start coordinate\n"
-       "-r            Sort alignments by the reference start coordinate\n"
-       "-w int        Set the screen width - default is 60\n"
-       "-x int        Set the matrix type - default is 2 (BLOSUM 62),\n"
-       "              other options include 1 (BLOSUM 45) and 3 (BLOSUM 80)\n"
-       "              note: only has effect on amino acid alignments\n\n");
+           "-h            Display help information\n"
+           "-q            Sort alignments by the query start coordinate\n"
+           "-r            Sort alignments by the reference start coordinate\n"
+           "-w int        Set the screen width - default is terminal width\n"
+           "-x int        Set the matrix type - default is 2 (BLOSUM 62)\n"
+           "-m int        Space between markers - default is 10, disable with 0\n"
+           "              other options include 1 (BLOSUM 45) and 3 (BLOSUM 80)\n"
+           "              note: only has effect on amino acid alignments\n\n");
   fprintf (stderr,
-       "  Input is the .delta output of either the \"nucmer\" or the\n"
-       "\"promer\" program passed on the command line.\n"
-       "  Output is to stdout, and consists of all the alignments between the\n"
-       "query and reference sequences identified on the command line.\n"
-       "  NOTE: No sorting is done by default, therefore the alignments\n"
-       "will be ordered as found in the <deltafile> input.\n\n");
+           "  Input is the .delta output of either the \"nucmer\" or the\n"
+           "\"promer\" program passed on the command line.\n"
+           "  Output is to stdout, and consists of all the alignments between the\n"
+           "query and reference sequences identified on the command line.\n"
+           "  NOTE: No sorting is done by default, therefore the alignments\n"
+           "will be ordered as found in the <deltafile> input.\n\n");
   return;
 }
 
