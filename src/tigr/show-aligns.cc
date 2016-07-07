@@ -32,6 +32,11 @@ const char NUCMER_MATCH_CHAR = ' ';
 const char PROMER_SIM_CHAR = '+';
 const char PROMER_MISMATCH_CHAR = ' ';
 
+// ANSI terminal codes
+static const char* const ANSI_RESET     = "\033[0m";
+static const char* const ANSI_BOLD    = "\033[1m";
+static const char* const ANSI_UNDERLINE = "\033[4m";
+
 //-- Note: if coord exceeds LINE_PREFIX_LEN - 1 digits,
 //         increase these accordingly
 #define LINE_PREFIX_LEN 11
@@ -42,6 +47,67 @@ int Screen_Width = 0;
 
 #define DEFAULT_MARKER_WIDTH 10
 int Marker_Width = DEFAULT_MARKER_WIDTH;
+
+bool Colorize = false;
+
+class ColoredBuffer {
+  std::string m_buf;
+  bool        m_bright;
+  int         m_color;
+  size_t      m_bases;
+
+public:
+  ColoredBuffer()
+    : m_bright(false)
+    , m_color(-1)
+    , m_bases(0)
+  { }
+
+  // Behave somewhat like a std::string
+  void clear() { m_buf.clear(); m_bases = 0; }
+  bool empty() const { return m_buf.empty(); }
+  size_t size() const { return m_buf.size(); }
+  char& back() { return m_buf.back(); }
+  const char* c_str() { return m_buf.c_str(); }
+
+  // Number of bases. Ignore formatting characters
+  size_t bases() const { return m_bases; }
+
+  void reset() {
+    if(m_bright || m_color != -1)
+      m_buf += ANSI_RESET;
+    m_bright = false;
+    m_color = -1;
+  }
+  template<typename T>
+  ColoredBuffer& operator+=(const T& x) {
+    const size_t before = size();
+    m_buf += x;
+    m_bases += size() - before;
+    return *this;
+  }
+  enum colors { Black, Red, Green, Yello, Blue, Magenta, Cyan, White };
+
+  void color(colors c, bool b) {
+    if(c == m_color && b == m_bright) return;
+    if(m_bright && !b)
+      reset();
+    m_buf    += ansi_color(c, b);
+    m_color   = c;
+    m_bright  = b;
+  }
+
+  std::string ansi_color(colors c, bool b) {
+    std::string res("\033[3");
+    res += std::to_string(c);
+    if(b) res += ";7"; // 1 for bold, 7 for reverse video
+    res += 'm';
+    // std::cerr << "ansi_color " << c << ',' << b << ' ' << res << '\n';
+    return res;
+  }
+
+  bool bright() const { return m_bright; }
+};
 
 //-- Get screen width from system. If not available, returns the
 //-- default.
@@ -118,7 +184,14 @@ void parseDelta
 void printAlignments
      (vector<AlignStats> Aligns, char * R, char * Q);
 
-void print_markers();
+void add_prefix(ColoredBuffer& Buff, long int pos, long int seqlen, int frame);
+
+void append(ColoredBuffer& Buff1, ColoredBuffer& Buff2, std::string &Buff3,
+            char c1, char c2, char c3);
+
+void print_buffers(ColoredBuffer& b1, ColoredBuffer& b2, std::string& b3);
+
+void print_markers(int max_len = Screen_Width);
 
 void printHelp
      (const char * s);
@@ -153,7 +226,7 @@ int main
     optarg = NULL;
 
     while ( !errflg  &&  ((ch = getopt
-                           (argc, argv, "hqrw:x:m:")) != EOF) )
+                           (argc, argv, "hqrw:x:m:c")) != EOF) )
       switch (ch)
         {
         case 'h' :
@@ -194,6 +267,10 @@ int main
 	      MATRIX_TYPE = mummer::sw_align::BLOSUM62;
 	    }
 	  break;
+
+        case 'c' :
+          Colorize = true;
+          break;
 
         default :
           errflg ++;
@@ -357,23 +434,20 @@ void printAlignments
   char * B[7] = {NULL, NULL, NULL, NULL, NULL, NULL, NULL};
   int Ai, Bi, i;
 
-  char Buff1 [Screen_Width + 1],
-       Buff2 [Screen_Width + 1],
-       Buff3 [Screen_Width + 1];
+  ColoredBuffer Buff1, Buff2;
+  std::string Buff3;
 
   int Sign;
   long int Delta;
   long int Total, Remain;
   // long int Errors;
   long int Pos;
+  char c; // Character to add to Buff3
 
   long int sR, eR, sQ, eQ;
   long int Apos, Bpos;
   long int SeqLenR, SeqLenQ;
   int frameR, frameQ;
-
-  for ( i = 0; i < LINE_PREFIX_LEN; i ++ )
-    Buff3[i] = ' ';
 
   SeqLenR = strlen (R + 1);
   SeqLenQ = strlen (Q + 1);
@@ -456,7 +530,6 @@ void printAlignments
       printf("-- BEGIN alignment [ %s%d %ld - %ld | %s%d %ld - %ld ]\n\n",
 	     frameR > 0 ? "+" : "-", abs(frameR), Ap->sR, Ap->eR,
 	     frameQ > 0 ? "+" : "-", abs(frameQ), Ap->sQ, Ap->eQ);
-      print_markers();
 
       Apos = sR;
       Bpos = sQ;
@@ -465,8 +538,8 @@ void printAlignments
       Total = 0;
       Remain = eR - sR + 1;
 
-      sprintf(Buff1, PREFIX_FORMAT, toFwd (Apos, SeqLenR, frameR));
-      sprintf(Buff2, PREFIX_FORMAT, toFwd (Bpos, SeqLenQ, frameQ));
+      add_prefix(Buff1, Apos, SeqLenR, frameR);
+      add_prefix(Buff2, Bpos, SeqLenQ, frameQ);
       Pos = LINE_PREFIX_LEN;
 
       for ( Dp = Ap->Delta.begin( );
@@ -481,70 +554,57 @@ void printAlignments
 	  //-- For all the bases before the next indel
 	  for ( i = 1; i < Delta; i ++ )
 	    {
-	      if ( Pos >= Screen_Width )
-		{
-		  Buff1[Pos] = Buff2[Pos] = Buff3[Pos] = '\0';
-		  if ( DATA_TYPE == NUCMER_DATA )
-		    printf("%s\n%s\n%s\n", Buff1, Buff2, Buff3);
-		  else
-		    printf("%s\n%s\n%s\n", Buff1, Buff3, Buff2);
-                  print_markers();
-		  sprintf(Buff1, PREFIX_FORMAT, toFwd (Apos, SeqLenR, frameR));
-		  sprintf(Buff2, PREFIX_FORMAT, toFwd (Bpos, SeqLenQ, frameQ));
-		  Pos = LINE_PREFIX_LEN;
-		}
+	      if ( Pos >= Screen_Width ) {
+                print_buffers(Buff1, Buff2, Buff3);
+                add_prefix(Buff1, Apos, SeqLenR, frameR);
+                add_prefix(Buff2, Bpos, SeqLenQ, frameQ);
+                Pos = LINE_PREFIX_LEN;
+              }
 
 	      if ( DATA_TYPE == NUCMER_DATA )
-		Buff3[Pos] = A[Ai][Apos] == B[Bi][Bpos] ?
-		  NUCMER_MATCH_CHAR : NUCMER_MISMATCH_CHAR;
-	      else if ( A[Ai][Apos] == B[Bi][Bpos] )
-		Buff3[Pos] = A[Ai][Apos];
+                c = A[Ai][Apos] == B[Bi][Bpos] ? NUCMER_MATCH_CHAR : NUCMER_MISMATCH_CHAR;
+              else if ( A[Ai][Apos] == B[Bi][Bpos] )
+                c = A[Ai][Apos];
 	      else
-		Buff3[Pos] = mummer::sw_align::MATCH_SCORE
+		c = mummer::sw_align::MATCH_SCORE
 		  [MATRIX_TYPE]
 		  [toupper(A[Ai][Apos]) - 'A']
 		  [toupper(B[Bi][Bpos]) - 'A'] > 0 ?
 		  PROMER_SIM_CHAR : PROMER_MISMATCH_CHAR;
-	      Buff1[Pos] = A[Ai][Apos ++];
-	      Buff2[Pos ++] = B[Bi][Bpos ++];
+              append(Buff1, Buff2, Buff3, A[Ai][Apos++], B[Bi][Bpos++], c);
+              ++Pos;
 	    }
 
 
 	  //-- For the indel
 	  Remain -= i - 1;
 
-	  if ( Pos >= Screen_Width )
-	    {
-	      Buff1[Pos] = Buff2[Pos] = Buff3[Pos] = '\0';
-	      if ( DATA_TYPE == NUCMER_DATA )
-		printf("%s\n%s\n%s\n", Buff1, Buff2, Buff3);
-	      else
-		printf("%s\n%s\n%s\n", Buff1, Buff3, Buff2);
-              print_markers();
-	      sprintf(Buff1, PREFIX_FORMAT, toFwd (Apos, SeqLenR, frameR));
-	      sprintf(Buff2, PREFIX_FORMAT, toFwd (Bpos, SeqLenQ, frameQ));
-	      Pos = LINE_PREFIX_LEN;
-	    }
+	  if ( Pos >= Screen_Width ) {
+            print_buffers(Buff1, Buff2, Buff3);
+            add_prefix(Buff1, Apos, SeqLenR, frameR);
+            add_prefix(Buff2, Bpos, SeqLenQ, frameQ);
+            Pos = LINE_PREFIX_LEN;
+          }
 
 	  if ( Sign == 1 )
 	    {
 	      if ( DATA_TYPE == NUCMER_DATA )
-		Buff3[Pos] = NUCMER_MISMATCH_CHAR;
+		c = NUCMER_MISMATCH_CHAR;
 	      else
-		Buff3[Pos] = PROMER_MISMATCH_CHAR;
-	      Buff1[Pos] = A[Ai][Apos ++];
-	      Buff2[Pos ++] = '.';
+		c = PROMER_MISMATCH_CHAR;
+              append(Buff1, Buff2, Buff3, A[Ai][Apos++], '.', c);
 	      Remain --;
+              ++Pos;
 	    }
 	  else
 	    {
 	      if ( DATA_TYPE == NUCMER_DATA )
-		Buff3[Pos] = NUCMER_MISMATCH_CHAR;
+		c = NUCMER_MISMATCH_CHAR;
 	      else
-		Buff3[Pos] = PROMER_MISMATCH_CHAR;
-	      Buff1[Pos] = '.';
-	      Buff2[Pos ++] = B[Bi][Bpos ++];
+		c = PROMER_MISMATCH_CHAR;
+              append(Buff1, Buff2, Buff3, '.', B[Bi][Bpos++], c);
 	      Total ++;
+              ++Pos;
 	    }
 	}
 
@@ -552,46 +612,36 @@ void printAlignments
       //-- For all the bases remaining after the last indel
       for ( i = 0; i < Remain; i ++ )
 	{
-	  if ( Pos >= Screen_Width )
-	    {
-	      Buff1[Pos] = Buff2[Pos] = Buff3[Pos] = '\0';
-	      if ( DATA_TYPE == NUCMER_DATA )
-		printf("%s\n%s\n%s\n\n", Buff1, Buff2, Buff3);
-	      else
-		printf("%s\n%s\n%s\n\n", Buff1, Buff3, Buff2);
-	      sprintf(Buff1, PREFIX_FORMAT, toFwd (Apos, SeqLenR, frameR));
-	      sprintf(Buff2, PREFIX_FORMAT, toFwd (Bpos, SeqLenQ, frameQ));
-	      Pos = LINE_PREFIX_LEN;
-	    }
+	  if ( Pos >= Screen_Width ) {
+            print_buffers(Buff1, Buff2, Buff3);
+            add_prefix(Buff1, Apos, SeqLenR, frameR);
+            add_prefix(Buff2, Bpos, SeqLenQ, frameQ);
+            Pos = LINE_PREFIX_LEN;
+          }
 
 	  if ( DATA_TYPE == NUCMER_DATA )
-	    Buff3[Pos] = A[Ai][Apos] == B[Bi][Bpos] ?
+	    c = A[Ai][Apos] == B[Bi][Bpos] ?
 	      NUCMER_MATCH_CHAR : NUCMER_MISMATCH_CHAR;
 	  else if ( A[Ai][Apos] == B[Bi][Bpos] )
-	    Buff3[Pos] = A[Ai][Apos];
+	    c = A[Ai][Apos];
 	  else
-	    Buff3[Pos] = mummer::sw_align::MATCH_SCORE
+	    c = mummer::sw_align::MATCH_SCORE
 	      [MATRIX_TYPE]
 	      [toupper(A[Ai][Apos]) - 'A']
 	      [toupper(B[Bi][Bpos]) - 'A'] > 0 ?
 	      PROMER_SIM_CHAR : PROMER_MISMATCH_CHAR;
-	  Buff1[Pos] = A[Ai][Apos ++];
-	  Buff2[Pos ++] = B[Bi][Bpos ++];
+          append(Buff1, Buff2, Buff3, A[Ai][Apos++], B[Bi][Bpos++], c);
+          ++Pos;
 	}
 
 
       //-- For the remaining buffered output
-      if ( Pos > LINE_PREFIX_LEN )
-	{
-	  Buff1[Pos] = Buff2[Pos] = Buff3[Pos] = '\0';
-	  if ( DATA_TYPE == NUCMER_DATA )
-	    printf("%s\n%s\n%s\n", Buff1, Buff2, Buff3);
-	  else
-	    printf("%s\n%s\n%s\n", Buff1, Buff3, Buff2);
-	  sprintf(Buff1, PREFIX_FORMAT, toFwd (Apos, SeqLenR, frameR));
-	  sprintf(Buff2, PREFIX_FORMAT, toFwd (Bpos, SeqLenQ, frameQ));
-	  Pos = LINE_PREFIX_LEN;
-	}
+      if ( Pos > LINE_PREFIX_LEN ) {
+        print_buffers(Buff1, Buff2, Buff3);
+        add_prefix(Buff1, Apos, SeqLenR, frameR);
+        add_prefix(Buff2, Bpos, SeqLenQ, frameQ);
+        Pos = LINE_PREFIX_LEN;
+      }
 
       printf("\n--   END alignment [ %s%d %ld - %ld | %s%d %ld - %ld ]\n",
 	     frameR > 0 ? "+" : "-", abs(frameR), Ap->sR, Ap->eR,
@@ -610,7 +660,64 @@ void printAlignments
   return;
 }
 
-void print_markers() {
+void base_color(ColoredBuffer& b, char c, bool m) {
+  // std::cerr << "base_color " << c << ',' << m << '\n';
+  switch(c) {
+  case 'a': case 'A': b.color(ColoredBuffer::Green, m); break;
+  case 'c': case 'C': b.color(ColoredBuffer::Blue, m);  break;
+  case 'g': case 'G': b.color(ColoredBuffer::Black, m); break;
+  case 't': case 'T': b.color(ColoredBuffer::Red, m);   break;
+  default: b.reset(); break;
+  }
+  b += c;
+}
+
+void append(ColoredBuffer& Buff1, ColoredBuffer& Buff2, std::string &Buff3,
+            char c1, char c2, char c3) {
+  if(!Colorize || DATA_TYPE == PROMER_DATA) {
+    Buff1 += c1;
+    Buff2 += c2;
+  } else {
+    const bool mismatch =
+      (DATA_TYPE == NUCMER_DATA && c3 == NUCMER_MISMATCH_CHAR) ||
+      (DATA_TYPE == PROMER_DATA && c3 == PROMER_MISMATCH_CHAR);
+    // std::cerr << "append " << c3 << ',' << NUCMER_MISMATCH_CHAR << ',' << PROMER_MISMATCH_CHAR << ' ' << mismatch << '\n';
+    base_color(Buff1, c1, mismatch);
+    base_color(Buff2, c2, mismatch);
+    if(Buff3.empty())
+      Buff3 += ANSI_BOLD;
+  }
+  Buff3 += c3;
+}
+
+void add_prefix(ColoredBuffer& Buff, long int pos, long int seqlen, int frame) {
+  char b[LINE_PREFIX_LEN + 1];
+  sprintf(b, PREFIX_FORMAT, toFwd(pos, seqlen, frame));
+  Buff.clear();
+  Buff += b;
+}
+
+void print_buffers(ColoredBuffer& Buff1, ColoredBuffer& Buff2, std::string& Buff3) {
+  print_markers(Buff1.bases());
+  if(Colorize) { // Make sure that we reset any color/property setting
+    Buff1.reset();
+    Buff2.reset();
+    Buff3 += ANSI_RESET;
+  }
+  const char* b2 = Buff2.c_str();
+  const char* b3 = Buff3.c_str();
+  if(DATA_TYPE != NUCMER_DATA)
+    std::swap(b2, b3);
+  printf("%s\n"
+         "%s\n"
+         "%*s%s\n",
+         Buff1.c_str(),
+         Buff2.c_str(),
+         LINE_PREFIX_LEN, "", Buff3.c_str());
+  Buff1.clear(); Buff2.clear(); Buff3.clear();
+}
+
+void print_markers(int max_len) {
   static const int maximums[7] = {1, 10, 100, 1000, 10000, 100000, 1000000};
   if(Marker_Width <= 0) {
     printf("\n");
@@ -619,11 +726,20 @@ void print_markers() {
 
   const int max = maximums[std::min(6, Marker_Width - 1)];
   printf("%*s", LINE_PREFIX_LEN, "");
-  for(int i = Marker_Width; i <= Screen_Width - LINE_PREFIX_LEN; i += Marker_Width) {
+  if(Colorize)
+    printf("%s", ANSI_UNDERLINE);
+  int i = Marker_Width;
+  for( ; i <= max_len - LINE_PREFIX_LEN; i += Marker_Width) {
     if(i < max)
       printf("%*d|", Marker_Width - 1, i);
     else
       printf("%*s|", Marker_Width - 1, "");
+  }
+  if(Colorize) {
+    i -= Marker_Width;
+    if(i < max_len - LINE_PREFIX_LEN)
+      printf("%*s", max_len - LINE_PREFIX_LEN - i, "");
+    printf("%s", ANSI_RESET);
   }
   printf("\n");
 }
@@ -642,6 +758,7 @@ void printHelp
            "-q            Sort alignments by the query start coordinate\n"
            "-r            Sort alignments by the reference start coordinate\n"
            "-w int        Set the screen width - default is terminal width\n"
+           "-c            Colorize bases on output\n"
            "-x int        Set the matrix type - default is 2 (BLOSUM 62)\n"
            "-m int        Space between markers - default is 10, disable with 0\n"
            "              other options include 1 (BLOSUM 45) and 3 (BLOSUM 80)\n"

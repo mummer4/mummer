@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <signal.h>
+
 
 // Class that will redirect stdout to a pager if: (1) stdout is a tty
 // and (2) it can launch a pager. The pager is the content of the
@@ -13,10 +15,12 @@ struct stdio_launch_pager {
   static constexpr const char* dflt_pager = "more";
   FILE* pager_handle;
 
-  stdio_launch_pager()
+  static void clean_exit(int) { exit(0); }
+
+  stdio_launch_pager(bool no_pager = false)
     : pager_handle(NULL)
   {
-    if(!isatty(1)) return;
+    if(!isatty(1) || no_pager) return;
     // Open a pager
     const char* pager      = getenv("PAGER");
     if(pager)
@@ -32,6 +36,12 @@ struct stdio_launch_pager {
       return; // Done already!
     if(dup2(fileno(pager_handle), 1) == -1)
       stop_pager();
+
+    // Upon SIGPIPE, quit without error
+    struct sigaction act;
+    memset(&act, '\0', sizeof(act));
+    act.sa_handler = clean_exit;
+    sigaction(SIGPIPE, &act, NULL);
   }
 
   ~stdio_launch_pager() { stop_pager(); }
