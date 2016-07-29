@@ -86,7 +86,8 @@ noinst_HEADERS += include/mummer/48bit_index.hpp		\
 noinst_HEADERS += include/mummer/dset.hpp		\
                   include/mummer/openmp_qsort.hpp	\
                   include/mt_skip_list/common.hpp	\
-                  include/mt_skip_list/set.hpp
+                  include/mt_skip_list/set.hpp		\
+                  include/mummer/redirect_to_pager.hpp
 
 ###########
 # essaMEM #
