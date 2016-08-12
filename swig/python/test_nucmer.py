@@ -35,6 +35,13 @@ class TestNucmer(unittest.TestCase):
         self.assertEqual(1.0, al.identity())
         self.assertEqual(1.0, al.similarity())
 
+    def test_thread(self):
+        nt = mummer.get_num_threads()
+        self.assertTrue(nt >= 1)
+        mummer.set_num_threads(nt + 1)
+        nnt = mummer.get_num_threads()
+        self.assertTrue(nnt == 1 or nnt == nt + 1)
+
 
 if __name__ == '__main__':
     unittest.main()

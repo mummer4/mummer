@@ -6,6 +6,9 @@
 
 namespace mummer {
 
+void set_num_threads(int nb);
+int  get_num_threads();
+
 namespace postnuc {
 struct Alignment   {
   //-- An alignment object between two sequences A and B

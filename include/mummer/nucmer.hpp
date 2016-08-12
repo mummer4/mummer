@@ -15,7 +15,27 @@
 #include <jellyfish/whole_sequence_parser.hpp>
 #include <mt_skip_list/set.hpp>
 
+#ifdef _OPENMP
+#include <omp.h>
+#endif
+
 namespace mummer {
+
+// Limit number of threads to use
+inline void set_num_threads(int nb) {
+#ifdef _OPENMP
+  omp_set_num_threads(nb);
+#endif
+}
+
+inline int get_num_threads() {
+#ifdef _OPENMP
+  return omp_get_num_threads();
+#else
+  return 1;
+#endif
+}
+
 namespace nucmer {
 void reverse_complement(std::string& s);
 
