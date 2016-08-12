@@ -4,7 +4,7 @@
 ACLOCAL_AMFLAGS = -I m4
 
 AM_CPPFLAGS = -Wall -I$(srcdir)/include
-AM_CXXFLAGS = $(EXTRA_CXXFLAGS)
+AM_CXXFLAGS = -std=c++11 $(EXTRA_CXXFLAGS)
 AM_LDFLAGS = -lpthread
 
 # Pre-declare all used variables.
