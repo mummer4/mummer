@@ -806,6 +806,8 @@ bool find_sequence(const std::vector<string>& paths, const std::string& Id, std:
       if(j->data[i].header.compare(0, n, Id) == 0) {
         found = true;
         seq = std::string(1, '\0') + j->data[i].seq; // seq is 1-based
+        for(auto& base : seq)
+          base = tolower(base);
         break;
       }
     }

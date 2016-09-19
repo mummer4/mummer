@@ -12,7 +12,7 @@
 // PAGER environment variables or "more" if not set. This works with
 // stdio.
 struct stdio_launch_pager {
-  static constexpr const char* dflt_pager = "more";
+  static constexpr const char* dflt_pager = "less -R";
   FILE* pager_handle;
 
   static void clean_exit(int) { exit(0); }
