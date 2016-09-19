@@ -1189,7 +1189,7 @@ sub WriteGP ($$)
             $xrange += $rref->{$xlabel}[1];
             $tic = $rref->{$xlabel}[0] + 1;
             $dir = ($rref->{$xlabel}[2] == 1) ? "" : "*";
-            print GFILE " \"$dir$xlabel\" $tic, \\\n";
+            print GFILE " \"$dir$xlabel\" $tic.0, \\\n";
         }
         print GFILE " \"\" $xrange \\\n\)\n";
         $xlabel = "REF";
@@ -1212,7 +1212,7 @@ sub WriteGP ($$)
             $yrange += $qref->{$ylabel}[1];
             $tic = $qref->{$ylabel}[0] + 1;
             $dir = ($qref->{$ylabel}[2] == 1) ? "" : "*";
-            print GFILE " \"$dir$ylabel\" $tic, \\\n";
+            print GFILE " \"$dir$ylabel\" $tic.0, \\\n";
         }
         print GFILE " \"\" $yrange \\\n\)\n";
         $ylabel = "QRY";

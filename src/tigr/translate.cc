@@ -2,7 +2,7 @@
 
 
 long int Translate_DNA
-     (char * A, char * tA, int Frame)
+(const char * A, int dnaseq_len, char * tA, int Frame)
 
      // function to translate dna sequence to aminoacid sequence
      // uses esttrans' headers and algo
@@ -12,12 +12,12 @@ long int Translate_DNA
      // returns new (strlen(tA+1)) or -1 on error
 
 {
-  int     dna_int;
-  int     dnaseq_len, aaseq_len;
-  int     aa_index;
-  char    *dna_seq, *dna_ptr, *dna_end, *aa_ptr;
+  int         dna_int;
+  int         aaseq_len;
+  int         aa_index;
+  const char *dna_seq, *dna_ptr, *dna_end;
+  char       *aa_ptr;
 
-  dnaseq_len = strlen ( A + 1 );
   aa_ptr =  tA + 1;
   dna_seq = A + 1;
   dna_end = A + dnaseq_len;
@@ -35,7 +35,7 @@ long int Translate_DNA
 	  }
 	  aa_index = dna_int;
 	  aa_index <<= 4;
-	  
+
 	  dna_int = transdna [ int(*dna_ptr++) ];
 	  if ( dna_int == BAD_PEP_CHAR ) {
 	    fprintf(stderr,"WARNING: Forcing unrecognized DNA char to N\n");

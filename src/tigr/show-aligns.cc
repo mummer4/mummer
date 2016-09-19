@@ -21,9 +21,18 @@
 #include <mummer/translate.hh>
 #include <mummer/sw_alignscore.hh>
 #include <mummer/redirect_to_pager.hpp>
+#include <jellyfish/stream_manager.hpp>
+#include <jellyfish/whole_sequence_parser.hpp>
+#include <string>
 #include <vector>
 #include <algorithm>
 using namespace std;
+
+//------------------------------------------------------------- Jellyfish parser ----//
+typedef std::vector<std::string>::const_iterator         path_iterator;
+typedef jellyfish::stream_manager<path_iterator>         stream_manager;
+typedef jellyfish::whole_sequence_parser<stream_manager> sequence_parser;
+
 
 //------------------------------------------------------------- Constants ----//
 
@@ -170,8 +179,8 @@ int DATA_TYPE = NUCMER_DATA;
 int MATRIX_TYPE = mummer::sw_align::BLOSUM62;
 
 char InputFileName [MAX_LINE];
-char RefFileName [MAX_LINE], QryFileName [MAX_LINE];
-
+// Today, only 1 ref and qry file supported in delta format. It may change one day!
+std::vector<std::string> RefFileNames, QryFileNames;
 
 
 //------------------------------------------------- Function Declarations ----//
@@ -179,10 +188,10 @@ long int toFwd
      (long int coord, long int len, int frame);
 
 void parseDelta
-     (vector<AlignStats> & Aligns, char * IdR, char * IdQ);
+(vector<AlignStats> & Aligns, const std::string& IdR, const std::string& IdQ);
 
 void printAlignments
-     (vector<AlignStats> Aligns, char * R, char * Q);
+(vector<AlignStats> Aligns, const std::string& R, const std::string& Q);
 
 void add_prefix(ColoredBuffer& Buff, long int pos, long int seqlen, int frame);
 
@@ -202,7 +211,7 @@ void printUsage
 long int revC
      (long int coord, long int len);
 
-
+bool find_sequence(const std::vector<string>& paths, const std::string& IdS, std::string& seq);
 
 //-------------------------------------------------- Function Definitions ----//
 int main
@@ -210,15 +219,11 @@ int main
 {
   long int i;
 
-  FILE * RefFile = NULL;
-  FILE * QryFile = NULL;
-
   vector<AlignStats> Aligns;
 
-  char * R, * Q;
+  std::string R, Q; // Reference & Query sequence
 
-  long int InitSize = INIT_SIZE;
-  char Id [MAX_LINE], IdR [MAX_LINE], IdQ [MAX_LINE];
+  std::string IdR, IdQ;
 
   //-- Parse the command line arguments
   {
@@ -290,40 +295,24 @@ int main
   }
 
   strcpy (InputFileName, argv[optind ++]);
-  strcpy (IdR, argv[optind ++]);
-  strcpy (IdQ, argv[optind ++]);
+  IdR = argv[optind++];
+  IdQ = argv[optind++];
 
   //-- Read in the alignment data
-  parseDelta (Aligns, IdR, IdQ);
+  parseDelta (Aligns, IdR.c_str(), IdQ.c_str());
 
   //-- Find, and read in the reference sequence
-  RefFile = File_Open (RefFileName, "r");
-  InitSize = INIT_SIZE;
-  R = (char *) Safe_malloc ( sizeof(char) * InitSize );
-  while ( Read_String (RefFile, R, InitSize, Id, false) )
-    if ( strcmp (Id, IdR) == 0 )
-      break;
-  fclose (RefFile);
-  if ( strcmp (Id, IdR) != 0 )
+  if(!find_sequence(RefFileNames, IdR, R))
     {
-      fprintf(stderr,"ERROR: Could not find %s in the reference file\n", IdR);
+      fprintf(stderr,"ERROR: Could not find %s in the reference file\n", IdR.c_str());
       exit (EXIT_FAILURE);
     }
 
-
-  //-- Find, and read in the query sequence
-  QryFile = File_Open (QryFileName, "r");
-  InitSize = INIT_SIZE;
-  Q = (char *) Safe_malloc ( sizeof(char) * InitSize );
-  while ( Read_String (QryFile, Q, InitSize, Id, false) )
-    if ( strcmp (Id, IdQ) == 0 )
-      break;
-  fclose (QryFile);
-  if ( strcmp (Id, IdQ) != 0 )
-    {
-      fprintf(stderr,"ERROR: Could not find %s in the query file\n", IdQ);
-      exit (EXIT_FAILURE);
-    }
+  if(!find_sequence(QryFileNames, IdQ, Q))
+  {
+    fprintf(stderr,"ERROR: Could not find %s in the query file\n", IdQ.c_str());
+    exit (EXIT_FAILURE);
+  }
 
   //-- Sort the alignment regions if user passed -r or -q option
   if ( isSortByReference )
@@ -334,9 +323,9 @@ int main
 
   //-- Output the alignments to stdout
   stdio_launch_pager redirect_to_pager;
-  printf("%s %s\n\n", RefFileName, QryFileName);
+  printf("%s %s\n\n", RefFileNames[0].c_str(), QryFileNames[0].c_str());
   for ( i = 0; i < Screen_Width; i ++ ) printf("=");
-  printf("\n-- Alignments between %s and %s\n\n", IdR, IdQ);
+  printf("\n-- Alignments between %s and %s\n\n", IdR.c_str(), IdQ.c_str());
   printAlignments (Aligns, R, Q);
   printf("\n");
   for ( i = 0; i < Screen_Width; i ++ ) printf("=");
@@ -370,7 +359,7 @@ long int toFwd
 
 
 void parseDelta
-     (vector<AlignStats> & Aligns, char * IdR, char * IdQ)
+(vector<AlignStats> & Aligns, const std::string& IdR, const std::string& IdQ)
 
      // Read in the alignments from the desired region
 
@@ -382,8 +371,8 @@ void parseDelta
   dr.open (InputFileName);
   DATA_TYPE = dr.getDataType( ) == NUCMER_STRING ?
     NUCMER_DATA : PROMER_DATA;
-  strcpy (RefFileName, dr.getReferencePath( ).c_str( ));
-  strcpy (QryFileName, dr.getQueryPath( ).c_str( ));
+  RefFileNames.push_back(dr.getReferencePath());
+  QryFileNames.push_back(dr.getQueryPath());
 
   while ( dr.readNext( ) )
     {
@@ -397,7 +386,7 @@ void parseDelta
   if ( !found )
     {
       fprintf(stderr, "ERROR: Could not find any alignments for %s and %s\n",
-	      IdR, IdQ);
+	      IdR.c_str(), IdQ.c_str());
       exit (EXIT_FAILURE);
     }
 
@@ -422,7 +411,7 @@ void parseDelta
 
 
 void printAlignments
-     (vector<AlignStats> Aligns, char * R, char * Q)
+(vector<AlignStats> Aligns, const std::string& R, const std::string& Q)
 
      // Print the alignments to the screen
 
@@ -430,8 +419,8 @@ void printAlignments
   vector<AlignStats>::iterator Ap;
   vector<long int>::iterator Dp;
 
-  char * A[7] = {NULL, NULL, NULL, NULL, NULL, NULL, NULL};
-  char * B[7] = {NULL, NULL, NULL, NULL, NULL, NULL, NULL};
+  const char * A[7] = {NULL, NULL, NULL, NULL, NULL, NULL, NULL};
+  const char * B[7] = {NULL, NULL, NULL, NULL, NULL, NULL, NULL};
   int Ai, Bi, i;
 
   ColoredBuffer Buff1, Buff2;
@@ -449,22 +438,24 @@ void printAlignments
   long int SeqLenR, SeqLenQ;
   int frameR, frameQ;
 
-  SeqLenR = strlen (R + 1);
-  SeqLenQ = strlen (Q + 1);
+  SeqLenR = R.size() - 1; // strlen (R + 1);
+  SeqLenQ = Q.size() - 1; // strlen (Q + 1);
 
   if ( DATA_TYPE == NUCMER_DATA )
     {
-      A[1] = R;
-      A[4] = (char *) Safe_malloc ( sizeof(char) * (SeqLenR + 2) );
-      strcpy ( A[4] + 1, A[1] + 1 );
-      A[4][0] = '\0';
-      Reverse_Complement ( A[4], 1, SeqLenR );
+      A[1] = R.c_str();
+      char* rcR = (char *) Safe_malloc ( sizeof(char) * (SeqLenR + 2) );
+      strcpy ( rcR + 1, A[1] + 1 );
+      rcR[0] = '\0';
+      Reverse_Complement ( rcR, 1, SeqLenR );
+      A[4] = rcR;
 
-      B[1] = Q;
-      B[4] = (char *) Safe_malloc ( sizeof(char) * (SeqLenQ + 2) );
-      strcpy ( B[4] + 1, B[1] + 1 );
-      B[4][0] = '\0';
-      Reverse_Complement ( B[4], 1, SeqLenQ );
+      B[1] = Q.c_str();
+      char* rcQ = (char *) Safe_malloc ( sizeof(char) * (SeqLenQ + 2) );
+      strcpy ( rcQ + 1, B[1] + 1 );
+      rcQ[0] = '\0';
+      Reverse_Complement ( rcQ, 1, SeqLenQ );
+      B[4] = rcQ;
     }
 
   for ( Ap = Aligns.begin( ); Ap < Aligns.end( ); Ap ++ )
@@ -513,16 +504,19 @@ void printAlignments
       if ( A[Ai] == NULL )
 	{
 	  assert ( DATA_TYPE == PROMER_DATA );
-	  A[Ai] = (char *) Safe_malloc ( sizeof(char) * ( SeqLenR / 3 + 2 ) );
-	  A[Ai][0] = '\0';
-	  Translate_DNA ( R, A[Ai], Ai );
+	  char* translated = (char *) Safe_malloc ( sizeof(char) * ( SeqLenR / 3 + 2 ) );
+	  translated[0] = '\0';
+	  Translate_DNA ( R.c_str(), R.size() - 1, translated, Ai );
+          A[Ai] = translated;
 	}
       if ( B[Bi] == NULL )
 	{
 	  assert ( DATA_TYPE == PROMER_DATA );
-	  B[Bi] = (char *) Safe_malloc ( sizeof(char) * ( SeqLenQ / 3 + 2 ) );
-	  B[Bi][0] = '\0';
-	  Translate_DNA ( Q, B[Bi], Bi );
+          char* translated = (char *) Safe_malloc ( sizeof(char) * ( SeqLenQ / 3 + 2 ) );
+	  translated[0] = '\0';
+	  Translate_DNA ( Q.c_str(), Q.size() - 1, translated, Bi );
+	  B[Bi] = translated;
+
 	}
 
 
@@ -652,9 +646,9 @@ void printAlignments
   for ( i = 0; i < 7; i ++ )
     {
       if ( (DATA_TYPE != NUCMER_DATA || i != 1)  &&  A[i] != NULL )
-	free ( A[i] );
+	free ( (void*)A[i] );
       if ( (DATA_TYPE != NUCMER_DATA || i != 1)  &&  B[i] != NULL )
-	free ( B[i] );
+	free ( (void*)B[i] );
     }
 
   return;
@@ -795,4 +789,26 @@ long int revC
      (long int coord, long int len)
 {
   return len - coord + 1;
+}
+
+bool find_sequence(const std::vector<string>& paths, const std::string& Id, std::string& seq)
+{
+  //-- Find, and read in sequences. Return if find one with name Id, and store it in seq.
+  stream_manager streams(paths.cbegin(), paths.cend());
+  sequence_parser parser(16, 10, 1, streams);
+  bool found = false;
+  while(!found) {
+    sequence_parser::job j(parser);
+    if(j.is_empty()) break;
+    for(size_t i = 0; i < j->nb_filled; ++i) {
+      // Compare up to first white space or tab
+      const auto n = j->data[i].header.find_first_of(" \t");
+      if(j->data[i].header.compare(0, n, Id) == 0) {
+        found = true;
+        seq = std::string(1, '\0') + j->data[i].seq; // seq is 1-based
+        break;
+      }
+    }
+  }
+  return found;
 }
