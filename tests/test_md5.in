@@ -1,0 +1,6 @@
+#! /bin/bash
+
+case @MD5@ in
+    (md5sum) exec md5sum -c <(echo "$1  -") 2>&1;;
+    (md5) x=`md5 -r`; test "$x" = "$1";;
+esac
