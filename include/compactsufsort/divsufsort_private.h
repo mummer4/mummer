@@ -55,6 +55,8 @@
 # endif
 #endif
 
+#include <type_traits>
+
 #include <tuple>
 #include "said_traits.hpp"
 
@@ -97,7 +99,9 @@
 namespace compactsufsort_imp {
 extern const saint_t lg_table[256];
 
-inline saint_t ilg(int32_t n) {
+template<typename T>
+inline typename std::enable_if<std::is_integral<T>::value && sizeof(T) == 4, saint_t>::type
+ilg(T n) {
   return ((n & 0xffff0000) ?
           ((n & 0xff000000) ?
            24 + lg_table[(n >> 24) & 0xff] :
@@ -107,8 +111,10 @@ inline saint_t ilg(int32_t n) {
            0 + lg_table[(n      ) & 0xff]));
 }
 
-inline saint_t ilg(int64_t n) {
-  return ((n >> 32) ? 32 + ilg((int32_t)(n >> 32)) : ilg((int32_t)(n & 0xffffffff)));
+template<typename T>
+inline typename std::enable_if<std::is_integral<T>::value && sizeof(T) == 8, saint_t>::type
+ilg(T n) {
+  return ((n >> 32) ? 32 + ilg((int32_t)(n >> 32)) : ilg((int32_t)(n & (T)0xffffffff)));
 }
 
 extern const saint_t sqq_table[256];

@@ -20,6 +20,9 @@ AS_IF([test x$cxxflags_given = xno], [CXXFLAGS="-DNDEBUG $CXXFLAGS"])
 EXTRA_CXXFLAGS=
 AC_SUBST([EXTRA_CXXFLAGS])
 
+# Check for md5sum or md5
+AC_CHECK_PROGS([MD5], [md5sum md5])
+
 # Check for openmp
 AC_ARG_ENABLE([openmp], [AS_HELP_STRING([--disable-openmp], [Disable OpenMP, even if available])])
 AS_IF([test "x$enable_openmp" != "xno"],

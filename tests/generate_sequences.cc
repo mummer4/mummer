@@ -122,6 +122,7 @@ int main(int argc, char *argv[]) {
       cmdline::error() << "Failed to write to seed file '" << name << "'";
   }
 
+  rand_gen.seed(seed);
   std::string genome = sequence(args.genome_size_arg);
   { std::string name = args.prefix_arg + "_genome.fa";
     std::ofstream os(name);

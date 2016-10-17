@@ -1,3 +1,7 @@
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -45,9 +49,33 @@ struct header_type {
   header_type(T v, const char* s, const char* e) : value(v), start(s), end(e) { }
 };
 
+char* mmalloc(size_t size) {
+#ifdef HAVE_MREMAP
+  return (char*)mmap(0, size, PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
+#else
+  char* res = (char*)malloc(size);
+  return res ? res : (char*)MAP_FAILED;
+#endif
+}
+char* mrealloc(char* ptr, size_t old_size, size_t new_size) {
+#ifdef HAVE_MREMAP
+  return (char*)mremap(ptr, old_size, new_size, MREMAP_MAYMOVE);
+#else
+  void* res = realloc(ptr, new_size);
+  return res ? (char*)res : (char*)MAP_FAILED;
+#endif
+}
+void mfree(char* ptr, size_t size) {
+#ifdef HAVE_MREMAP
+  if(ptr != nullptr) munmap((void*)ptr, size);
+#else
+  if(ptr != nullptr) free(ptr);
+#endif
+}
+
 void slurp_in(close_fd& fd) {
   fd.size = 1024 * 1024;
-  fd.ptr  = (char*)mmap(0, fd.size, PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
+  fd.ptr  = mmalloc(fd.size);
   if(fd.ptr == MAP_FAILED) return;
 
   size_t offset = 0;
@@ -59,17 +87,17 @@ void slurp_in(close_fd& fd) {
       if(res == -1) goto error;
       if(res == 0) {
         size_t new_size = offset + 1;
-        void*  new_ptr  = mremap(fd.ptr, fd.size, new_size, MREMAP_MAYMOVE);
+        char*  new_ptr  = mrealloc(fd.ptr, fd.size, new_size);
         if(new_ptr == MAP_FAILED) goto error;
         fd.size = new_size;
-        fd.ptr = (char*)new_ptr;
+        fd.ptr = new_ptr;
         return;
       }
       offset += res;
       left   -= res;
     }
     size_t new_size = fd.size * 2;
-    void*  new_ptr  = mremap(fd.ptr, fd.size, new_size, MREMAP_MAYMOVE);
+    char* new_ptr = mrealloc(fd.ptr, fd.size, new_size);
     if(new_ptr == MAP_FAILED) goto error;
     fd.size = new_size;
     fd.ptr  = (char*)new_ptr;
@@ -77,7 +105,7 @@ void slurp_in(close_fd& fd) {
 
  error:
   int save_errno = errno;
-  fd.unmap();
+  mfree(fd.ptr, fd.size);
   errno = save_errno;
 }
 

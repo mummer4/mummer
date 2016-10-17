@@ -2,7 +2,7 @@
 # Build helper programs and scripts used for testing #
 ######################################################
 check_PROGRAMS += %D%/generate_sequences %D%/ufasta %D%/check_cigar %D%/check_LCP
-check_SCRIPTS += %D%/testsh
+check_SCRIPTS += %D%/testsh %D%/test_md5
 CLEANFILES += $(check_SCRIPTS)
 
 # Build testsh. A wrapper around /bin/shell that runs the tests in the
@@ -14,7 +14,10 @@ CLEANFILES += $(check_SCRIPTS)
 EXTRA_DIST += %D%/testsh.in
 
 # test_md5 is a wrapper around md5sum to check outputs
-EXTRA_DIST += %D%/test_md5
+%D%/test_md5: %D%/test_md5.in
+	$(AM_V_GEN)sed -e 's,[@]MD5[@],$(MD5),g' $< > $@
+	@chmod a+x $@
+EXTRA_DIST += %D%/test_md5.in
 
 # Build generate_sequences, used to generage pseudo-random sequences.
 %C%_generate_sequences_SOURCES = %D%/generate_sequences.cc
@@ -49,7 +52,7 @@ YAGGO_BUILT += %D%/check_LCP_cmdline.hpp
 # every time. Used for testing identical results with older version of
 # MUMmer.
 %D%/data/seed_reads%0.fa %D%/data/seed_reads%1.fa %D%/data/seed_reads%2.fa: %D%/generate%sequences
-	$(AM_V_GEN)mkdir -p $(dir $@); %D%/generate_sequences -p %D%/data/seed --seed 1348091448 -G 1M \
+	$(AM_V_GEN)mkdir -p $(dir $@); %D%/generate_sequences -p %D%/data/seed --seed 5489 -G 1M \
 	  --errors 1 --lengths 100 --numbers 1000 \
 	  --errors 5 --lengths 1000 --numbers 1000 \
 	  --errors 2 --lengths 50k --numbers 10
