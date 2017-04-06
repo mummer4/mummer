@@ -1,10 +1,11 @@
 #include <mummer/tigrinc.hh>
-
+#include <unistd.h>
 
 FILE *  File_Open  (const char * Filename, const char * Mode)
 
-/* Open  Filename  in  Mode  and return a pointer to its control
-*  block.  If fail, print a message and exit. */
+/* Open Filename in Mode and return a pointer to its control block.
+ * If fail, print a message and exit.  If file is a tty, write a
+ * warning. */
 
   {
    FILE  *  fp;
@@ -15,6 +16,8 @@ FILE *  File_Open  (const char * Filename, const char * Mode)
         fprintf (stderr, "ERROR:  Could not open file  %s \n", Filename);
         exit (EXIT_FAILURE);
        }
+   if(isatty(fileno(fp)))
+      fprintf(stderr, "Warning: reading file %s from a tty\n", Filename);
 
    return  fp;
   }

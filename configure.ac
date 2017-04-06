@@ -1,4 +1,4 @@
-AC_INIT([MUMmer], [3.9.4alpha], [gmarcais@umd.edu])
+AC_INIT([MUMmer], [4.0.0beta], [gmarcais@umd.edu])
 AC_CANONICAL_HOST
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([subdir-objects foreign parallel-tests color-tests])
@@ -17,7 +17,7 @@ AC_PATH_PROG(ENV_PROG, [env])
 # Add -std=c++0x always. Add -DNDEBUG only if CXXFLAGS is not given on command line
 CXXFLAGS="-std=c++0x $CXXFLAGS"
 AS_IF([test x$cxxflags_given = xno], [CXXFLAGS="-DNDEBUG $CXXFLAGS"])
-EXTRA_CXXFLAGS="-std=c++0x"
+EXTRA_CXXFLAGS=
 AC_SUBST([EXTRA_CXXFLAGS])
 
 # Check for openmp
@@ -54,7 +54,7 @@ AS_IF([test x$try_nano_sleep = xyes],
       [AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <thread>]],
                                          [[std::this_thread::sleep_for(std::chrono::seconds(1))]])],
                          [AC_MSG_RESULT([yes])]
-                         [EXTRA_CXXFLAGS="-D_GLIBCXX_USE_NANOSLEEP $CXXFLAGS"],
+                         [EXTRA_CXXFLAGS="-D_GLIBCXX_USE_NANOSLEEP $EXTRA_CXXFLAGS"],
                          [AC_MSG_RESULT([no])]
                          [AC_MSG_FAILURE([Compiler does not support std::this_thread::sleep_for])])]
       [CXXFLAGS="$save_cxxflags"])

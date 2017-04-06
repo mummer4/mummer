@@ -7,7 +7,7 @@
 #include <cstring>
 
 long int Translate_DNA
-(char * A, char * tA, int Frame);
+(const char * A, int dnaseq_len, char * tA, int Frame);
 
      // function to translate dna sequence to aminoacid sequence
      // uses esttrans' headers and algo
@@ -16,6 +16,12 @@ long int Translate_DNA
      // frame is 1,2,3,4,5,6
      // returns new (strlen(A+1)) or -1 on error
      // See end of file for source.
+
+inline long int Translate_DNA
+(const char * A, char * tA, int Frame) {
+  return Translate_DNA(A, (int)strlen(A + 1), tA, Frame);
+}
+
 
 #define BAD_PEP_CHAR	-1
 #define SKIP_PEP_CHAR	-2

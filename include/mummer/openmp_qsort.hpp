@@ -37,6 +37,7 @@ namespace openmp_qsort_imp {
 template<typename Iterator, class Compare>
 void openmp_qsort_(Iterator begin, Iterator end, const size_t sz, Compare Comp) {
   typedef typename std::iterator_traits<Iterator>::value_type Type;
+  assert((size_t)(end - begin) == sz);
   auto pivot = begin + sz/2;
   auto const pivot_v = *pivot;
 
@@ -45,8 +46,13 @@ void openmp_qsort_(Iterator begin, Iterator end, const size_t sz, Compare Comp) 
   std::swap(*p, *(end - 1));
 
   auto const sz1 = p - begin, sz2 = end - p - 1;
+  assert(sz1 >= 0);
+  assert(sz2 >= 0);
+  assert((size_t)sz2 <= sz);
+  assert((size_t)sz1 <= sz);
+  assert((size_t)sz1 + (size_t)sz2 + 1 == sz);
   if(sz1 > 1024) {
-#pragma omp task
+#pragma omp task firstprivate(p, sz1)
     openmp_qsort_(begin, p, sz1, Comp);
     if(sz2 > 1024)
       openmp_qsort_(p + 1, end, sz2, Comp);
@@ -54,7 +60,7 @@ void openmp_qsort_(Iterator begin, Iterator end, const size_t sz, Compare Comp) 
       std::sort(p + 1, end, Comp);
   } else {
     if(sz2 > 1024)
-#pragma omp task
+#pragma omp task firstprivate(p, sz2)
       openmp_qsort_(p + 1, end, sz2, Comp);
     else
       std::sort(p + 1, end, Comp);

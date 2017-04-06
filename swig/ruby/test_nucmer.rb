@@ -140,6 +140,13 @@ class TestNucmer < MiniTest::Unit::TestCase
     assert_equal 3, al.SimErrors
     assert_equal 2, al.delta.size
     assert_good_alignment(a, rs1, rs2)
+  end
 
+  def test_threads
+    nt = Mummer::get_num_threads
+    assert_operator nt, :>=, 1
+    Mummer::set_num_threads(nt + 1)
+    nnt = Mummer::get_num_threads
+    assert(nnt == 1 || nnt == nt + 1)
   end
 end

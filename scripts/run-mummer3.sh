@@ -14,6 +14,7 @@ qry=$2
 pfx=$3
 
 bindir="@BIN_DIR@"
+libexecdir="@LIBEXEC_DIR@"
 
 if [ -z "$ref" -o -z "$qry" -o -z "$pfx" ]; then
     echo "USAGE: $0 <fasta reference> <multi-fasta query> <prefix>"
@@ -23,6 +24,6 @@ fi
 echo "Find MUMs"
 $bindir/mummer -mumreference -b -l 20 $ref $qry > $pfx.out
 echo "Determine gaps"
-$bindir/mgaps -l 100 -f .12 -s 600 < $pfx.out > $pfx.gaps
+$libexecdir/mgaps -l 100 -f .12 -s 600 < $pfx.out > $pfx.gaps
 echo "Align gaps"
 $bindir/combineMUMs -x -e .10 -W $pfx.errorsgaps $ref $qry $pfx.gaps > $pfx.align

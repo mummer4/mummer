@@ -37,4 +37,12 @@ sub seq {
   ok($b[0]->similarity == 1.0, "Similarity");
 }
 
+# Attempt changing number of threads
+my $nt = mummer::get_num_threads();
+ok($nt >= 1, "Number threads");
+mummer::set_num_threads($nt + 1);
+my $nnt = mummer::get_num_threads();
+ok($nnt == 1 || $nnt == $nt + 1, "Increased threads");
+print("$nt $nnt\n");
+
 done_testing;
