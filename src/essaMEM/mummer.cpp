@@ -5,6 +5,10 @@
 #include <thread>
 #include <mutex>
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include <jellyfish/stream_manager.hpp>
 #include <jellyfish/whole_sequence_parser.hpp>
 #include <mummer/sparseSA.hpp>
@@ -176,6 +180,7 @@ int main(int argc, char* argv[]) {
       {"save", 1, 0, 0}, // 19
       {"load", 1, 0, 0}, // 20
       {"max-chunk", 1, 0, 0}, // 21
+      {"version", 0, 0, 0}, // 22
       {0, 0, 0, 0}
     };
     int longindex = -1;
@@ -210,6 +215,13 @@ int main(int argc, char* argv[]) {
       case 19: save = optarg; break;
       case 20: load = optarg; break;
       case 21: max_chunk = atoi(optarg); break;
+      case 22:
+#ifdef VERSION
+        std::cout << VERSION << '\n';
+#elif
+        std::cout << "<unknown version>\n";
+#endif
+        exit(0);
       default: break;
       }
     }
