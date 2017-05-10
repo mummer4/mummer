@@ -218,7 +218,7 @@ int main(int argc, char* argv[]) {
       case 22:
 #ifdef VERSION
         std::cout << VERSION << '\n';
-#elif
+#else
         std::cout << "<unknown version>\n";
 #endif
         exit(0);
