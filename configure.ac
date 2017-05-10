@@ -33,6 +33,10 @@ AS_IF([test "x$enable_openmp" != "xno"],
 AC_ARG_VAR([YAGGO], [Yaggo switch parser generator])
 AS_IF([test "x$YAGGO" = "x"], [AC_PATH_PROG([YAGGO], [yaggo], [false])])
 
+# Check for gnuplot
+AC_ARG_VAR([GNUPLOT], [Gnuplot plotting program])
+AS_IF([test "x$GNUPLOT" = "x"], [AC_PATH_PROGS([GNUPLOT], [gnuplot gnuplot5 gnuplot4], [false])])
+
 # Check that type __int128 is supported and if the
 AC_ARG_WITH([int128],
             [AS_HELP_STRING([--with-int128], [enable int128])],
