@@ -1503,13 +1503,13 @@ sub ParseOptions ( )
 
         if ( $OPT_color ) {
             print STDERR
-                "WARNING: Turning of --color option for compatibility\n";
+                "WARNING: Turning off --color option for compatibility\n";
             undef $OPT_color;
         }
 
         if ( $OPT_terminal eq $PNG  &&  $OPT_size ne $SMALL ) { 
             print STDERR
-                "WARNING: Turning of --size option for compatibility\n";
+                "WARNING: Turning off --size option for compatibility\n";
             $OPT_size = $SMALL;
         }
     }
