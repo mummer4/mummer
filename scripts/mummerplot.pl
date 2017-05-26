@@ -1500,7 +1500,7 @@ sub ParseOptions ( )
     }
     elsif ( $OPT_gpstatus ) {
         print STDERR
-            "WARNING: Using outdated gnuplot, use v4.0 for best results\n";
+            "WARNING: Using outdated gnuplot, use v4 or later for best results\n";
 
         if ( $OPT_color ) {
             print STDERR
