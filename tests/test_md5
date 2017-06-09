@@ -1,3 +1,4 @@
 #! /bin/bash
 
-exec md5sum -c <(echo "$1  -") 2>&1
+md5sum -c <(echo "$1  -") 2>&1 || \
+    test $(md5) == "$1" 2>&1

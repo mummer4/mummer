@@ -15,6 +15,8 @@ struct close_fd {
   int         fd;
   char*       ptr;
   off_t       size;
+  enum mem_type { MALLOC, MMAP };
+  mem_type    type;
 
   close_fd() : fd(-1), ptr(nullptr), size(0) { }
   close_fd(int i) : fd(i), ptr(nullptr), size(0) { }
@@ -45,9 +47,25 @@ struct header_type {
   header_type(T v, const char* s, const char* e) : value(v), start(s), end(e) { }
 };
 
+#ifdef MREMAP_MAYMOVE
+void* mem_alloc(size_t size) {
+  return mmap(0, size, PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
+}
+void* mem_realloc(void* ptr, size_t old_size, size_t new_size) {
+  return mremap(ptr, old_size, new_size, MREMAP_MAYMOVE);
+}
+#else
+void* mem_alloc(size_t size) {
+  return malloc(size);
+}
+void* mem_realloc(void* ptr, size_t old_size, size_t new_size) {
+  return realloc(ptr, new_size);
+}
+#endif
+
 void slurp_in(close_fd& fd) {
   fd.size = 1024 * 1024;
-  fd.ptr  = (char*)mmap(0, fd.size, PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
+  fd.ptr  = (char*)mem_alloc(fd.size);
   if(fd.ptr == MAP_FAILED) return;
 
   size_t offset = 0;
@@ -59,7 +77,7 @@ void slurp_in(close_fd& fd) {
       if(res == -1) goto error;
       if(res == 0) {
         size_t new_size = offset + 1;
-        void*  new_ptr  = mremap(fd.ptr, fd.size, new_size, MREMAP_MAYMOVE);
+        void*  new_ptr  = mem_realloc(fd.ptr, fd.size, new_size);
         if(new_ptr == MAP_FAILED) goto error;
         fd.size = new_size;
         fd.ptr = (char*)new_ptr;
@@ -69,7 +87,7 @@ void slurp_in(close_fd& fd) {
       left   -= res;
     }
     size_t new_size = fd.size * 2;
-    void*  new_ptr  = mremap(fd.ptr, fd.size, new_size, MREMAP_MAYMOVE);
+    void*  new_ptr  = mem_realloc(fd.ptr, fd.size, new_size);
     if(new_ptr == MAP_FAILED) goto error;
     fd.size = new_size;
     fd.ptr  = (char*)new_ptr;
