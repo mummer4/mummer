@@ -1,1 +1,2 @@
 language: cpp
+script: autoreconf -fi && ./configure && make -j 2 && make test
