@@ -9,6 +9,9 @@ option("p", "prefix") {
 option("s", "seed") {
   description "Random seed"
   uint64 }
+option("seed-file") {
+  description "Random seed file, as written by generate_sequences"
+  c_string; typestr "PATH" }
 option("G", "genome-size") {
   description "Length L of genome"
   uint32; typestr "L"; default "10M"; suffix }
