@@ -6,4 +6,4 @@ install:
   - chmod a+rx ~/bin/yaggo
   - export PATH=~/bin:$PATH
   - yaggo --version
-script: autoreconf -fi && ./configure && make -j 2 && make test
+script: autoreconf -fi && ./configure && make -j 2 && make distcheck
