@@ -2,7 +2,7 @@ os: linux
 dist: trusty
 language: cpp
 install:
-  - curl --create-dirs -o ~/bin/yaggo https://github.com/gmarcais/yaggo/releases/download/v1.5.9/yaggo
+  - curl -L --create-dirs -o ~/bin/yaggo https://github.com/gmarcais/yaggo/releases/download/v1.5.9/yaggo
   - chmod a+rx ~/bin/yaggo
   - export PATH=~/bin:$PATH
   - yaggo --version
