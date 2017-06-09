@@ -97,7 +97,12 @@
 namespace compactsufsort_imp {
 extern const saint_t lg_table[256];
 
-inline saint_t ilg(int32_t n) {
+template<typename T, int L>
+struct ilg_imp { };
+
+template<typename T>
+struct ilg_imp<T, 4> {
+  static saint_t ilg(T n)  {
   return ((n & 0xffff0000) ?
           ((n & 0xff000000) ?
            24 + lg_table[(n >> 24) & 0xff] :
@@ -105,10 +110,19 @@ inline saint_t ilg(int32_t n) {
           ((n & 0x0000ff00) ?
            8 + lg_table[(n >>  8) & 0xff] :
            0 + lg_table[(n      ) & 0xff]));
-}
+  }
+};
 
-inline saint_t ilg(int64_t n) {
-  return ((n >> 32) ? 32 + ilg((int32_t)(n >> 32)) : ilg((int32_t)(n & 0xffffffff)));
+template<typename T>
+struct ilg_imp<T, 8> {
+  static inline saint_t ilg(T n) {
+    return ((n >> 32) ? 32 + ilg_imp<T, 4>::ilg((int32_t)(n >> 32)) : ilg_imp<T, 4>::ilg((int32_t)(n & 0xffffffff)));
+  }
+};
+
+template<typename T>
+inline saint_t ilg(T n) {
+  return ilg_imp<T, sizeof(T)>::ilg(n);
 }
 
 extern const saint_t sqq_table[256];
