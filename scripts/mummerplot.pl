@@ -21,8 +21,9 @@ use Foundation;
 use strict;
 use IO::Socket;
 
-my $BIN_DIR = "@BIN_DIR@";
-my $LIB_DIR = "@LIB_DIR@";
+my $BIN_DIR     = "@BIN_DIR@";
+my $LIB_DIR     = "@LIB_DIR@";
+my $GNUPLOT_EXE = "@GNUPLOT_EXE@";
 
 
 #================================================================= Globals ====#
@@ -1151,7 +1152,7 @@ sub WriteGP ($$)
         $P_KEY = "unset key";
         $P_FORMAT .= "\nset mouse format \"$TFORMAT\"";
         $P_FORMAT .= "\nset mouse mouseformat \"$MFORMAT\"";
-        $P_FORMAT .= "\nset mouse clipboardformat \"$MFORMAT\"";
+        $P_FORMAT .= "\nif(GPVAL_VERSION < 5) { set mouse clipboardformat \"$MFORMAT\" }";
     }
     else {
         $P_LS = "set linestyle";
@@ -1308,7 +1309,7 @@ sub RunGP ( )
         print STDERR "Rendering plot to screen\n";
     }
 
-    my $cmd = "gnuplot";
+    my $cmd = $GNUPLOT_EXE;
 
     #-- x11 specifics
     if ( $OPT_terminal eq $X11 ) {
@@ -1499,7 +1500,7 @@ sub ParseOptions ( )
     }
     elsif ( $OPT_gpstatus ) {
         print STDERR
-            "WARNING: Using outdated gnuplot, use v4.0 for best results\n";
+            "WARNING: Using outdated gnuplot, use v4 or later for best results\n";
 
         if ( $OPT_color ) {
             print STDERR
