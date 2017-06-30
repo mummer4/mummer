@@ -102,9 +102,26 @@ void generate_reads(const std::string& genome, size_t number, size_t length, uns
 
 int main(int argc, char *argv[]) {
   cmdline args(argc, argv);
-  const size_t seed = args.seed_given
-    ? args.seed_arg
-    : std::chrono::high_resolution_clock::now().time_since_epoch().count();
+
+  if(args.seed_file_given) {
+    std::ifstream is(args.seed_file_arg);
+    if(!is.good())
+      cmdline::error() << "Failed to open seed file '" << args.seed_file_arg << "'";
+    is >> rand_gen;
+  } else if(args.seed_given) {
+    rand_gen.seed(args.seed_arg);
+  } else {
+    rand_gen.seed(std::chrono::high_resolution_clock::now().time_since_epoch().count());
+  }
+
+  { std::string name = args.prefix_arg + "_seed";
+    std::ofstream os(name);
+    if(!os.good())
+      cmdline::error() << "Failed to open seed file '" << name << "'";
+    os << rand_gen;
+    if(!os.good())
+      cmdline::error() << "Failed to write to seed file '" << name << "'";
+  }
 
   if(!args.errors_given)
     args.errors_arg = { 1, 5 };
@@ -113,14 +130,6 @@ int main(int argc, char *argv[]) {
   if(!args.numbers_given)
     args.numbers_arg = { 100, 100 };
 
-  { std::string name = args.prefix_arg + "_seed";
-    std::ofstream os(name);
-    if(!os.good())
-      cmdline::error() << "Failed to open seed file '" << name << "'";
-    os << seed << '\n';
-    if(!os.good())
-      cmdline::error() << "Failed to write to seed file '" << name << "'";
-  }
 
   std::string genome = sequence(args.genome_size_arg);
   { std::string name = args.prefix_arg + "_genome.fa";

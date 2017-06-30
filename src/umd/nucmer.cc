@@ -121,11 +121,15 @@ sequence_info::sequence_info(std::istream& data, size_t chunk_size)  {
     sequence += '`';
     const size_t sequence_offset = sequence.size();
     for(c = data.peek(); c != EOF && c != '>'; c = data.peek()) {
-      std::getline(data, line);
-      const size_t start = line.find_first_not_of(" ");
-      const size_t end = std::min(line.size(), line.find_last_not_of(" \t"));
-      for(size_t i = start; i <= end; ++i)
-        sequence += std::tolower(line[i]);
+      for(c = data.get(); c != EOF && c != '\n'; c = data.get()) { // Copy a line
+        if(std::isspace(c)) continue;
+        sequence += std::tolower(c);
+      // std::getline(data, line);
+      // const size_t start = line.find_first_not_of(" ");
+      // const size_t end = std::min(line.size(), line.find_last_not_of(" \t"));
+      // for(size_t i = start; i <= end; ++i)
+      //   sequence += std::tolower(line[i]);
+      }
     }
 
     records.push_back({ sequence_offset, header_offset });
