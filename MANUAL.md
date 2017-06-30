@@ -1,4 +1,4 @@
-# MUMmer43.x README 
+# MUMmer4.x README 
 
 **NOTE**
 
