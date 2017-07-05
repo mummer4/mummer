@@ -118,7 +118,7 @@ int main(int argc, char *argv[]) {
   if(args.load_given) {
     mummer::nucmer::sequence_info reference_info(args.ref_arg);
     mummer::mummer::sparseSA SA(reference_info.sequence, args.load_arg);
-    aligner.reset(new mummer::nucmer::FileAligner(std::move(reference_info), std::move(SA)));
+    aligner.reset(new mummer::nucmer::FileAligner(std::move(reference_info), std::move(SA), opts));
   } else {
     reference.open(args.ref_arg);
     if(!reference.good())
