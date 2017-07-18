@@ -18,10 +18,10 @@ static void generateDelta
       long int N, std::vector<long int> & Delta);
 
 
-static inline int maxScore(Score S[3]);
+static inline int maxScore(const Node & node);
 
-static inline void scoreEdit
-     (Score & curr, const long int del, const long int ins, const long int mat);
+static inline std::pair<long int, char> scoreEdit
+     (const long int del, const long int ins, const long int mat);
 
 
 //------------------------------------------ Private Function Definitions ----//
@@ -96,14 +96,14 @@ bool aligner::_alignEngine
     D0.lbound = lbound;
     D0.rbound = rbound ++;
     auto& I0 = D0.I[0];
-    I0.S[DELETE].value = min_score;
-    I0.S[INSERT].value = min_score;
-    I0.S[MATCH].value  = 0;
+    I0.values[DELETE] = min_score;
+    I0.values[INSERT] = min_score;
+    I0.values[MATCH]  = 0;
     I0.max(MATCH);
 
-    I0.S[DELETE].used = NONE;
-    I0.S[INSERT].used = NONE;
-    I0.S[MATCH].used  = START;
+    I0.used[DELETE] = NONE;
+    I0.used[INSERT] = NONE;
+    I0.used[MATCH]  = START;
   }
 
   L = N < M ? N : M;
@@ -166,13 +166,15 @@ bool aligner::_alignEngine
       //-- Calculate DELETE score
       if(PDi >= 0  &&  PDi < PDs ) {
         const auto& PrevDi = PrevD.I[PDi];
-        scoreEdit(CurDi.S[DELETE],
-                  PrevDi.S[DELETE].value + (PrevDi.S[DELETE].used == NONE ? 0 : CONT_GAP_SCORE [_matrix_type]),
-                  PrevDi.S[INSERT].value + (PrevDi.S[INSERT].used == NONE ? 0 : OPEN_GAP_SCORE [_matrix_type]),
-                  PrevDi.S[MATCH].value  + (PrevDi.S[MATCH].used == NONE  ? 0 : OPEN_GAP_SCORE [_matrix_type]));
+        auto dummy = scoreEdit(
+                  PrevDi.values[DELETE] + (PrevDi.used[DELETE] == NONE ? 0 : CONT_GAP_SCORE [_matrix_type]),
+                  PrevDi.values[INSERT] + (PrevDi.used[INSERT] == NONE ? 0 : OPEN_GAP_SCORE [_matrix_type]),
+                  PrevDi.values[MATCH]  + (PrevDi.used[MATCH] == NONE  ? 0 : OPEN_GAP_SCORE [_matrix_type]));
+        CurDi.values[DELETE] = dummy.first;
+        CurDi.used[DELETE] = dummy.second;
       } else {
-        CurDi.S[DELETE].value = min_score;
-        CurDi.S[DELETE].used  = NONE;
+        CurDi.values[DELETE] = min_score;
+        CurDi.used[DELETE]  = NONE;
       }
 
       PDi ++;
@@ -180,35 +182,39 @@ bool aligner::_alignEngine
       //-- Calculate INSERT score
       if(PDi >= 0  &&  PDi < PDs ) {
         const auto& PrevDi = PrevD.I[PDi];
-        scoreEdit(CurDi.S[INSERT],
-                  PrevDi.S[DELETE].value + (PrevDi.S[DELETE].used == NONE ? 0 : OPEN_GAP_SCORE [_matrix_type]),
-                  PrevDi.S[INSERT].value + (PrevDi.S[INSERT].used == NONE ? 0 : CONT_GAP_SCORE [_matrix_type]),
-                  PrevDi.S[MATCH].value  + (PrevDi.S[MATCH].used == NONE  ? 0 : OPEN_GAP_SCORE [_matrix_type]));
+        auto dummy = scoreEdit(
+                  PrevDi.values[DELETE] + (PrevDi.used[DELETE] == NONE ? 0 : OPEN_GAP_SCORE [_matrix_type]),
+                  PrevDi.values[INSERT] + (PrevDi.used[INSERT] == NONE ? 0 : CONT_GAP_SCORE [_matrix_type]),
+                  PrevDi.values[MATCH]  + (PrevDi.used[MATCH] == NONE  ? 0 : OPEN_GAP_SCORE [_matrix_type]));
+        CurDi.values[INSERT] = dummy.first;
+        CurDi.used[INSERT] = dummy.second;
       } else {
-        CurDi.S[INSERT].value = min_score;
-        CurDi.S[INSERT].used  = NONE;
+        CurDi.values[INSERT] = min_score;
+        CurDi.used[INSERT]  = NONE;
       }
 
       //-- Calculate MATCH/MIS-MATCH score
       if(PPDi >= 0  &&  PPDi < PPDs) {
         const auto& PPrevDi = PPrevD.I[PPDi];
-        scoreEdit(CurDi.S[MATCH],
-                  PPrevDi.S[DELETE].value,
-                  PPrevDi.S[INSERT].value,
-                  PPrevDi.S[MATCH].value);
-        CurDi.S[MATCH].value += scoreMatch(CurD, Dct, CDi, A, B, N, m_o);
+        auto dummy = scoreEdit(
+                  PPrevDi.values[DELETE],
+                  PPrevDi.values[INSERT],
+                  PPrevDi.values[MATCH]);
+        CurDi.values[MATCH] = dummy.first;
+        CurDi.used[MATCH] = dummy.second;
+        CurDi.values[MATCH] += scoreMatch(CurD, Dct, CDi, A, B, N, m_o);
       } else {
-        CurDi.S[MATCH].value = min_score;
-        CurDi.S[MATCH].used  = NONE;
+        CurDi.values[MATCH] = min_score;
+        CurDi.used[MATCH]  = NONE;
       }
 
       PPDi ++;
 
-      CurDi.max(maxScore (CurDi.S));
+      CurDi.max(maxScore(CurDi));
 
       //-- Reset high_score if new global max was found
-      if(CurDi.max().value >= high_score) {
-        high_score = CurDi.max().value;
+      if(CurDi.max() >= high_score) {
+        high_score = CurDi.max();
         FinishCt   = Dct;
         FinishCDi  = CDi;
       }
@@ -220,16 +226,16 @@ bool aligner::_alignEngine
     if(m_o & SEQEND_BIT  &&  Dct >= L) {
       if(L == N) {
         if(lbound == 0) {
-          if(CurD.I[0].max().value >= xhigh_score) {
-            xhigh_score = CurD.I[0].max().value;
+          if(CurD.I[0].max() >= xhigh_score) {
+            xhigh_score = CurD.I[0].max();
             xFinishCt   = Dct;
             xFinishCDi  = 0;
           }
         }
       } else  { // L == M
         if(rbound == M) {
-          if(CurD.I[M-CurD.lbound].max().value >= xhigh_score) {
-            xhigh_score = CurD.I[M-CurD.lbound].max().value;
+          if(CurD.I[M-CurD.lbound].max() >= xhigh_score) {
+            xhigh_score = CurD.I[M-CurD.lbound].max();
             xFinishCt   = Dct;
             xFinishCDi  = M;
           }
@@ -247,13 +253,13 @@ bool aligner::_alignEngine
     const auto CurDi_start = CurD.I.cbegin();
     const auto CurDi_end   = CurDi_start + Ds;
     for(auto it = CurDi_start ; it < CurDi_end; ++it) {
-      if(high_score - it->max().value > max_diff )
+      if(high_score - it->max() > max_diff )
         lbound ++;
       else
         break;
     }
     for(auto it = CurDi_end - 1; it >= CurDi_start; --it) {
-      if(high_score - it->max().value > max_diff )
+      if(high_score - it->max() > max_diff )
         rbound --;
       else
         break;
@@ -320,7 +326,7 @@ bool aligner::_alignEngine
   //-- Ouput calculation statistics
   if(TargetReached )
     fprintf(stderr,"Finish score = %ld : %ld,%ld\n",
-	    Diag[FinishCt].I[0].max().value, N, M);
+	    Diag[FinishCt].I[0].max(), N, M);
   else
     fprintf(stderr,"High score = %ld : %ld,%ld\n", high_score,
 	    labs(Aadj) + 1, labs(Badj) + 1);
@@ -410,7 +416,6 @@ static void generateDelta
   long int PSize = 100;     // capacity of the path space
   char * Reverse_Path;       // path space
 
-  Score curr_score;
   int edit;
 
   //-- malloc space for the edit path
@@ -430,7 +435,7 @@ static void generateDelta
     }
 
     Di = CDi - Diag[Dct].lbound;
-    curr_score = Diag[Dct].I[Di].S[edit];
+    auto used = Diag[Dct].I[Di].used[edit];
 
     Reverse_Path[Pi ++] = edit;
     switch ( edit ) {
@@ -453,7 +458,7 @@ static void generateDelta
       exit ( EXIT_FAILURE );
     }
 
-    edit = curr_score.used;
+    edit = used;
   }
 
   //-- Generate the delta information
@@ -488,40 +493,37 @@ static void generateDelta
 
 
 
-static inline int maxScore(Score S[3])
+static inline int maxScore(const Node & node)
 
      //  Return a pointer to the maximum score in the score array
 
 {
-  if(S[DELETE].value > S[INSERT].value)
-    return S[DELETE].value > S[MATCH].value ? DELETE : MATCH;
+  const auto& values = node.values;
+  if(values[DELETE] > values[INSERT])
+    return values[DELETE] > values[MATCH] ? DELETE : MATCH;
   else
-    return S[INSERT].value > S[MATCH].value ? INSERT : MATCH;
+    return values[INSERT] > values[MATCH] ? INSERT : MATCH;
 }
 
 
 
 
-static inline void scoreEdit
-     (Score & curr, const long int del, const long int ins, const long int mat)
+static inline std::pair<long int, char> scoreEdit
+     (const long int del, const long int ins, const long int mat)
 
      //  Assign current edit a maximal score using either del, ins or mat
 
 {
   if ( del > ins ) {
     if ( del > mat ) {
-      curr.value = del;
-      curr.used = DELETE;
+      return std::make_pair(del, DELETE);
     } else {
-      curr.value = mat;
-      curr.used = MATCH;
+      return std::make_pair(mat, MATCH);
     }
   } else if ( ins > mat ) {
-    curr.value = ins;
-    curr.used = INSERT;
+    return std::make_pair(ins, INSERT);
   }  else {
-    curr.value = mat;
-    curr.used = MATCH;
+    return std::make_pair(mat, MATCH);
   }
 }
 
