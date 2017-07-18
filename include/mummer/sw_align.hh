@@ -110,19 +110,13 @@ public:
   const_iterator cend() const { return m_vec.cend(); }
 };
 
-struct Score
-{
-  long int value;
-  char used;
-};
-
 struct Node
 {
-  Score S[3];
-  int   m_max;
+  long int values[3];
+  char used[3];
+  int m_max;
 
-  Score& max() { return S[m_max]; }
-  const Score& max() const { return S[m_max]; }
+  long int max() const { return values[m_max]; }
   void max(int i) { m_max = i; }
   int edit() const { return m_max; }
 };
