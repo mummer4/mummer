@@ -14,7 +14,7 @@ option("seed-file") {
   c_string; typestr "PATH" }
 option("G", "genome-size") {
   description "Length L of genome"
-  uint32; typestr "L"; default "10M"; suffix }
+  uint32; typestr "L"; default "10000000"; suffix }
 option("errors") {
   description "Error rates (percentages) of reads (1 and 5)"
   double; multiple}
