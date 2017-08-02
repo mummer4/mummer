@@ -74,6 +74,9 @@ struct Alignment
     , eA(m.sA + m.len - 1)
     , eB(m.sB + m.len - 1)
     , deltaApos(0)
+    , Errors(0)
+    , SimErrors(0)
+    , NonAlphas(0)
   { }
   Alignment() = default;
   Alignment(const Alignment& rhs) = default;
