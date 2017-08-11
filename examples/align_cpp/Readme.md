@@ -1,7 +1,7 @@
 # Description
 
 Similar to the scripts `align.*`, this program is an example to show
-how to align two sequences. This program program is very primitive and
+how to align two sequences. This program is very primitive and
 meant only as an example:
 
 - there is little error handling
