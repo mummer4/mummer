@@ -97,7 +97,7 @@ my $USAGE_INFO = q~
 my @DEPEND_INFO =
     (
      "$BIN_DIR/mummer",
-     "$BIN_DIR/mgaps",
+     "$AUX_BIN_DIR/mgaps",
      "$BIN_DIR/show-coords",
      "$AUX_BIN_DIR/postpro",
      "$AUX_BIN_DIR/prepro",
@@ -227,7 +227,7 @@ sub main ( )
 
     #-- Set up the program path names
     my $algo_path = "$BIN_DIR/mummer";
-    my $mgaps_path = "$BIN_DIR/mgaps";
+    my $mgaps_path = "$AUX_BIN_DIR/mgaps";
     my $prepro_path = "$AUX_BIN_DIR/prepro";
     my $postpro_path = "$AUX_BIN_DIR/postpro";
     my $showcoords_path = "$BIN_DIR/show-coords";
