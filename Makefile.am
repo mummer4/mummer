@@ -24,6 +24,8 @@ BUILT_SOURCES =
 
 # Where to install
 script_libdir = $(pkglibdir)
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = mummer.pc
 
 # Special cleaning rules. Like CLEANFILES and DISTCLEANFILES, but for
 # directories.
@@ -52,42 +54,48 @@ libumdmummer_la_SOURCES  = src/essaMEM/sparseSA.cpp src/essaMEM/sssort_compact.c
 libumdmummer_la_SOURCES += src/tigr/mgaps.cc src/tigr/postnuc.cc src/tigr/sw_align.cc src/tigr/tigrinc.cc
 libumdmummer_la_SOURCES += src/umd/nucmer.cc
 
+library_includedir = $(includedir)/mummer-@PACKAGE_VERSION@
+
 # TODO: remove duplicated header and functionality between jellyfish and thread_pipe
-noinst_HEADERS += include/mummer/sparseSA.hpp				\
-                  include/mummer/fasta.hpp include/mummer/postnuc.hh	\
-                  include/mummer/translate.hh				\
-                  include/mummer/sw_align.hh				\
-                  include/mummer/tigrinc.hh include/mummer/nucmer.hpp	\
-                  include/mummer/mgaps.hh include/mummer/delta.hh	\
-                  include/mummer/sw_alignscore.hh			\
-                  include/mummer/sparseSA_imp.hpp			\
-                  include/jellyfish/circular_buffer.hpp			\
-                  include/jellyfish/cooperative_pool2.hpp		\
-                  include/jellyfish/cpp_array.hpp			\
-                  include/jellyfish/divisor.hpp				\
-                  include/jellyfish/stream_manager.hpp			\
-                  include/jellyfish/whole_sequence_parser.hpp		\
-                  include/mummer/timer.hpp
-noinst_HEADERS += include/thread_pipe.hpp			\
-                  include/thread_pipe/circular_buffer.hpp	\
-                  include/thread_pipe/cooperative_pool2.hpp	\
-                  include/thread_pipe/divisor.hpp		\
-                  include/thread_pipe/traits.hpp
-noinst_HEADERS += include/compactsufsort/compactsufsort.hpp		\
-                  include/compactsufsort/const_iterator_traits.hpp	\
-                  include/compactsufsort/said_traits.hpp		\
-                  include/compactsufsort/trsort_imp.hpp			\
-                  include/compactsufsort/compactsufsort_imp.hpp		\
-                  include/compactsufsort/divsufsort_private.h		\
-                  include/compactsufsort/sssort_imp.hpp
-noinst_HEADERS += include/mummer/48bit_index.hpp		\
-                  include/mummer/48bit_iterator.hpp		\
-                  include/mummer/const_iterator_traits.hpp
-noinst_HEADERS += include/mummer/dset.hpp		\
-                  include/mummer/openmp_qsort.hpp	\
-                  include/mt_skip_list/common.hpp	\
-                  include/mt_skip_list/set.hpp		\
-                  include/mummer/redirect_to_pager.hpp
+nobase_library_include_HEADERS = include/mummer/sparseSA.hpp			\
+                                 include/mummer/fasta.hpp			\
+                                 include/mummer/postnuc.hh			\
+                                 include/mummer/translate.hh			\
+                                 include/mummer/sw_align.hh			\
+                                 include/mummer/tigrinc.hh			\
+                                 include/mummer/nucmer.hpp			\
+                                 include/mummer/mgaps.hh			\
+                                 include/mummer/delta.hh			\
+                                 include/mummer/sw_alignscore.hh		\
+                                 include/mummer/sparseSA_imp.hpp		\
+                                 include/jellyfish/circular_buffer.hpp		\
+                                 include/jellyfish/cooperative_pool2.hpp	\
+                                 include/jellyfish/cpp_array.hpp		\
+                                 include/jellyfish/divisor.hpp			\
+                                 include/jellyfish/stream_manager.hpp		\
+                                 include/jellyfish/whole_sequence_parser.hpp	\
+                                 include/mummer/timer.hpp
+nobase_library_include_HEADERS += include/thread_pipe.hpp			\
+                                  include/thread_pipe/circular_buffer.hpp	\
+                                  include/thread_pipe/cooperative_pool2.hpp	\
+                                  include/thread_pipe/divisor.hpp		\
+                                  include/thread_pipe/traits.hpp
+nobase_library_include_HEADERS +=							\
+                                  include/compactsufsort/compactsufsort.hpp		\
+                                  include/compactsufsort/const_iterator_traits.hpp	\
+                                  include/compactsufsort/said_traits.hpp		\
+                                  include/compactsufsort/trsort_imp.hpp			\
+                                  include/compactsufsort/compactsufsort_imp.hpp		\
+                                  include/compactsufsort/divsufsort_private.h		\
+                                  include/compactsufsort/sssort_imp.hpp
+nobase_library_include_HEADERS += include/mummer/48bit_index.hpp		\
+                                  include/mummer/48bit_iterator.hpp		\
+                                  include/mummer/const_iterator_traits.hpp
+nobase_library_include_HEADERS += include/mummer/dset.hpp		\
+                                  include/mummer/openmp_qsort.hpp	\
+                                  include/mt_skip_list/common.hpp	\
+                                  include/mt_skip_list/set.hpp		\
+                                  include/mummer/redirect_to_pager.hpp
 
 ###########
 # essaMEM #
