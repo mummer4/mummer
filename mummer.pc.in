@@ -1,0 +1,10 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: MUMmer
+Description: MUMmer genome alignment tool
+Version: @PACKAGE_VERSION@
+Libs: -L${libdir} -lumdmummer -pthread
+Cflags: -I${includedir}/mummer-@PACKAGE_VERSION@/include
