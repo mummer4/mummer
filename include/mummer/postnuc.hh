@@ -278,7 +278,7 @@ template<typename FR1, typename FR2>
 void printSAMAlignments(const std::vector<Alignment>& Alignments,
                         const FR1& A, const FR2& B,
                         std::ostream& SAMFile, bool long_format, const long minLen = 0);
-std::string createCIGAR(const std::vector<long int>& ds, long int start, long int end, long int len);
+std::string createCIGAR(const std::vector<long int>& ds, long int start, long int end, long int len, bool hard_clip = false);
 std::string createMD(const Alignment& al, const char* ref,
                      const char* qry, size_t qry_len);
 
@@ -417,20 +417,30 @@ void printSAMAlignments(const std::vector<Alignment>& Alignments,
                         const FR1& A, const FR2& B,
                         std::ostream& SAMFile, bool long_format,
                         const long minLen) {
+  const char* mapq = Alignments.size() > 1 ? "\t10\t" : "\t30\t";
+  bool hard_clip = false;
   for(const auto& Al : Alignments) {
     if(std::abs(Al.eA - Al.sA) < minLen && std::abs(Al.eB - Al.sB) < minLen)
       continue;
     const bool fwd = Al.dirB == FORWARD_CHAR;
-    SAMFile << B.Id()
-            << (fwd ? " 0 " : " 16 ")
-            << A.Id() << ' ' << Al.sA
-            << " 255 "
-            << createCIGAR(Al.delta, Al.sB, Al.eB, B.len())
-            << " * 0 0 " << (long_format ? B.seq() + 1 : "*")
-            << " * NM:i:" << Al.Errors;
+    SAMFile << B.Id() << '\t'
+            << ((hard_clip ? 0x800 : 0) | (fwd ? 0 : 0x10)) << '\t'
+            << A.Id() << '\t' << Al.sA
+            << mapq
+            << createCIGAR(Al.delta, Al.sB, Al.eB, B.len(), hard_clip)
+            << "\t*\t0\t0\t";
+    if(long_format) {
+      const auto start = hard_clip ? Al.sB : 1;
+      const auto len   = hard_clip ? Al.eB - start + 1 : B.len();
+      SAMFile.write(B.seq() + start, len);
+    } else {
+      SAMFile << '*';
+    }
+    SAMFile << "\t*\tNM:i:" << Al.Errors;
     if(long_format)
-      SAMFile << " MD:Z:" << createMD(Al, A.seq(), B.seq(), B.len());
+      SAMFile << "\tMD:Z:" << createMD(Al, A.seq(), B.seq(), B.len());
     SAMFile << '\n';
+    hard_clip = true;
   }
 }
 

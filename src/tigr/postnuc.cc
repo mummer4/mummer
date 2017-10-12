@@ -829,12 +829,13 @@ void printDeltaAlignments(const std::vector<Alignment>& Alignments,
   }
 }
 
-std::string createCIGAR(const std::vector<long int>& ds, long int start, long int end, long int len) {
+std::string createCIGAR(const std::vector<long int>& ds, long int start, long int end, long int len,
+                        bool hard_clip) {
   std::string res;
   long int    off   = 0;
   long int    range = 0;
   if(start > 1) {
-    res += std::to_string(start - 1) + 'S';
+    res += std::to_string(start - 1) + (hard_clip ? 'H' : 'S');
     off += start - 1;
   }
   for(const auto& id : ds) {
@@ -864,7 +865,7 @@ std::string createCIGAR(const std::vector<long int>& ds, long int start, long in
   if(off < end)
     res += std::to_string(end - off) + 'M';
   if(end < len)
-    res += std::to_string(len - end) + 'S';
+    res += std::to_string(len - end) + (hard_clip ? 'H' : 'S');
   return res;
 }
 
