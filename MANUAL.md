@@ -27,24 +27,18 @@ system:
 
 **(Version 3.0 described)**
  
- >Versatile and open software for comparing large genomes.
- 
- >S. Kurtz, A. Phillippy, A.L. Delcher, M. Smoot, M. Shumway, C. Antonescu, and S.L. Salzberg.
- 
+ >Versatile and open software for comparing large genomes.</br>
+ >S. Kurtz, A. Phillippy, A.L. Delcher, M. Smoot, M. Shumway, C. Antonescu, and S.L. Salzberg.</br>
  >Genome Biology (2004), 5:R12.
 
 **(Version 2.1 described)**
->Fast algorithms for large-scale genome alignment and comparison.
-
->A.L. Delcher. A. Phillippy, J. Carlton, and S.L. Salzberg.
-
+>Fast algorithms for large-scale genome alignment and comparison.</br>
+>A.L. Delcher. A. Phillippy, J. Carlton, and S.L. Salzberg.</br>
 >Nucleic Acids Research 30:11 (2002), 2478-2483.
 
 **(Version 1.0 described)**
->Alignment of Whole Genomes.
-
->A.L. Delcher, S. Kasif,R.D. Fleischmann, J. Peterson, O. White, and S.L. Salzberg.
-
+>Alignment of Whole Genomes.</br>
+>A.L. Delcher, S. Kasif,R.D. Fleischmann, J. Peterson, O. White, and S.L. Salzberg.</br>
 >Nucleic Acids Research, 27:11 (1999), 2369-2376.
 
 
@@ -58,7 +52,7 @@ documentation in the "docs/" subdirectory.  Refer to the "RUNNING THE
 MUMmer UTILITIES" section for a brief description of all of the
 utilities in this directory.
 
-###Simple use case
+### Simple use case
 
 Given a file containing a single reference sequence (ref.seq) in
 FASTA format and another file containing multiple sequences in FastA
@@ -84,7 +78,7 @@ explore the \<prefix>.[fr]plot file to see the data collection.
 
 `./mummerplot  -p <prefix>  <prefix>.out`
 
-##RUNNING THE MUMmer SCRIPTS
+## RUNNING THE MUMmer SCRIPTS
 Because of MUMmer's modular design, it may be necessary to use a number
 of separate programs to produce the desired output.  The MUMmer scripts
 attempt to simplify this process by wrapping various utilities into packages
@@ -93,7 +87,7 @@ descriptions and usage definitions for these scripts.  Please refer to the
 "docs/" subdirectory for a more detailed description of each script.
 
 
-###nucmer
+### nucmer
 
 **Description:**
 
@@ -130,7 +124,7 @@ only matches that are unique in the reference sequence by default,
 use the '--mum' or '--maxmatch' options to change this behavior.
 
 
-###promer
+### promer
 
 **Description:**
 
@@ -183,7 +177,7 @@ query sequence.  Please use nucmer or promer if this coordinate
 system is confusing.
 
 
-###dnadiff
+### dnadiff
 
 **Description:**
 
@@ -238,7 +232,7 @@ additional information from the output.  Listed below are the descriptions
 and usage definitions for these utilities.
 
 
-###annotate
+### annotate
 
 **Description:**
 This program reads the output of the `gaps` program and adds alignment
@@ -265,7 +259,7 @@ This program will eventually be dropped in favor of the combineMUMs
 or nucmer match extenders, but persists for the time being.
 
 
-###combineMUMs
+### combineMUMs
 
 **Description:**
 
@@ -298,7 +292,7 @@ behavior and only outputs the positions of difference, e.g. SNPs.
                          the number of alignment errors for each gap.
 
 
-###delta-filter
+### delta-filter
 
 **Description:**
 
@@ -333,7 +327,7 @@ SNP finding. Use the -q option for mapping query contigs to
 their best reference location.
 
 
-###exact-tandems
+### exact-tandems
 
 **Description:**
 
@@ -352,7 +346,7 @@ interface and output for tandem repeat detection.
                 of the repeat region, the length of each repetitive unit, and
                 to total copies of the repetitive unit involved.
 
-###mgaps
+### mgaps
 
 **Description:**
 
@@ -386,7 +380,7 @@ helpful to run this program a number of times with different
 parameters until the desired result is achieved.
 
 
-###mummer
+### mummer
 
 **Description:**
 
@@ -422,7 +416,7 @@ to behave like `mummer2` while the -maxmatch switch forces it to behave
 like the old `max-match` program.
 
 
-###mummerplot
+### mummerplot
 
 **Description:**
 
@@ -461,7 +455,7 @@ the same space. For better looking color gradient plots, try the
 postscript terminal and avoid the png terminal.
 
 
-###nucmer2xfig
+### nucmer2xfig
 
 **Description:**
 
@@ -470,7 +464,7 @@ of script for more information, or see if `mummerplot` or `mapview`
 has the functionality required as they are properly maintained.
 
 
-###repeat-match
+### repeat-match
 
 **Description:**
 
@@ -495,7 +489,7 @@ functionality that REPuter does not so we include it along with the
 MUMmer package.
 
 
-###show-aligns
+### show-aligns
 
 **Description:**
 
@@ -528,7 +522,7 @@ specified on the command line.
                 a '+' in the consensus line.
 
 
-###show-coords
+### show-coords
 
 **Description:**
 
@@ -609,7 +603,7 @@ alignment similarity or appearance.  This option also disregards match
 orientation, so should not be used if this information is needed.
 
 
-###show-diff
+### show-diff
 
 **Description:**
 
@@ -704,7 +698,7 @@ references for queries, and uses the query coordinates for the
 analysis.
 
 
-###show-snps
+### show-snps
 
 **Description:**
 
@@ -768,7 +762,7 @@ It is often helpful to run this with the -C option to assure
 reported SNPs are only reported from uniquely aligned regions.
 
 
-###show-tiling
+### show-tiling
 
 **Description:**
 
@@ -805,12 +799,12 @@ When run with the -x option, `show-tiling` will produce an XML output
 format that can be accepted by TIGR's open source scaffolding software
 'Bambus' as contig linking information.
 
-##Obsolete programs
+## Obsolete programs
 
 The programs `mapview`, `run-mummer1`, `run-mummer3` and `nucmer2xfig`
 are now obsolete. The original documentation is still available in
 [OBSOLETE.md](OBSOLETE.md).
 
-##CONTACT INFORMATION
+## CONTACT INFORMATION
 
 Please address questions and bug reports via the [github issue tracker](https://github.com/gmarcais/mummer/issues).

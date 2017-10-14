@@ -46,13 +46,13 @@ std::string rev_comp(const std::string& seq) {
 std::vector<std::string> split(const std::string& line) {
   std::vector<std::string> res;
   size_t pi = 0;
-  size_t ni = line.find_first_of(" \t");
+  size_t ni = line.find_first_of("\t");
   while(true) {
     res.push_back(line.substr(pi, ni - pi));
     if(ni == std::string::npos) break;
-    pi = line.find_first_not_of(" \t", ni);
+    pi = line.find_first_not_of("\t", ni);
     if(pi == std::string::npos) break;
-    ni = line.find_first_of(" \t", pi);
+    ni = line.find_first_of("\t", pi);
   }
   return res;
 }
@@ -111,6 +111,7 @@ int main(int argc, char *argv[]) {
     const auto&       ref   = find(ref_map, fields[2]);
     const auto&       qry   = find(qry_map, fields[0]);
     const bool        rev   = std::stoul(fields[1]) & 0x10;
+    const std::string sam_seq = fields[9];
     const std::string seq   = rev ? rev_comp(qry) : qry;
     auto              cigar = split_cigar(fields[5]);
     const long        pos   = std::stol(fields[3]);
@@ -125,6 +126,7 @@ int main(int argc, char *argv[]) {
 
     long refp  = pos - 1;
     long qryp  = 0;
+    long sqryp = 0;
     long diffs = 0;
     for(const auto& ci : cigar) {
       if(refp > ref.size())
@@ -135,11 +137,16 @@ int main(int argc, char *argv[]) {
                                      << " of size " << ref.size();
 
       switch(ci.t) {
+      case 'H':
+        qryp += ci.l;
+        continue;
       case 'S':
         qryp  += ci.l;
+        sqryp += ci.l;
         continue;
       case 'I':
         qryp  += ci.l;
+        sqryp += ci.l;
         diffs += ci.l;
         continue;
       case 'D':
@@ -160,8 +167,16 @@ int main(int argc, char *argv[]) {
         check_cigar_cmdline::error() << "linenb:" << linenb << " match at " << qryp << ':' << ci.l
                                      << " goes beyond end of qry " << fields[0]
                                      << " of size " << seq.size();
-      for(int i = 0; i < ci.l; ++i, ++refp, ++qryp)
+      if(sam_seq[0] != '*' && sqryp >= sam_seq.size())
+        check_cigar_cmdline::error() << "linenb:" << linenb << " match at " << qryp << ':' << ci.l
+                                     << " goes beyond end of sequence in sam file " << sam_seq
+                                     << " of size " << sam_seq.size();
+      for(int i = 0; i < ci.l; ++i, ++refp, ++qryp, ++sqryp) {
         diffs += std::tolower(ref[refp]) != std::tolower(seq[qryp]);
+        if(sam_seq[0] != '*' && std::tolower(qry[qryp]) != std::tolower(sam_seq[sqryp]))
+            check_cigar_cmdline::error() << "linenb:" << linenb << " qry sequence does not match sequence in sam file at pos "
+                                         << qryp << " and " << sqryp;
+      }
     }
     if(diffs != nm)
       check_cigar_cmdline::error() << "linenb:" << linenb << " invalid NM field " << nm << ", should be " << diffs;

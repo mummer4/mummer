@@ -1,4 +1,4 @@
-## MUMmer3.x INSTALLATION README
+## MUMmer4 INSTALLATION README
 
 ## Dependencies
 
@@ -9,8 +9,9 @@ essential tools for compilation (GNU make, ar, etc. Install
 requirements are needed to compile the SWIG script bindings. See the
 [SWIG installation guide](swig/INSTALL.md).
 
-If compiling from the github development tree, additionally you need
+If compiling from the github development tree, additionally you need autotools (autoconf, automake and libtools),
 [yaggo](https://github.com/gmarcais/yaggo/releases).
+You should compile from a [release source tarball](../../releases), unless you plan on modifying the code of MUMmer.
 
 ## Compilation & Installation
 
@@ -25,6 +26,8 @@ make install
 If `--prefix` is omitted, the software is installed in
 `/usr/local`. One may need `sudo make install` if installing in a
 system location.
+
+If compiling from the git tree, do `autoreconf -fi` first.
 
 ## SOFTWARE REQUIREMENTS
 
@@ -57,7 +60,7 @@ In the "MUMmer4.x" base directory type:
 make uninstall
 ```
 
-##CONTACT INFORMATION
+## CONTACT INFORMATION
 
 Please address questions and bug reports via the [github issue
 tracker](../../issues).

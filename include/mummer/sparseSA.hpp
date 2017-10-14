@@ -167,6 +167,12 @@ struct match_t {
   long len; // length of match
 };
 
+// XXX: Work around essamem bug for now: do not allow length to hang
+// of passed the end of query.
+inline match_t make_match(long r, long q, long l, long max) {
+  return match_t(r, q, std::max((long)0, std::min(l, max - q)));
+}
+
 
 struct saTuple_t {
     saTuple_t(): left(0), right(0) {}
@@ -554,9 +560,11 @@ void sparseSA::findMAM_each(const char* P, size_t Plen, int min_len, bool flip_f
     if(cur.size() == 1 && cur.depth >= min_len) {
       if(is_leftmaximal(P, prefix, SA[cur.start])) {
 	// Yes, it's a MAM.
-	match_t m(SA[cur.start], prefix, cur.depth);
-        if(flip_forward) m.query = Plen-1-prefix;
-        out(m);
+        // match_t m(SA[cur.start], prefix, cur.depth);
+        // if(flip_forward) m.query = Plen-1-prefix;
+        // out(m);
+        // XXX: until essamem bug is fixed
+        out(make_match(SA[cur.start], !flip_forward ? prefix : (long)Plen-1-prefix, cur.depth, Plen));
       }
     }
     do {
@@ -711,8 +719,11 @@ void sparseSA::find_Lmaximal(const char* P, size_t Plen, long prefix, long i, lo
   for(long k = 0; k < sparseMult*K; k++) {
     // If we reach the end or a mismatch, and the match is long enough, print.
     if(prefix == 0 || i == 0 || P[prefix-1] != S[i-1]) {
-      if(len >= min_len)
-        out(match_t(i, !flip_forward ? prefix : (long)Plen-1-prefix, len));
+      if(len >= min_len) {
+        //        out(match_t(i, !flip_forward ? prefix : (long)Plen-1-prefix, len));
+        // XXX: until essamem bug is fixed
+        out(make_match(i, !flip_forward ? prefix : (long)Plen-1-prefix, len, Plen));
+      }
       return; // Reached mismatch, done.
     }
     prefix--; i--; len++; // Continue matching.

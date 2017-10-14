@@ -18,8 +18,9 @@ TEST(SparseSA, ComputeLCP) {
     EXPECT_LE((unsigned int)0, sa.LCP[i]);
     EXPECT_EQ(seq.substr(sa.SA[i-1], sa.LCP[i]), seq.substr(sa.SA[i], sa.LCP[i]));
     SCOPED_TRACE(::testing::Message() << "SA[i-1]:" << sa.SA[i-1] << " SA[i]:" << sa.SA[i] << " LCP[i]:" << sa.LCP[i]);
-    if(sa.SA[i - 1] + sa.LCP[i] + 1 < N && sa.SA[i] + sa.LCP[i] + 1 < N)
+    if(sa.SA[i - 1] + sa.LCP[i] + 1 < N && sa.SA[i] + sa.LCP[i] + 1 < N) {
       EXPECT_NE(seq[sa.SA[i - 1] + sa.LCP[i]], seq[sa.SA[i] + sa.LCP[i]]);
+    }
   }
 }
 
