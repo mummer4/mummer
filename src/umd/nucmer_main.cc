@@ -8,6 +8,7 @@
 #include <src/umd/nucmer_cmdline.hpp>
 #include <thread_pipe.hpp>
 
+#undef _OPENMP
 #ifdef _OPENMP
 #include <omp.h>
 #endif

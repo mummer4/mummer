@@ -355,7 +355,7 @@ void merge_syntenys::processSyntenys_long_each(Container& Syntenys, const FR2& B
   std::atomic<size_t> pos(0);
   const auto end = Syntenys.end();
 
-#pragma omp parallel
+//#pragma omp parallel
   {
     auto CurrSp = Syntenys.begin();
     size_t prev = 0;
