@@ -63,14 +63,15 @@ void rev_comp(std::string& s) {
     s[i] = comp(s[i]);
 }
 
-void generate_reads(const std::string& genome, size_t number, size_t length, unsigned int error, std::ostream& os) {
+void generate_reads(const std::string& genome, size_t number, size_t length, unsigned int error, std::ostream& os, const bool fq = false) {
   std::string errors;
   std::uniform_int_distribution<unsigned int> has_error(0, 99);
   std::uniform_int_distribution<unsigned int> error_type(0, 2);
-  std::uniform_int_distribution<size_t> position(0, genome.size() - length);
+  std::uniform_int_distribution<size_t>       position(0, genome.size() - length);
   std::uniform_int_distribution<unsigned int> subst(1, 3);
   std::uniform_int_distribution<unsigned int> insertion(0, 3);
   std::uniform_int_distribution<unsigned int> reverse(0, 1);
+  std::uniform_int_distribution<char>         qual('!' + 2, '!' + 41);
 
   for(size_t i = 0; i < number; ++i) {
     errors.clear();
@@ -95,8 +96,14 @@ void generate_reads(const std::string& genome, size_t number, size_t length, uns
         }
       }
     }
-    os << '>' << i << ' ' << errors << '\n';
+    os << (fq ? '@' : '>') << i << ' ' << errors << '\n';
     write_sequence(os, seq);
+    if(fq) {
+      os << "+\n";
+      for(size_t j = 0; j < seq.size(); ++j)
+        os << qual(rand_gen);
+      os << '\n';
+    }
   }
 }
 
@@ -143,11 +150,11 @@ int main(int argc, char *argv[]) {
   }
 
   for(size_t i = 0; i < min(args.errors_arg.size(), args.lengths_arg.size(), args.numbers_arg.size()); ++i) {
-    std::string name = args.prefix_arg + "_reads_" + std::to_string(i) + ".fa";
+    std::string name = args.prefix_arg + "_reads_" + std::to_string(i) + (args.fq_flag ? ".fq" : ".fa");
     std::ofstream os(name);
     if(!os.good())
       cmdline::error() << "Failed to open reads fasta file '" << name << "'";
-    generate_reads(genome, args.numbers_arg[i], args.lengths_arg[i], args.errors_arg[i], os);
+    generate_reads(genome, args.numbers_arg[i], args.lengths_arg[i], args.errors_arg[i], os, args.fq_flag);
     if(!os.good())
       cmdline::error() << "Failed to write to reads fasta file '" << name << "'";
   }
