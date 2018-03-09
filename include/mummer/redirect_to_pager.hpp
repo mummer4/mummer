@@ -52,7 +52,8 @@ struct stdio_launch_pager {
 
   void stop_pager() {
     if(pager_handle) {
-      pclose(pager_handle);
+      fclose(stdout); // Close stdout for the pager to notice EOF
+      pclose(pager_handle); // Then wait for the pager to quit
       pager_handle = NULL;
     }
   }
