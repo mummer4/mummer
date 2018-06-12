@@ -15,14 +15,14 @@
 #
 #-------------------------------------------------------------------------------
 
-use lib "@LIB_DIR@";
+use lib '@LIB_DIR@';
 use Foundation;
 use File::Spec::Functions;
 use strict;
 
-my $AUX_BIN_DIR = "@LIBEXEC_DIR@";
-my $BIN_DIR = "@BIN_DIR@";
-my $LIB_DIR = "@LIB_DIR@";
+my $AUX_BIN_DIR = '@LIBEXEC_DIR@';
+my $BIN_DIR = '@BIN_DIR';
+my $LIB_DIR = '@LIB_DIR';
 
 #-- Set up the program path names
 my $algo_path = "$BIN_DIR/@MUMMER@";

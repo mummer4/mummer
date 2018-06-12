@@ -9,14 +9,14 @@
 #
 #-------------------------------------------------------------------------------
 
-use lib "@LIB_DIR@";
+use lib '@LIB_DIR@';
 use Foundation;
 use File::Spec::Functions;
 use warnings;
 use strict;
 
-my $BIN_DIR = "@BIN_DIR@";
-my $SCRIPT_DIR = "@LIB_DIR@";
+my $BIN_DIR = '@BIN_DIR@';
+my $SCRIPT_DIR = '@LIB_DIR@';
 
 my $VERSION_INFO = q~
 DNAdiff version 1.3
