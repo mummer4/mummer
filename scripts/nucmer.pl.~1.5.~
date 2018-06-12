@@ -15,14 +15,14 @@
 #
 #-------------------------------------------------------------------------------
 
-use lib "__SCRIPT_DIR";
+use lib '__SCRIPT_DIR';
 use Foundation;
 use File::Spec::Functions;
 use strict;
 
-my $AUX_BIN_DIR = "__AUX_BIN_DIR";
-my $BIN_DIR = "__BIN_DIR";
-my $SCRIPT_DIR = "__SCRIPT_DIR";
+my $AUX_BIN_DIR = '__AUX_BIN_DIR';
+my $BIN_DIR = '__BIN_DIR';
+my $SCRIPT_DIR = '__SCRIPT_DIR';
 
 
 my $VERSION_INFO = q~
