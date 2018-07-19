@@ -15,6 +15,10 @@
 
 
 namespace mummer {
+  namespace nucmer {
+    void reverse_complement(std::string& s);
+  }
+
 namespace postnuc {
 static const signed char FORWARD_CHAR = 1;
 static const signed char REVERSE_CHAR = -1;
@@ -432,7 +436,13 @@ void printSAMAlignments(const std::vector<Alignment>& Alignments,
     if(long_format) {
       const auto start = hard_clip ? Al.sB : 1;
       const auto len   = hard_clip ? Al.eB - start + 1 : B.len();
-      SAMFile.write(B.seq() + start, len);
+      if (! fwd) {
+        std::string revComp(B.seq() + start, len);
+        nucmer::reverse_complement(revComp);
+        SAMFile << revComp;
+      } else {
+        SAMFile.write(B.seq() + start, len);
+      }
     } else {
       SAMFile << '*';
     }
