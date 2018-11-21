@@ -10,6 +10,7 @@ AM_LDFLAGS = -lpthread
 # Pre-declare all used variables.
 bin_PROGRAMS =
 bin_SCRIPTS =
+pkglibexec_SCRIPTS =
 pkglibexec_PROGRAMS =
 noinst_SCRIPTS =
 noinst_HEADERS =
@@ -51,7 +52,8 @@ AM_DISTCHECK_CONFIGURE_FLAGS=--enable-perl-binding --enable-ruby-binding --enabl
 lib_LTLIBRARIES = libumdmummer.la
 LDADD = libumdmummer.la
 libumdmummer_la_SOURCES  = src/essaMEM/sparseSA.cpp src/essaMEM/sssort_compact.cc
-libumdmummer_la_SOURCES += src/tigr/mgaps.cc src/tigr/postnuc.cc src/tigr/sw_align.cc src/tigr/tigrinc.cc
+libumdmummer_la_SOURCES += src/tigr/mgaps.cc src/tigr/postnuc.cc	\
+                           src/tigr/sw_align.cc src/tigr/tigrinc.cc
 libumdmummer_la_SOURCES += src/umd/nucmer.cc
 
 library_includedir = $(includedir)/mummer-@PACKAGE_VERSION@
@@ -109,8 +111,9 @@ mummer_SOURCES = src/essaMEM/fasta.cpp src/essaMEM/mummer.cpp
 bin_PROGRAMS += show-coords show-aligns show-snps show-tiling	\
                 show-diff repeat-match annotate combineMUMs	\
                 delta-filter
-pkglibexec_PROGRAMS += mgaps postnuc prepro postpro
+pkglibexec_PROGRAMS += mgaps prenuc postnuc prepro postpro
 mgaps_SOURCES = src/tigr/mgaps_main.cc
+prenuc_SOURCES = src/tigr/prenuc.cc
 postnuc_SOURCES = src/tigr/postnuc_main.cc
 show_coords_SOURCES = src/tigr/show-coords.cc src/tigr/delta.cc
 show_aligns_SOURCES = src/tigr/show-aligns.cc src/tigr/delta.cc src/tigr/translate.cc
@@ -135,20 +138,23 @@ EXTRA_DIST += src/tigr/gaps.cc
 # what LIBTOOLS does.
 
 # List of scripts to install
-perl_scripts = mummerplot dnadiff promer delta2vcf
+perl_scripts = mummerplot dnadiff promer delta2vcf nucmer_ori
 shell_scripts = exact-tandems
 all_scripts = $(perl_scripts) $(shell_scripts)
+bin_scripts = mummerplot dnadiff promer exact-tandems
+libexec_scripts = nucmer_ori
 
 # Obsolete stuff
 EXTRA_DIST += scripts/run-mummer1.sh scripts/run-mummer3.sh	\
               scripts/mapview.pl scripts/nucmer2xfig.pl
 
-libs_scripts = $(patsubst %,.libs/%,$(all_scripts))
-bin_SCRIPTS += $(libs_scripts)
-noinst_SCRIPTS += $(all_scripts)
-EXTRA_DIST += $(patsubst %,scripts/%.pl,$(perl_scripts))
-EXTRA_DIST += $(patsubst %,scripts/%.sh,$(shell_scripts))
-CLEANFILES += $(libs_scripts) $(all_scripts)
+libs_scripts        = $(patsubst %,.libs/%,$(all_scripts))
+bin_SCRIPTS        += $(patsubst %,.libs/%,$(bin_scripts))
+pkglibexec_SCRIPTS += $(patsubst %,.libs/%,$(libexec_scripts))
+noinst_SCRIPTS     += $(all_scripts)
+EXTRA_DIST         += $(patsubst %,scripts/%.pl,$(perl_scripts))
+EXTRA_DIST         += $(patsubst %,scripts/%.sh,$(shell_scripts))
+CLEANFILES         += $(libs_scripts) $(all_scripts)
 
 # Rules to generate the scripts, in .libs and in build directory.
 script_inst_subst  = sed -e 's,[@]PERL[@],$(PERL),g' \
