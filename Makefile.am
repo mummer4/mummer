@@ -192,3 +192,8 @@ include swig/Makefile.am
 #########
 include unittests/Makefile.am
 include tests/Makefile.am
+
+###################################
+# Extra flags in development tree #
+###################################
+-include $(srcdir)/development.mk
