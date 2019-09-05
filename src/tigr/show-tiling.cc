@@ -75,7 +75,7 @@ struct AlignStats
 struct QueryContig
      //-- Query sequence tiling contig data structure
 {
-  char * IdQ;                              // FASTA Id of the query
+  string IdQ;                              // FASTA Id of the query
   long int SeqLenQ;                        // length of the query
   char * SeqQ;                             // query sequence
 
@@ -151,7 +151,7 @@ struct IdQ_Sort
   bool operator( ) (const QueryContig & pA, const QueryContig & pB)
   {
     //-- sort IdQ
-    if ( strcmp (pA.IdQ, pB.IdQ) < 0 )
+    if ( pA.IdQ < pB.IdQ )
       return true;
     else
       return false;
@@ -795,13 +795,13 @@ void outputContigs
 	  if ( Cp->DirQ == FORWARD_CHAR )
 	    fprintf(Output,
             "#%s(%ld) [%s] %ld bases, 00000000 checksum. {%ld %ld} <%ld %ld>\n",
-		    Cp->IdQ, Cp->StartR + Cp->LoTrim - 1, "", Cp->SeqLenQ,
+		    Cp->IdQ.c_str(), Cp->StartR + Cp->LoTrim - 1, "", Cp->SeqLenQ,
 		    Cp->LoTrim + 1, Cp->SeqLenQ - Cp->HiTrim,
 		    Cp->StartR + Cp->LoTrim, Cp->EndR - Cp->HiTrim);
 	  else
 	    fprintf(Output,
             "#%s(%ld) [%s] %ld bases, 00000000 checksum. {%ld %ld} <%ld %ld>\n",
-		    Cp->IdQ, Cp->StartR + Cp->LoTrim - 1, "RC", Cp->SeqLenQ,
+		    Cp->IdQ.c_str(), Cp->StartR + Cp->LoTrim - 1, "RC", Cp->SeqLenQ,
 		    Cp->SeqLenQ - Cp->LoTrim, Cp->HiTrim + 1,
 		    Cp->StartR + Cp->LoTrim, Cp->EndR - Cp->HiTrim);
 	}
@@ -836,7 +836,7 @@ void outputPseudoMolecule
     {
       for ( Cp = Contigs.begin( ); Cp < Contigs.end( ); Cp ++ )
 	if ( Cp->TileLevel == USED_TILE_LEVEL )
-	  if ( strcmp ( Line, Cp->IdQ ) == 0 )
+          if ( string(Line) == Cp->IdQ )
 	    break;
       
       if ( Cp < Contigs.end( ) )
@@ -908,7 +908,7 @@ void outputPseudoMolecule
 		 "\nERROR: Sequence \"%s\" was not found in the query file.\n"
 		 "       Please check the validity of the query file listed\n"
 		 "       at the top of the .delta input file and rerun.\n",
-		       Cp->IdQ);
+		       Cp->IdQ.c_str());
 	      exit (EXIT_FAILURE);
 	    }
 
@@ -989,7 +989,7 @@ void parseDelta
 {
   vector<QueryContig>::iterator Cp;
 
-  char * CurrIdQ;                        // the current contig Id
+  string CurrIdQ;                        // the current contig Id
   long int temp;
 
   QueryContig aContig;                   //  single query contig
@@ -1004,7 +1004,7 @@ void parseDelta
 
 
   Contigs.clear( );
-  CurrIdQ = NULL_STRING;
+
   aContig.SeqQ = NULL;
   aContig.DirQ = '*';
   aContig.IdR = NULL_STRING;
@@ -1046,10 +1046,9 @@ void parseDelta
       aContig.SeqLenQ = dr.getRecord( ).lenQ;
       
       aStats.IdR = dr.getRecord( ).idR;
-      aContig.IdQ = new char[dr.getRecord( ).idQ.length( ) + 1];
-      strcpy (aContig.IdQ, dr.getRecord( ).idQ.c_str( ));
+      aContig.IdQ = dr.getRecord( ).idQ;
 
-      if ( strcmp (CurrIdQ, aContig.IdQ) )
+      if ( CurrIdQ != aContig.IdQ )
 	{
 	  CurrIdQ = aContig.IdQ;
 	  aContig.TileLevel = aContig.SeqLenQ < MIN_CONTIG_LENGTH ?
@@ -1191,7 +1190,7 @@ void printAlignment
   fprintf(Output,"%.2f\t", Ap->Idy);
   fprintf(Output,"%ld\t%ld\t", Ap->SeqLenR, Cp->SeqLenQ);
   fprintf(Output,"%.2f\t%.2f\t", covA, covB);
-  fprintf(Output,"%s\t%s", Ap->IdR.c_str(), Cp->IdQ);
+  fprintf(Output,"%s\t%s", Ap->IdR.c_str(), Cp->IdQ.c_str());
   fprintf(Output,"\n"); 
 
   return;
@@ -1280,7 +1279,7 @@ void printTilingPath
 	  //-- Print the data
 	  printf ("%ld\t%ld\t%ld\t%ld\t%.2f\t%.2f\t%c\t%s\n",
 		  Cp->StartR, Cp->EndR, gap, len, pcov,
-		  pidy, Cp->DirQ, Cp->IdQ);
+		  pidy, Cp->DirQ, Cp->IdQ.c_str());
 
 	  //-- Walk the pointer down the list of contigs
 	  if ( Cp->linksTo == Contigs.end( )  ||  Cp->linksTo->isLinkHead )
@@ -1335,7 +1334,7 @@ void printTilingXML
 	{
 	  printf
 	    ("\t<CONTIG ID = \"contig_%s\" NAME = \"%s\" LEN = \"%ld\"/>\n",
-	     Cp->IdQ, Cp->IdQ, Cp->SeqLenQ);
+	     Cp->IdQ.c_str(), Cp->IdQ.c_str(), Cp->SeqLenQ);
 
 	  //-- Walk the pointer down the list of contigs
 	  if ( Cp->linksTo == Contigs.end( )  ||  Cp->linksTo->isLinkHead )
@@ -1372,7 +1371,7 @@ void printTilingXML
 	    ("\t<LINK ID = \"link_%ld\" SIZE = \"%ld\" TYPE = \"MUMmer\">\n",
 	     ++ ct, gap);
 	  printf("\t\t<CONTIG ID = \"contig_%s\" ORI = \"%s\">\n",
-		 Cp->IdQ, Cp->DirQ == FORWARD_CHAR ? "BE" : "EB");
+		 Cp->IdQ.c_str(), Cp->DirQ == FORWARD_CHAR ? "BE" : "EB");
 
 	  for ( Ap = Cp->Aligns.begin( );
 		Ap < Cp->Aligns.end( ); Ap ++ )
@@ -1386,7 +1385,7 @@ void printTilingXML
 
 	  printf("\t\t</CONTIG>\n");
 	  printf("\t\t<CONTIG ID = \"contig_%s\" ORI = \"%s\">\n",
-		 Cp->linksTo->IdQ,
+		 Cp->linksTo->IdQ.c_str(),
 		 Cp->linksTo->DirQ == FORWARD_CHAR ? "BE" : "EB");
 
 	  for ( Ap = Cp->linksTo->Aligns.begin( );
