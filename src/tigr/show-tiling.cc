@@ -829,24 +829,22 @@ void outputPseudoMolecule
   long int InitSize = INIT_SIZE;
   char Line [MAX_LINE];
 
-
   //-- Read in the needed query contig sequences
   A = new char[InitSize];
   while ( Read_String (QryFile, A, InitSize, Line, false) )
     {
+      // NOTE: if a chromosome occurs multiple times in a tiling, we need to
+      //       store the query sequence each time.
       for ( Cp = Contigs.begin( ); Cp < Contigs.end( ); Cp ++ )
 	if ( Cp->TileLevel == USED_TILE_LEVEL )
           if ( string(Line) == Cp->IdQ )
-	    break;
-      
-      if ( Cp < Contigs.end( ) )
-	{
-	  assert ( (long int)strlen(A+1) == Cp->SeqLenQ );
-	  Cp->SeqQ = new char [Cp->SeqLenQ + 2];
-	  Cp->SeqQ[0] = '\0';
-	  strcpy ( Cp->SeqQ + 1, A + 1 );
-	  if ( Cp->DirQ == REVERSE_CHAR )
-	    Reverse_Complement (Cp->SeqQ, 1, Cp->SeqLenQ);
+          {
+            assert ( (long int)strlen(A+1) == Cp->SeqLenQ );
+            Cp->SeqQ = new char [Cp->SeqLenQ + 2];
+            Cp->SeqQ[0] = '\0';
+            strcpy ( Cp->SeqQ + 1, A + 1 );
+            if ( Cp->DirQ == REVERSE_CHAR )
+              Reverse_Complement (Cp->SeqQ, 1, Cp->SeqLenQ);
 	}
     }
   delete[] A;
