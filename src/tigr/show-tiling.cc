@@ -683,7 +683,7 @@ long int longestConsistentSubset
 
   //-- Build the data array
   N = 0;
-  A = (node *) Safe_malloc (sizeof(node) * (end - begin));
+  A = new node [end - begin];
   for ( Ap = begin; Ap < end; Ap ++ )
     {
       assert ( Ap->isTiled == false );
@@ -750,7 +750,7 @@ long int longestConsistentSubset
 
   Best = A[Best].Score;
 
-  free ( A );
+  delete[] A;
 
   return Best;
 }
@@ -837,7 +837,7 @@ void outputPseudoMolecule
 
 
   //-- Read in the needed query contig sequences
-  A = (char *) Safe_malloc ( sizeof(char) * InitSize );
+  A = new char[InitSize];
   while ( Read_String (QryFile, A, InitSize, Line, false) )
     {
       for ( Cp = Contigs.begin( ); Cp < Contigs.end( ); Cp ++ )
@@ -848,15 +848,14 @@ void outputPseudoMolecule
       if ( Cp < Contigs.end( ) )
 	{
 	  assert ( (long int)strlen(A+1) == Cp->SeqLenQ );
-	  Cp->SeqQ = (char *) Safe_malloc
-	    ( sizeof(char) * (Cp->SeqLenQ + 2) );
+	  Cp->SeqQ = new char [Cp->SeqLenQ + 2];
 	  Cp->SeqQ[0] = '\0';
 	  strcpy ( Cp->SeqQ + 1, A + 1 );
 	  if ( Cp->DirQ == REVERSE_CHAR )
 	    Reverse_Complement (Cp->SeqQ, 1, Cp->SeqLenQ);
 	}
     }
-  free ( A );
+  delete[] A;
 
   //-- For all contigs, create pseudo
   for ( beginCp = Contigs.begin( ); beginCp < Contigs.end( ); beginCp ++ )
@@ -929,7 +928,7 @@ void outputPseudoMolecule
 		  fputc ('\n', Output);
 		}
 	    }
-	  free (Cp->SeqQ);
+	  delete[] Cp->SeqQ;
 
 	  //-- Print the gap
 	  for ( i = 1; i <= gap; i ++ )
@@ -1052,8 +1051,8 @@ void parseDelta
       aStats.SeqLenR = dr.getRecord( ).lenR;
       aContig.SeqLenQ = dr.getRecord( ).lenQ;
       
-      aStats.IdR = (char *) Safe_malloc (dr.getRecord( ).idR.length( ) + 1);
-      aContig.IdQ = (char *) Safe_malloc (dr.getRecord( ).idQ.length( ) + 1);
+      aStats.IdR = new char[dr.getRecord( ).idR.length( ) + 1];
+      aContig.IdQ = new char[dr.getRecord( ).idQ.length( ) + 1];
       strcpy (aStats.IdR, dr.getRecord( ).idR.c_str( ));
       strcpy (aContig.IdQ, dr.getRecord( ).idQ.c_str( ));
 
