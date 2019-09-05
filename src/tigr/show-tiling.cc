@@ -190,6 +190,7 @@ bool isPrintAlignments = false;          // set by -a option
 bool isPrintXML = false;                 // set by -x option
 bool isCircularReference = false;        // set by -c option
 bool isRandomRepeats = false;            // set by -R option
+char fillCharacter = 'N';                // set by -f option
 
 long int MIN_CONTIG_LENGTH = DEFAULT_MIN_CONTIG_LENGTH;
 
@@ -298,7 +299,7 @@ int main
     optarg = NULL;
 
     while ( !errflg  &&  ((ch = getopt
-			   (argc, argv, "achg:i:l:p:Rt:u:v:V:x")) != EOF) )
+			   (argc, argv, "achgf:i:l:p:Rt:u:v:V:x")) != EOF) )
       switch (ch)
         {
 	case 'a' :
@@ -313,6 +314,15 @@ int main
           printHelp (argv[0]);
           exit (EXIT_SUCCESS);
           break;
+
+	case 'f' :
+          if (strcmp(optarg,"none") == 0)
+              fillCharacter = 0;
+          else if (strlen(optarg)==1)
+              fillCharacter = optarg[0];
+          else
+              errflg++;
+	  break;
 
 	case 'g' :
 	  MAX_GAP_SIZE = atoi (optarg);
@@ -923,15 +933,18 @@ void outputPseudoMolecule
 	  delete[] Cp->SeqQ;
 
 	  //-- Print the gap
-	  for ( i = 1; i <= gap; i ++ )
-	    {
-	      fputc ('N', Output);
-	      if ( ++ ct == CHARS_PER_LINE )
-		{
-		  ct = 0;
-		  fputc ('\n', Output);
-		}
-	    }
+          if (fillCharacter > 0)
+          {
+              for (int i = 1; i <= gap; i ++ )
+              {
+                  fputc (fillCharacter, Output);
+                  if ( ++ ct == CHARS_PER_LINE )
+                  {
+                      ct = 0;
+                      fputc ('\n', Output);
+                  }
+              }
+          }
 
 	  //-- Adjust the next start if this contig was used for overlap
 	  if ( gap < 0  &&  end == Cp->SeqLenQ )
@@ -1429,6 +1442,9 @@ void printHelp
     "-c            Assume the reference sequences are circular, and allow\n"
     "              tiled contigs to span the origin\n"
     "-h            Display help information\n"
+    "-f char       Set default fill character for missing regions in\n"
+    "              pseudomolecules.  If given '-f none' then missing\n"
+    "              are left empty. (default = N)\n"
     "-g int        Set maximum gap between clustered alignments [-1, INT_MAX]\n"
     "              A value of -1 will represent infinity\n"
     "              (nucmer default = %ld)\n"
