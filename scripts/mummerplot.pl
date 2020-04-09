@@ -1152,7 +1152,7 @@ sub WriteGP ($$)
         $P_KEY = "unset key";
         $P_FORMAT .= "\nset mouse format \"$TFORMAT\"";
         $P_FORMAT .= "\nset mouse mouseformat \"$MFORMAT\"";
-        $P_FORMAT .= "\nif(GPVAL_VERSION < 5) { set mouse clipboardformat \"$MFORMAT\" }";
+        $P_FORMAT .= "\nif(GPVAL_VERSION < 5) set mouse clipboardformat \"$MFORMAT\"";
     }
     else {
         $P_LS = "set linestyle";
