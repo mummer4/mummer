@@ -135,7 +135,7 @@ EXTRA_DIST += src/tigr/gaps.cc
 # what LIBTOOLS does.
 
 # List of scripts to install
-perl_scripts = mummerplot dnadiff promer
+perl_scripts = mummerplot dnadiff promer delta2vcf
 shell_scripts = exact-tandems
 all_scripts = $(perl_scripts) $(shell_scripts)
 
