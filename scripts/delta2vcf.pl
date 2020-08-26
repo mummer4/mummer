@@ -132,7 +132,7 @@ while($line=<STDIN>){
         }
       }else{ 
         print substr($rseq,$ref_pos-1,1)," ",substr($qseq,$qry_pos-1,1)," $ref_pos $qry_pos $alignment_coord\n" if($DEBUG);
-        push @outarray, {'refname'=>$refname,'refpos'=>$ref_pos,'ref'=>substr($rseq,$ref_pos-1,1),'qry'=>substr($qseq,$qry_pos-1,1)} if(not(substr($rseq,$ref_pos-1,1) eq substr($qseq,$qry_pos-1,1)));
+        push @outarray, {'refname'=>$refname,'refpos'=>$ref_pos,'ref'=>substr($rseq,$ref_pos-1,1),'qry'=>substr($qseq,$qry_pos-1,1)} if(not(uc(substr($rseq,$ref_pos-1,1)) eq uc(substr($qseq,$qry_pos-1,1))));
         $ref_pos++;
         $qry_pos++;
         $alignment_coord++;
