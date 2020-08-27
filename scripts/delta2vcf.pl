@@ -147,7 +147,7 @@ while($line=<STDIN>){
 $last_refname="";
 $last_pos="";
 foreach $l(@outarray_sorted){
-print $l->{'refname'},"\t",$l->{'refpos'},"\t\.\t",$l->{'ref'},"\t",$l->{'qry'},"\t40\tPASS\n" if(not($last_refname eq $l->{'refname'}) || not($last_pos==$l->{'refpos'}));
+print $l->{'refname'},"\t",$l->{'refpos'},"\t\.\t",$l->{'ref'},"\t",$l->{'qry'},"\t40\tPASS\t*\t*\t0:0:0:0:0:2:2:0\n" if(not($last_refname eq $l->{'refname'}) || not($last_pos==$l->{'refpos'}));
 $last_refname=$l->{'refname'};
 $last_pos=$l->{'refpos'};
 }
