@@ -490,11 +490,11 @@ void sparseSA::construct(bool off48){
       ISA.resize(N, off48);
       if(SA.is_small) {
         compactsufsort::create((const unsigned char*)(S + 0), (int*)SA.small.data(), N);
-#pragma omp parallel for
+//#pragma omp parallel for
         for(long i = 0; i < N; ++i) { ISA.small[SA.small[i]] = i; }
       } else {
         compactsufsort::create((const unsigned char*)(S + 0), SA.large.begin(), N);
-#pragma omp parallel for
+//#pragma omp parallel for
         for(long i = 0; i < N; ++i) { ISA.large[SA.large[i]] = i; }
       }
     }

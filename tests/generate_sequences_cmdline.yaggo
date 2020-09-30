@@ -24,4 +24,6 @@ option("lengths") {
 option("numbers") {
   description "Number of reads (100 and 100)"
   uint32; multiple }
-
+option("q", "fq") {
+  description "Output fastq format"
+  off }

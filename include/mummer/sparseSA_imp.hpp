@@ -1,6 +1,7 @@
 #ifndef __SPARSESA_IMP_H__
 #define __SPARSESA_IMP_H__
 
+#undef _OPENMP
 #ifdef _OPENMP
 #include <omp.h>
 #endif

@@ -56,6 +56,11 @@ EXTRA_DIST += %D%/data_seed
 	  --errors 5 --lengths 1000 --numbers 1000 \
 	  --errors 2 --lengths 50k --numbers 10
 
+%D%/data/seed_fq_reads%0.fq: %D%/generate%sequences
+	$(AM_V_GEN)mkdir -p $(dir $@); %D%/generate_sequences --seed-file $(srcdir)/tests/data_seed \
+	  -p %D%/data/seed_fq -G 1M --fq \
+	  --errors 1 --lengths 101 --numbers 1000
+
 # Clean data directory
 CLEANDIRS += %D%/data
 
@@ -81,6 +86,6 @@ CLEANDIRS += $(patsubst %D%/%.sh,%D%/%,$(script_tests))
 
 %D%/mummer.log: %D%/data/seed_reads_0.fa %D%/data/seed_reads_1.fa
 %D%/nucmer.log: %D%/data/seed_reads_0.fa %D%/data/seed_reads_1.fa
-%D%/sam.log: %D%/data/seed_reads_0.fa %D%/data/seed_reads_1.fa
+%D%/sam.log: %D%/data/seed_reads_0.fa %D%/data/seed_reads_1.fa %D%/data/seed_fq_reads_0.fq
 %D%/genome.log: %D%/data/seed_reads_2.fa
 %D%/delta-filter.log: %D%/data/small_reads_0.fa %D%/data/small_reads_1.fa
