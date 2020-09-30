@@ -1,4 +1,4 @@
-require 'minitest/autorun'
+require 'test/unit'
 require 'mummer'
 
 $bases = "ACGT"
@@ -51,7 +51,7 @@ def assert_good_alignment(a, s1, s2)
   }
 end
 
-class TestNucmer < MiniTest::Unit::TestCase
+class TestNucmer < Test::Unit::TestCase
   def test_exact_pair
     s1 = seq(100)
     s2 = s1[80..-1] + seq(80)

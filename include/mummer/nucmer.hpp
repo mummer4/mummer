@@ -174,7 +174,7 @@ public:
 inline void align_sequences(const char* reference, size_t reference_len,
                             const char* query,  size_t query_len,
                             std::vector<postnuc::Alignment>& alignments,
-                            Options opts = Options()) {
+                            const Options opts = Options()) {
   SequenceAligner aligner(reference, reference_len, opts);
   aligner.align(query, query_len, alignments);
 }
@@ -184,6 +184,9 @@ inline std::vector<postnuc::Alignment> align_sequences(const char* reference, si
                                                        const Options opts = Options()) {
   SequenceAligner aligner(reference, reference_len, opts);
   return aligner.align(query, query_len);
+}
+inline std::vector<postnuc::Alignment> align_sequences(const std::string& reference, const std::string& query, const Options opts = Options()) {
+  return align_sequences(reference.c_str(), reference.size(), query.c_str(), query.size(), opts);
 }
 
 

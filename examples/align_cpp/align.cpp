@@ -16,8 +16,7 @@ int main(int argc, char *argv[]) {
 
   mummer::nucmer::Options o;
   o.minmatch(10).mincluster(10);
-  auto aligns = mummer::nucmer::align_sequences(ref.c_str(), ref.size(),
-                                                qry.c_str(), qry.size(), o);
+  auto aligns = mummer::nucmer::align_sequences(ref, qry, o);
   for(const auto& a : aligns) {
     std::cout << a.sA << ' ' << a.eA << ' ' << a.sB << ' ' << a.eB << ' '
               << a.Errors << ' ' << a.SimErrors << ' ' << a.NonAlphas << '\n';
