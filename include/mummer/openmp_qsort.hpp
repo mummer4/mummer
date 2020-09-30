@@ -18,9 +18,9 @@ void openmp_qsort(Iterator begin, Iterator end, Compare Comp) {
   if(sz < 1024)
     return std::sort(begin, end, Comp);
 
-#pragma omp parallel
+//#pragma omp parallel
   {
-#pragma omp single
+//#pragma omp single
     {
       openmp_qsort_imp::openmp_qsort_(begin, end, sz, Comp);
     }
@@ -52,7 +52,7 @@ void openmp_qsort_(Iterator begin, Iterator end, const size_t sz, Compare Comp) 
   assert((size_t)sz1 <= sz);
   assert((size_t)sz1 + (size_t)sz2 + 1 == sz);
   if(sz1 > 1024) {
-#pragma omp task firstprivate(p, sz1)
+//#pragma omp task firstprivate(p, sz1)
     openmp_qsort_(begin, p, sz1, Comp);
     if(sz2 > 1024)
       openmp_qsort_(p + 1, end, sz2, Comp);
@@ -60,7 +60,7 @@ void openmp_qsort_(Iterator begin, Iterator end, const size_t sz, Compare Comp) 
       std::sort(p + 1, end, Comp);
   } else {
     if(sz2 > 1024)
-#pragma omp task firstprivate(p, sz2)
+//#pragma omp task firstprivate(p, sz2)
       openmp_qsort_(p + 1, end, sz2, Comp);
     else
       std::sort(p + 1, end, Comp);

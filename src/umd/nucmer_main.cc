@@ -8,6 +8,7 @@
 #include <src/umd/nucmer_cmdline.hpp>
 #include <thread_pipe.hpp>
 
+#undef _OPENMP
 #ifdef _OPENMP
 #include <omp.h>
 #endif
@@ -134,7 +135,7 @@ int main(int argc, char *argv[]) {
       nucmer_cmdline::error() << "Can't save the suffix array to '" << args.save_arg << "'";
 
     stream_manager     streams(args.qry_arg.cbegin(), args.qry_arg.cend());
-    const unsigned int nb_threads = args.threads_given ? args.threads_arg : std::thread::hardware_concurrency();
+    const unsigned int nb_threads = args.threads_given ? args.threads_arg : 2;
 #ifdef _OPENMP
     if(args.threads_given) omp_set_num_threads(nb_threads);
 #endif // _OPENMP

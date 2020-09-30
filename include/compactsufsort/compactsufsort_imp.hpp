@@ -8,6 +8,7 @@
 #include "trsort_imp.hpp"
 #include <mummer/timer.hpp>
 
+#undef _OPENMP
 #ifdef _OPENMP
 # include <omp.h>
 #endif
