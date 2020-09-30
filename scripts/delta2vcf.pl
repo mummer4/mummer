@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!@PERL@
 #this code converts delta file (stdin) to vcf file (stdout)
 $line=<STDIN>;
 chomp($line);
