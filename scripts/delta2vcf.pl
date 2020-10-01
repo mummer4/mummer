@@ -1,5 +1,8 @@
 #!@PERL@
 #this code converts delta file (stdin) to vcf file (stdout)
+if($#ARGV>=0){
+  die("delta to vcf converter. vcf file contains variants in reference detected by query alignments.\nUsage: delta2vcf < file.delta > file.vcf\n");
+}
 $line=<STDIN>;
 chomp($line);
 my ($ref,$qry)=split(/\s+/,$line);
