@@ -23,7 +23,7 @@ use IO::Socket;
 
 my $BIN_DIR     = "@BIN_DIR@";
 my $LIB_DIR     = "@LIB_DIR@";
-my $GNUPLOT_EXE = "@GNUPLOT_EXE@";
+my $GNUPLOT_EXE = "gnuplot";
 
 
 #================================================================= Globals ====#
@@ -1152,7 +1152,8 @@ sub WriteGP ($$)
         $P_KEY = "unset key";
         $P_FORMAT .= "\nset mouse format \"$TFORMAT\"";
         $P_FORMAT .= "\nset mouse mouseformat \"$MFORMAT\"";
-        $P_FORMAT .= "\nif(GPVAL_VERSION < 5) { set mouse clipboardformat \"$MFORMAT\" }";
+        $P_FORMAT .= "\nset mouse clipboardformat \"$MFORMAT\"";
+        #$P_FORMAT .= "\nif(GPVAL_VERSION < 5) { set mouse clipboardformat \"$MFORMAT\" }";
     }
     else {
         $P_LS = "set linestyle";
