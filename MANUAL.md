@@ -1,11 +1,10 @@
 # MUMmer4.x README 
 
-**NOTE**
+**NOTES**
 
-Further documentation, but potentially out of date, is in the [docs](../../tree/master/docs) directory. Please refer to the [INSTALL.md](INSTALL.md) file for installation
-instructions.
+Further, but potentially out of date, documentation can be found in the [docs](../../tree/master/docs) directory. Please refer to the [INSTALL.md](INSTALL.md) file for installation instructions.
 
-This file contains brief descriptions of all
+This file contains brief descriptions of all the
 executables in the base directory and general information about the
 MUMmer package.
 
@@ -16,11 +15,11 @@ two bacterial genomes of ~5 million base pairs each in 20 seconds, using 90 MB
 of memory, on a typical 1.8 GHz Linux desktop computer.  MUMmer can also align
 incomplete genomes; it handles the 100s or 1000s of contigs from a shotgun
 sequencing project with ease, and will align them to another set of contigs or
-a genome, using the nucmer utility included with the system.  The promer
+a genome, using the `nucmer` utility included with the system.  The `promer`
 utility takes this a step further by generating alignments based upon the
-six-frame translations of both input sequences.  promer permits the alignment
+six-frame translations of both input sequences.  `promer` permits the alignment
 of genomes for which the proteins are similar but the DNA sequence is too
-divergent to detect similarity.  See the nucmer and promer readme files in the
+divergent to detect similarity.  See the `nucmer` and `promer` readme files in the
 "docs/" subdirectory for more details.  MUMmer is open source, so all we ask
 is that you cite our most recent paper in any publications that use this
 system:
@@ -44,9 +43,9 @@ system:
 
 ## RUNNING MUMmer4.x
 
-MUMmer4.x is comprised of many various utilities
+MUMmer4.x is composed of various utilities
 and scripts.  For general purposes, the programs `nucmer`, and
-`promer` will be all that is needed.  See their descriptions in the
+`promer` are all that is needed.  See their descriptions in the
 "RUNNING THE MUMmer PROGRAMS" section, or refer to their individual
 documentation in the "docs/" subdirectory.  Refer to the "RUNNING THE
 MUMmer UTILITIES" section for a brief description of all of the
@@ -56,17 +55,17 @@ utilities in this directory.
 
 Given a file containing a single reference sequence (ref.seq) in
 FASTA format and another file containing multiple sequences in FastA
-format (qry.seq) type the following at the command line:
+format (qry.seq), type the following at the command line:
 
 `./nucmer  -p <prefix>  ref.seq  qry.seq`
 
 To produce the following files:
    
-    <prefix>.delta
+`<prefix>.delta`
 
 Please read the utility-specific documentation in the "docs/" subdirectory
 for descriptions of these files and information on how to change the
-alignment parameters for the scripts (minimum match length, etc.), or see
+alignment parameters for the scripts (minimum match length, etc.) or see
 the notes below in the "RUNNING THE MUMmer SCRIPTS" section for a brief
 explanation.
 
@@ -94,10 +93,13 @@ descriptions and usage definitions for these scripts.  Please refer to the
 `nucmer` is for the all-vs-all comparison of nucleotide sequences
 contained in multi-FastA data files.  It is best used for highly
 similar sequence that may have large rearrangements.  Common use
-cases are: comparing two unfinished shotgun sequencing assemblies,
-mapping an unfinished sequencing assembly to a finished genome, and
-comparing two fairly similar genomes that may have large
-rearrangements and duplications.  Please refer to "docs/nucmer.README"
+cases are:
+
+- Comparing two unfinished shotgun sequencing assemblies
+- Mapping an unfinished sequencing assembly to a finished genome
+- Comparing two fairly similar genomes that may have large rearrangements and duplications
+
+Please refer to "docs/nucmer.README"
 for more information regarding this script and its output, or type
 `nucmer -h` for a list of its options.
 
@@ -119,7 +121,7 @@ for more information regarding this script and its output, or type
 **Notes:**
 
 All output coordinates reference the forward strand of the involved
-sequence, regardless of the match direction. Also, nucmer now uses
+sequence, regardless of the match direction. Also, `nucmer` now uses
 only matches that are unique in the reference sequence by default,
 use the '--mum' or '--maxmatch' options to change this behavior.
 
@@ -131,14 +133,17 @@ use the '--mum' or '--maxmatch' options to change this behavior.
 `promer` is for the protein level, all-vs-all comparison of nucleotide
 sequences contained in multi-FastA data files.  The nucleotide input
 files are translated in all 6 reading frames and then aligned to one
-another via the same methods as nucmer.  It is best used for highly
+another via the same methods as `nucmer`.  It is best used for highly
 divergent sequences that may have moderate to high similarity on the
-protein level.  Common use cases are: identifying syntenic regions
-between highly divergent genomes, comparative genome annotation i.e.
-using an already annotated genome to help in the annotation of a
-newly sequenced genome, and the general comparison of two fairly
-divergent genomes that have large rearrangements and may only be
-similar on the protein level. Please refer to "docs/promer.README"
+protein level.  Common use cases are: 
+
+- Identifying syntenic regions between highly divergent genomes
+- Comparative genome annotation, i.e. using an already annotated genome to help in the annotation of a
+newly sequenced genome
+- General comparison of two fairly divergent genomes that have large rearrangements and may only be
+similar on the protein level
+
+Please refer to "docs/promer.README"
 for more information regarding this script and its output, or type
 `promer -h` for a list of its options.
 
@@ -162,18 +167,15 @@ for more information regarding this script and its output, or type
 All output coordinates reference the forward strand of the involved
 sequence, regardless of the match direction, and are measured in
 nucleotides with the exception of the delta integers which are
-measured in amino acids (1 delta int = 3 nucleotides). Also, promer
+measured in amino acids (1 delta int = 3 nucleotides). Also, `promer`
 now uses only matches that are unique in the reference sequence by
 default, use the '--mum' or '--maxmatch' options to change this
 behavior.
 
-
-**Notes:**
-
 All output coordinates reference their respective strand.  This means
 that for all reverse matches, the coordinates that reference the
 query sequence will be relative to the reverse complement of the
-query sequence.  Please use nucmer or promer if this coordinate
+query sequence.  Please use `nucmer` or `promer` if this coordinate
 system is confusing.
 
 
@@ -255,8 +257,8 @@ only be used on the output of the `gaps` program.
 
 **Notes:**
 
-This program will eventually be dropped in favor of the combineMUMs
-or nucmer match extenders, but persists for the time being.
+This program will eventually be dropped in favor of the `combineMUMs`
+or `nucmer` match extenders, but persists for the time being.
 
 
 ### combineMUMs
@@ -297,7 +299,7 @@ behavior and only outputs the positions of difference, e.g. SNPs.
 **Description:**
 
 This program filters a delta alignment file produced by either
-nucmer or promer, leaving only the desired alignments which
+`nucmer` or `promer`, leaving only the desired alignments which
 are output to stdout in the same delta format as the
 input. Its primary function is the LIS algorithm which
 calculates the longest increasing subset of alignments. This
@@ -422,8 +424,8 @@ like the old `max-match` program.
 
 `mummerplot` is a perl script that generates gnuplot scripts and data
 collections for plotting with the gnuplot utility.  It can generate
-2-d dotplots and 1-d coverage plots for the output of mummer, nucmer,
-promer or show-tiling. It can also color dotplots with an identity
+2-d dotplots and 1-d coverage plots for the output of `mummer`, `nucmer`,
+`promer` or `show-tiling`. It can also color dotplots with an identity
 color gradient.
 
         USAGE:
@@ -459,7 +461,7 @@ postscript terminal and avoid the png terminal.
 
 **Description:**
 
-Script for plotting nucmer hits against a reference sequence. See top
+Script for plotting `nucmer` hits against a reference sequence. See top
 of script for more information, or see if `mummerplot` or `mapview`
 has the functionality required as they are properly maintained.
 
@@ -703,11 +705,11 @@ analysis.
 **Description:**
 
 This program reports polymorphism contained in a delta encoded
-alignment file output by either nucmer or promer. It catalogs
+alignment file output by either `nucmer` or `promer`. It catalogs
 all of the single nucleotide polymorphisms (SNPs) and
 insertions/deletions within the delta file
-alignments. Polymorphisms are reported one per line, in a
-delimited fashion similar to show-coords. Pairing this program
+alignments. Polymorphisms are reported one per line in a
+delimited fashion similar to the output of `how-coords` Pairing this program
 with the appropriate MUMmer tools can create an easy to use
 SNP pipeline for the rapid identification of putative SNPs
 between any two sequence sets.
