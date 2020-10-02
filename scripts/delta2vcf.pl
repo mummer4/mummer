@@ -57,7 +57,12 @@ if(not($seq eq "")){
   $seq=~tr/ACGTNacgtn/TGCANtgcan/;
   $qseq_rc{$ctg}=$seq;
 }
-
+#print header
+($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime();
+print "##fileformat=VCFv4.2\n";
+printf("##fileDate=20%02d%02d%02d\n",$year-100,$mon+1,$mday);
+print "##source=delta2vcf\n";
+print "##reference=file:/$ref\n";
 print "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\n";
 @outarray=();
 #going through the delta file
