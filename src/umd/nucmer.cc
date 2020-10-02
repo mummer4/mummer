@@ -45,22 +45,24 @@ void reverse_complement(std::string& s) {
 void replace_n_random_letter(std::string& s) {
   auto st = s.begin();
   auto en = s.end() - 1;
-
+  const char* bases="acgt";
   for( ; st < en; ++st) {
     if( *st == 'n' ){
-        int n=rand()%4; 
-        if(n==0){
-        *st='a';
-        }else if(n==1){
-        *st='c';
-        }else if(n==2){
-        *st='g';
-        }else{
-        *st='t';
-        }
+//        int n=rand()%4; 
+//        if(n==0){
+//        *st='a';
+//        }else if(n==1){
+//        *st='c';
+//        }else if(n==2){
+//        *st='g';
+//        }else{
+//        *st='t';
+//        }
+      *st=bases[rand()%4];    
     }
   }
 }
+
 
 void SequenceAligner::align(const char* query, size_t query_len, std::vector<postnuc::Alignment>& alignments) {
   std::vector<mgaps::Match_t>        fwd_matches(1), bwd_matches(1);
