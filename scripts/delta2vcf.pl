@@ -63,7 +63,7 @@ print "##fileformat=VCFv4.2\n";
 printf("##fileDate=20%02d%02d%02d\n",$year-100,$mon+1,$mday);
 print "##source=delta2vcf\n";
 print "##reference=file:/$ref\n";
-print "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\n";
+print "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\tAF\n";
 @outarray=();
 #going through the delta file
 while($line=<STDIN>){
@@ -155,7 +155,7 @@ while($line=<STDIN>){
 $last_refname="";
 $last_pos="";
 foreach $l(@outarray_sorted){
-print $l->{'refname'},"\t",$l->{'refpos'},"\t\.\t",$l->{'ref'},"\t",$l->{'qry'},"\t40\tPASS\t*\t*\t0:0:0:0:0:2:2:0\n" if(not($last_refname eq $l->{'refname'}) || not($last_pos==$l->{'refpos'}));
+print $l->{'refname'},"\t",$l->{'refpos'},"\t\.\t",$l->{'ref'},"\t",$l->{'qry'},"\t40\tPASS\t*\tGT:DP:AD:RO:QR:AO:QA:GL\t0:1:0:1:40:2:40:0\n" if(not($last_refname eq $l->{'refname'}) || not($last_pos==$l->{'refpos'}));
 $last_refname=$l->{'refname'};
 $last_pos=$l->{'refpos'};
 }
