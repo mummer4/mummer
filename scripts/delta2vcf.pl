@@ -63,6 +63,10 @@ print "##fileformat=VCFv4.2\n";
 printf("##fileDate=20%02d%02d%02d\n",$year-100,$mon+1,$mday);
 print "##source=delta2vcf\n";
 print "##reference=file:/$ref\n";
+foreach $c(keys %rseq){
+  print "##contig=<ID=$c,length=",length($rseq{$c}),">\n";
+}
+print "##FORMAT=<ID=GT,Number=1,Type=Integer,Description=\"Genotype\">\n";
 print "##FORMAT=<ID=DP,Number=1,Type=Integer,Description=\"Coverage Depth, 1 by default\">\n";
 print "##FORMAT=<ID=AD,Number=R,Type=Integer,Description=\"Number of observations for each allele, 1,2 by default\">\n";
 print "##FORMAT=<ID=RO,Number=1,Type=Integer,Description=\"Reference allele observation count, 1 by default\">\n";
@@ -161,7 +165,7 @@ while($line=<STDIN>){
 $last_refname="";
 $last_pos="";
 foreach $l(@outarray_sorted){
-print $l->{'refname'},"\t",$l->{'refpos'},"\t\.\t",$l->{'ref'},"\t",$l->{'qry'},"\t40\tPASS\t*\tGT:DP:AD:RO:QR:AO:QA\t0:1:1,2:1:40:2:40\n" if(not($last_refname eq $l->{'refname'}) || not($last_pos==$l->{'refpos'}));
+print $l->{'refname'},"\t",$l->{'refpos'},"\t\.\t",$l->{'ref'},"\t",$l->{'qry'},"\t40\tPASS\t.\tGT:DP:AD:RO:QR:AO:QA\t0:1:1,2:1:40:2:40\n" if(not($last_refname eq $l->{'refname'}) || not($last_pos==$l->{'refpos'}));
 $last_refname=$l->{'refname'};
 $last_pos=$l->{'refpos'};
 }
