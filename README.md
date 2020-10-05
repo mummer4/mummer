@@ -16,7 +16,7 @@ executables in the base directory and general information about the
 MUMmer package.
 
 ## DESCRIPTION
-MUMmer is a system for rapidly aligning genome and proteing sequences.  The current
+MUMmer is a system for rapidly aligning genome and protein sequences.  The current
 version (release 4.x) can find all 20 base pair maximal exact matches between
 two bacterial genomes of ~5 million base pairs each in 20 seconds, using 90 MB
 of memory, on a typical 1.8 GHz Linux desktop computer.  MUMmer handles the 100s 
