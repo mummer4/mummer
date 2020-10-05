@@ -81,7 +81,7 @@ on mummer output (.out), or nucmer/promer output (.delta). Edit the
 <prefix>.gp file that is created to change colors, line thicknesses, etc. or
 explore the \<prefix>.[fr]plot file to see the data collection.
 
-`./mummerplot  -p <prefix>  <prefix>.out`
+`./mummerplot -l -p <prefix>  <prefix>.out`
 
 ## RUNNING THE NUCMER and THE PROMER
 
