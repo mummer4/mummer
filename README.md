@@ -72,7 +72,7 @@ To produce the following files:
 Please read the utility-specific documentation in the "docs/" subdirectory
 for descriptions of these files and information on how to change the
 alignment parameters for the scripts (minimum match length, etc.), or see
-the notes below in the "RUNNING THE MUMmer SCRIPTS" section for a brief
+the notes below in the "RUNNING THE MUMmer UTILITIES" section for a brief
 explanation.
 
 To see a simple gnuplot output, if you have gnuplot installed, run
@@ -83,7 +83,7 @@ explore the \<prefix>.[fr]plot file to see the data collection.
 
 `./mummerplot  -p <prefix>  <prefix>.out`
 
-## RUNNING THE MUMmer SCRIPTS
+## RUNNING THE MUMmer UTILITIES
 Because of MUMmer's modular design, it may be necessary to use a number
 of separate programs to produce the desired output.  The MUMmer scripts
 attempt to simplify this process by wrapping various utilities into packages
@@ -92,16 +92,16 @@ descriptions and usage definitions for these scripts.  Please refer to the
 "docs/" subdirectory for a more detailed description of each script.
 
 
-### nucmer
+### nucmer utility
 
 **Description:**
 
 `nucmer` is for the all-vs-all comparison of nucleotide sequences
-contained in multi-FastA data files.  It is best used for highly
-similar sequence that may have large rearrangements.  Common use
-cases are: comparing two unfinished shotgun sequencing assemblies,
-mapping an unfinished sequencing assembly to a finished genome, and
-comparing two fairly similar genomes that may have large
+contained in multi-Fasta data files.  It is best used for 
+similar sequences that may have large rearrangements.  Common use
+cases are: comparing two genome assemblies,
+mapping an assembly or sequencing reads to a finished genome, and
+comparing two genomes of related species that may have large
 rearrangements and duplications.  Please refer to "docs/nucmer.README"
 for more information regarding this script and its output, or type
 `nucmer -h` for a list of its options.
