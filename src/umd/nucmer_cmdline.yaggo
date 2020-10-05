@@ -73,7 +73,7 @@ option("batch") {
   uint64; typestr "BASES"
   conflict "save", "load" }
 option("t", "threads") {
-  description "Use NUM threads (# of cores)"
+  description "Use NUM threads (2)"
   uint32; typestr "NUM" }
 
 # Hidden / experimental options
