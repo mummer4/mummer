@@ -72,7 +72,7 @@ To produce the following files:
 Please read the utility-specific documentation in the "docs/" subdirectory
 for descriptions of these files and information on how to change the
 alignment parameters for the scripts (minimum match length, etc.), or see
-the notes below in the "RUNNING THE MUMmer UTILITIES" section for a brief
+the notes below in the "RUNNING THE NUCMER AND THE PROMER" section for a brief
 explanation.
 
 To see a simple gnuplot output, if you have gnuplot installed, run
@@ -83,16 +83,11 @@ explore the \<prefix>.[fr]plot file to see the data collection.
 
 `./mummerplot  -p <prefix>  <prefix>.out`
 
-## RUNNING THE MUMmer UTILITIES
-Because of MUMmer's modular design, it may be necessary to use a number
-of separate programs to produce the desired output.  The MUMmer scripts
-attempt to simplify this process by wrapping various utilities into packages
-that can perform standard alignment requests.  Listed below are brief
-descriptions and usage definitions for these scripts.  Please refer to the
-"docs/" subdirectory for a more detailed description of each script.
+## RUNNING THE NUCMER and THE PROMER
 
+Two main executables in MUMmer are nucmer and promer.  nucmer is designed for DNA sequence alignment and proteing is designed for protein or translated sequence alignment
 
-### nucmer utility
+### nucmer
 
 **Description:**
 
