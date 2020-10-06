@@ -50,38 +50,40 @@ system:
 ## RUNNING MUMmer4.x
 
 MUMmer4.x is comprised of many various utilities
-and scripts.  For general purposes, the programs `nucmer`, and
+and scripts.  For most alignment tasks, the programs `nucmer`, and
 `promer` will be all that is needed.  See their descriptions in the
-"RUNNING THE MUMmer PROGRAMS" section, or refer to their individual
+"RUNNING THE NUCMER and THE PROMER" section, or refer to their individual
 documentation in the "docs/" subdirectory.  Refer to the "RUNNING THE
 MUMmer UTILITIES" section for a brief description of all of the
 utilities in this directory.
 
 ### Simple use case
 
-Given a file containing a single reference sequence (ref.seq) in
+Given a file containing a single reference sequence (ref.fa) in
 FASTA format and another file containing multiple sequences in FastA
-format (qry.seq) type the following at the command line:
+format (qry.fa) type the following at the command line:
 
-`./nucmer  -p <prefix>  ref.seq  qry.seq`
+`./nucmer  -p <prefix>  ref.fa  qry.fa`
 
-To produce the following files:
+To produce the following file:
    
     <prefix>.delta
+
+To see the alignment coordinates, type:
+
+`show-coords <prefix>.delta > <prefix>.coords`
+ 
+To plot the alignments, if you have gnuplot installed, run
+the perl script `mummerplot` on the output files. This script can be run
+on mummer output (.out), or nucmer/promer output (.delta). 
+
+`./mummerplot -l <prefix>.delta`
 
 Please read the utility-specific documentation in the "docs/" subdirectory
 for descriptions of these files and information on how to change the
 alignment parameters for the scripts (minimum match length, etc.), or see
 the notes below in the "RUNNING THE NUCMER AND THE PROMER" section for a brief
 explanation.
-
-To see a simple gnuplot output, if you have gnuplot installed, run
-the perl script `mummerplot` on the output files. This script can be run
-on mummer output (.out), or nucmer/promer output (.delta). Edit the
-<prefix>.gp file that is created to change colors, line thicknesses, etc. or
-explore the \<prefix>.[fr]plot file to see the data collection.
-
-`./mummerplot -l -p <prefix>  <prefix>.out`
 
 ## RUNNING THE NUCMER and THE PROMER
 
