@@ -30,19 +30,19 @@ divergent to detect similarity.  See the nucmer and promer readme files in the
 that you cite our most recent paper in any publications that use this
 system:
 
-**(Version 4.x citation)**
+**(The latest Version 4.x citation)**
 
 >Marçais G, Delcher AL, Phillippy AM, Coston R, Salzberg SL, Zimin A. MUMmer4: A fast and versatile genome alignment system. PLoS computational biology. 2018 Jan 26;14(1):e1005944.
 
-**(Version 3.x described)**
+**(Version 3.x citation)**
  
 >Kurtz S, Phillippy A, Delcher AL, Smoot M, Shumway M, Antonescu C, Salzberg SL. Versatile and open software for comparing large genomes. Genome biology. 2004 Jan 1;5(2):R12.
 
-**(Version 2.1 described)**
+**(Version 2.1 citation)**
 
 >Delcher AL, Phillippy A, Carlton J, Salzberg SL. Fast algorithms for large-scale genome alignment and comparison. Nucleic acids research. 2002 Jun 1;30(11):2478-83.
 
-**(Version 1.0 described)**
+**(Version 1.0 citation)**
 
 >Delcher AL, Kasif S, Fleischmann RD, Peterson J, White O, Salzberg SL. Alignment of whole genomes. Nucleic acids research. 1999 Jan 1;27(11):2369-76.
 
