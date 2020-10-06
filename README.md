@@ -67,7 +67,7 @@ format (qry.fa) type the following at the command line:
 
 To produce the following file:
    
-    <prefix>.delta
+ `<prefix>.delta`
 
 To see the alignment coordinates, type:
 
