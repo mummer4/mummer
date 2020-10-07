@@ -8,7 +8,7 @@ MUMmer is a versatile alignment tool for DNA and protein sequences. To install t
 
 **NOTE**
 
-Further documentation, but potentially out of date, is in the [docs](../../tree/master/docs) directory. Please refer to the [INSTALL.md](INSTALL.md) file for installation
+Further documentation, is in the [docs](../../tree/master/docs) directory. Please refer to the [INSTALL.md](INSTALL.md) file for installation
 instructions.
 
 ## DESCRIPTION
