@@ -11,10 +11,6 @@ MUMmer is a versatile alignment tool for DNA and protein sequences. To install t
 Further documentation, but potentially out of date, is in the [docs](../../tree/master/docs) directory. Please refer to the [INSTALL.md](INSTALL.md) file for installation
 instructions.
 
-This file contains brief descriptions of all
-executables in the base directory and general information about the
-MUMmer package.
-
 ## DESCRIPTION
 MUMmer is a system for rapidly aligning genome and protein sequences.  The current
 version (release 4.x) can find all 20 base pair maximal exact matches between
