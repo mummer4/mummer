@@ -12,13 +12,9 @@ Further documentation is in the [docs](../../tree/master/docs) directory. Please
 instructions.
 
 ## DESCRIPTION
-MUMmer is a system for rapidly aligning DNA and protein sequences.  The current
-version (release 4.x) can find all 20 base pair maximal exact matches between
-two bacterial genomes of ~5 million base pairs each in 20 seconds, using 90 MB
-of memory, on a typical 1.8 GHz Linux desktop computer.  MUMmer handles the 100s 
-or 1000s of contigs or reads from a shotgun sequencing project with ease, 
-and will align them to a genome, using the nucmer utility included with the system.  The promer
-utility takes this a step further by generating alignments based upon the
+MUMmer is a system for rapidly aligning DNA and protein sequences.  The nucmer aligner in the current
+version (release 4.x) can align two mammalian genomes in about 3 hours on a typical 32+ core workstation with 64+Gb RAM; smaller genomes such as bacteria or small eukaryotes are aligned in seconds or minutes.  The promer
+utility generates alignments based upon the
 six-frame translations of both input sequences.  promer permits the alignment
 of genomes for which the proteins are similar but the DNA sequence is too
 divergent to detect similarity.  See the nucmer and promer readme files in the
