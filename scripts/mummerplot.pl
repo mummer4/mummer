@@ -23,7 +23,7 @@ use IO::Socket;
 
 my $BIN_DIR     = "@BIN_DIR@";
 my $LIB_DIR     = "@LIB_DIR@";
-my $GNUPLOT_EXE = "@GNUPLOT_EXE@";
+my $GNUPLOT_EXE = "gnuplot";
 
 
 #================================================================= Globals ====#
