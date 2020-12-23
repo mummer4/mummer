@@ -1,0 +1,5 @@
+*.md
+.dockerignore
+.git
+docs
+Dockerfile

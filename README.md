@@ -4,7 +4,7 @@ Master | Develop
 
 # MUMmer4.x README
 
-MUMmer is a versatile alignment tool for DNA and protein sequences. To install the software, download the [latest release](../../releases) and follow the [installation instructions](INSTALL.md).
+MUMmer is a versatile alignment tool for DNA and protein sequences. To install the software, download the [latest release](../../releases) and follow the [installation instructions](INSTALL.md). Alternatively, a Docker image can be built, and mummer executed in a Docker container, following the directions in the [Docker container](#docker-container) section.
 
 **NOTE**
 
@@ -798,6 +798,19 @@ format that can be accepted by TIGR's open source scaffolding software
 The programs `mapview`, `run-mummer1`, `run-mummer3` and `nucmer2xfig`
 are now obsolete. The original documentation is still available in
 [OBSOLETE.md](OBSOLETE.md).
+
+## Docker container
+To build a Docker container image containing mummer and all dependencies, [install Docker](https://docs.docker.com/get-docker/) for Windows, Mac, or Linux; clone the mummer git repo; and issue the following command in the top-level directory of the mummer git working tree:
+
+    docker build -t mummer .
+
+To execute individual mummer commands (e.g., nucmer) within a container:
+
+    docker run --rm -v $PWD:/mnt -w /mnt mummer nucmer -p <prefix> ref.fa  qry.fa
+
+To execute an interactive shell within a container (from which mummer commands can be executed):
+
+    docker run -it --rm -v $PWD:/mnt -w /mnt mummer
 
 ## CONTACT INFORMATION
 
