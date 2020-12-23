@@ -160,13 +160,11 @@ CLEANFILES         += $(libs_scripts) $(all_scripts)
 script_inst_subst  = sed -e 's,[@]PERL[@],$(PERL),g' \
                        -e 's,[@]BIN_DIR[@],$(bindir),g' \
                        -e 's,[@]LIB_DIR[@],$(script_libdir),g' \
-	               -e 's,[@]LIBEXEC_DIR[@],$(pkglibexecdir),g' \
-		       -e 's,[@]GNUPLOT_EXE[@],$(GNUPLOT),g'
+	               -e 's,[@]LIBEXEC_DIR[@],$(pkglibexecdir),g'
 script_local_subst = sed -e 's,[@]PERL[@],$(PERL),g' \
                        -e 's,[@]BIN_DIR[@],$(abs_builddir),g' \
                        -e 's,[@]LIB_DIR[@],$(abs_srcdir)/scripts,g' \
-	               -e 's,[@]LIBEXEC_DIR[@],$(abs_builddir),g' \
-                       -e 's,[@]GNUPLOT_EXE[@],$(GNUPLOT),g'
+	               -e 's,[@]LIBEXEC_DIR[@],$(abs_builddir),g'
 
 .libs/%: scripts/%.pl
 	@mkdir -p $(dir $@) && $(script_inst_subst) < $< > $@
