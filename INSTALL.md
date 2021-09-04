@@ -18,6 +18,8 @@ You should compile from a [release source tarball](../../releases), unless you p
 To compile and install:
 
 ```Shell
+cd mummer/
+autoreconf -i configure.ac
 ./configure --prefix=/path/to/installation
 make
 make install
