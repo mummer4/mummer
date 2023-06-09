@@ -5,6 +5,7 @@
 #include <config.h>
 #endif
 
+#include <cstdint>
 #include "48bit_iterator.hpp"
 
 template<typename IDX>
