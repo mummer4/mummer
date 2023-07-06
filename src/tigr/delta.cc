@@ -284,6 +284,33 @@ void DeltaReader_t::open
       break;
 }
 
+// as the same as the DeltaReader_t::open, but stdin
+void DeltaReader_t::openStdin
+()
+{
+
+  //-- Open the delta file
+  delta_stream_m.copyfmt(std::cin);
+  delta_stream_m.clear();
+  delta_stream_m.basic_ios<char>::rdbuf(std::cin.rdbuf());
+
+  checkStream ();
+
+  //-- Read the file header
+  delta_stream_m >> reference_path_m;
+  delta_stream_m >> query_path_m;
+  delta_stream_m >> data_type_m;
+  if ( (data_type_m != NUCMER_STRING  &&  data_type_m != PROMER_STRING) )
+    delta_stream_m.setstate (ios::failbit);
+  checkStream ();
+  is_open_m = true;
+
+  //-- Advance to first record header
+  while ( delta_stream_m.peek () != '>' )
+    if ( delta_stream_m.get () == EOF )
+      break;
+}
+
 
 //----------------------------------------------------- readNextAlignment ------
 void DeltaReader_t::readNextAlignment
@@ -450,6 +477,68 @@ void DeltaGraph_t::build (const string & deltapath, bool getdeltas)
   dr.close ();
 }
 
+// as the same as the DeltaGraph_t::build, but stdin
+void DeltaGraph_t::buildStdin (bool getdeltas)
+{
+  DeltaReader_t dr;
+  DeltaEdge_t * dep;
+  pair<map<string, DeltaNode_t>::iterator, bool> insret;
+
+
+  //-- Open the delta file and read in the alignment information
+  dr.openStdin();
+
+  refpath = dr.getReferencePath();
+  qrypath = dr.getQueryPath();
+
+  if ( dr.getDataType() == NUCMER_STRING )
+    datatype = NUCMER_DATA;
+  else if ( dr.getDataType() == PROMER_STRING )
+    datatype = PROMER_DATA;
+  else
+    datatype = NULL_DATA;
+
+  //-- Read in the next graph edge, i.e. a new delta record
+  while ( dr.readNext (getdeltas) )
+    {
+      dep = new DeltaEdge_t();
+
+
+      //-- Find the reference node in the graph, add a new one if necessary
+      insret = refnodes.insert
+        (map<string, DeltaNode_t>::value_type
+         (dr.getRecord().idR, DeltaNode_t()));
+      dep->refnode = &((insret.first)->second);
+
+      //-- If a new reference node
+      if ( insret.second )
+        {
+          dep->refnode->id  = &((insret.first)->first);
+          dep->refnode->len = dr.getRecord().lenR;
+        }
+
+
+      //-- Find the query node in the graph, add a new one if necessary
+      insret = qrynodes.insert
+        (map<string, DeltaNode_t>::value_type
+         (dr.getRecord().idQ, DeltaNode_t()));
+      dep->qrynode = &((insret.first)->second);
+
+      //-- If a new query node
+      if ( insret.second )
+        {
+          dep->qrynode->id  = &((insret.first)->first);
+          dep->qrynode->len = dr.getRecord().lenQ;
+        }
+
+
+      //-- Build the edge
+      dep->build (dr.getRecord());
+      dep->refnode->edges.push_back (dep);
+      dep->qrynode->edges.push_back (dep);
+    }
+  dr.close ();
+}
 
 //------------------------------------------------------------------- clean ----
 //! \brief Clean the graph of all edgelets where isGOOD = false

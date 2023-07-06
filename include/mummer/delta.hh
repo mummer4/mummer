@@ -214,6 +214,7 @@ public:
   //! \return void
   //!
   void open (const std::string & delta_path);
+  void openStdin ();
 
 
   //--------------------------------------------------- close ------------------
@@ -491,6 +492,7 @@ public:
   { clear(); }
 
   void build(const std::string & deltapath, bool getdeltas = true);
+  void buildStdin(bool getdeltas = true);
   void clean();
   void clear();
   long getNodeCount();

@@ -2,6 +2,8 @@
 //   Programmer: Adam M Phillippy, The Institute for Genomic Research
 //         File: show-snps.cc
 //         Date: 12 / 08 / 2004
+//   Modified by: Hajin Jeon, Korea Bioinformation Center
+//         Date: 2023-07-06
 //
 //        Usage: show-snps [options] <deltafile>
 //               Try 'show-snps -h' for more information
@@ -30,8 +32,6 @@
 using namespace std;
 
 
-
-
 //=============================================================== Options ====//
 string  OPT_AlignName;                  // delta file name
 string  OPT_ReferenceName;              // reference sequence file name
@@ -45,6 +45,7 @@ bool    OPT_ShowIndels    = true;       // -I option
 bool    OPT_PrintTabular  = false;      // -T option
 bool    OPT_PrintHeader   = true;       // -H option
 bool    OPT_SelectAligns  = false;      // -S option
+bool    OPT_Stdin         = false;      // -s option
 
 int     OPT_Context       = 0;          // -x option
 
@@ -193,8 +194,6 @@ void PrintHelp (const char * s);
 void PrintUsage (const char * s);
 
 
-
-
 //========================================================= Function Defs ====//
 int main (int argc, char ** argv)
 {
@@ -210,7 +209,11 @@ int main (int argc, char ** argv)
     SelectAligns ( );
 
   //-- Build the alignment graph from the delta file
-  graph . build (OPT_AlignName, true);
+  if (!OPT_Stdin ) {
+    graph . build (OPT_AlignName, true);
+  }else{
+    graph . buildStdin(true);
+  }
 
   //-- Read sequences
   graph . loadSequences ( );
@@ -888,7 +891,7 @@ void ParseArgs (int argc, char ** argv)
   optarg = NULL;
   
   while ( !errflg  &&
-          ((ch = getopt (argc, argv, "ChHIlqrSTx:")) != EOF) )
+          ((ch = getopt (argc, argv, "ChHIlqrSsTx:")) != EOF) )
     switch (ch)
       {
       case 'C':
@@ -922,6 +925,14 @@ void ParseArgs (int argc, char ** argv)
 
       case 'S':
         OPT_SelectAligns = true;
+        if (OPT_Stdin == true) {
+          OPT_SelectAligns = false;
+        }
+        break;
+
+      case 's':
+        OPT_Stdin = true;
+        OPT_SelectAligns = false;
         break;
 
       case 'T':
@@ -948,14 +959,15 @@ void ParseArgs (int argc, char ** argv)
   if ( !OPT_SortReference  &&  !OPT_SortQuery )
     OPT_SortReference = true;
 
-  if ( errflg > 0  ||  optind != argc - 1 )
+  if ( errflg > 0  ||  optind != argc - 1 && !OPT_Stdin || optind != argc && OPT_Stdin )
     {
       PrintUsage (argv[0]);
       cerr << "Try '" << argv[0] << " -h' for more information.\n";
       exit (EXIT_FAILURE);
     }
-
-  OPT_AlignName = argv [optind ++];
+  if (!OPT_Stdin) {
+    OPT_AlignName = argv [optind ++];
+  }
 }
 
 
@@ -977,6 +989,8 @@ void PrintHelp (const char * s)
     << "-r            Sort output lines by reference IDs and SNP positions\n"
     << "-S            Specify which alignments to report by passing\n"
     << "              'show-coords' lines to stdin\n"
+    << "-s            Standart input (STDIN) data will be taken instead of a file\n"
+    << "              This option will ignore '-S' option\n"
     << "-T            Switch to tab-delimited format\n"
     << "-x int        Include x characters of surrounding SNP context in the\n"
     << "              output, default "
