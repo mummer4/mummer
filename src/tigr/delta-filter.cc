@@ -33,6 +33,7 @@ bool           OPT_RLIS         = false;     // do reference based LIS
 bool           OPT_GLIS         = false;     // do global LIS
 bool           OPT_1to1         = false;     // do 1-to-1 alignment
 bool           OPT_MtoM         = false;     // do M-to-M alignment
+string         OPT_PrintIdentity = "identity.idy";           // path to print %identity
 long int       OPT_MinLength    = 0;         // minimum alignment length
 float          OPT_MinIdentity  = 0.0;       // minimum %identity
 float          OPT_MinUnique    = 0.0;       // minimum %unique
@@ -130,7 +131,7 @@ void ParseArgs(int argc, char ** argv)
   optarg = NULL;
   
   while ( !errflg  &&
-         ((ch = getopt(argc, argv, "e:ghi:l:o:qru:m1")) != EOF) )
+         ((ch = getopt(argc, argv, "e:ghi:I:l:o:qru:m1")) != EOF) )
     switch (ch)
       {
       case 'e':
@@ -150,13 +151,17 @@ void ParseArgs(int argc, char ** argv)
         OPT_MinIdentity = atof(optarg);
         break;
 
+      case 'I':
+        OPT_PrintIdentity = optarg;
+        break;
+
       case 'l':
         OPT_MinLength = atol(optarg);
         break;
 
       case 'o':
-	OPT_MaxOverlap = atof(optarg);
-	break;
+	      OPT_MaxOverlap = atof(optarg);
+	      break;
 
       case 'q':
         OPT_QLIS = true;
@@ -230,6 +235,7 @@ void PrintHelp(const char * s)
     << "-h            Display help information\n"
     << "-i float      Set the minimum alignment identity [0, 100], default "
     << OPT_MinIdentity << endl
+    << "-I string     Print "
     << "-l int        Set the minimum alignment length, default "
     << OPT_MinLength << endl
     << "-m            Many-to-many alignment allowing for rearrangements\n"
@@ -300,6 +306,7 @@ int FilterDelta(std::istream& is, float min_len, float min_idy) {
   DeltaRecord_t record;
   DeltaAlignment_t alignment;
 
+  std::ofstream outfile(OPT_PrintIdentity); // Open the output file
   while(c != EOF) {
     is >> record;
     bool first = true;
@@ -311,10 +318,12 @@ int FilterDelta(std::istream& is, float min_len, float min_idy) {
         continue;
       if(first) {
         std::cout << record << '\n';
+        outfile << record << " " << alignment.idy << '\n';
         first = false;
       }
       std::cout << alignment;
     }
   }
+  outfile.close();
   return EXIT_SUCCESS;
 }
