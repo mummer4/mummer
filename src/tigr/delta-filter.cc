@@ -35,6 +35,7 @@ bool           OPT_1to1         = false;     // do 1-to-1 alignment
 bool           OPT_MtoM         = false;     // do M-to-M alignment
 string         OPT_PrintIdentity = "identity.idy";           // path to print %identity
 long int       OPT_MinLength    = 0;         // minimum alignment length
+long int       OPT_MinSeqLength    = 0;         // minimum alignment length
 float          OPT_MinIdentity  = 0.0;       // minimum %identity
 float          OPT_MinUnique    = 0.0;       // minimum %unique
 float          OPT_MaxOverlap   = 100.0;     // maximum olap as % of align len
@@ -68,7 +69,7 @@ int main(int argc, char ** argv)
   // Optimization: if only filtering by identity or length, stream
   // through, do not create graph.
   const bool stream = !(OPT_MinUnique > 0) && !OPT_QLIS && !OPT_RLIS && !OPT_GLIS && !OPT_MtoM && !OPT_1to1;
-  const bool noop = stream && !(OPT_MinIdentity > 0) && !(OPT_MinLength);
+  const bool noop = stream && !(OPT_MinIdentity > 0) && !(OPT_MinLength) && !(OPT_MinSeqLength);
   if(stream) {
     std::ifstream is(OPT_AlignName);
     if(!is.good()) {
@@ -131,7 +132,7 @@ void ParseArgs(int argc, char ** argv)
   optarg = NULL;
   
   while ( !errflg  &&
-         ((ch = getopt(argc, argv, "e:ghi:I:l:o:qru:m1")) != EOF) )
+         ((ch = getopt(argc, argv, "e:ghi:I:L:l:o:qru:m1")) != EOF) )
     switch (ch)
       {
       case 'e':
@@ -157,6 +158,10 @@ void ParseArgs(int argc, char ** argv)
 
       case 'l':
         OPT_MinLength = atol(optarg);
+        break;
+
+      case 'L':
+        OPT_MinSeqLength = atol(optarg);
         break;
 
       case 'o':
@@ -235,9 +240,12 @@ void PrintHelp(const char * s)
     << "-h            Display help information\n"
     << "-i float      Set the minimum alignment identity [0, 100], default "
     << OPT_MinIdentity << endl
-    << "-I string     Print "
+    << "-I string     Print identity value, default "
+    << OPT_PrintIdentity << endl
     << "-l int        Set the minimum alignment length, default "
     << OPT_MinLength << endl
+    << "-L int        Set the minimum length, default "
+    << OPT_MinSeqLength << endl
     << "-m            Many-to-many alignment allowing for rearrangements\n"
     << "              (union of -r and -q alignments)\n"
     << "-q            Maps each position of each query to its best hit in\n"
@@ -312,6 +320,8 @@ int FilterDelta(std::istream& is, float min_len, float min_idy) {
     bool first = true;
     for(c = is.peek(); c != '>' && c != EOF; c = is.peek()) {
       alignment.read(is, promer, true);
+      
+      if (record.lenQ < OPT_MinSeqLength) continue;
       if(alignment.idy < min_idy ||
          std::abs(alignment.eR - alignment.sR) + 1 < min_len ||
          std::abs(alignment.eQ - alignment.sQ) + 1 < min_len)
