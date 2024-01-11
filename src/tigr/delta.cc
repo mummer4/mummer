@@ -1387,6 +1387,7 @@ void DeltaGraph_t::loadSequences ()
         if ( len != mi->second.len )
           {
             cerr << "ERROR: Query input does not match delta file\n";
+            cerr << "Error occured in " << id << "\n";
             exit (EXIT_FAILURE);
           }
       }
@@ -1417,7 +1418,7 @@ void DeltaGraph_t::loadSequences ()
 //! \param out The output stream to write to
 //! \return The output stream
 //!
-ostream & DeltaGraph_t::outputDelta (ostream & out)
+ostream & DeltaGraph_t::outputDelta (ostream & out, bool OPT_PrintHeader)
 {
   bool header;
   long s1, e1, s2, e2;
@@ -1427,9 +1428,11 @@ ostream & DeltaGraph_t::outputDelta (ostream & out)
   vector<DeltaEdgelet_t *>::const_iterator eli;
  
   //-- Print the file header
-  cout
-    << refpath << ' ' << qrypath << '\n'
-    << (datatype == PROMER_DATA ? PROMER_STRING : NUCMER_STRING) << '\n';
+  if (OPT_PrintHeader) {
+    cout
+      << refpath << ' ' << qrypath << '\n'
+      << (datatype == PROMER_DATA ? PROMER_STRING : NUCMER_STRING) << '\n';
+  }
  
   for ( mi = qrynodes.begin(); mi != qrynodes.end(); ++ mi )
     {
@@ -1471,6 +1474,37 @@ ostream & DeltaGraph_t::outputDelta (ostream & out)
                 << (*eli)->simc << ' '
                 << (*eli)->stpc << '\n'
                 << (*eli)->delta;
+            }
+        }
+    }
+  return out;
+}
+
+ostream & DeltaGraph_t::outputIdy (ostream & out)
+{ 
+  map<string, DeltaNode_t>::const_iterator mi;
+  vector<DeltaEdge_t *>::const_iterator ei;
+  vector<DeltaEdgelet_t *>::const_iterator eli;
+
+  for ( mi = qrynodes.begin(); mi != qrynodes.end(); ++ mi )
+    {
+      for ( ei  = (mi->second).edges.begin();
+            ei != (mi->second).edges.end(); ++ ei )
+        {
+ 
+          for ( eli  = (*ei)->edgelets.begin();
+                eli != (*ei)->edgelets.end(); ++ eli )
+            {
+              if ( ! (*eli)->isGOOD )
+                continue;
+ 
+              out
+                << '>'
+                << *((*ei)->refnode->id) << ' '
+                << *((*ei)->qrynode->id) << ' '
+                << (*ei)->refnode->len << ' '
+                << (*ei)->qrynode->len << ' '
+                << (*eli)->idy << '\n';
             }
         }
     }

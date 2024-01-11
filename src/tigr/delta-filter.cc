@@ -33,6 +33,7 @@ bool           OPT_RLIS         = false;     // do reference based LIS
 bool           OPT_GLIS         = false;     // do global LIS
 bool           OPT_1to1         = false;     // do 1-to-1 alignment
 bool           OPT_MtoM         = false;     // do M-to-M alignment
+bool           OPT_PrintHeader  = true;      // print output header
 string         OPT_PrintIdentity = "identity.idy";           // path to print %identity
 long int       OPT_MinLength    = 0;         // minimum alignment length
 long int       OPT_MinSeqLength    = 0;         // minimum alignment length
@@ -117,7 +118,11 @@ int main(int argc, char ** argv)
     graph.flag1to1(OPT_Epsilon, OPT_MaxOverlap);
 
   //-- Output the filtered delta file
-  graph.outputDelta(cout);
+  graph.outputDelta(cout, OPT_PrintHeader);
+
+  std::ofstream outfile(OPT_PrintIdentity);
+  graph.outputIdy(outfile);
+  outfile.close();
 
   return EXIT_SUCCESS;
 }
@@ -132,7 +137,7 @@ void ParseArgs(int argc, char ** argv)
   optarg = NULL;
   
   while ( !errflg  &&
-         ((ch = getopt(argc, argv, "e:ghi:I:L:l:o:qru:m1")) != EOF) )
+         ((ch = getopt(argc, argv, "e:ghHi:I:L:l:o:qru:m1")) != EOF) )
     switch (ch)
       {
       case 'e':
@@ -146,6 +151,10 @@ void ParseArgs(int argc, char ** argv)
       case 'h':
         PrintHelp(argv[0]);
         exit(EXIT_SUCCESS);
+        break;
+
+      case 'H':
+        OPT_PrintHeader = false;
         break;
 
       case 'i':
@@ -238,6 +247,7 @@ void PrintHelp(const char * s)
     << "              (intersection of -r and -q alignments)\n"
     << "-g            1-to-1 global alignment not allowing rearrangements\n"
     << "-h            Display help information\n"
+    << "-H            Do not print the output header\n"
     << "-i float      Set the minimum alignment identity [0, 100], default "
     << OPT_MinIdentity << endl
     << "-I string     Print identity value, default "
@@ -296,14 +306,14 @@ int FilterDelta(std::istream& is, float min_len, float min_idy) {
   std::string line;
   // Print header unmodified
   std::getline(is, line);
-  std::cout << line << '\n';
+  if (OPT_PrintHeader) std::cout << line << '\n';
   std::getline(is, line);
   const bool promer = line == PROMER_STRING;
   if(!promer && line != NUCMER_STRING) {
     std::cerr << "Unsupported format '" << line << "'\n";
     return EXIT_FAILURE;
   }
-  std::cout << line << '\n';
+  if (OPT_PrintHeader) std::cout << line << '\n';
 
   int c = is.peek();
   if(c != '>') {

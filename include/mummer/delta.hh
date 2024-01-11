@@ -513,7 +513,8 @@ public:
   void flagUNIQ(float minuniq);
 
   void loadSequences();
-  std::ostream & outputDelta(std::ostream & out);
+  std::ostream & outputDelta(std::ostream & out, bool OPT_PrintHeader);
+  std::ostream & outputIdy(std::ostream & out);
 };
 
 #endif // #ifndef __DELTA_HH
