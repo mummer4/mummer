@@ -1,11 +1,11 @@
-AC_INIT([MUMmer], [4.0.0rc1], [alekseyz@jhu.edu])
+AC_INIT([MUMmer],[4.0.0rc1],[alekseyz@jhu.edu])
 AC_CANONICAL_HOST
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([subdir-objects foreign parallel-tests color-tests])
 AM_SILENT_RULES([yes])
 AC_CONFIG_SRCDIR([.])
 AC_CONFIG_HEADERS([config.h])
-AC_PROG_LIBTOOL
+LT_INIT
 
 # Check for compiler and flags
 AS_IF([test -z "$CXXFLAGS"], [cxxflags_given=no], [cxxflags_given=yes])
@@ -69,25 +69,25 @@ AS_IF([test x$try_nano_sleep = xyes],
 need_shared_libraries=no
 # --enable-python-binding
 AC_ARG_ENABLE([python-binding],
-              [AC_HELP_STRING([--enable-python-binding@<:@=PATH@:>@], [create SWIG python module and install in PATH])])
+              [AS_HELP_STRING([--enable-python-binding@<:@=PATH@:>@],[create SWIG python module and install in PATH])])
 # --enable-ruby-binding
 AC_ARG_ENABLE([ruby-binding],
-              [AC_HELP_STRING([--enable-ruby-binding@<:@=PATH@:>@], [create SWIG ruby module and install in PATH])])
+              [AS_HELP_STRING([--enable-ruby-binding@<:@=PATH@:>@],[create SWIG ruby module and install in PATH])])
 # --enable-perl-binding
 AC_ARG_ENABLE([perl-binding],
-              [AC_HELP_STRING([--enable-perl-binding@<:@=PATH@:>@], [create SWIG perl module and install in PATH])])
+              [AS_HELP_STRING([--enable-perl-binding@<:@=PATH@:>@],[create SWIG perl module and install in PATH])])
 # --enable-all-binding
 AC_ARG_ENABLE([all-binding],
-              [AC_HELP_STRING([--enable-all-binding@<:@=PATH@:>@], [create SWIG module for all languages and install in PATH])])
+              [AS_HELP_STRING([--enable-all-binding@<:@=PATH@:>@],[create SWIG module for all languages and install in PATH])])
 
 
 # --enable-swig
 AC_ARG_ENABLE([swig],
-              [AC_HELP_STRING([--enable-swig], [enable development of swig binding])])
+              [AS_HELP_STRING([--enable-swig],[enable development of swig binding])])
 AS_IF([test x$enable_swig = xyes],
       [AX_PKG_SWIG([3.0.0], [], [AC_MSG_ERROR([SWIG version 3 is required])])])
 AS_IF([test -n "$SWIG"],
-      [SWIG_ENABLE_CXX])
+      [AX_SWIG_ENABLE_CXX])
 AM_CONDITIONAL([HAVE_SWIG], [test -n "$SWIG"])
 
 # Python binding setup

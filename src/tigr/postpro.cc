@@ -554,6 +554,9 @@ void addNewAlignment
   Align.frameB = Cp->frameB;
   Align.delta.clear( );
   Align.deltaApos = 0;
+  Align.Errors = 0;
+  Align.SimErrors = 0;
+  Align.NonAlphas = 0;
 
   //-- Add the alignment object
   Alignments.push_back (Align);
