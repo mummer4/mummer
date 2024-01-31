@@ -36,7 +36,7 @@ bool           OPT_MtoM         = false;     // do M-to-M alignment
 bool           OPT_PrintHeader  = true;      // print output header
 string         OPT_PrintIdentity = "identity.idy";           // path to print %identity
 long int       OPT_MinLength    = 0;         // minimum alignment length
-long int       OPT_MinSeqLength    = 0;         // minimum alignment length
+long int       OPT_MinSeqLength    = 0;         // minimum sequence length
 float          OPT_MinIdentity  = 0.0;       // minimum %identity
 float          OPT_MinUnique    = 0.0;       // minimum %unique
 float          OPT_MaxOverlap   = 100.0;     // maximum olap as % of align len
@@ -90,8 +90,8 @@ int main(int argc, char ** argv)
   graph.build(OPT_AlignName, true);
 
   //-- Identity requirements
-  if ( OPT_MinIdentity > 0  ||  OPT_MinLength > 0 )
-    graph.flagScore(OPT_MinLength, OPT_MinIdentity);
+  if ( OPT_MinIdentity > 0  ||  OPT_MinLength > 0  || OPT_MinSeqLength > 0)
+    graph.flagScore(OPT_MinLength, OPT_MinIdentity, OPT_MinSeqLength);
 
   //-- Uniqueness requirements
   if ( OPT_MinUnique > 0 )

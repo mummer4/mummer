@@ -1194,7 +1194,7 @@ void DeltaGraph_t::flagRLIS (float epsilon, float maxolap, bool flagbad)
 //! \param minidy Flag edgelets if less than minidy identity [0-100]
 //! \return void
 //!
-void DeltaGraph_t::flagScore (long minlen, float minidy)
+void DeltaGraph_t::flagScore (long minlen, float minidy, long minseqlen)
 {
   map<string, DeltaNode_t>::const_iterator mi;
   vector<DeltaEdge_t *>::const_iterator ei;
@@ -1214,6 +1214,10 @@ void DeltaGraph_t::flagScore (long minlen, float minidy)
             //-- Flag small lengths
             if ( (*eli)->hiR - (*eli)->loR + 1 < minlen ||
                  (*eli)->hiQ - (*eli)->loQ + 1 < minlen )
+              (*eli)->isGOOD = false;
+
+            //-- Flag small query lengths
+            if ( (*ei)->qrynode->len < minseqlen )
               (*eli)->isGOOD = false;
           }
 }
@@ -1486,26 +1490,42 @@ ostream & DeltaGraph_t::outputIdy (ostream & out)
   vector<DeltaEdge_t *>::const_iterator ei;
   vector<DeltaEdgelet_t *>::const_iterator eli;
 
+  long idycTotal;
+  double idy = 0;
+  bool pass;
+
   for ( mi = qrynodes.begin(); mi != qrynodes.end(); ++ mi )
     {
       for ( ei  = (mi->second).edges.begin();
             ei != (mi->second).edges.end(); ++ ei )
         {
- 
+          idycTotal = 0;
+          pass = true;
+          
           for ( eli  = (*ei)->edgelets.begin();
                 eli != (*ei)->edgelets.end(); ++ eli )
             {
-              if ( ! (*eli)->isGOOD )
-                continue;
- 
-              out
-                << '>'
-                << *((*ei)->refnode->id) << ' '
-                << *((*ei)->qrynode->id) << ' '
-                << (*ei)->refnode->len << ' '
-                << (*ei)->qrynode->len << ' '
-                << (*eli)->idy << '\n';
+              if ( (*eli)->isGOOD )
+                pass = false;
+              idycTotal += (*eli)->idyc;
             }
+          if (pass != true)
+          {
+
+            if ((*ei)->refnode->len > (*ei)->qrynode->len)
+            {
+              idy = (double)(((*ei)->qrynode->len - idycTotal)) / (double)((*ei)->qrynode->len);
+            }else{
+              idy = (double)(((*ei)->refnode->len - idycTotal)) / (double)((*ei)->refnode->len);
+            }
+            out
+              << '>'
+              << *((*ei)->refnode->id) << ' '
+              << *((*ei)->qrynode->id) << ' '
+              << (*ei)->refnode->len << ' '
+              << (*ei)->qrynode->len << ' '
+              << idy << '\n';
+          }
         }
     }
   return out;

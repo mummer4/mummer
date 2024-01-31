@@ -509,7 +509,7 @@ public:
   void flagRLIS(float epsilon = -1,
                 float maxolap = 100.0,
                 bool flagbad = true);
-  void flagScore(long minlen, float minidy);
+  void flagScore(long minlen, float minidy, long minseqlen);
   void flagUNIQ(float minuniq);
 
   void loadSequences();
