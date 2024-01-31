@@ -214,6 +214,7 @@ public:
   //! \return void
   //!
   void open (const std::string & delta_path);
+  void openStdin ();
 
 
   //--------------------------------------------------- close ------------------
@@ -491,6 +492,7 @@ public:
   { clear(); }
 
   void build(const std::string & deltapath, bool getdeltas = true);
+  void buildStdin(bool getdeltas = true);
   void clean();
   void clear();
   long getNodeCount();
@@ -507,11 +509,12 @@ public:
   void flagRLIS(float epsilon = -1,
                 float maxolap = 100.0,
                 bool flagbad = true);
-  void flagScore(long minlen, float minidy);
+  void flagScore(long minlen, float minidy, long minseqlen);
   void flagUNIQ(float minuniq);
 
   void loadSequences();
-  std::ostream & outputDelta(std::ostream & out);
+  std::ostream & outputDelta(std::ostream & out, bool OPT_PrintHeader);
+  std::ostream & outputIdy(std::ostream & out);
 };
 
 #endif // #ifndef __DELTA_HH

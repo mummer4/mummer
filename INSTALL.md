@@ -9,7 +9,7 @@ essential tools for compilation (GNU make, ar, etc. Install
 requirements are needed to compile the SWIG script bindings. See the
 [SWIG installation guide](swig/INSTALL.md).
 
-If compiling from the github development tree, additionally you need autotools (autoconf, automake and libtools),
+If compiling from the github development tree, additionally you need autotools (autoconf, automake and libtools) version >= 1.14,
 [yaggo](https://github.com/gmarcais/yaggo/releases).
 You should compile from a [release source tarball](../../releases), unless you plan on modifying the code of MUMmer.
 

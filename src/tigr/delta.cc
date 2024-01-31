@@ -284,6 +284,33 @@ void DeltaReader_t::open
       break;
 }
 
+// as the same as the DeltaReader_t::open, but stdin
+void DeltaReader_t::openStdin
+()
+{
+
+  //-- Open the delta file
+  delta_stream_m.copyfmt(std::cin);
+  delta_stream_m.clear();
+  delta_stream_m.basic_ios<char>::rdbuf(std::cin.rdbuf());
+
+  checkStream ();
+
+  //-- Read the file header
+  delta_stream_m >> reference_path_m;
+  delta_stream_m >> query_path_m;
+  delta_stream_m >> data_type_m;
+  if ( (data_type_m != NUCMER_STRING  &&  data_type_m != PROMER_STRING) )
+    delta_stream_m.setstate (ios::failbit);
+  checkStream ();
+  is_open_m = true;
+
+  //-- Advance to first record header
+  while ( delta_stream_m.peek () != '>' )
+    if ( delta_stream_m.get () == EOF )
+      break;
+}
+
 
 //----------------------------------------------------- readNextAlignment ------
 void DeltaReader_t::readNextAlignment
@@ -450,6 +477,68 @@ void DeltaGraph_t::build (const string & deltapath, bool getdeltas)
   dr.close ();
 }
 
+// as the same as the DeltaGraph_t::build, but stdin
+void DeltaGraph_t::buildStdin (bool getdeltas)
+{
+  DeltaReader_t dr;
+  DeltaEdge_t * dep;
+  pair<map<string, DeltaNode_t>::iterator, bool> insret;
+
+
+  //-- Open the delta file and read in the alignment information
+  dr.openStdin();
+
+  refpath = dr.getReferencePath();
+  qrypath = dr.getQueryPath();
+
+  if ( dr.getDataType() == NUCMER_STRING )
+    datatype = NUCMER_DATA;
+  else if ( dr.getDataType() == PROMER_STRING )
+    datatype = PROMER_DATA;
+  else
+    datatype = NULL_DATA;
+
+  //-- Read in the next graph edge, i.e. a new delta record
+  while ( dr.readNext (getdeltas) )
+    {
+      dep = new DeltaEdge_t();
+
+
+      //-- Find the reference node in the graph, add a new one if necessary
+      insret = refnodes.insert
+        (map<string, DeltaNode_t>::value_type
+         (dr.getRecord().idR, DeltaNode_t()));
+      dep->refnode = &((insret.first)->second);
+
+      //-- If a new reference node
+      if ( insret.second )
+        {
+          dep->refnode->id  = &((insret.first)->first);
+          dep->refnode->len = dr.getRecord().lenR;
+        }
+
+
+      //-- Find the query node in the graph, add a new one if necessary
+      insret = qrynodes.insert
+        (map<string, DeltaNode_t>::value_type
+         (dr.getRecord().idQ, DeltaNode_t()));
+      dep->qrynode = &((insret.first)->second);
+
+      //-- If a new query node
+      if ( insret.second )
+        {
+          dep->qrynode->id  = &((insret.first)->first);
+          dep->qrynode->len = dr.getRecord().lenQ;
+        }
+
+
+      //-- Build the edge
+      dep->build (dr.getRecord());
+      dep->refnode->edges.push_back (dep);
+      dep->qrynode->edges.push_back (dep);
+    }
+  dr.close ();
+}
 
 //------------------------------------------------------------------- clean ----
 //! \brief Clean the graph of all edgelets where isGOOD = false
@@ -1105,7 +1194,7 @@ void DeltaGraph_t::flagRLIS (float epsilon, float maxolap, bool flagbad)
 //! \param minidy Flag edgelets if less than minidy identity [0-100]
 //! \return void
 //!
-void DeltaGraph_t::flagScore (long minlen, float minidy)
+void DeltaGraph_t::flagScore (long minlen, float minidy, long minseqlen)
 {
   map<string, DeltaNode_t>::const_iterator mi;
   vector<DeltaEdge_t *>::const_iterator ei;
@@ -1125,6 +1214,10 @@ void DeltaGraph_t::flagScore (long minlen, float minidy)
             //-- Flag small lengths
             if ( (*eli)->hiR - (*eli)->loR + 1 < minlen ||
                  (*eli)->hiQ - (*eli)->loQ + 1 < minlen )
+              (*eli)->isGOOD = false;
+
+            //-- Flag small query lengths
+            if ( (*ei)->qrynode->len < minseqlen )
               (*eli)->isGOOD = false;
           }
 }
@@ -1298,6 +1391,7 @@ void DeltaGraph_t::loadSequences ()
         if ( len != mi->second.len )
           {
             cerr << "ERROR: Query input does not match delta file\n";
+            cerr << "Error occured in " << id << "\n";
             exit (EXIT_FAILURE);
           }
       }
@@ -1328,7 +1422,7 @@ void DeltaGraph_t::loadSequences ()
 //! \param out The output stream to write to
 //! \return The output stream
 //!
-ostream & DeltaGraph_t::outputDelta (ostream & out)
+ostream & DeltaGraph_t::outputDelta (ostream & out, bool OPT_PrintHeader)
 {
   bool header;
   long s1, e1, s2, e2;
@@ -1338,9 +1432,11 @@ ostream & DeltaGraph_t::outputDelta (ostream & out)
   vector<DeltaEdgelet_t *>::const_iterator eli;
  
   //-- Print the file header
-  cout
-    << refpath << ' ' << qrypath << '\n'
-    << (datatype == PROMER_DATA ? PROMER_STRING : NUCMER_STRING) << '\n';
+  if (OPT_PrintHeader) {
+    cout
+      << refpath << ' ' << qrypath << '\n'
+      << (datatype == PROMER_DATA ? PROMER_STRING : NUCMER_STRING) << '\n';
+  }
  
   for ( mi = qrynodes.begin(); mi != qrynodes.end(); ++ mi )
     {
@@ -1383,6 +1479,53 @@ ostream & DeltaGraph_t::outputDelta (ostream & out)
                 << (*eli)->stpc << '\n'
                 << (*eli)->delta;
             }
+        }
+    }
+  return out;
+}
+
+ostream & DeltaGraph_t::outputIdy (ostream & out)
+{ 
+  map<string, DeltaNode_t>::const_iterator mi;
+  vector<DeltaEdge_t *>::const_iterator ei;
+  vector<DeltaEdgelet_t *>::const_iterator eli;
+
+  long idycTotal;
+  double idy = 0;
+  bool pass;
+
+  for ( mi = qrynodes.begin(); mi != qrynodes.end(); ++ mi )
+    {
+      for ( ei  = (mi->second).edges.begin();
+            ei != (mi->second).edges.end(); ++ ei )
+        {
+          idycTotal = 0;
+          pass = true;
+          
+          for ( eli  = (*ei)->edgelets.begin();
+                eli != (*ei)->edgelets.end(); ++ eli )
+            {
+              if ( (*eli)->isGOOD )
+                pass = false;
+              idycTotal += (*eli)->idyc;
+            }
+          if (pass != true)
+          {
+
+            if ((*ei)->refnode->len > (*ei)->qrynode->len)
+            {
+              idy = (double)(((*ei)->qrynode->len - idycTotal)) / (double)((*ei)->qrynode->len);
+            }else{
+              idy = (double)(((*ei)->refnode->len - idycTotal)) / (double)((*ei)->refnode->len);
+            }
+            out
+              << '>'
+              << *((*ei)->refnode->id) << ' '
+              << *((*ei)->qrynode->id) << ' '
+              << (*ei)->refnode->len << ' '
+              << (*ei)->qrynode->len << ' '
+              << idy << '\n';
+          }
         }
     }
   return out;
