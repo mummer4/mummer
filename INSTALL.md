@@ -13,9 +13,17 @@ If compiling from the github development tree, additionally you need autotools (
 [yaggo](https://github.com/gmarcais/yaggo/releases).
 You should compile from a [release source tarball](../../releases), unless you plan on modifying the code of MUMmer.
 
+On Ubuntu:
+
+```Shell
+sudo apt install git build-essential yaggo autoconf automake libtool gettext
+# For the bindings to scripting, additionally install
+sudo apt install swig python3-dev ruby-dev libperl-dev
+```
+
 ## Compilation & Installation
 
-To compile and install:
+To compile and install from a [release source tarball](../../releases):
 
 ```Shell
 ./configure --prefix=/path/to/installation
@@ -27,7 +35,13 @@ If `--prefix` is omitted, the software is installed in
 `/usr/local`. One may need `sudo make install` if installing in a
 system location.
 
-If compiling from the git tree, do `autoreconf -fi` first.
+To compile from the github tree, `autoreconf` must additionally be run:
+```Shell
+autoreconf -fi
+./configure --prefix=/path/to/installation
+make
+make install
+```
 
 ## SOFTWARE REQUIREMENTS
 
