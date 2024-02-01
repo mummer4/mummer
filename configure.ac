@@ -14,7 +14,6 @@ AC_PROG_CXX
 AC_PROG_CC
 AC_PATH_PROG(ENV_PROG, [env])
 
-# Add -std=c++0x always. Add -DNDEBUG only if CXXFLAGS is not given on command line
 AS_IF([test x$cxxflags_given = xno], [CXXFLAGS="-DNDEBUG $CXXFLAGS"])
 EXTRA_CXXFLAGS=
 AC_SUBST([EXTRA_CXXFLAGS])
