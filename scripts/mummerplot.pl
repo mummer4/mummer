@@ -516,7 +516,7 @@ sub ParseCluster ($)
 
     while ( <MFILE> ) {
         #-- match
-        if ( /^\s+(\d+)\s+(\d+)\s+(\d+)\s+\S+\s+\S+$/ ) {
+        if ( /^\s*(\d+)\s+(\d+)\s+(\d+)\s+\S+\s+\S+$/ ) {
             @align = ($1, $1, $2, $2, 100, $lenR, $lenQ, $idR, $idQ);
             $len = $3 - 1;
             $align[1] += $dR == 1 ? $len : -$len;
@@ -563,7 +563,7 @@ sub ParseMummer ($)
 
     while ( <MFILE> ) {
         #-- 3 column match
-        if ( /^\s+(\d+)\s+(\d+)\s+(\d+)$/ ) {
+        if ( /^\s*(\d+)\s+(\d+)\s+(\d+)$/ ) {
             @align = ($1, $1, $2, $2, 100, 0, $lenQ, "REF", $idQ);
             $len = $3 - 1;
             $align[1] += $len;
@@ -573,7 +573,7 @@ sub ParseMummer ($)
         }
 
         #-- 4 column match
-        if ( /^\s+(\S+)\s+(\d+)\s+(\d+)\s+(\d+)$/ ) {
+        if ( /^\s*(\S+)\s+(\d+)\s+(\d+)\s+(\d+)$/ ) {
             @align = ($2, $2, $3, $3, 100, 0, $lenQ, $1, $idQ);
             $len = $4 - 1;
             $align[1] += $len;

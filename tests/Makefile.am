@@ -72,7 +72,7 @@ TEST_EXTENSIONS += .sh
 SH_LOG_COMPILER = %D%/testsh
 
 # List of tests to run
-script_tests = %D%/save_load.sh %D%/batch.sh %D%/mummer.sh %D%/nucmer.sh %D%/sam.sh %D%/genome.sh %D%/delta-filter.sh
+script_tests = %D%/save_load.sh %D%/batch.sh %D%/mummer.sh %D%/nucmer.sh %D%/sam.sh %D%/genome.sh %D%/delta-filter.sh %D%/mummerplot.sh
 EXTRA_DIST += $(script_tests)
 TESTS += $(script_tests)
 
