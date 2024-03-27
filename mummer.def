@@ -1,0 +1,46 @@
+Bootstrap: docker
+From: debian:12.5-slim
+Stage: builder
+
+%arguments
+  # Branch to build
+  treeish=HEAD
+
+%setup
+    # Copy code
+    mkdir -p ${APPTAINER_ROOTFS}/usr/src
+    git archive {{ treeish  }} | tar -x -C ${APPTAINER_ROOTFS}/usr/src
+
+%post
+    # System package installation
+    apt update
+    apt install -y --no-install-recommends \
+      autoconf automake libtool g++ make yaggo
+
+    # Buil and install
+    cd /usr/src
+    autoreconf -fi
+    ./configure
+    make -j`nproc`
+    make install DESTDIR=$(pwd)/inst
+
+Bootstrap: docker
+From: debian:12.5-slim
+Stage: final
+
+%help
+
+%files from builder
+       /usr/src/inst/* /
+
+%post
+    ldconfig
+    apt update
+    apt install  -y --no-install-recommends \
+      gnuplot libgomp1 perl
+    apt-get clean
+
+%test
+    set -e
+    echo -n "nucmer: "; nucmer --help > /dev/null && echo "Good"
+    # echo -n "mummer: "; mummer --help > /dev/null && echo "Good"
