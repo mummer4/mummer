@@ -1,4 +1,4 @@
-## MUMmer4 INSTALLATION README
+# MUMmer4 INSTALLATION README
 
 ## Dependencies
 
@@ -66,12 +66,54 @@ necessary to install the following utilities:
 
 
 
-# UN-INSTALLATION
+## UN-INSTALLATION
 
 In the "MUMmer4.x" base directory type:
 
 ```Shell
 make uninstall
+```
+
+## Container installation
+
+### Docker container
+
+To build a Docker container image containing mummer and all dependencies, [install Docker](https://docs.docker.com/get-docker/) for Windows, Mac, or Linux; clone the mummer git repo; and issue the following command in the top-level directory of the mummer git working tree:
+
+```Shell
+docker build -t mummer .
+```
+
+To execute individual mummer commands (e.g., `nucmer`) within a container:
+
+```Shell
+docker run --rm -v $PWD:/mnt -w /mnt mummer nucmer -p <prefix> ref.fa  qry.fa
+```
+
+To execute an interactive shell within a container (from which mummer commands can be executed):
+
+```Shell
+docker run -it --rm -v $PWD:/mnt -w /mnt mummer
+```
+
+### Apptainer container
+
+To build an Apptainer container, from the git tree run:
+
+```Shell
+apptainer build mummer.sif mummer.def
+```
+
+To build another branch than HEAD (for example `develop`), run:
+
+```Shell
+apptainer build --build-arg treeish=develop mummer.sif mummer.def
+```
+
+To execute individual MUMmer commands (e.g., `nucmer`):
+
+```Shell
+apptainer run mummer.sif nucmer -p <prefix> ref.fa qry.fa
 ```
 
 ## CONTACT INFORMATION
