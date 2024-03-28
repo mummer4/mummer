@@ -18,7 +18,7 @@ jobs:
     - name: autotools
       run: autoreconf -fi
     - name: configure
-      run: ./configure --enable-all-binding --enable-swig
+      run: ./configure --enable-all-binding --enable-swig CXX=g++-10 CC=gcc-10
     - name: make
       run: make -j2
     - name: make check
