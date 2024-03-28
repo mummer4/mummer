@@ -19,9 +19,30 @@ jobs:
       run: autoreconf -fi
     - name: configure
       run: ./configure --enable-all-binding --enable-swig CXX=g++-10 CC=gcc-10
+
     - name: make
-      run: make -j2
+      run: make -j$(nproc)
+
     - name: make check
-      run: make -j2 check
+      run: make -j$(nproc) check
+    - name: Check logs
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: checklog
+        path: "**/*tests/*.log"
+
     - name: make distcheck
-      run: make -j2 distcheck
+      run: make -j$(nproc) distcheck
+    - name: Distcheck logs
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: distchecklog
+        path: "**/*tests/*.log"
+
+    - name: Distribution tar ball
+      uses: actions/upload-artifact@v4
+      with:
+        name: disttarball
+        path: "mummer-*.tar.gz"
