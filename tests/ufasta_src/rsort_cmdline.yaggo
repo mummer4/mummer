@@ -1,0 +1,18 @@
+purpose "Sort a fasta file in a streaming fashion"
+
+description <<EOS
+
+EOS
+
+option("s", "start") {
+  description "Starting value"
+  int64; default 0 }
+option("k", "key") {
+  description "1-index of column in header to sort by"
+  uint32; default 1 }
+option("p", "prefix") {
+  description "Skip prefix of key until first number"
+  off }
+arg("file") {
+  description "Input fasta files"
+  c_string; typestr "path"; multiple }

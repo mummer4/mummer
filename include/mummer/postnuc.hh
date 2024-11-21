@@ -126,12 +126,18 @@ struct error_description_type {
   // is equal to the number of matching and mismatching bases since the start or the
   // previous indel.
 };
-class error_iterator_type : public std::iterator<std::input_iterator_tag, error_description_type> {
+class error_iterator_type {
   const Alignment&       m_al;
   error_description_type m_error;
   const char*            m_ref_end;
   size_t                 m_k;   // index in delta
 public:
+  typedef error_description_type  value_type;
+  typedef std::ptrdiff_t          difference_type;
+  typedef value_type*             pointer;
+  typedef value_type&             reference;
+  typedef std::input_iterator_tag iterator_category;
+
   // Create an iterator at beginning of error. ref and qry pointer
   // points char before the start of sequence (i.e. as in 1-base
   // indexing).

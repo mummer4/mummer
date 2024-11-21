@@ -18,6 +18,12 @@ option("H", "header-full") {
 option("k", "key") {
   description "1-index of column in header to sort by"
   uint32; default 1 }
+option("write-seed") {
+  description "Write seed used by random order to PATH"
+  c_string; typestr "PATH" }
+option("read-seed") {
+  description "Read seed for random order from PATH"
+  c_string; typestr "PATH" }
 arg("file") {
   description "Input fasta files"
   c_string; typestr "path"; multiple }

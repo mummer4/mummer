@@ -22,10 +22,20 @@ EXTRA_DIST += %D%/test_md5
 YAGGO_BUILT += %D%/generate_sequences_cmdline.hpp
 
 # Build ufasta, used to sort fasta files for reliable comparisons.
-%C%_ufasta_SOURCES = %D%/ufasta_src/sort.cc %D%/ufasta_src/dsort.cc	\
- %D%/ufasta_src/ufasta.cc %D%/ufasta_src/common.hpp
-%C%_ufasta_CPPFLAGS = $(CPPFLAGS) -I%D%/ufasta_src -I$(srcdir)/tests/ufasta_src
-YAGGO_BUILT += %D%/ufasta_src/dsort_cmdline.hpp %D%/ufasta_src/sort_cmdline.hpp
+ufasta_SUB_CMDS = %D%/ufasta_src/one.cc %D%/ufasta_src/sizes.cc	\
+               %D%/ufasta_src/head.cc %D%/ufasta_src/tail.cc				\
+               %D%/ufasta_src/rc.cc %D%/ufasta_src/n50.cc						\
+               %D%/ufasta_src/extract.cc %D%/ufasta_src/format.cc	  \
+               %D%/ufasta_src/sort.cc %D%/ufasta_src/dsort.cc			  \
+               %D%/ufasta_src/split.cc %D%/ufasta_src/rsort.cc
+%C%_ufasta_SOURCES = %D%/ufasta_src/ufasta.cc %D%/ufasta_src/common.cc $(ufasta_SUB_CMDS)
+%C%_ufasta_CPPFLAGS = $(AM_CPPFLAGS) -I%D%/ufasta_src -I$(srcdir)/%D%/ufasta_src
+YAGGO_BUILT += $(ufasta_SUB_CMDS:.cc=_cmdline.hpp)
+noinst_HEADERS += %D%/ufasta_src/common.hpp %D%/ufasta_src/seeded_prg.hpp
+# %C%_ufasta_SOURCES = %D%/ufasta_src/sort.cc %D%/ufasta_src/dsort.cc	\
+#  %D%/ufasta_src/ufasta.cc %D%/ufasta_src/common.hpp
+# %C%_ufasta_CPPFLAGS = $(CPPFLAGS) -I%D%/ufasta_src -I$(srcdir)/tests/ufasta_src
+# YAGGO_BUILT += %D%/ufasta_src/dsort_cmdline.hpp %D%/ufasta_src/sort_cmdline.hpp
 
 # Build check_cigar, to check validity of cigar strings.
 %C%_check_cigar_SOURCES = %D%/check_cigar.cc

@@ -1,3 +1,7 @@
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -6,8 +10,11 @@
 #include <type_traits>
 #include <string>
 #include <algorithm>
+#include <random>
 
 #include <sort_cmdline.hpp>
+
+#include "common.hpp"
 
 static sort_cmdline args;
 
@@ -15,8 +22,6 @@ struct close_fd {
   int         fd;
   char*       ptr;
   off_t       size;
-  enum mem_type { MALLOC, MMAP };
-  mem_type    type;
 
   close_fd() : fd(-1), ptr(nullptr), size(0) { }
   close_fd(int i) : fd(i), ptr(nullptr), size(0) { }
@@ -47,25 +52,33 @@ struct header_type {
   header_type(T v, const char* s, const char* e) : value(v), start(s), end(e) { }
 };
 
-#ifdef MREMAP_MAYMOVE
-void* mem_alloc(size_t size) {
-  return mmap(0, size, PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
-}
-void* mem_realloc(void* ptr, size_t old_size, size_t new_size) {
-  return mremap(ptr, old_size, new_size, MREMAP_MAYMOVE);
-}
+char* mmalloc(size_t size) {
+#ifdef HAVE_MREMAP
+  return (char*)mmap(0, size, PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
 #else
-void* mem_alloc(size_t size) {
-  return malloc(size);
-}
-void* mem_realloc(void* ptr, size_t old_size, size_t new_size) {
-  return realloc(ptr, new_size);
-}
+  char* res = (char*)malloc(size);
+  return res ? res : (char*)MAP_FAILED;
 #endif
+}
+char* mrealloc(char* ptr, size_t old_size, size_t new_size) {
+#ifdef HAVE_MREMAP
+  return (char*)mremap(ptr, old_size, new_size, MREMAP_MAYMOVE);
+#else
+  void* res = realloc(ptr, new_size);
+  return res ? (char*)res : (char*)MAP_FAILED;
+#endif
+}
+void mfree(char* ptr, size_t size) {
+#ifdef HAVE_MREMAP
+  if(ptr != nullptr) munmap((void*)ptr, size);
+#else
+  if(ptr != nullptr) free(ptr);
+#endif
+}
 
 void slurp_in(close_fd& fd) {
   fd.size = 1024 * 1024;
-  fd.ptr  = (char*)mem_alloc(fd.size);
+  fd.ptr  = mmalloc(fd.size);
   if(fd.ptr == MAP_FAILED) return;
 
   size_t offset = 0;
@@ -77,17 +90,17 @@ void slurp_in(close_fd& fd) {
       if(res == -1) goto error;
       if(res == 0) {
         size_t new_size = offset + 1;
-        void*  new_ptr  = mem_realloc(fd.ptr, fd.size, new_size);
+        char*  new_ptr  = mrealloc(fd.ptr, fd.size, new_size);
         if(new_ptr == MAP_FAILED) goto error;
         fd.size = new_size;
-        fd.ptr = (char*)new_ptr;
+        fd.ptr = new_ptr;
         return;
       }
       offset += res;
       left   -= res;
     }
-    size_t new_size = fd.size * 2;
-    void*  new_ptr  = mem_realloc(fd.ptr, fd.size, new_size);
+    size_t new_size = fd.size * 1.5;
+    char* new_ptr = mrealloc(fd.ptr, fd.size, new_size);
     if(new_ptr == MAP_FAILED) goto error;
     fd.size = new_size;
     fd.ptr  = (char*)new_ptr;
@@ -95,7 +108,7 @@ void slurp_in(close_fd& fd) {
 
  error:
   int save_errno = errno;
-  fd.unmap();
+  mfree(fd.ptr, fd.size);
   errno = save_errno;
 }
 
@@ -157,7 +170,7 @@ struct header_traits<str_type> {
     std::sort(headers.begin(), headers.end(),
               [](const type& x, const type& y) -> bool {
                 const bool xshort = x.value.size < y.value.size;
-                const int  res    = memcmp(x.value.col, y.value.col, xshort ? x.value.size : y.value.size);
+                const int  res    = strncmp(x.value.col, y.value.col, xshort ? x.value.size : y.value.size);
                 return res != 0 ? res < 0 : xshort;
               });
   }
@@ -198,20 +211,11 @@ struct header_traits<random_type> {
   }
 
   static void sort(std::vector<type>& headers) {
-    std::random_shuffle(headers.begin(), headers.end());
+    auto rng = seeded_prg<std::mt19937_64>(args.write_seed_given ? args.write_seed_arg : nullptr,
+                                           args.read_seed_given ? args.read_seed_arg : nullptr);
+    std::shuffle(headers.begin(), headers.end(), rng);
   }
 };
-
-// Return a pointer to the nb-th space separated token in str. str is
-// not modified. Returns NULL if less than nb columns.
-const char* find_token(uint32_t nb, const char* str) {
-  static const char* space = " \t\n";
-  for(uint32_t i = 1; i < nb && *str && *str != '\n'; ++i) {
-    str += strcspn(str, space);
-    str += strspn(str, space);
-  }
-  return (*str && *str != '\n') ? str : nullptr;
-}
 
 template<typename T>
 void parse_headers(const char* const start, const char* const end, std::vector<header_type<T>>& headers) {

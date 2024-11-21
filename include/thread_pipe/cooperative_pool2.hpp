@@ -93,18 +93,17 @@ struct take_token {
 /// reaching the end to not "loose" elements in the
 /// pool. Alternatively, one can call release() reach the end.
 template<typename Pool, typename Category>
-class pool_iterator : public std::iterator<Category, typename Pool::element_type> {
-  typedef std::iterator<Category, typename Pool::element_type> super;
+class pool_iterator {
   typedef typename Pool::size_type                             size_type;
 
   size_type m_i;
   Pool*     m_cp;
 public:
-  typedef typename super::value_type        value_type;
-  typedef typename super::difference_type   difference_type;
-  typedef typename super::pointer           pointer;
-  typedef typename super::reference         reference;
-  typedef typename super::iterator_category iterator_category;
+  typedef typename Pool::element_type value_type;
+  typedef std::ptrdiff_t              difference_type;
+  typedef value_type*                 pointer;
+  typedef value_type&                          reference;
+  typedef Category                    iterator_category;
 
   pool_iterator() : m_i(Pool::cbT::guard), m_cp(nullptr) { }
   pool_iterator(Pool& cp) : m_i(cp.get_element()), m_cp(&cp) { }
@@ -402,19 +401,18 @@ private:
 };
 
 template<typename Pipe>
-class pipe_input_iterator : public std::iterator<std::input_iterator_tag, typename Pipe::element_type> {
-  typedef std::iterator<std::input_iterator_tag, typename Pipe::element_type> super;
+class pipe_input_iterator {
   typedef pool_iterator<typename Pipe::pool_type, std::input_iterator_tag>    iterator;
 
   iterator m_it;
   size_t   m_off;
 
 public:
-  typedef typename super::value_type        value_type;
-  typedef typename super::difference_type   difference_type;
-  typedef typename super::pointer           pointer;
-  typedef typename super::reference         reference;
-  typedef typename super::iterator_category iterator_category;
+  typedef typename Pipe::element_type value_type;
+  typedef std::ptrdiff_t              difference_type;
+  typedef value_type*                 pointer;
+  typedef value_type&                 reference;
+  typedef std::input_iterator_tag     iterator_category;
 
   pipe_input_iterator(iterator it) : m_it(it), m_off(0) { }
 
@@ -441,18 +439,17 @@ public:
 };
 
 template<typename Pipe>
-class pipe_output_iterator : public std::iterator<std::output_iterator_tag, typename Pipe::element_type> {
-  typedef std::iterator<std::output_iterator_tag, typename Pipe::element_type> super;
+class pipe_output_iterator {
   typedef pool_iterator<typename Pipe::pool_type, std::output_iterator_tag>    iterator;
 
   iterator m_it;
 
 public:
-  typedef typename super::value_type        value_type;
-  typedef typename super::difference_type   difference_type;
-  typedef typename super::pointer           pointer;
-  typedef typename super::reference         reference;
-  typedef typename super::iterator_category iterator_category;
+  typedef typename Pipe::element_type value_type;
+  typedef std::ptrdiff_t              difference_type;
+  typedef value_type*                 pointer;
+  typedef value_type&                 reference;
+  typedef std::output_iterator_tag    iterator_category;
 
   pipe_output_iterator(iterator it) : m_it(it) { }
 

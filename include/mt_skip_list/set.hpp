@@ -82,12 +82,16 @@ public:
     bool operator!=(const node_iterator& rhs) const { return item != rhs.item; }
   };
 
-  class iterator :
-    public std::iterator<std::forward_iterator_tag, key_type>,
-    public node_iterator {
+  class iterator : public node_iterator {
     friend class set;
     iterator(node* item_) : node_iterator(item_) { }
   public:
+    typedef key_type                  value_type;
+    typedef std::ptrdiff_t            difference_type;
+    typedef value_type*               pointer;
+    typedef value_type&               reference;
+    typedef std::forward_iterator_tag iterator_category;
+
     iterator() : node_iterator(nullptr) { }
     iterator(const node_iterator& rhs) : node_iterator(rhs) { }
 
@@ -107,12 +111,19 @@ public:
       return c;
     }
   };
-  class const_iterator :
-    public std::iterator<std::forward_iterator_tag, key_type>,
-    public node_iterator {
+  class const_iterator : public node_iterator {
     friend class set;
     const_iterator(node* item_) : node_iterator(item_) { }
   public:
+    typedef key_type                  value_type;
+    typedef std::ptrdiff_t            difference_type;
+    typedef value_type*               pointer;
+    typedef value_type&               reference;
+    typedef const value_type*         const_pointer;
+    typedef const value_type&         const_reference;
+    typedef std::forward_iterator_tag iterator_category;
+
+
     const_iterator() : node_iterator(nullptr) { }
     const_iterator(const const_iterator& rhs) : node_iterator(rhs) { }
     const_iterator(const iterator& rhs) : node_iterator(rhs) { }

@@ -1,0 +1,41 @@
+purpose "Compute statistics on fasta"
+
+description <<EOS
+If no -N or -E switch is passed, it computes the N50. Otherwise
+compute all the statistics asked for. The E-size is always displayed
+last.
+EOS
+
+option("H", "no-header") {
+  description "Do not display header"
+  off }
+option("a", "all") {
+  description "All statistics and N50 if not other Nx specified"
+  off }
+option("s", "size") {
+  description "Use N as size of genome, instead of total size in files"
+  uint64; typestr "N"; suffix }
+option("N") {
+  description "Compute Nx statistic"
+  uint32; typestr "x"; multiple }
+option("E", "Esize") {
+  description "Compute the E-size"
+  off }
+option("S", "sum") {
+  description "Compute sum of size of all entries"
+  off }
+option("A", "average") {
+  description "Compute average length of all entries"
+  off }
+option("C", "count") {
+  description "Compute the number of sequences"
+  off }
+option("f", "from-sizes") {
+  description "Read list of contig sizes instead of fasta"
+  off }
+option("t", "terse") {
+  description "Old terse headers"
+  off }
+arg("file") {
+  description "Input fasta file"
+  c_string; multiple }

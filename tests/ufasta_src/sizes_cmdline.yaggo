@@ -1,0 +1,17 @@
+description "Display the sizes of the sequences in fasta file"
+
+option("H", "header") {
+  description "Print headers before size"
+  off }
+option("i", "index") {
+  description "Print in addition starting offset of each sequence"
+  off }
+option("q", "quiet") {
+  description "Never print headers giving file names"
+  off }
+option("v", "verbose") {
+  description "Always print headers giving file names"
+  off }
+arg("file") {
+  description "Input fasta file"
+  c_string; multiple }

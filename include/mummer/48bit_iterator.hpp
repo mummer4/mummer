@@ -30,7 +30,7 @@ inline void set(uint32_t* p1, uint16_t* p2, const IDX x) {
 template<typename Derived, typename IDX>
 class common {
 public:
-  typedef typename std::iterator<std::random_access_iterator_tag, IDX>::difference_type difference_type;
+  typedef ptrdiff_t difference_type;
 
   void* raw() const { return static_cast<Derived*>(this)->ptr; }
 
@@ -173,10 +173,8 @@ std::ostream& operator<<(std::ostream& os, const common<Derived, IDX>& p) {
 
 template<typename IDX>
 class fortyeight_iterator
-  : public std::iterator<std::random_access_iterator_tag, IDX>
-  , public fortyeight_iterator_imp::common<fortyeight_iterator<IDX>, IDX>
+  : public fortyeight_iterator_imp::common<fortyeight_iterator<IDX>, IDX>
 {
-  typedef std::iterator<std::random_access_iterator_tag, IDX> super;
   typedef fortyeight_iterator_imp::setter<IDX>                setter_type;
 
   friend class const_fortyeight_iterator<IDX>;
@@ -187,8 +185,11 @@ class fortyeight_iterator
   uint16_t* p2;
 
  public:
-  typedef typename super::value_type      value_type;
-  typedef typename super::difference_type difference_type;
+  typedef IDX                             value_type;
+  typedef std::ptrdiff_t                  difference_type;
+  typedef value_type*                     pointer;
+  typedef value_type&                     reference;
+  typedef std::random_access_iterator_tag iterator_category;
 
   fortyeight_iterator() = default;
   fortyeight_iterator(uint32_t* x, uint16_t* y) : p1(x), p2(y) { }
@@ -201,10 +202,8 @@ class fortyeight_iterator
 
 template<typename IDX>
 class const_fortyeight_iterator
-  : public std::iterator<std::random_access_iterator_tag, const IDX>
-  , public fortyeight_iterator_imp::common<const_fortyeight_iterator<IDX>, IDX>
+  : public fortyeight_iterator_imp::common<const_fortyeight_iterator<IDX>, IDX>
 {
-  typedef std::iterator<std::random_access_iterator_tag, const IDX> super;
   const uint32_t* p1;
   const uint16_t* p2;
 
@@ -213,8 +212,11 @@ class const_fortyeight_iterator
   friend class fortyeight_iterator_imp::common<const_fortyeight_iterator<IDX>, IDX>;
 
  public:
-  typedef typename super::value_type      value_type;
-  typedef typename super::difference_type difference_type;
+  typedef const IDX      value_type;
+  typedef std::ptrdiff_t difference_type;
+  typedef value_type* pointer;
+  typedef value_type& reference;
+  typedef std::random_access_iterator_tag iterator_category;
 
   const_fortyeight_iterator() = default;
   const_fortyeight_iterator(const uint32_t* x, const uint16_t* y) : p1(x), p2(y) { }

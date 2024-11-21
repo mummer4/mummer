@@ -172,7 +172,7 @@ public:
   friend class job;
 
   /// STL compliant iterator
-  class iterator : public std::iterator<std::input_iterator_tag, element_type> {
+  class iterator {
     job* j_;
   public:
     iterator() : j_(0) { }

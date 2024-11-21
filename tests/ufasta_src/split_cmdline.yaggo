@@ -1,0 +1,9 @@
+purpose "Split an input fasta file into many different files"
+
+option("i", "input") {
+  description "Input fasta file"
+  c_string; typestr "PATH"; default "/dev/stdin" }
+arg("output") {
+  description "Output file or pipe (stdout)"
+  multiple
+  c_string; typestr "PATH" }
