@@ -428,7 +428,7 @@ void printAlignments
 
   int Sign;
   long int Delta;
-  long int Total, Remain;
+  long int Remain;
   // long int Errors;
   long int Pos;
   char c; // Character to add to Buff3
@@ -529,7 +529,6 @@ void printAlignments
       Bpos = sQ;
 
       //      Errors = 0;
-      Total = 0;
       Remain = eR - sR + 1;
 
       add_prefix(Buff1, Apos, SeqLenR, frameR);
@@ -597,7 +596,6 @@ void printAlignments
 	      else
 		c = PROMER_MISMATCH_CHAR;
               append(Buff1, Buff2, Buff3, '.', B[Bi][Bpos++], c);
-	      Total ++;
               ++Pos;
 	    }
 	}

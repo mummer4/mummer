@@ -1298,130 +1298,112 @@ void parseDelta
   long int Delta;
   int Sign;
   long int i, Apos, Bpos;
-  long int Remain, Total;
+  long int Remain;
   long int Errors, SimErrors;
   long int NonAlphas;
   vector<Alignment>::iterator Ap;
   vector<long int>::iterator Dp;
 
-  for ( Ap = Alignments.begin( ); Ap < Alignments.end( ); Ap ++ )
-    {      
-      if ( A [Ap->frameA] == NULL )
-	{
-	  A [Ap->frameA] = (char *) Safe_malloc
-	    ( sizeof(char) * ( (Af->len / 3) + 2 ) );
-	  A [Ap->frameA] [0] = '\0';
-	  Translate_DNA ( Af->seq, A [Ap->frameA], Ap->frameA );
-	}
-      if ( B [Ap->frameB] == NULL )
-	{
-	  B [Ap->frameB] = (char *) Safe_malloc
-	    ( sizeof(char) * ( (Bf->len / 3) + 2) );
-	  B [Ap->frameB] [0] = '\0';
-	  Translate_DNA ( Bf->seq, B [Ap->frameB], Ap->frameB );
-	}
+  for ( Ap = Alignments.begin( ); Ap < Alignments.end( ); Ap ++ ) {
+    if ( A [Ap->frameA] == NULL ) {
+      A [Ap->frameA] = (char *) Safe_malloc( sizeof(char) * ( (Af->len / 3) + 2 ) );
+      A [Ap->frameA] [0] = '\0';
+      Translate_DNA ( Af->seq, A [Ap->frameA], Ap->frameA );
+    }
+    if ( B [Ap->frameB] == NULL ) {
+      B [Ap->frameB] = (char *) Safe_malloc( sizeof(char) * ( (Bf->len / 3) + 2) );
+      B [Ap->frameB] [0] = '\0';
+      Translate_DNA ( Bf->seq, B [Ap->frameB], Ap->frameB );
+    }
       
-      Apos = Ap->sA;
-      Bpos = Ap->sB;
+    Apos = Ap->sA;
+    Bpos = Ap->sB;
 
-      Errors = 0;
-      SimErrors = 0;
-      NonAlphas = 0;
-      Remain = Ap->eA - Ap->sA + 1;
-      Total = Remain;
+    Errors = 0;
+    SimErrors = 0;
+    NonAlphas = 0;
+    Remain = Ap->eA - Ap->sA + 1;
 
-      //-- For all delta's in this alignment
-      for ( Dp = Ap->delta.begin( ); Dp < Ap->delta.end( ); Dp ++ )
-	{
-	  Delta = *Dp;
-	  Sign = Delta > 0 ? 1 : -1;
-	  Delta = labs ( Delta );
+    //-- For all delta's in this alignment
+    for ( Dp = Ap->delta.begin( ); Dp < Ap->delta.end( ); Dp ++ ) {
+      Delta = *Dp;
+      Sign = Delta > 0 ? 1 : -1;
+      Delta = labs ( Delta );
 
-	  //-- For all the bases before the next indel
-	  for ( i = 1; i < Delta; i ++ )
-	    {
-	      ch1 = A [Ap->frameA] [Apos ++];
+      //-- For all the bases before the next indel
+      for ( i = 1; i < Delta; i ++ ) {
+        ch1 = A [Ap->frameA] [Apos ++];
 	      ch2 = B [Ap->frameB] [Bpos ++];
 
-	      if ( !isalpha (ch1) )
-		{
-		  ch1 = STOP_CHAR;
-		  NonAlphas ++;
-		}
-	      if ( !isalpha (ch2) )
-		{
-		  ch2 = STOP_CHAR;
-		  NonAlphas ++;
-		}
+	      if ( !isalpha (ch1) ) {
+          ch1 = STOP_CHAR;
+          NonAlphas ++;
+        }
+	      if ( !isalpha (ch2) ) {
+          ch2 = STOP_CHAR;
+          NonAlphas ++;
+        }
 	      
 	      ch1 = toupper(ch1);
 	      ch2 = toupper(ch2);
 	      if ( 1 > aligner.match_score(ch1 - 'A', ch2 - 'A'))
-		SimErrors ++;
+          SimErrors ++;
 	      if ( ch1 != ch2 )
-		Errors ++;      
+          Errors ++;
 	    }
 
-	  //-- Process the current indel
-	  Remain -= i - 1;
-	  Errors ++;
-	  SimErrors ++;
+      //-- Process the current indel
+      Remain -= i - 1;
+      Errors ++;
+      SimErrors ++;
 	  
-	  if ( Sign == 1 )
-	    {
+      if ( Sign == 1 ) {
 	      if ( !isalpha (A [Ap->frameA] [Apos ++]) )
-		NonAlphas ++;
+          NonAlphas ++;
 	      Remain --;
-	    }
-	  else
-	    {
+	    } else {
 	      if ( !isalpha (B [Ap->frameB] [Bpos ++]) )
-		NonAlphas ++;
-	      Total ++;
+          NonAlphas ++;
 	    }
-	}
+    }
       
-      //-- For all the bases after the final indel
-      for ( i = 0; i < Remain; i ++ )
-	{
-	  //-- Score character match and update error counters
-	  ch1 = A [Ap->frameA] [Apos ++];
-	  ch2 = B [Ap->frameB] [Bpos ++];
+    //-- For all the bases after the final indel
+    for ( i = 0; i < Remain; i ++ ) {
+      //-- Score character match and update error counters
+      ch1 = A [Ap->frameA] [Apos ++];
+      ch2 = B [Ap->frameB] [Bpos ++];
 	  
-	  if ( !isalpha (ch1) )
-	    {
+      if ( !isalpha (ch1) ) {
 	      ch1 = STOP_CHAR;
 	      NonAlphas ++;
 	    }
-	  if ( !isalpha (ch2) )
-	    {
-	      ch2 = STOP_CHAR;
-	      NonAlphas ++;
+      if ( !isalpha (ch2) ) {
+        ch2 = STOP_CHAR;
+        NonAlphas ++;
 	    }
 	  
-	  ch1 = toupper(ch1);
-	  ch2 = toupper(ch2);
-	  if ( 1 > aligner.match_score(ch1 - 'A', ch2 - 'A'))
-	    SimErrors ++;
-	  if ( ch1 != ch2 )
-	    Errors ++;
-	}
-
-      Ap->Errors = Errors;
-      Ap->SimErrors = SimErrors;
-      Ap->NonAlphas = NonAlphas;
+      ch1 = toupper(ch1);
+      ch2 = toupper(ch2);
+      if ( 1 > aligner.match_score(ch1 - 'A', ch2 - 'A'))
+        SimErrors ++;
+      if ( ch1 != ch2 )
+        Errors ++;
     }
 
-  for ( i = 1; i <= 6; i ++ )
-    {
-      if ( A [i] != NULL )
-        free ( A [i] );
-      A [i] = NULL;
+    Ap->Errors = Errors;
+    Ap->SimErrors = SimErrors;
+    Ap->NonAlphas = NonAlphas;
+  }
 
-      if ( B [i] != NULL )
-        free ( B [i] );
-      B [i] = NULL;
-    }
+  for ( i = 1; i <= 6; i ++ ) {
+    if ( A [i] != NULL )
+      free ( A [i] );
+    A [i] = NULL;
+
+    if ( B [i] != NULL )
+      free ( B [i] );
+    B [i] = NULL;
+  }
 
   return;
 }

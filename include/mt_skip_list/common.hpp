@@ -19,6 +19,10 @@
 #ifndef __SKIP_LIST_COMMON_HPP__
 #define __SKIP_LIST_COMMON_HPP__
 
+#include <cstddef>
+#include <cstdint>
+#include <atomic>
+
 namespace mt_skip_list {
 namespace imp {
 
@@ -106,9 +110,9 @@ struct first_comp {
 template<int p>
 struct height_bound { };
 template<>
-struct height_bound<2> { static const int value = 64; };
+struct height_bound<2> { static constexpr int value = 64; };
 template<>
-struct height_bound<4> { static const int value = 32; };
+struct height_bound<4> { static constexpr int value = 32; };
 
 template<typename T>
 struct block_allocator {

@@ -270,7 +270,7 @@ int  Add_String  (int Start, int Root)
   {
    int  Leaf, End, Last_Parent, Grandparent;
    int  Segment_Len, Segment_Start, Leaf_Len;
-   int  Last_Parent_Depth, Link_Depth, Matched, Offset;
+   int  Last_Parent_Depth, Link_Depth, Matched;
    int  New_Place, New_Depth, Made_New_Node, New_Place_Is_Leaf;
 
    for  (End = Start;  Data [End] != DOLLAR_CHAR;  End ++)
@@ -282,37 +282,34 @@ int  Add_String  (int Start, int Root)
    New_Place = New_Step_Down (Root, 0, Segment_Start, Segment_Len,
                           Matched, true, New_Place_Is_Leaf, Grandparent);
 
-   if  (Segment_Len == Matched)
-       {
-        printf ("*** Genome is exact palindrome ***\n");
-        return  -1;
-       }
+   if  (Segment_Len == Matched) {
+       printf ("*** Genome is exact palindrome ***\n");
+       return  -1;
+   }
 
-   if  (1 + Matched == Segment_Len)
-       {
-        Offset = 0;
-        if  (New_Place_Is_Leaf)
-            fprintf (stderr, "ERROR:  Unexpected leaf\n");
-          else
-            {
-             while  (! Node_Array [New_Place] . Child_Is_Leaf)
-               {
-                New_Place = Node_Array [New_Place] . Child;
-                Offset += abs (Node_Array [New_Place] . Len);
-               }
-             New_Place = Node_Array [New_Place] . Child;
-             Offset += abs (Leaf_Array [New_Place] . Len) - 1;
-            }
-        printf ("String %d is a substring of previous string.\n",
-                     Curr_String_ID);
-        return  0;
+   if  (1 + Matched == Segment_Len) {
+       if  (New_Place_Is_Leaf) {
+           fprintf (stderr, "ERROR:  Unexpected leaf\n");
+       } else {
+           // Th result of this computation is not used. Should it be displayed?
+           // int Offset = 0;
+           //  while  (! Node_Array [New_Place] . Child_Is_Leaf)
+           //    {
+           //     New_Place = Node_Array [New_Place] . Child;
+           //     Offset += abs (Node_Array [New_Place] . Len);
+           //    }
+           //  New_Place = Node_Array [New_Place] . Child;
+           //  Offset += abs (Leaf_Array [New_Place] . Len) - 1;
        }
+       printf ("String %d is a substring of previous string.\n", Curr_String_ID);
+       return  0;
+   }
 
    Leaf = Start;
    Leaf_Array [Leaf] . Lo = Segment_Start + Matched;
    Leaf_Array [Leaf] . Sibling = Node_Array [New_Place] . Child;
    Leaf_Array [Leaf] . Sibling_Is_Leaf
-          = Node_Array [New_Place] . Child_Is_Leaf;
+       = Node_Array [New_Place] . Child_Is_Leaf;
    Node_Array [New_Place] . Child = Leaf;
    Node_Array [New_Place] . Child_Is_Leaf = true;
    Leaf_Array [Leaf] . Len = Segment_Len - Matched;
@@ -326,38 +323,38 @@ int  Add_String  (int Start, int Root)
    Last_Parent_Depth = Matched;
 
    while  (++ Start <= End)
-     {
-      Curr_ID ++;
-      if  (Node_Array [Last_Parent] . Link != NIL)
-          {
+   {
+       Curr_ID ++;
+       if  (Node_Array [Last_Parent] . Link != NIL)
+       {
            if  (Last_Parent == Root)
-               {
-                Segment_Start = Start;
-                Segment_Len = 1 + End - Start;
-                Link_Depth = Last_Parent_Depth;
-               }
-             else
-               {
-                Segment_Start = Start + Last_Parent_Depth - 1;
-                Segment_Len = 2 + End - Start - Last_Parent_Depth;
-                Link_Depth = Last_Parent_Depth - 1;
-               }
+           {
+               Segment_Start = Start;
+               Segment_Len = 1 + End - Start;
+               Link_Depth = Last_Parent_Depth;
+           }
+           else
+           {
+               Segment_Start = Start + Last_Parent_Depth - 1;
+               Segment_Len = 2 + End - Start - Last_Parent_Depth;
+               Link_Depth = Last_Parent_Depth - 1;
+           }
            New_Place = New_Step_Down (Node_Array [Last_Parent] . Link,
-                                  Link_Depth,
-                                  Segment_Start, Segment_Len,
-                                  Matched, false,
-                                  New_Place_Is_Leaf, Grandparent);
+                                      Link_Depth,
+                                      Segment_Start, Segment_Len,
+                                      Matched, false,
+                                      New_Place_Is_Leaf, Grandparent);
            if  (Matched == Segment_Len)
-               {
-                New_Depth = Link_Depth + Matched;
-                return  Add_Duplicates (Start, End, New_Place, New_Depth);
-               }
+           {
+               New_Depth = Link_Depth + Matched;
+               return  Add_Duplicates (Start, End, New_Place, New_Depth);
+           }
 
            Leaf = Start;
            Leaf_Array [Leaf] . Lo = Segment_Start + Matched;
            Leaf_Array [Leaf] . Sibling = Node_Array [New_Place] . Child;
            Leaf_Array [Leaf] . Sibling_Is_Leaf
-                  = Node_Array [New_Place] . Child_Is_Leaf;
+               = Node_Array [New_Place] . Child_Is_Leaf;
            Node_Array [New_Place] . Child = Leaf;
            Node_Array [New_Place] . Child_Is_Leaf = true;
            Leaf_Array [Leaf] . Len = Segment_Len - Matched;
@@ -369,84 +366,84 @@ int  Add_String  (int Start, int Root)
 
            Last_Parent = New_Place;
            Last_Parent_Depth = Link_Depth + Matched;
-          }
-        else
-          {
+       }
+       else
+       {
            Leaf_Len = Leaf_Array [Leaf] . Len;
            if  (Grandparent == Root)
-               {
-                Segment_Start = Start;
-                Segment_Len = Node_Array [Last_Parent] . Len - 1;
-                Link_Depth = 0;
-               }
-             else
-               {
-                Segment_Start = Start + Last_Parent_Depth - 1
-                                    - Node_Array [Last_Parent] . Len;
-                Segment_Len = Node_Array [Last_Parent] . Len;
-                Link_Depth = Last_Parent_Depth - 1
-                                    - Node_Array [Last_Parent] . Len;
-               }
+           {
+               Segment_Start = Start;
+               Segment_Len = Node_Array [Last_Parent] . Len - 1;
+               Link_Depth = 0;
+           }
+           else
+           {
+               Segment_Start = Start + Last_Parent_Depth - 1
+                   - Node_Array [Last_Parent] . Len;
+               Segment_Len = Node_Array [Last_Parent] . Len;
+               Link_Depth = Last_Parent_Depth - 1
+                   - Node_Array [Last_Parent] . Len;
+           }
            New_Place = New_Jump_Down (Node_Array [Grandparent] . Link,
-                                  Link_Depth,
-                                  Segment_Start, Segment_Len,
-                                  Made_New_Node, Grandparent);
+                                      Link_Depth,
+                                      Segment_Start, Segment_Len,
+                                      Made_New_Node, Grandparent);
 
            if  (Made_New_Node)
-               {
-                Leaf = Start;
-                Leaf_Array [Leaf] . Lo = Segment_Start + Segment_Len;
-                Leaf_Array [Leaf] . Sibling = Node_Array [New_Place] . Child;
-                Leaf_Array [Leaf] . Sibling_Is_Leaf
-                       = Node_Array [New_Place] . Child_Is_Leaf;
-                Node_Array [New_Place] . Child = Leaf;
-                Node_Array [New_Place] . Child_Is_Leaf = true;
-                Leaf_Array [Leaf] . Len = Leaf_Len;
+           {
+               Leaf = Start;
+               Leaf_Array [Leaf] . Lo = Segment_Start + Segment_Len;
+               Leaf_Array [Leaf] . Sibling = Node_Array [New_Place] . Child;
+               Leaf_Array [Leaf] . Sibling_Is_Leaf
+                   = Node_Array [New_Place] . Child_Is_Leaf;
+               Node_Array [New_Place] . Child = Leaf;
+               Node_Array [New_Place] . Child_Is_Leaf = true;
+               Leaf_Array [Leaf] . Len = Leaf_Len;
 #if  USE_EXTRA_FIELDS
-                Leaf_Array [Leaf] . Depth = 1 + End - Start;
-                Leaf_Array [Leaf] . ID = Start;
-                Leaf_Array [Leaf] . Parent = New_Place;
+               Leaf_Array [Leaf] . Depth = 1 + End - Start;
+               Leaf_Array [Leaf] . ID = Start;
+               Leaf_Array [Leaf] . Parent = New_Place;
 #endif
-                Node_Array [Last_Parent] . Link = New_Place;
-                Last_Parent = New_Place;
-                Last_Parent_Depth = Link_Depth + Segment_Len;
-               }
-             else
+               Node_Array [Last_Parent] . Link = New_Place;
+               Last_Parent = New_Place;
+               Last_Parent_Depth = Link_Depth + Segment_Len;
+           }
+           else
+           {
+               Node_Array [Last_Parent] . Link = New_Place;
+               Segment_Start += Segment_Len;
+               Link_Depth += Segment_Len;
+               Segment_Len = Leaf_Len;
+               New_Place = New_Step_Down (New_Place, Link_Depth,
+                                          Segment_Start, Segment_Len,
+                                          Matched, false,
+                                          New_Place_Is_Leaf, Grandparent);
+               if  (Matched >= Segment_Len)
                {
-                Node_Array [Last_Parent] . Link = New_Place;
-                Segment_Start += Segment_Len;
-                Link_Depth += Segment_Len;
-                Segment_Len = Leaf_Len;
-                New_Place = New_Step_Down (New_Place, Link_Depth,
-                                       Segment_Start, Segment_Len,
-                                       Matched, false,
-                                       New_Place_Is_Leaf, Grandparent);
-                if  (Matched >= Segment_Len)
-                    {
-                     New_Depth = Link_Depth + Matched;
-                     return  Add_Duplicates (Start, End, New_Place, New_Depth);
-                    }
+                   New_Depth = Link_Depth + Matched;
+                   return  Add_Duplicates (Start, End, New_Place, New_Depth);
+               }
 
-                Leaf = Start;
-                Leaf_Array [Leaf] . Lo = Segment_Start + Matched;
-                Leaf_Array [Leaf] . Sibling
-                        = Node_Array [New_Place] . Child;
-                Leaf_Array [Leaf] . Sibling_Is_Leaf
-                       = Node_Array [New_Place] . Child_Is_Leaf;
-                Node_Array [New_Place] . Child = Leaf;
-                Node_Array [New_Place] . Child_Is_Leaf = true;
-                Leaf_Array [Leaf] . Len = Segment_Len - Matched;
+               Leaf = Start;
+               Leaf_Array [Leaf] . Lo = Segment_Start + Matched;
+               Leaf_Array [Leaf] . Sibling
+                   = Node_Array [New_Place] . Child;
+               Leaf_Array [Leaf] . Sibling_Is_Leaf
+                   = Node_Array [New_Place] . Child_Is_Leaf;
+               Node_Array [New_Place] . Child = Leaf;
+               Node_Array [New_Place] . Child_Is_Leaf = true;
+               Leaf_Array [Leaf] . Len = Segment_Len - Matched;
 #if  USE_EXTRA_FIELDS
-                Leaf_Array [Leaf] . Depth = 1 + End - Start;
-                Leaf_Array [Leaf] . ID = Start;
-                Leaf_Array [Leaf] . Parent = New_Place;
+               Leaf_Array [Leaf] . Depth = 1 + End - Start;
+               Leaf_Array [Leaf] . ID = Start;
+               Leaf_Array [Leaf] . Parent = New_Place;
 #endif
 
-                Last_Parent = New_Place;
-                Last_Parent_Depth = Link_Depth + Matched;
-               }
-          }
-     }
+               Last_Parent = New_Place;
+               Last_Parent_Depth = Link_Depth + Matched;
+           }
+       }
+   }
 
    return  0;
   }

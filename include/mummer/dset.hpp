@@ -103,7 +103,7 @@ public:
             return false;
         // On IA32/x64, a PAUSE instruction is recommended for CAS busy loops
         #if defined(__i386__) || defined(__amd64__)
-            __asm__ __volatile__ ("pause\n");
+        __asm__ __volatile__ ("pause\n");
         #endif
         return mData[id].compare_exchange_strong(value, value | lock_flag);
     }

@@ -617,7 +617,7 @@ void merge_syntenys::parseDelta
   long int Delta;
   int Sign;
   long int i, Apos, Bpos;
-  long int Remain, Total;
+  long int Remain;
   long int Errors, SimErrors;
   long int NonAlphas;
   std::vector<Alignment>::iterator Ap;
@@ -643,7 +643,6 @@ void merge_syntenys::parseDelta
       SimErrors = 0;
       NonAlphas = 0;
       Remain = Ap->eA - Ap->sA + 1;
-      Total = Remain;
 
       //-- For all delta's in this alignment
       for ( Dp = Ap->delta.begin( ); Dp != Ap->delta.end( ); ++Dp) {
@@ -683,7 +682,6 @@ void merge_syntenys::parseDelta
             Remain --;
           } else {
             Bpos ++;
-            Total ++;
           }
       }
 
