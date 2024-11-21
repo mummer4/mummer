@@ -4,6 +4,11 @@ set -e
 set -x
 set -o pipefail
 
+# Make sure we use ASCII based sorting and comparisons, not whatever local is
+# used on the system
+unset LANG LC_COLLATE
+export LC_ALL=C
+
 BUILD=@BUILDDIR@
 SRC=@SRCDIR@
 SCRIPT=$1

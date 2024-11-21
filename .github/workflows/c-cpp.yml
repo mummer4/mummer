@@ -39,7 +39,9 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: distchecklog
-        path: "**/*tests/*.log"
+        path: |
+          **/*tests/*.log
+          **/*tests/**/tee.*
 
     - name: Distribution tar ball
       uses: actions/upload-artifact@v4

@@ -28,5 +28,4 @@ TESTS += $(unittests_programs)
  %D%/test_multi_thread_skip_list_set.cc
 %C%_test_all_LDADD = $(LDADD) %D%/libgtest_main.la
 %C%_test_all_CXXFLAGS = $(AM_CXXFLAGS) -I$(srcdir)/unittests
-
-
+noinst_HEADERS += %D%/misc.hpp
