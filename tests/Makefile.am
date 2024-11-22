@@ -17,7 +17,7 @@ EXTRA_DIST += %D%/testsh.in
 EXTRA_DIST += %D%/test_md5
 
 # Build generate_sequences, used to generage pseudo-random sequences.
-%C%_generate_sequences_SOURCES = %D%/generate_sequences.cc
+%C%_generate_sequences_SOURCES = %D%/generate_sequences.cc %D%/gcc10_uniform_dist.hpp
 %C%_generate_sequences_CPPFLAGS = $(CPPFLAGS) -I%D%
 YAGGO_BUILT += %D%/generate_sequences_cmdline.hpp
 

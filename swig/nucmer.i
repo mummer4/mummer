@@ -1,8 +1,12 @@
 %{
+#include <vector>
+#include <string>
 #include <sstream>
 %}
 
-%template(LongVector) ::std::vector<long>;
+%include <std_vector.i>
+
+%template(LongVector) std::vector<long>;
 
 namespace mummer {
 
@@ -14,7 +18,7 @@ struct Alignment   {
   //-- An alignment object between two sequences A and B
   signed char         dirB;     // the query sequence direction
   long int            sA, sB, eA, eB; // the start in A, B and the end in A, B
-  ::std::vector<long> delta;    // the delta values, with NO zero at the end
+  std::vector<long>   delta;    // the delta values, with NO zero at the end
   long int            deltaApos; // sum of abs(deltas) - #of negative deltas
   long int            Errors, SimErrors, NonAlphas; // errors, similarity errors, nonalphas
   double identity() const;
@@ -29,9 +33,11 @@ struct Alignment   {
     }
   }
 };
-%template(AlignmentVector) ::std::vector<mummer::postnuc::Alignment>;
 } // namespace postnuc
+} // namespace mummer
+%template(AlignmentVector) ::std::vector<mummer::postnuc::Alignment>;
 
+namespace mummer {
 namespace nucmer {
 struct Options {
   mummer::nucmer::Options& mum();
@@ -77,9 +83,8 @@ struct Options {
 };
 %apply (const char* STRING, size_t LENGTH) { (const char* reference, size_t reference_len) };
 %apply (const char* STRING, size_t LENGTH) { (const char* query, size_t query_len) };
-::std::vector<mummer::postnuc::Alignment> align_sequences(const char* reference, size_t reference_len,
-                                                          const char* query, size_t query_len,
-                                                          mummer::nucmer::Options opts = mummer::nucmer::Options());
+std::vector<mummer::postnuc::Alignment> align_sequences(const char* reference, size_t reference_len,
+                                                        const char* query, size_t query_len,
+                                                        mummer::nucmer::Options opts = mummer::nucmer::Options());
 } // namespace nucmer
 } // namespace mummer
-
