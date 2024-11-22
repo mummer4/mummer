@@ -48,8 +48,9 @@ static const char* const ANSI_UNDERLINE = "\033[4m";
 
 //-- Note: if coord exceeds LINE_PREFIX_LEN - 1 digits,
 //         increase these accordingly
-#define LINE_PREFIX_LEN 11
-#define PREFIX_FORMAT "%-10ld "
+#define LINE_BUFFER_LEN 32 // Must be long enough to accomodate a full long int
+#define LINE_PREFIX_LEN 12 // Should be enough for genomes up to 99 billion bases
+#define PREFIX_FORMAT "%-11ld "
 
 #define DEFAULT_SCREEN_WIDTH 60
 int Screen_Width = 0;
@@ -683,7 +684,7 @@ void append(ColoredBuffer& Buff1, ColoredBuffer& Buff2, std::string &Buff3,
 }
 
 void add_prefix(ColoredBuffer& Buff, long int pos, long int seqlen, int frame) {
-  char b[LINE_PREFIX_LEN + 1];
+  char b[LINE_BUFFER_LEN + 1];
   sprintf(b, PREFIX_FORMAT, toFwd(pos, seqlen, frame));
   Buff.clear();
   Buff += b;
