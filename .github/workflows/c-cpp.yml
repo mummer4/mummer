@@ -18,7 +18,7 @@ jobs:
     - name: autotools
       run: autoreconf -fi
     - name: configure
-      run: ./configure --enable-all-binding --enable-swig CXX=g++-10 CC=gcc-10
+      run: ./configure --enable-all-binding --enable-swig
 
     - name: make
       run: make -j$(nproc)
