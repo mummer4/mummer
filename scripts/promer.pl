@@ -21,10 +21,15 @@ use File::Spec::Functions;
 use strict;
 
 my $BIN_DIR = "@BIN_DIR@";
-my $AUX_BIN_DIR = "@LIBEXEC_DIR@";
+my $AUX_BIN_DIR = "@LIBEXEC_DIR@"
 my $LIB_DIR = "@LIB_DIR@";
 
-
+#-- Set up the program path names
+my $algo_path = "$BIN_DIR/@MUMMER@";
+my $mgaps_path = "$AUX_BIN_DIR/@MGAPS@";
+my $prepro_path = "$AUX_BIN_DIR/@PREPRO@";
+my $postpro_path = "$AUX_BIN_DIR/@POSTPRO@";
+my $showcoords_path = "$BIN_DIR/@SHOWCOORDS@";
 
 my $VERSION_INFO = q~
 PROmer (PROtein MUMmer) version 3.07
@@ -96,11 +101,11 @@ my $USAGE_INFO = q~
 
 my @DEPEND_INFO =
     (
-     "$BIN_DIR/mummer",
-     "$AUX_BIN_DIR/mgaps",
-     "$BIN_DIR/show-coords",
-     "$AUX_BIN_DIR/postpro",
-     "$AUX_BIN_DIR/prepro",
+     $algo_path,
+     $mgaps_path,
+     $showcoords_path,
+     $postpro_path,
+     $prepro_path,
      "$LIB_DIR/Foundation.pm"
      );
 
@@ -225,13 +230,6 @@ sub main ( )
 	exit (1);
     }
 
-    #-- Set up the program path names
-    my $algo_path = "$BIN_DIR/mummer";
-    my $mgaps_path = "$AUX_BIN_DIR/mgaps";
-    my $prepro_path = "$AUX_BIN_DIR/prepro";
-    my $postpro_path = "$AUX_BIN_DIR/postpro";
-    my $showcoords_path = "$BIN_DIR/show-coords";
-		     
     #-- Check that the files needed are all there and readable/writable
     {
 	undef (@err);

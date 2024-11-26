@@ -24,6 +24,12 @@ my $AUX_BIN_DIR = "@LIBEXEC_DIR@";
 my $BIN_DIR = "@BIN_DIR@";
 my $LIB_DIR = "@LIB_DIR@";
 
+#-- Set up the program path names
+my $algo_path = "$BIN_DIR/@MUMMER@";
+my $mgaps_path = "$AUX_BIN_DIR/@MGAPS@";
+my $prenuc_path = "$AUX_BIN_DIR/@PRENUC@";
+my $postnuc_path = "$AUX_BIN_DIR/@POSTNUC@";
+my $showcoords_path = "$BIN_DIR/@SHOWCOORDS@";
 
 my $VERSION_INFO = q~
 NUCmer (NUCleotide MUMmer) version 3.1
@@ -98,11 +104,11 @@ my $USAGE_INFO = q~
 
 my @DEPEND_INFO =
     (
-     "$BIN_DIR/mummer",
-     "$AUX_BIN_DIR/mgaps",
-     "$BIN_DIR/show-coords",
-     "$AUX_BIN_DIR/postnuc",
-     "$AUX_BIN_DIR/prenuc",
+     $algo_path,
+     $mgaps_path,
+     $showcoords_path,
+     $postnuc_path,
+     $prenuc_path,
      "$LIB_DIR/Foundation.pm"
      );
 
@@ -249,13 +255,6 @@ sub main ( )
 	exit (1);
     }
 
-    #-- Set up the program path names
-    my $algo_path = "$BIN_DIR/mummer";
-    my $mgaps_path = "$AUX_BIN_DIR/mgaps";
-    my $prenuc_path = "$AUX_BIN_DIR/prenuc";
-    my $postnuc_path = "$AUX_BIN_DIR/postnuc";
-    my $showcoords_path = "$BIN_DIR/show-coords";
-		     
     #-- Check that the files needed are all there and readable/writable
     {
 	undef (@err);

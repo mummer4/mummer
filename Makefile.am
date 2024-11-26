@@ -157,14 +157,52 @@ EXTRA_DIST         += $(patsubst %,scripts/%.sh,$(shell_scripts))
 CLEANFILES         += $(libs_scripts) $(all_scripts)
 
 # Rules to generate the scripts, in .libs and in build directory.
+mummername      = $(shell echo mummer | sed '$(transform)')
+nucmername      = $(shell echo nucmer | sed '$(transform)')
+mgapsname       = $(shell echo mgaps | sed '$(transform)')
+prenucname      = $(shell echo prenuc | sed '$(transform)')
+postnucname     = $(shell echo postnuc | sed '$(transform)')
+preproname      = $(shell echo prepro | sed '$(transform)')
+postproname     = $(shell echo postpro | sed '$(transform)')
+showcoordsname  = $(shell echo show-coords | sed '$(transform)')
+showdiffname    = $(shell echo show-diff | sed '$(transform)')
+showsnpsname    = $(shell echo show-snps | sed '$(transform)')
+deltafiltername = $(shell echo delta-filter | sed '$(transform)')
+repeatmatchname = $(shell echo repeat-match | sed '$(transform)')
+
+
 script_inst_subst  = sed -e 's,[@]PERL[@],$(PERL),g' \
-                       -e 's,[@]BIN_DIR[@],$(bindir),g' \
-                       -e 's,[@]LIB_DIR[@],$(script_libdir),g' \
-	               -e 's,[@]LIBEXEC_DIR[@],$(pkglibexecdir),g'
+                         -e 's,[@]BIN_DIR[@],$(bindir),g' \
+                         -e 's,[@]LIB_DIR[@],$(script_libdir),g' \
+                         -e 's,[@]LIBEXEC_DIR[@],$(pkglibexecdir),g' \
+                         -e 's,[@]MUMMER[@],$(mummername),g' \
+                         -e 's,[@]MGAPS[@],$(mgapsname),g' \
+                         -e 's,[@]PRENUC[@],$(prenucname),g' \
+                         -e 's,[@]POSTNUC[@],$(postnucname),g' \
+                         -e 's,[@]PREPRO[@],$(preproname),g' \
+                         -e 's,[@]POSTPRO[@],$(postproname),g' \
+                         -e 's,[@]SHOWCOORDS[@],$(showcoordsname),g' \
+                         -e 's,[@]SHOWDIFF[@],$(showdiffname),g' \
+                         -e 's,[@]SHOWSNPS[@],$(showsnpsname),g' \
+                         -e 's,[@]NUCMER[@],$(nucmername),g' \
+                         -e 's,[@]DELTAFILTER[@],$(deltafiltername),g' \
+                         -e 's,[@]REPEATMATCH[@],$(repeatmatchname),g'
 script_local_subst = sed -e 's,[@]PERL[@],$(PERL),g' \
-                       -e 's,[@]BIN_DIR[@],$(abs_builddir),g' \
-                       -e 's,[@]LIB_DIR[@],$(abs_srcdir)/scripts,g' \
-	               -e 's,[@]LIBEXEC_DIR[@],$(abs_builddir),g'
+                         -e 's,[@]BIN_DIR[@],$(abs_builddir),g' \
+                         -e 's,[@]LIB_DIR[@],$(abs_srcdir)/scripts,g' \
+                         -e 's,[@]LIBEXEC_DIR[@],$(abs_builddir),g' \
+                         -e 's,[@]MUMMER[@],mummer,g' \
+                         -e 's,[@]MGAPS[@],mgaps,g' \
+                         -e 's,[@]PRENUC[@],prenuc,g' \
+                         -e 's,[@]POSTNUC[@],postnuc,g' \
+                         -e 's,[@]PREPRO[@],prepro,g' \
+                         -e 's,[@]POSTPRO[@],postpro,g' \
+                         -e 's,[@]SHOWCOORDS[@],show-coords,g' \
+                         -e 's,[@]SHOWDIFF[@],show-diff,g' \
+                         -e 's,[@]SHOWSNPS[@],show-snps,g' \
+                         -e 's,[@]NUCMER[@],nucmer,g' \
+                         -e 's,[@]DELTAFILTER[@],delta-filter,g' \
+                         -e 's,[@]REPEATMATCH[@],repeat-match,g'
 
 .libs/%: scripts/%.pl
 	@mkdir -p $(dir $@) && $(script_inst_subst) < $< > $@
@@ -176,8 +214,8 @@ script_local_subst = sed -e 's,[@]PERL[@],$(PERL),g' \
 	$(AM_V_GEN)$(script_local_subst) < $< > $@ && chmod a+x $@
 
 # Supporting modules
-script_lib_SCRIPTS = scripts/Foundation.pm scripts/tandem-repeat.awk
-EXTRA_DIST += $(script_lib_SCRIPTS)
+script_lib_DATA = scripts/Foundation.pm scripts/tandem-repeat.awk
+EXTRA_DIST += $(script_lib_DATA)
 
 #######
 # umd #
