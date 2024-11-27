@@ -102,13 +102,13 @@ nobase_library_include_HEADERS += include/mummer/dset.hpp		\
 ###########
 # essaMEM #
 ###########
-bin_PROGRAMS += mummer
+pkglibexec_PROGRAMS += mummer
 mummer_SOURCES = src/essaMEM/fasta.cpp src/essaMEM/mummer.cpp
 
 ########
 # tigr #
 ########
-bin_PROGRAMS += show-coords show-aligns show-snps show-tiling	\
+pkglibexec_PROGRAMS += show-coords show-aligns show-snps show-tiling	\
                 show-diff repeat-match annotate combineMUMs	\
                 delta-filter
 pkglibexec_PROGRAMS += mgaps prenuc postnuc prepro postpro
@@ -141,15 +141,14 @@ EXTRA_DIST += src/tigr/gaps.cc
 perl_scripts = mummerplot dnadiff promer delta2vcf nucmer_ori
 shell_scripts = exact-tandems
 all_scripts = $(perl_scripts) $(shell_scripts)
-bin_scripts = mummerplot dnadiff promer exact-tandems
-libexec_scripts = nucmer_ori
+libexec_scripts = nucmer_ori mummerplot dnadiff promer exact-tandems
 
 # Obsolete stuff
 EXTRA_DIST += scripts/run-mummer1.sh scripts/run-mummer3.sh	\
               scripts/mapview.pl scripts/nucmer2xfig.pl
 
 libs_scripts        = $(patsubst %,.libs/%,$(all_scripts))
-bin_SCRIPTS        += $(patsubst %,.libs/%,$(bin_scripts))
+# bin_SCRIPTS        += $(patsubst %,.libs/%,$(bin_scripts))
 pkglibexec_SCRIPTS += $(patsubst %,.libs/%,$(libexec_scripts))
 noinst_SCRIPTS     += $(all_scripts)
 EXTRA_DIST         += $(patsubst %,scripts/%.pl,$(perl_scripts))
@@ -220,9 +219,25 @@ EXTRA_DIST += $(script_lib_DATA)
 #######
 # umd #
 #######
-bin_PROGRAMS += nucmer
+pkglibexec_PROGRAMS += nucmer
 YAGGO_BUILT += src/umd/nucmer_cmdline.hpp
 nucmer_SOURCES = src/umd/nucmer_main.cc
+
+
+######################
+# Entry point script #
+######################
+bin_SCRIPTS += mumtool
+libs_scripts += .libs/mumtool
+
+LINKS = mummer nucmer promer show-coords show-diff show-snps annotate
+# Should those be linked at all? Kind of internal stuff
+LINKS += mgaps prenuc prepro postnuc post pro
+if LEGACYLINKS
+install-exec-hook:
+	cd $(DESTDIR)$(bindir) && \
+	for x in $(LINKS); do $(LN_S) mumtool$(EXEEXT) $${x}$(EXEEXT); done
+endif
 
 #################
 # SWIG bindings #

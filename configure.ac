@@ -17,6 +17,12 @@ AC_PATH_PROG(ENV_PROG, [env])
 AS_IF([test x$cxxflags_given = xno], [CXXFLAGS="-DNDEBUG $CXXFLAGS"])
 EXTRA_CXXFLAGS=
 AC_SUBST([EXTRA_CXXFLAGS])
+# All the commands are subcommands to 'mumtool'. Do we also install the symlinks
+# to the old commands?
+AC_ARG_ENABLE([legacylinks], [AS_HELP_STRING([--enable-legacylinks], [Enable legacy executable symlinks (default: yes)])])
+# Looking for symlinks or hard links
+AC_PROG_LN_S
+AM_CONDITIONAL([LEGACYLINKS], [test "x$enable_legacylinks" != "xno"])
 
 # Check for openmp
 AC_ARG_ENABLE([openmp], [AS_HELP_STRING([--disable-openmp], [Disable OpenMP, even if available])])
