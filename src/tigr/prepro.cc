@@ -31,6 +31,7 @@
 //
 //------------------------------------------------------------------------------
 
+#include <string>
 #include <mummer/tigrinc.hh>
 #include <mummer/translate.hh>
 
@@ -72,7 +73,7 @@ int main
   char * A, * tA;
   char mask_char = 0;
   char Id [MAX_LINE];
-  char InputFileName [MAX_LINE];
+  std::string InputFileName;
 
   FILE * InputFile;
 
@@ -93,13 +94,13 @@ int main
 	  break;
 
 	case 'q' :
-	  strcpy (InputFileName, optarg);
+	  InputFileName = optarg;
 	  isQuery = true;
 	  mask_char = QUERY_MASK;
 	  break;
 
 	case 'r' :
-	  strcpy (InputFileName, optarg);
+	  InputFileName = optarg;
 	  isReference = true;
 	  mask_char = REFERENCE_MASK;
 	  break;
@@ -123,7 +124,7 @@ int main
       }
   }
 
-  InputFile = File_Open (InputFileName, "r");
+  InputFile = File_Open (InputFileName.c_str(), "r");
 
   InitSize = INIT_SIZE;
   A = (char *) Safe_malloc ( sizeof(char) * InitSize );
@@ -132,7 +133,7 @@ int main
   
   ct = 0;
   if ( isReference )
-    printf (">allcontigs %s\n", InputFileName);
+    printf (">allcontigs %s\n", InputFileName.c_str());
   while ( Read_String (InputFile, A, InitSize, Id, false) )
     {
       LenA = strlen(A + 1);

@@ -15,6 +15,7 @@
 //------------------------------------------------------------------------------
 
 #include <sys/ioctl.h>
+#include <sys/stat.h>
 
 #include <mummer/delta.hh>
 #include <mummer/tigrinc.hh>
@@ -179,7 +180,7 @@ bool isSortByReference = false;          // -r option
 int DATA_TYPE = NUCMER_DATA;
 int MATRIX_TYPE = mummer::sw_align::BLOSUM62;
 
-char InputFileName [MAX_LINE];
+std::string InputFileName;
 // Today, only 1 ref and qry file supported in delta format. It may change one day!
 std::vector<std::string> RefFileNames, QryFileNames;
 
@@ -234,59 +235,59 @@ int main
     while ( !errflg  &&  ((ch = getopt
                            (argc, argv, "hqrw:x:m:c")) != EOF) )
       switch (ch)
-        {
-        case 'h' :
-	  printHelp (argv[0]);
-	  exit (EXIT_SUCCESS);
-          break;
+			{
+			case 'h' :
+				printHelp (argv[0]);
+				exit (EXIT_SUCCESS);
+				break;
 
-	case 'q' :
-	  isSortByQuery = true;
-	  break;
+			case 'q' :
+				isSortByQuery = true;
+				break;
 
-	case 'r' :
-	  isSortByReference = true;
-	  break;
+			case 'r' :
+				isSortByReference = true;
+				break;
 
-	case 'w' :
-	  Screen_Width = atoi (optarg);
-	  if ( Screen_Width <= LINE_PREFIX_LEN )
-	    {
-	      fprintf(stderr,
-		      "WARNING: invalid screen width %d, using default\n",
-		      Screen_Width);
-	      Screen_Width = DEFAULT_SCREEN_WIDTH;
-	    }
-	  break;
+			case 'w' :
+				Screen_Width = atoi (optarg);
+				if ( Screen_Width <= LINE_PREFIX_LEN )
+				{
+					fprintf(stderr,
+									"WARNING: invalid screen width %d, using default\n",
+									Screen_Width);
+					Screen_Width = DEFAULT_SCREEN_WIDTH;
+				}
+				break;
 
-        case 'm':
-          Marker_Width = atoi(optarg);
-          break;
+			case 'm':
+				Marker_Width = atoi(optarg);
+				break;
 
-	case 'x' :
-	  MATRIX_TYPE = atoi (optarg);
-	  if ( MATRIX_TYPE < 1 || MATRIX_TYPE > 3 )
-	    {
-	      fprintf(stderr,
-		      "WARNING: invalid matrix type %d, using default\n",
-		      MATRIX_TYPE);
-	      MATRIX_TYPE = mummer::sw_align::BLOSUM62;
-	    }
-	  break;
+			case 'x' :
+				MATRIX_TYPE = atoi (optarg);
+				if ( MATRIX_TYPE < 1 || MATRIX_TYPE > 3 )
+				{
+					fprintf(stderr,
+									"WARNING: invalid matrix type %d, using default\n",
+									MATRIX_TYPE);
+					MATRIX_TYPE = mummer::sw_align::BLOSUM62;
+				}
+				break;
 
-        case 'c' :
-          Colorize = true;
-          break;
+			case 'c' :
+				Colorize = true;
+				break;
 
-        default :
-          errflg ++;
-        }
+			default :
+				errflg ++;
+			}
 
     if ( errflg > 0  ||  argc - optind != 3 )
-      {
-        printUsage (argv[0]);
-        exit (EXIT_FAILURE);
-      }
+		{
+			printUsage (argv[0]);
+			exit (EXIT_FAILURE);
+		}
 
     if ( isSortByQuery  &&  isSortByReference )
       fprintf (stderr,
@@ -295,7 +296,7 @@ int main
       Screen_Width = get_screen_width();
   }
 
-  strcpy (InputFileName, argv[optind ++]);
+  InputFileName = argv[optind ++];
   IdR = argv[optind++];
   IdQ = argv[optind++];
 
@@ -369,11 +370,21 @@ void parseDelta
   bool found = false;
 
   DeltaReader_t dr;
-  dr.open (InputFileName);
+  dr.open (InputFileName.c_str());
   DATA_TYPE = dr.getDataType( ) == NUCMER_STRING ?
     NUCMER_DATA : PROMER_DATA;
+
+	struct stat sb;
   RefFileNames.push_back(dr.getReferencePath());
+	if(stat(RefFileNames.back().c_str(), &sb) == -1 || !(sb.st_mode & S_IFREG)) {
+		fprintf(stderr, "WARNING: the reference file '%s' is not a regular file, process may hang for input\n",
+						RefFileNames.back().c_str());
+	}
   QryFileNames.push_back(dr.getQueryPath());
+	if(stat(QryFileNames.back().c_str(), &sb) == -1 || !(sb.st_mode & S_IFREG)) {
+		fprintf(stderr, "WARNING: the query file '%s' is not a regular file, process may hang for input\n",
+						QryFileNames.back().c_str());
+	}
 
   while ( dr.readNext( ) )
     {
@@ -793,7 +804,7 @@ long int revC
 bool find_sequence(const std::vector<string>& paths, const std::string& Id, std::string& seq)
 {
   //-- Find, and read in sequences. Return if find one with name Id, and store it in seq.
-  stream_manager streams(paths.cbegin(), paths.cend());
+	stream_manager streams(paths.cbegin(), paths.cend());
   sequence_parser parser(16, 10, 1, streams);
   bool found = false;
   while(!found) {

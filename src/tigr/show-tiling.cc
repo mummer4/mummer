@@ -13,6 +13,7 @@
 //
 //------------------------------------------------------------------------------
 
+#include <sys/stat.h>
 #include <mummer/delta.hh>
 #include <mummer/tigrinc.hh>
 #include <mummer/redirect_to_pager.hpp>
@@ -211,8 +212,8 @@ bool isdef_MIN_PIDY           = false;
 
 int   DATA_TYPE = NUCMER_DATA;         // set by .delta header
 
-char InputFileName [MAX_LINE];
-char RefFileName [MAX_LINE], QryFileName [MAX_LINE];
+std::string InputFileName;
+std::string RefFileName, QryFileName;
 
 
 
@@ -265,7 +266,7 @@ void printTilingPath
      (vector<QueryContig> & Contigs);
 
 void printTilingXML
-     (vector<QueryContig> & Contigs, char * QryFileName,
+     (vector<QueryContig> & Contigs, const char * QryFileName,
       int argc, char ** argv);
 
 void printHelp
@@ -403,7 +404,7 @@ int main
 
 
   //-- Parse the delta file
-  strcpy (InputFileName, argv[optind ++]);
+  InputFileName = argv[optind ++];
   parseDelta (Contigs);
 
 
@@ -412,8 +413,14 @@ int main
     ContigsFile = File_Open ( ContigsFileName, "w" );
   if ( isOutputPseudoMolecule )
     PseudoMoleculeFile = File_Open ( PseudoMoleculeFileName, "w" );
-  if ( isOutputPseudoMolecule )
-    QryFile = File_Open ( QryFileName, "r" );
+  if ( isOutputPseudoMolecule ) {
+		struct stat sb;
+		if(stat(QryFileName.c_str(), &sb) == -1 || !(sb.st_mode & S_IFREG)) {
+			fprintf(stderr, "WARNING: the query file '%s' is not a regular file, process may hang for input\n",
+							QryFileName.c_str());
+		}
+    QryFile = File_Open ( QryFileName.c_str(), "r" );
+	}
   if ( isOutputUnusable )
     UnusableFile = File_Open ( UnusableFileName, "w" );
 
@@ -455,7 +462,7 @@ int main
   if ( isPrintAlignments )
     printTilingAlignments (Contigs);
   else if ( isPrintXML )
-    printTilingXML (Contigs, QryFileName, argc, argv);
+    printTilingXML (Contigs, QryFileName.c_str(), argc, argv);
   else
     printTilingPath (Contigs);
 
@@ -1003,11 +1010,11 @@ void parseDelta
   AlignStats aStats;                     //  single alignment region
 
   DeltaReader_t dr;
-  dr.open (InputFileName);
+  dr.open (InputFileName.c_str());
   DATA_TYPE = dr.getDataType( ) == NUCMER_STRING ?
     NUCMER_DATA : PROMER_DATA;
-  strcpy (RefFileName, dr.getReferencePath( ).c_str( ));
-  strcpy (QryFileName, dr.getQueryPath( ).c_str( ));
+  RefFileName = dr.getReferencePath( );
+  QryFileName = dr.getQueryPath( );
 
 
   Contigs.clear( );
@@ -1305,7 +1312,7 @@ void printTilingPath
 
 
 void printTilingXML
-     (vector<QueryContig> & Contigs, char * QryFileName, int argc, char ** argv)
+     (vector<QueryContig> & Contigs, const char * QryFileName, int argc, char ** argv)
 {
   vector<AlignStats>::iterator Ap;
   vector<QueryContig>::iterator Cp;
