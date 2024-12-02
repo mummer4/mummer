@@ -236,7 +236,7 @@ LINKS += mgaps prenuc prepro postnuc post pro
 if LEGACYLINKS
 install-exec-hook:
 	cd $(DESTDIR)$(bindir) && \
-	for x in $(LINKS); do $(LN_S) mumtool$(EXEEXT) $${x}$(EXEEXT); done
+	for x in $(LINKS); do $(LN_S) `echo mumtool | sed '$(transform)'` `echo $${x} | sed '$(transform)'`; done
 endif
 
 #################
