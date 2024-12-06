@@ -402,7 +402,7 @@ private:
   // the key from x.
   node* alloc_node() {
     static thread_local uint64_t seed = 0;
-    if(seed == 0)  [[unlikely]]
+    if(seed == 0) // [[unlikely]] Not a C++17 feature
       seed = new_seed();
     const int height = std::min(height_upper_bound, imp::random_height<Random, p_>::gen(Random::gen(seed)));
     max_height_ = std::max(max_height_, height);
