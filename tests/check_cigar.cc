@@ -135,7 +135,6 @@ int main(int argc, char *argv[]) {
       if(qryp > seq.size())
         check_cigar_cmdline::error() << "linenb:" << linenb << " pos " << qryp << " beyond end of qry " << fields[0]
                                      << " of size " << ref.size();
-
       switch(ci.t) {
       case 'H':
         qryp += ci.l;
@@ -173,7 +172,7 @@ int main(int argc, char *argv[]) {
                                      << " of size " << sam_seq.size();
       for(int i = 0; i < ci.l; ++i, ++refp, ++qryp, ++sqryp) {
         diffs += std::tolower(ref[refp]) != std::tolower(seq[qryp]);
-        if(sam_seq[0] != '*' && std::tolower(qry[qryp]) != std::tolower(sam_seq[sqryp]))
+        if(sam_seq[0] != '*' && std::tolower(seq[qryp]) != std::tolower(sam_seq[sqryp]))
             check_cigar_cmdline::error() << "linenb:" << linenb << " qry sequence does not match sequence in sam file at pos "
                                          << qryp << " and " << sqryp;
       }
