@@ -412,36 +412,64 @@ void printSyntenys(const std::vector<Synteny<FastaRecord> > & Syntenys, const Fa
   }
 }
 
+inline char revChar(const char* c) {
+    char base = *c;
+    char res;
+    switch (base) {
+        case 'A': case 'a': res = 't'; break;
+        case 'T': case 't':  res = 'a'; break;
+        case 'C': case 'c':  res = 'g'; break;
+        case 'G': case 'g':  res = 'c'; break;
+        case 'N': case 'n':  res = 'n'; break;
+        default:  res = 'n'; break;
+    }
+    return res;
+};
+
 template<typename FR1, typename FR2>
 void printSAMAlignments(const std::vector<Alignment>& Alignments,
-                        const FR1& A, const FR2& B,
-                        std::ostream& SAMFile, bool long_format,
-                        const long minLen) {
-  const char* mapq = Alignments.size() > 1 ? "\t10\t" : "\t30\t";
-  bool hard_clip = false;
-  for(const auto& Al : Alignments) {
-    if(std::abs(Al.eA - Al.sA) < minLen && std::abs(Al.eB - Al.sB) < minLen)
-      continue;
-    const bool fwd = Al.dirB == FORWARD_CHAR;
-    SAMFile << B.Id() << '\t'
+    const FR1& A, const FR2& B,
+    std::ostream& SAMFile, bool long_format,
+    const long minLen) {
+    const char* mapq = Alignments.size() > 1 ? "\t10\t" : "\t30\t";
+    bool hard_clip = false;
+    for (const auto& Al : Alignments) {
+        if (std::abs(Al.eA - Al.sA) < minLen && std::abs(Al.eB - Al.sB) < minLen)
+            continue;
+        const bool fwd = Al.dirB == FORWARD_CHAR;
+        SAMFile << B.Id() << '\t'
             << ((hard_clip ? 0x800 : 0) | (fwd ? 0 : 0x10)) << '\t'
             << A.Id() << '\t' << Al.sA
             << mapq
             << createCIGAR(Al.delta, Al.sB, Al.eB, B.len(), hard_clip)
             << "\t*\t0\t0\t";
-    if(long_format) {
-      const auto start = hard_clip ? Al.sB : 1;
-      const auto len   = hard_clip ? Al.eB - start + 1 : B.len();
-      SAMFile.write(B.seq() + start, len);
-    } else {
-      SAMFile << '*';
+        if (long_format) {
+            if (fwd) {
+                const auto start = hard_clip ? Al.sB : 1;
+                const auto len = hard_clip ? Al.eB - start + 1 : B.len();
+                SAMFile.write(B.seq() + start, len);
+            }
+            else {
+                const auto start = hard_clip ? revC(Al.sB, B.len()) : B.len();
+                const auto end = hard_clip ? revC(Al.eB, B.len()) : 1;
+                const auto len = start - end + 1;
+
+                const char* c = B.seq() + start;
+                for (size_t i = len; i > 0; i--) {
+                    SAMFile << revChar(c);
+                    c -= 1;
+                }
+            }
+        }
+        else {
+            SAMFile << '*';
+        }
+        SAMFile << "\t*\tNM:i:" << Al.Errors;
+        if (long_format)
+            SAMFile << "\tMD:Z:" << createMD(Al, A.seq(), B.seq(), B.len());
+        SAMFile << '\n';
+        hard_clip = true;
     }
-    SAMFile << "\t*\tNM:i:" << Al.Errors;
-    if(long_format)
-      SAMFile << "\tMD:Z:" << createMD(Al, A.seq(), B.seq(), B.len());
-    SAMFile << '\n';
-    hard_clip = true;
-  }
 }
 
 
