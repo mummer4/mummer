@@ -104,8 +104,39 @@ int main(int argc, char *argv[]) {
 
     getrealpath real_ref(args.ref_arg), real_qry(args.qry_arg[0]);
     if(args.sam_short_given || args.sam_long_given) {
-      os << "@HD VN1.0 SO:unsorted\n"
-         << "@PG ID:nucmer PN:nucmer VN:4.0 CL:\"" << cmdline << "\"\n";
+      os << "@HD\tVN:1.4\tSO:unsorted\n";
+      
+      // Add @SQ lines for reference sequences
+      std::ifstream ref_file(args.ref_arg);
+      if(!ref_file.good())
+        nucmer_cmdline::error() << "Failed to open reference file '" << args.ref_arg << "' for SAM header";
+      
+      std::string line, seq;
+      std::string current_id;
+      while(std::getline(ref_file, line)) {
+        if(line.empty()) continue;
+        if(line[0] == '>') {
+          // Output previous sequence if exists
+          if(!current_id.empty()) {
+            os << "@SQ\tSN:" << current_id << "\tLN:" << seq.length() << '\n';
+          }
+          // Get new sequence ID (remove '>' and any whitespace)
+          current_id = line.substr(1);
+          size_t space_pos = current_id.find_first_of(" \t");
+          if(space_pos != std::string::npos)
+            current_id = current_id.substr(0, space_pos);
+          seq.clear();
+        } else {
+          seq += line;
+        }
+      }
+      // Output last sequence
+      if(!current_id.empty()) {
+        os << "@SQ\tSN:" << current_id << "\tLN:" << seq.length() << '\n';
+      }
+      ref_file.close();
+      
+      os << "@PG\tID:nucmer\tPN:nucmer\tVN:4.0\tCL:\"" << cmdline << "\"\n";
     } else {
       os << real_ref << ' ' << real_qry << '\n'
          << "NUCMER\n";
