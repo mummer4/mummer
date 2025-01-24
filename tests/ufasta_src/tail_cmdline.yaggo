@@ -1,0 +1,17 @@
+description "Output the tail of fasta files"
+
+option("n", "entries") {
+  description "Print the last K entries. With a leading +, print all but the first K entries."
+  string; typestr "[+]K"; default "10" }
+option("c", "bytes") {
+  description "With a leading +, print entries starting at or after byte K"
+  string; typestr "+K"; conflict "entries" }
+option("q", "quiet") {
+  description "Never print headers giving file names"
+  off }
+option("v", "verbose") {
+  description "Always print headers giving file names"
+  off }
+arg("file") {
+  description "Input fasta file"
+  c_string; multiple }

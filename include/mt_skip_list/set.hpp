@@ -28,7 +28,7 @@
 
 namespace mt_skip_list {
 
-template <typename Key, typename Compare = std::less<Key>, int p_ = 4, typename Random = imp::xor_random>
+template <typename Key, typename Compare = std::less<Key>, int p_ = 4, int height_upper_bound = imp::height_bound<p_>::value, typename Random = imp::xor_random>
 class set {
 protected:
   struct node;
@@ -53,12 +53,12 @@ protected:
     node*  val;
   };
 
-  const int  height_upper_bound_;
   anode*     heads_;
   int        max_height_;
   Compare    comp_;
 
 public:
+  static constexpr int                          default_height = height_upper_bound / 4;
   typedef Key                                   key_type;
   typedef Key                                   value_type;
   typedef Compare                               key_compare;
@@ -69,7 +69,7 @@ public:
   typedef ssize_t                               difference_type;
   typedef Key*                                  pointer;
   typedef const Key*                            const_pointer;
-  static const int p = p_;
+  static constexpr int p = p_;
 
   class node_iterator {
   protected:
@@ -82,12 +82,16 @@ public:
     bool operator!=(const node_iterator& rhs) const { return item != rhs.item; }
   };
 
-  class iterator :
-    public std::iterator<std::forward_iterator_tag, key_type>,
-    public node_iterator {
+  class iterator : public node_iterator {
     friend class set;
     iterator(node* item_) : node_iterator(item_) { }
   public:
+    typedef key_type                  value_type;
+    typedef std::ptrdiff_t            difference_type;
+    typedef value_type*               pointer;
+    typedef value_type&               reference;
+    typedef std::forward_iterator_tag iterator_category;
+
     iterator() : node_iterator(nullptr) { }
     iterator(const node_iterator& rhs) : node_iterator(rhs) { }
 
@@ -107,12 +111,19 @@ public:
       return c;
     }
   };
-  class const_iterator :
-    public std::iterator<std::forward_iterator_tag, key_type>,
-    public node_iterator {
+  class const_iterator : public node_iterator {
     friend class set;
     const_iterator(node* item_) : node_iterator(item_) { }
   public:
+    typedef key_type                  value_type;
+    typedef std::ptrdiff_t            difference_type;
+    typedef value_type*               pointer;
+    typedef value_type&               reference;
+    typedef const value_type*         const_pointer;
+    typedef const value_type&         const_reference;
+    typedef std::forward_iterator_tag iterator_category;
+
+
     const_iterator() : node_iterator(nullptr) { }
     const_iterator(const const_iterator& rhs) : node_iterator(rhs) { }
     const_iterator(const iterator& rhs) : node_iterator(rhs) { }
@@ -136,22 +147,20 @@ public:
 
 
   explicit set(const Compare& comp,
-               int max_height,
-               int height_upper_bound)
-    : height_upper_bound_(height_upper_bound)
-    , heads_(new anode[height_upper_bound_])
+               int max_height)
+    : heads_(new anode[height_upper_bound])
     , max_height_(max_height)
     , comp_(comp)
-  { std::fill_n(heads_, height_upper_bound_, nullptr); }
+  { std::fill_n(heads_, height_upper_bound, nullptr); }
 
   explicit set(const Compare& comp = Compare())
-    : set(comp, 10, imp::height_bound<p_>::value)
+    : set(comp, default_height)
   { }
 
   template<class InputIterator>
   set(InputIterator first, InputIterator last,
       const Compare& comp = Compare())
-    : set(comp, 10, imp::height_bound<p_>::value)
+    : set(comp, default_height)
   { insert(first, last); }
 
   set(const std::initializer_list<value_type>& il,
@@ -160,12 +169,11 @@ public:
   { }
 
   set(const set& rhs)
-    : set(rhs.comp_, rhs.max_height_, rhs.height_upper_bound_)
+    : set(rhs.comp_, rhs.max_height_)
   { insert(rhs.cbegin(), rhs.cend()); }
 
   set(set&& rhs)
-    : height_upper_bound_(rhs.height_upper_bound_)
-    , heads_(rhs.heads_)
+    : heads_(rhs.heads_)
     , max_height_(rhs.max_height_)
     , comp_(rhs.comp_)
   { rhs.heads_ = nullptr; }
@@ -189,8 +197,6 @@ public:
   }
 
   void swap(set& rhs) {
-    if(height_upper_bound_ != rhs.height_upper_bound_)
-      throw std::invalid_argument("Incompatible height upper bound");
     std::swap(heads_, rhs.heads_);
     std::swap(max_height_, rhs.max_height_);
     std::swap(comp_, rhs.comp_);
@@ -203,7 +209,7 @@ public:
       delete cnode;
       cnode = nnode;
     }
-    std::fill_n(heads_, height_upper_bound_, nullptr);
+    std::fill_n(heads_, height_upper_bound, nullptr);
   }
 
   /* The following methods are thread safe.
@@ -267,7 +273,7 @@ public:
 
   std::pair<iterator, bool> insert(const value_type& x) {
     static_assert(std::is_pod<path_node>::value, "Path_node is a POD");
-    path_node path[height_upper_bound_];
+    path_node path[height_upper_bound];
     int       aheight;
     node*     n = find_node_path(x, path, aheight);
     if(n) return std::make_pair(iterator(n), false);
@@ -276,7 +282,7 @@ public:
 
   std::pair<iterator, bool> insert(value_type&& x) {
     static_assert(std::is_pod<path_node>::value, "Path_node is a POD");
-    path_node path[height_upper_bound_];
+    path_node path[height_upper_bound];
     int       aheight;
     node*     n = find_node_path(x, path, aheight);
     if(n) return std::make_pair(iterator(n), false);
@@ -296,7 +302,7 @@ public:
   template<class... Args>
   std::pair<iterator, bool> emplace(Args&&... args) {
     static_assert(std::is_pod<path_node>::value, "Path_node is a POD");
-    path_node path[height_upper_bound_];
+    path_node path[height_upper_bound];
     int       aheight;
     node *nnode = emplace_node(std::forward<Args>(args)...);
     node*     n = find_node_path(nnode->k, path, aheight);
@@ -309,7 +315,7 @@ public:
 
   size_type erase(const value_type& x) {
     static_assert(std::is_pod<path_node>::value, "Path_node is a POD");
-    path_node path[height_upper_bound_];
+    path_node path[height_upper_bound];
     int       aheight;
     node*     n = find_node_path(x, path, aheight);
     if(!n) return 0;
@@ -395,10 +401,10 @@ private:
   // enough space for the tower. Then in place copy construction of
   // the key from x.
   node* alloc_node() {
-    static __thread uint64_t seed = 0;
-    if(__builtin_expect(seed == 0, 0))
+    static thread_local uint64_t seed = 0;
+    if(seed == 0) // [[unlikely]] Not a C++17 feature
       seed = new_seed();
-    const int height = std::min(height_upper_bound_, imp::random_height<Random, p_>::gen(Random::gen(seed)));
+    const int height = std::min(height_upper_bound, imp::random_height<Random, p_>::gen(Random::gen(seed)));
     max_height_ = std::max(max_height_, height);
     node* res   = (node*)operator new(sizeof(node) + height * sizeof(anode));
     res->height.store(height, std::memory_order_relaxed);
@@ -452,8 +458,8 @@ private:
   }
 };
 
-template <typename Key, typename Comp, int p_, typename Random>
-inline void swap(set<Key, Comp, p_, Random>& x, set<Key, Comp, p_, Random>& y) {
+template <typename Key, typename Comp, int p_, int height_upper_bound, typename Random>
+inline void swap(set<Key, Comp, p_, height_upper_bound, Random>& x, set<Key, Comp, p_, height_upper_bound, Random>& y) {
   x.swap(y);
 }
 

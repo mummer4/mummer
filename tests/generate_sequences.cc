@@ -3,6 +3,7 @@
 #include <fstream>
 #include <string>
 #include <algorithm>
+#include "gcc10_uniform_dist.hpp"
 #include "generate_sequences_cmdline.hpp"
 
 std::mt19937 rand_gen;
@@ -65,18 +66,20 @@ void rev_comp(std::string& s) {
 
 void generate_reads(const std::string& genome, size_t number, size_t length, unsigned int error, std::ostream& os, const bool fq = false) {
   std::string errors;
-  std::uniform_int_distribution<unsigned int> has_error(0, 99);
-  std::uniform_int_distribution<unsigned int> error_type(0, 2);
-  std::uniform_int_distribution<size_t>       position(0, genome.size() - length);
-  std::uniform_int_distribution<unsigned int> subst(1, 3);
-  std::uniform_int_distribution<unsigned int> insertion(0, 3);
-  std::uniform_int_distribution<unsigned int> reverse(0, 1);
-  std::uniform_int_distribution<char>         qual('!' + 2, '!' + 41);
+  uniform_int_distribution<unsigned int> has_error(0, 99);
+  uniform_int_distribution<unsigned int> error_type(0, 2);
+  uniform_int_distribution<size_t>       position(0, genome.size() - length);
+  uniform_int_distribution<unsigned int> subst(1, 3);
+  uniform_int_distribution<unsigned int> insertion(0, 3);
+  uniform_int_distribution<unsigned int> reverse(0, 1);
+  uniform_int_distribution<char>         qual('!' + 2, '!' + 41);
 
   for(size_t i = 0; i < number; ++i) {
     errors.clear();
-    std::string seq = genome.substr(position(rand_gen), length);
-    if(reverse(rand_gen))
+    const auto extract_pos = position(rand_gen);
+    const bool is_reversed = reverse(rand_gen) != 0;
+    std::string seq = genome.substr(extract_pos, length);
+    if(is_reversed)
       rev_comp(seq);
     for(size_t j = 0; j < seq.size(); ++j) {
       if(has_error(rand_gen) < error) {
@@ -96,7 +99,7 @@ void generate_reads(const std::string& genome, size_t number, size_t length, uns
         }
       }
     }
-    os << (fq ? '@' : '>') << i << ' ' << errors << '\n';
+    os << (fq ? '@' : '>') << i << ' ' << (is_reversed ? '-' : '+') << extract_pos << ' ' << errors << '\n';
     write_sequence(os, seq);
     if(fq) {
       os << "+\n";

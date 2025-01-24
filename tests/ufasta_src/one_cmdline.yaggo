@@ -1,0 +1,5 @@
+description "All content written on one line"
+
+arg("file") {
+  description "Input fasta file"
+  c_string; multiple }

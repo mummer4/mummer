@@ -12,20 +12,22 @@
 typedef int (main_func_t)(int argc, char *argv[]);
 
 main_func_t one_main;
-// main_func_t sizes_main;
-// main_func_t head_main;
-// main_func_t tail_main;
-// main_func_t rc_main;
-// main_func_t n50_main;
-// main_func_t extract_main;
-// main_func_t format_main;
+main_func_t sizes_main;
+main_func_t head_main;
+main_func_t tail_main;
+main_func_t rc_main;
+main_func_t n50_main;
+main_func_t extract_main;
+main_func_t format_main;
 main_func_t sort_main;
 main_func_t dsort_main;
+main_func_t rsort_main;
+main_func_t split_main;
 
-// #ifdef HAVE_BOOST_REGEX
-// main_func_t hgrep_main;
-// main_func_t dgrep_main;
-// #endif
+#ifdef HAVE_BOOST_REGEX
+main_func_t hgrep_main;
+main_func_t dgrep_main;
+#endif
 
 main_func_t sos;
 main_func_t version;
@@ -35,21 +37,24 @@ struct cmd_func {
   main_func_t *func;
 };
 cmd_func cmd_list[] = {
-  // {"one",               &one_main},
-  // {"sizes",             &sizes_main},
-  // {"head",              &head_main},
-  // {"tail",              &tail_main},
-  // {"rc",                &rc_main},
-  // {"n50",               &n50_main},
-  // {"extract",           &extract_main},
-  // {"format",            &format_main},
-  {"sort",              &sort_main},
+  {"one",               &one_main},
+  {"sizes",             &sizes_main},
+  {"head",              &head_main},
+  {"tail",              &tail_main},
+  {"rc",                &rc_main},
+  {"n50",               &n50_main},
+  {"stats",             &n50_main},
+  {"extract",           &extract_main},
+  {"format",            &format_main},
   {"hsort",             &sort_main},
+  {"sort",              &sort_main},
   {"dsort",             &dsort_main},
-// #ifdef HAVE_BOOST_REGEX
-//   {"hgrep",             &hgrep_main},
-//   {"dgrep",             &dgrep_main},
-// #endif
+  {"rsort",             &rsort_main},
+#ifdef HAVE_BOOST_REGEX
+  {"hgrep",             &hgrep_main},
+  {"dgrep",             &dgrep_main},
+#endif
+  {"split",             &split_main},
 
   /* help in all its form. Must be first non-command */
   {"help",              &sos},

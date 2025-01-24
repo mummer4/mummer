@@ -104,8 +104,7 @@ int main(int argc, char *argv[]) {
 
     getrealpath real_ref(args.ref_arg), real_qry(args.qry_arg[0]);
     if(args.sam_short_given || args.sam_long_given) {
-      os << "@HD VN1.0 SO:unsorted\n"
-         << "@PG ID:nucmer PN:nucmer VN:4.0 CL:\"" << cmdline << "\"\n";
+      os << "@HD\tVN:1.4\tSO:unsorted\n";
     } else {
       os << real_ref << ' ' << real_qry << '\n'
          << "NUCMER\n";
@@ -130,6 +129,18 @@ int main(int argc, char *argv[]) {
   do {
     if(!args.load_given)
       aligner.reset(new mummer::nucmer::FileAligner(reference, batch_size,  opts));
+
+    if(args.sam_long_given || args.sam_short_given) { // Finish SAM header: ref sequence + program
+      if(!args.batch_given) { // Batch is not compatible with SAM header
+        const auto& info = aligner->reference_info();
+        for(size_t i = 0; i < info.size(); ++i)
+          os << "@SQ\tSN:" << info.header(i) << "\tLN:" << info.seq_size(i) << '\n';
+      }
+      os << "@PG\tID:nucmer\tPN:nucmer\tVN:" << PACKAGE_VERSION << "\tCL:\"" << cmdline << "\"\n";
+      if(!os.good())
+        nucmer_cmdline::error() << "Error while writing the SAM header";
+    }
+
 
     if(args.save_given && !aligner->sa().save(args.save_arg))
       nucmer_cmdline::error() << "Can't save the suffix array to '" << args.save_arg << "'";

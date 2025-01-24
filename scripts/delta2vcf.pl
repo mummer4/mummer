@@ -1,7 +1,7 @@
 #!@PERL@
 #this code converts delta file (stdin) to vcf file (stdout)
 if($#ARGV>=0){
-  die("delta to vcf converter. vcf file contains variants in reference detected by query alignments. The best practice is to ude delta-filter -1 before running delta2vcf, i.e. delta-filter -1 file.delta | delta2vcf > file.vcf.\nUsage: delta2vcf < file.delta > file.vcf\n");
+  die("delta to vcf converter. vcf file contains variants in reference detected by query alignments. The best practice is to use delta-filter -1 before running delta2vcf, i.e. delta-filter -1 file.delta | delta2vcf > file.vcf.\nUsage: delta2vcf < file.delta > file.vcf\n");
 }
 $line=<STDIN>;
 chomp($line);

@@ -19,6 +19,7 @@
 #include <mummer/redirect_to_pager.hpp>
 #include <vector>
 #include <algorithm>
+#include <string>
 using namespace std;
 
 //------------------------------------------------------------- Constants ----//
@@ -186,8 +187,8 @@ bool isAnnotation = false;              // true if either -w or -o
 float idyCutoff = 0;                    // -I option
 long int lenCutoff = 0;                 // -L option
 int  whichDataType = NUCMER_DATA;       // set by .delta header
-char InputFileName [MAX_LINE];          //  I/O filenames
-char RefFileName [MAX_LINE], QryFileName [MAX_LINE];
+std::string InputFileName;              //  I/O filenames
+std::string RefFileName, QryFileName;
 
 
 
@@ -401,7 +402,7 @@ int main
   srand (time (NULL));
 
   //-- Open and parse the delta file
-  strcpy (InputFileName, argv[optind ++]);
+  InputFileName = argv[optind ++];
   parseDelta (Stats);
 
   //-- Can only pick best frame for promer data
@@ -815,7 +816,7 @@ void printBtab
 
       //-- Output the stats for this alignment in btab format
       printf("%s\t%s\t%ld\t%s\t%s\t%s\t",
-	     Sip->IdB, date, Sip->SeqLenB, type, RefFileName, Sip->IdA);
+	     Sip->IdB, date, Sip->SeqLenB, type, RefFileName.c_str(), Sip->IdA);
 
       printf("%ld\t%ld\t%ld\t%ld\t%f\t%f\t%ld\t0\t0\tNULL\t",
 	     Sip->sB, Sip->eB, Sip->sA, Sip->eA,
@@ -845,7 +846,7 @@ void printHuman
   //-- Print the output header
   if ( isPrintHeader )
     {
-      printf ("%s %s\n%s\n\n", RefFileName, QryFileName,
+      printf ("%s %s\n%s\n\n", RefFileName.c_str(), QryFileName.c_str(),
 	      whichDataType == NUCMER_DATA ? "NUCMER" : "PROMER");
       printf("%8s %8s  | ", "[S1]", "[E1]");
       printf("%8s %8s  | ", "[S2]", "[E2]");
@@ -935,7 +936,7 @@ void printTabular
   //-- Print the output header
   if ( isPrintHeader )
     {
-      printf ("%s %s\n%s\n\n", RefFileName, QryFileName,
+      printf ("%s %s\n%s\n\n", RefFileName.c_str(), QryFileName.c_str(),
 	      whichDataType == NUCMER_DATA ? "NUCMER" : "PROMER");
       printf("%s\t%s\t", "[S1]", "[E1]");
       printf("%s\t%s\t", "[S2]", "[E2]");
@@ -1005,11 +1006,11 @@ void parseDelta
   AlignStats CurrStats;                //  single alignment region
 
   DeltaReader_t dr;
-  dr.open (InputFileName);
+  dr.open (InputFileName.c_str());
   whichDataType = dr.getDataType( ) == NUCMER_STRING ?
     NUCMER_DATA : PROMER_DATA;
-  strcpy (RefFileName, dr.getReferencePath( ).c_str( ));
-  strcpy (QryFileName, dr.getQueryPath( ).c_str( ));
+  RefFileName = dr.getReferencePath( );
+  QryFileName = dr.getQueryPath( );
 
   //-- for each delta record
   while ( dr.readNext( ) )

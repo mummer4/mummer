@@ -9,7 +9,9 @@ CLEANFILES += $(check_SCRIPTS)
 # proper environment
 %D%/testsh: %D%/testsh.in
 	$(AM_V_GEN)sed -e 's,[@]BUILDDIR[@],$(abs_builddir),g' \
-	               -e 's,[@]SRCDIR[@],$(abs_srcdir),g' $< > $@
+	               -e 's,[@]SRCDIR[@],$(abs_srcdir),g' \
+	               -e 's,[@]SAMTOOLS[@],$(SAMTOOLS),g' \
+	               -e 's,[@]VERSION[@],$(PACKAGE_VERSION),g' $< > $@
 	@chmod a+x $@
 EXTRA_DIST += %D%/testsh.in
 
@@ -17,15 +19,25 @@ EXTRA_DIST += %D%/testsh.in
 EXTRA_DIST += %D%/test_md5
 
 # Build generate_sequences, used to generage pseudo-random sequences.
-%C%_generate_sequences_SOURCES = %D%/generate_sequences.cc
+%C%_generate_sequences_SOURCES = %D%/generate_sequences.cc %D%/gcc10_uniform_dist.hpp
 %C%_generate_sequences_CPPFLAGS = $(CPPFLAGS) -I%D%
 YAGGO_BUILT += %D%/generate_sequences_cmdline.hpp
 
 # Build ufasta, used to sort fasta files for reliable comparisons.
-%C%_ufasta_SOURCES = %D%/ufasta_src/sort.cc %D%/ufasta_src/dsort.cc	\
- %D%/ufasta_src/ufasta.cc %D%/ufasta_src/common.hpp
-%C%_ufasta_CPPFLAGS = $(CPPFLAGS) -I%D%/ufasta_src -I$(srcdir)/tests/ufasta_src
-YAGGO_BUILT += %D%/ufasta_src/dsort_cmdline.hpp %D%/ufasta_src/sort_cmdline.hpp
+ufasta_SUB_CMDS = %D%/ufasta_src/one.cc %D%/ufasta_src/sizes.cc	\
+               %D%/ufasta_src/head.cc %D%/ufasta_src/tail.cc				\
+               %D%/ufasta_src/rc.cc %D%/ufasta_src/n50.cc						\
+               %D%/ufasta_src/extract.cc %D%/ufasta_src/format.cc	  \
+               %D%/ufasta_src/sort.cc %D%/ufasta_src/dsort.cc			  \
+               %D%/ufasta_src/split.cc %D%/ufasta_src/rsort.cc
+%C%_ufasta_SOURCES = %D%/ufasta_src/ufasta.cc %D%/ufasta_src/common.cc $(ufasta_SUB_CMDS)
+%C%_ufasta_CPPFLAGS = $(AM_CPPFLAGS) -I%D%/ufasta_src -I$(srcdir)/%D%/ufasta_src
+YAGGO_BUILT += $(ufasta_SUB_CMDS:.cc=_cmdline.hpp)
+noinst_HEADERS += %D%/ufasta_src/common.hpp %D%/ufasta_src/seeded_prg.hpp
+# %C%_ufasta_SOURCES = %D%/ufasta_src/sort.cc %D%/ufasta_src/dsort.cc	\
+#  %D%/ufasta_src/ufasta.cc %D%/ufasta_src/common.hpp
+# %C%_ufasta_CPPFLAGS = $(CPPFLAGS) -I%D%/ufasta_src -I$(srcdir)/tests/ufasta_src
+# YAGGO_BUILT += %D%/ufasta_src/dsort_cmdline.hpp %D%/ufasta_src/sort_cmdline.hpp
 
 # Build check_cigar, to check validity of cigar strings.
 %C%_check_cigar_SOURCES = %D%/check_cigar.cc
@@ -72,7 +84,7 @@ TEST_EXTENSIONS += .sh
 SH_LOG_COMPILER = %D%/testsh
 
 # List of tests to run
-script_tests = %D%/save_load.sh %D%/batch.sh %D%/mummer.sh %D%/nucmer.sh %D%/sam.sh %D%/genome.sh %D%/delta-filter.sh
+script_tests = %D%/save_load.sh %D%/batch.sh %D%/mummer.sh %D%/nucmer.sh %D%/sam.sh %D%/genome.sh %D%/delta-filter.sh %D%/mummerplot.sh
 EXTRA_DIST += $(script_tests)
 TESTS += $(script_tests)
 
@@ -89,3 +101,4 @@ CLEANDIRS += $(patsubst %D%/%.sh,%D%/%,$(script_tests))
 %D%/sam.log: %D%/data/seed_reads_0.fa %D%/data/seed_reads_1.fa %D%/data/seed_fq_reads_0.fq
 %D%/genome.log: %D%/data/seed_reads_2.fa
 %D%/delta-filter.log: %D%/data/small_reads_0.fa %D%/data/small_reads_1.fa
+%D%/mummerplot.log: %D%/data/small_reads_0.fa

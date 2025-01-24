@@ -1,11 +1,11 @@
-AC_INIT([MUMmer], [4.0.0rc1], [alekseyz@jhu.edu])
+AC_INIT([MUMmer],[4.0.0],[alekseyz@jhu.edu])
 AC_CANONICAL_HOST
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([subdir-objects foreign parallel-tests color-tests])
 AM_SILENT_RULES([yes])
 AC_CONFIG_SRCDIR([.])
 AC_CONFIG_HEADERS([config.h])
-AC_PROG_LIBTOOL
+LT_INIT
 
 # Check for compiler and flags
 AS_IF([test -z "$CXXFLAGS"], [cxxflags_given=no], [cxxflags_given=yes])
@@ -14,8 +14,6 @@ AC_PROG_CXX
 AC_PROG_CC
 AC_PATH_PROG(ENV_PROG, [env])
 
-# Add -std=c++0x always. Add -DNDEBUG only if CXXFLAGS is not given on command line
-CXXFLAGS="-std=c++0x $CXXFLAGS"
 AS_IF([test x$cxxflags_given = xno], [CXXFLAGS="-DNDEBUG $CXXFLAGS"])
 EXTRA_CXXFLAGS=
 AC_SUBST([EXTRA_CXXFLAGS])
@@ -30,12 +28,12 @@ AS_IF([test "x$enable_openmp" != "xno"],
       [EXTRA_CXXFLAGS="$EXTRA_CXXFLAGS -Wno-unknown-pragmas"])
 
 # Check for yaggo
-AC_ARG_VAR([YAGGO], [Yaggo switch parser generator])
+AC_ARG_VAR([YAGGO], [Path to the yaggo switch parser generator])
 AS_IF([test "x$YAGGO" = "x"], [AC_PATH_PROG([YAGGO], [yaggo], [false])])
 
-# Check for gnuplot
-AC_ARG_VAR([GNUPLOT], [Gnuplot plotting program])
-AS_IF([test "x$GNUPLOT" = "x"], [AC_PATH_PROGS([GNUPLOT], [gnuplot gnuplot5 gnuplot4], [false])])
+# Check for samtools. Only used for testing if available
+AC_ARG_VAR([SAMTOOLS], [Path to sammtools (for testing only, optional)])
+AS_IF([test "x$SAMTOOLS" = "x"], [AC_PATH_PROG([SAMTOOLS], [samtools])])
 
 # Check that type __int128 is supported and if the
 AC_ARG_WITH([int128],
@@ -69,25 +67,25 @@ AS_IF([test x$try_nano_sleep = xyes],
 need_shared_libraries=no
 # --enable-python-binding
 AC_ARG_ENABLE([python-binding],
-              [AC_HELP_STRING([--enable-python-binding@<:@=PATH@:>@], [create SWIG python module and install in PATH])])
+              [AS_HELP_STRING([--enable-python-binding@<:@=PATH@:>@],[create SWIG python module and install in PATH])])
 # --enable-ruby-binding
 AC_ARG_ENABLE([ruby-binding],
-              [AC_HELP_STRING([--enable-ruby-binding@<:@=PATH@:>@], [create SWIG ruby module and install in PATH])])
+              [AS_HELP_STRING([--enable-ruby-binding@<:@=PATH@:>@],[create SWIG ruby module and install in PATH])])
 # --enable-perl-binding
 AC_ARG_ENABLE([perl-binding],
-              [AC_HELP_STRING([--enable-perl-binding@<:@=PATH@:>@], [create SWIG perl module and install in PATH])])
+              [AS_HELP_STRING([--enable-perl-binding@<:@=PATH@:>@],[create SWIG perl module and install in PATH])])
 # --enable-all-binding
 AC_ARG_ENABLE([all-binding],
-              [AC_HELP_STRING([--enable-all-binding@<:@=PATH@:>@], [create SWIG module for all languages and install in PATH])])
+              [AS_HELP_STRING([--enable-all-binding@<:@=PATH@:>@],[create SWIG module for all languages and install in PATH])])
 
 
 # --enable-swig
 AC_ARG_ENABLE([swig],
-              [AC_HELP_STRING([--enable-swig], [enable development of swig binding])])
+              [AS_HELP_STRING([--enable-swig],[enable development of swig binding])])
 AS_IF([test x$enable_swig = xyes],
       [AX_PKG_SWIG([3.0.0], [], [AC_MSG_ERROR([SWIG version 3 is required])])])
 AS_IF([test -n "$SWIG"],
-      [SWIG_ENABLE_CXX])
+      [AX_SWIG_ENABLE_CXX])
 AM_CONDITIONAL([HAVE_SWIG], [test -n "$SWIG"])
 
 # Python binding setup

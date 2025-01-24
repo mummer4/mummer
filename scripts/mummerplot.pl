@@ -16,21 +16,24 @@
 # 
 ################################################################################
 
-use lib "@LIB_DIR@";
+use lib '@LIB_DIR@';
 use Foundation;
 use strict;
 use IO::Socket;
 
-my $BIN_DIR     = "@BIN_DIR@";
-my $LIB_DIR     = "@LIB_DIR@";
-my $GNUPLOT_EXE = "@GNUPLOT_EXE@";
+my $BIN_DIR     = '@BIN_DIR@';
+my $LIB_DIR     = '@LIB_DIR@';
+my $GNUPLOT_EXE = 'gnuplot';
 
 
 #================================================================= Globals ====#
 #-- terminal types
 my $X11    = "x11";
+my $QT     = "qt";
+my $AQUA   = "aqua";
 my $PS     = "postscript";
 my $PNG    = "png";
+my $JPEG   = "jpeg";
 
 #-- terminal sizes
 my $SMALL  = "small";
@@ -40,6 +43,8 @@ my $LARGE  = "large";
 my %TERMSIZE =
     (
      $X11 => { $SMALL => 500, $MEDIUM => 700,  $LARGE => 900  }, # screen pix
+     $QT  => { $SMALL => 500, $MEDIUM => 700,  $LARGE => 900  }, # screen pix
+     $AQUA => { $SMALL => 500, $MEDIUM => 700,  $LARGE => 900  }, # screen pix
      $PS  => { $SMALL => 1,   $MEDIUM => 2,    $LARGE => 3    }, # pages
      $PNG => { $SMALL => 800, $MEDIUM => 1024, $LARGE => 1400 }  # image pix
      );
@@ -57,6 +62,14 @@ my $REVPLOT = "rplot";
 my $HLTPLOT = "hplot";
 my $GNUPLOT = "gnuplot";
 
+# The terminals that are known to be interactive
+my %INTERACTIVE = (
+    $X11 => 1,
+    $QT => 1,
+    $AQUA => 1
+    );
+
+# Suffixes for files. If not a known terminal, use the terminal name as a suffix
 my %SUFFIX =
     (
      $FILTER  => ".filter",
@@ -65,8 +78,9 @@ my %SUFFIX =
      $HLTPLOT => ".hplot",
      $GNUPLOT => ".gp",
      $PS      => ".ps",
-     $PNG     => ".png"
-     );
+     $PNG     => ".png",
+     $JPEG    => ".jpeg"
+    );
 
 
 #================================================================= Options ====#
@@ -76,8 +90,7 @@ my $OPT_coverage;                  # --[no]coverage option
 my $OPT_filter;                    # -f option
 my $OPT_layout;                    # -l option
 my $OPT_prefix    = "out";         # -p option
-my $OPT_rv;                        # --rv option
-my $OPT_terminal  = $X11;          # -t option
+my $OPT_terminal;                  # -t option
 my $OPT_IdR;                       # -r option
 my $OPT_IdQ;                       # -q option
 my $OPT_IDRfile;                   # -R option
@@ -115,15 +128,15 @@ my $HELP = qq~
 
   DESCRIPTION:
     mummerplot generates plots of alignment data produced by mummer, nucmer,
-    promer or show-tiling by using the GNU gnuplot utility. After generating
-    the appropriate scripts and datafiles, mummerplot will attempt to run
-    gnuplot to generate the plot. If this attempt fails, a warning will be
-    output and the resulting .gp and .[frh]plot files will remain so that the
-    user may run gnuplot independently. If the attempt succeeds, either an x11
-    window will be spawned or an additional output file will be generated
-    (.ps or .png depending on the selected terminal). Feel free to edit the
-    resulting gnuplot script (.gp) and rerun gnuplot to change line thinkness,
-    labels, colors, plot size etc.
+    promer or show-tiling by using the GNU gnuplot utility. After generating the
+    appropriate scripts and datafiles, mummerplot will attempt to run gnuplot to
+    generate the plot. If this attempt fails, a warning will be output and the
+    resulting .gp and .[frh]plot files will remain so that the user may run
+    gnuplot independently. If the attempt succeeds, either an interactive
+    gnuplot window will be spawned (default) or an additional output file will
+    be generated (e.g., .ps or .png depending on the selected terminal with -t).
+    Feel free to edit the resulting gnuplot script (.gp) and rerun gnuplot to
+    change line thinkness, labels, colors, plot size etc.
 
   MANDATORY:
     match file      Set the alignment input to 'match file'
@@ -151,7 +164,6 @@ my $HELP = qq~
                     this option requires the -R -Q options
     --fat           Layout sequences using fattest alignment only
     -p|prefix       Set the prefix of the output files (default '$OPT_prefix')
-    -rv             Reverse video for x11 plots
     -r|IdR          Plot a particular reference sequence ID on the X-axis
     -q|IdQ          Plot a particular query sequence ID on the Y-axis
     -R|Rfile        Plot an ordered set of reference sequences from Rfile
@@ -166,21 +178,26 @@ my $HELP = qq~
                     --small --medium --large (default '$OPT_size')
     -S
     --SNP           Highlight SNP locations in each alignment
-    -t|terminal     Set the output terminal to x11, postscript or png
-                    --x11 --postscript --png (default '$OPT_terminal')
-    -t|title        Specify the gnuplot plot title (default none)
+    -t|terminal     Set the output terminal, anything understood by "set
+                    terminal", e.g. png, ps) (default: interactive)
+    --list-terms    List the available terminals
+    -title          Specify the gnuplot plot title (default none)
     -x|xrange       Set the xrange for the plot '[min:max]'
     -y|yrange       Set the yrange for the plot '[min:max]'
     -V
     --version       Display the version information and exit
     ~;
 
+my $deltafilter = "$BIN_DIR/@DELTAFILTER@";
+my $showcoords = "$BIN_DIR/@SHOWCOORDS@";
+my $showsnps = "$BIN_DIR/@SHOWSNPS@";
+
 my @DEPEND =
     (
      "$LIB_DIR/Foundation.pm",
-     "$BIN_DIR/delta-filter",
-     "$BIN_DIR/show-coords",
-     "$BIN_DIR/show-snps",
+     $deltafilter,
+     $showcoords,
+     $showsnps,
      "gnuplot"
      );
 
@@ -251,7 +268,7 @@ MAIN:
     #-- Filter the alignments
     if ( $OPT_filter || $OPT_layout ) {
         print STDERR "Writing filtered delta file $OPT_Dfile\n";
-        system ("$BIN_DIR/delta-filter -r -q $OPT_Mfile > $OPT_Dfile")
+        system ("$deltafilter -r -q $OPT_Mfile > $OPT_Dfile")
             and die "ERROR: Could not run delta-filter, $!\n";
         if ( $OPT_filter ) { $OPT_Mfile = $OPT_Dfile; }
     }
@@ -516,7 +533,7 @@ sub ParseCluster ($)
 
     while ( <MFILE> ) {
         #-- match
-        if ( /^\s+(\d+)\s+(\d+)\s+(\d+)\s+\S+\s+\S+$/ ) {
+        if ( /^\s*(\d+)\s+(\d+)\s+(\d+)\s+\S+\s+\S+$/ ) {
             @align = ($1, $1, $2, $2, 100, $lenR, $lenQ, $idR, $idQ);
             $len = $3 - 1;
             $align[1] += $dR == 1 ? $len : -$len;
@@ -563,7 +580,7 @@ sub ParseMummer ($)
 
     while ( <MFILE> ) {
         #-- 3 column match
-        if ( /^\s+(\d+)\s+(\d+)\s+(\d+)$/ ) {
+        if ( /^\s*(\d+)\s+(\d+)\s+(\d+)$/ ) {
             @align = ($1, $1, $2, $2, 100, 0, $lenQ, "REF", $idQ);
             $len = $3 - 1;
             $align[1] += $len;
@@ -573,7 +590,7 @@ sub ParseMummer ($)
         }
 
         #-- 4 column match
-        if ( /^\s+(\S+)\s+(\d+)\s+(\d+)\s+(\d+)$/ ) {
+        if ( /^\s*(\S+)\s+(\d+)\s+(\d+)\s+(\d+)$/ ) {
             @align = ($2, $2, $3, $3, 100, 0, $lenQ, $1, $idQ);
             $len = $4 - 1;
             $align[1] += $len;
@@ -668,7 +685,7 @@ sub LayoutIDs ($$)
     #  [ [idQ, slope] ]
 
     #-- get the filtered alignments
-    open (BTAB, "$BIN_DIR/show-coords -B $OPT_Dfile |")
+    open (BTAB, "$showcoords -B $OPT_Dfile |")
         or die "ERROR: Could not open show-coords pipe, $!\n";
 
     my @align;
@@ -959,7 +976,7 @@ sub PlotData ($$$)
 
         print STDERR "Determining SNPs from sequence and alignment data\n";
 
-        open (SNPS, "$BIN_DIR/show-snps -H -T -l $OPT_Mfile |")
+        open (SNPS, "$showsnps -H -T -l $OPT_Mfile |")
             or die "ERROR: Could not open show-snps pipe, $!\n";
 
         my @snps;
@@ -1069,71 +1086,83 @@ sub WriteGP ($$)
     open (GFILE, ">$OPT_Gfile")
         or die "ERROR: Could not open $OPT_Gfile, $!\n";
 
+    my $interactive = !defined($OPT_terminal) || $INTERACTIVE{$OPT_terminal};
+
+
     my ($FWD, $REV, $HLT) = (1, 2, 3);
     my $SIZE = $TERMSIZE{$OPT_terminal}{$OPT_size};
 
+
     #-- terminal specific stuff
     my ($P_TERM, $P_SIZE, %P_PS, %P_LW);
-    foreach ( $OPT_terminal ) {
-        /^$X11/    and do {
-            $P_TERM = $OPT_gpstatus == 0 ?
-                "$X11 font \"$FFACE,$FSIZE\"" : "$X11";
+    if ( $interactive ) {
+        $P_TERM = "$OPT_terminal font \"$FFACE,$FSIZE\"";
 
+        %P_PS = ( $FWD => 1.0, $REV => 1.0, $HLT => 1.0 );
+
+        %P_LW = $OPT_coverage || $OPT_color ?
+            ( $FWD => 3.0, $REV => 3.0, $HLT => 3.0 ) :
+            ( $FWD => 2.0, $REV => 2.0, $HLT => 2.0 );
+
+        $P_SIZE = $OPT_coverage ?
+            "set size 1,1" :
+            "set size 1,1";
+    } else {
+        foreach ( $OPT_terminal ) {
+            /^$PS/     and do {
+                $P_TERM = defined $OPT_color && $OPT_color == 0 ?
+                    "$PS monochrome" : "$PS color";
+                $P_TERM .= $OPT_gpstatus == 0 ?
+                    " solid \"$FFACE\" $FSIZE" : " solid \"$FFACE\" $FSIZE";
+
+                %P_PS = ( $FWD => 0.5, $REV => 0.5, $HLT => 0.5 );
+
+                %P_LW = $OPT_coverage || $OPT_color ?
+                    ( $FWD => 4.0, $REV => 4.0, $HLT => 4.0 ) :
+                    ( $FWD => 2.0, $REV => 2.0, $HLT => 2.0 );
+
+                $P_SIZE = $OPT_coverage ?
+                    "set size ".(1.0 * $SIZE).",".(0.5 * $SIZE) :
+                    "set size ".(1.0 * $SIZE).",".(1.0 * $SIZE);
+
+                last;
+            };
+
+            /^$PNG/    and do {
+                $P_TERM = $OPT_gpstatus == 0 ?
+                    "$PNG tiny size $SIZE,$SIZE" : "$PNG small";
+                if ( defined $OPT_color && $OPT_color == 0 ) {
+                    $P_TERM .= " xffffff x000000 x000000";
+                    $P_TERM .= " x000000 x000000 x000000";
+                    $P_TERM .= " x000000 x000000 x000000";
+                }
+
+                %P_PS = ( $FWD => 1.0, $REV => 1.0, $HLT => 1.0 );
+
+                %P_LW = $OPT_coverage || $OPT_color ?
+                    ( $FWD => 3.0, $REV => 3.0, $HLT => 3.0 ) :
+                    ( $FWD => 3.0, $REV => 3.0, $HLT => 3.0 );
+
+                $P_SIZE = $OPT_coverage ?
+                    "set size 1,.375" :
+                    "set size 1,1";
+
+                last;
+            };
+
+            # No particular formatting known for this terminal. Use default
+            # settings, hopping for the best.
+            $P_TERM = "$OPT_terminal";
             %P_PS = ( $FWD => 1.0, $REV => 1.0, $HLT => 1.0 );
-
-            %P_LW = $OPT_coverage || $OPT_color ?
-                ( $FWD => 3.0, $REV => 3.0, $HLT => 3.0 ) :
-                ( $FWD => 2.0, $REV => 2.0, $HLT => 2.0 );
-
-            $P_SIZE = $OPT_coverage ?
-                "set size 1,1" :
-                "set size 1,1";
-
-            last;
-        };
-
-        /^$PS/     and do {
-            $P_TERM = defined $OPT_color && $OPT_color == 0 ?
-                "$PS monochrome" : "$PS color";
-            $P_TERM .= $OPT_gpstatus == 0 ?
-                " solid \"$FFACE\" $FSIZE" : " solid \"$FFACE\" $FSIZE";
-
-            %P_PS = ( $FWD => 0.5, $REV => 0.5, $HLT => 0.5 );
-
-            %P_LW = $OPT_coverage || $OPT_color ?
-                ( $FWD => 4.0, $REV => 4.0, $HLT => 4.0 ) :
-                ( $FWD => 2.0, $REV => 2.0, $HLT => 2.0 );
-
-            $P_SIZE = $OPT_coverage ?
-                "set size ".(1.0 * $SIZE).",".(0.5 * $SIZE) :
-                "set size ".(1.0 * $SIZE).",".(1.0 * $SIZE);
-
-            last;
-        };
-
-        /^$PNG/    and do {
-            $P_TERM = $OPT_gpstatus == 0 ?
-                "$PNG tiny size $SIZE,$SIZE" : "$PNG small";
-            if ( defined $OPT_color && $OPT_color == 0 ) {
-                $P_TERM .= " xffffff x000000 x000000";
-                $P_TERM .= " x000000 x000000 x000000";
-                $P_TERM .= " x000000 x000000 x000000";
-            }
-            
-            %P_PS = ( $FWD => 1.0, $REV => 1.0, $HLT => 1.0 );
-
             %P_LW = $OPT_coverage || $OPT_color ?
                 ( $FWD => 3.0, $REV => 3.0, $HLT => 3.0 ) :
                 ( $FWD => 3.0, $REV => 3.0, $HLT => 3.0 );
-
             $P_SIZE = $OPT_coverage ?
                 "set size 1,.375" :
                 "set size 1,1";
-
             last;
-        };
-
-        die "ERROR: Don't know how to initialize terminal, $OPT_terminal\n";
+        }
+        # die "ERROR: Don't know how to initialize terminal, $OPT_terminal\n";
     }
 
     #-- plot commands
@@ -1282,7 +1311,7 @@ sub WriteGP ($$)
          ", \\\n \"$OPT_Hfile\" title \"HLT\" w lp ls $HLT");
     
     #-- interactive mode
-    if ( $OPT_terminal eq $X11 ) {
+    if ( $interactive ) {
         print GFILE "\n",
         "print \"-- INTERACTIVE MODE --\"\n",
         "print \"consult gnuplot docs for command list\"\n",
@@ -1310,29 +1339,6 @@ sub RunGP ( )
     }
 
     my $cmd = $GNUPLOT_EXE;
-
-    #-- x11 specifics
-    if ( $OPT_terminal eq $X11 ) {
-        my $size = $TERMSIZE{$OPT_terminal}{$OPT_size};
-        $cmd .= " -geometry ${size}x";
-        if ( $OPT_coverage ) { $size = sprintf ("%.0f", $size * .375); }
-        $cmd .= "${size}+0+0 -title mummerplot";
-
-        if ( defined $OPT_color && $OPT_color == 0 ) {
-            $cmd .= " -mono";
-            $cmd .= " -xrm 'gnuplot*line1Dashes: 0'";
-            $cmd .= " -xrm 'gnuplot*line2Dashes: 0'";
-            $cmd .= " -xrm 'gnuplot*line3Dashes: 0'";
-        }
-
-        if ( $OPT_rv ) {
-            $cmd .= " -rv";
-            $cmd .= " -xrm 'gnuplot*background: black'";
-            $cmd .= " -xrm 'gnuplot*textColor: white'";
-            $cmd .= " -xrm 'gnuplot*borderColor: white'";
-            $cmd .= " -xrm 'gnuplot*axisColor: white'";
-        }
-    }
 
     $cmd .= " $OPT_Gfile";
 
@@ -1433,9 +1439,11 @@ sub ListenGP($$)
 #------------------------------------------------------------ ParseOptions ----#
 sub ParseOptions ( )
 {
-    my ($opt_small, $opt_medium, $opt_large);
-    my ($opt_ps, $opt_x11, $opt_png);
+    my ($opt_small, $opt_medium, $opt_large, $opt_list_terms);
     my $cnt;
+
+    #-- Deprecated options
+    my ($OPT_rv, $opt_ps, $opt_x11, $opt_png);
 
     #-- Get options
     my $err = $tigr -> TIGR_GetOptions
@@ -1456,6 +1464,7 @@ sub ParseOptions ( )
          "s|size=s"     => \$OPT_size,
          "S|SNP"        => \$OPT_SNP,
          "t|terminal=s" => \$OPT_terminal,
+         "list-terms"   => \$opt_list_terms,
          "title=s"      => \$OPT_title,
          "x|xrange=s"   => \$OPT_xrange,
          "y|yrange=s"   => \$OPT_yrange,
@@ -1473,13 +1482,36 @@ sub ParseOptions ( )
         die "Try '$0 -h' for more information.\n";
     }
 
+    if($opt_list_terms) {
+        exec("gnuplot -e \"help set terminal\" < /dev/null > /dev/null");
+    }
+
+    if ($OPT_rv) {
+        print STDERR
+            "WARNING: the reverse video option is deprecated and ignored";
+    }
+
     $cnt = 0;
+    if ( $opt_png || $opt_ps || $opt_x11 ) {
+        print STDERR
+            "WARNING: deprecated switch $X11, $PS, $PNG, use -t,--terminal";
+    }
+
+    if ( defined($OPT_terminal) ) { $cnt ++; }
     if ( $opt_png ) { $OPT_terminal = $PNG; $cnt ++; }
     if ( $opt_ps  ) { $OPT_terminal = $PS;  $cnt ++; }
     if ( $opt_x11 ) { $OPT_terminal = $X11; $cnt ++; }
     if ( $cnt > 1 ) {
         print STDERR
             "WARNING: Multiple terminals not allowed, using '$OPT_terminal'\n";
+    }
+
+    if ( !defined($OPT_terminal) ) {
+        my $show_term = qx(gnuplot -e "show terminal" 2>&1);
+        if($show_term !~ /terminal type is (\S+)/) {
+            die "Can't determine default terminal type";
+        }
+        $OPT_terminal = $1;
     }
 
     $cnt = 0;
@@ -1517,11 +1549,12 @@ sub ParseOptions ( )
 
     #-- Check options
     if ( !exists $TERMSIZE{$OPT_terminal} ) {
-        die "ERROR: Invalid terminal type, $OPT_terminal\n";
-    }
-
-    if ( !exists $TERMSIZE{$OPT_terminal}{$OPT_size} ) {
-        die "ERROR: Invalid terminal size, $OPT_size\n";
+        print STDERR
+            "WARNING: No predefined settings for terminal $OPT_terminal. Using defaults\n";
+    } else {
+        if ( !exists $TERMSIZE{$OPT_terminal}{$OPT_size} ) {
+            die "ERROR: Invalid terminal size, $OPT_size\n";
+        }
     }
 
     if ( $OPT_xrange ) {
@@ -1570,8 +1603,9 @@ sub ParseOptions ( )
     $tigr->isWritableFile ($OPT_Gfile) or $tigr->isCreatableFile ($OPT_Gfile)
         or die "ERROR: Could not write $OPT_Gfile, $!\n";
 
-    if ( exists $SUFFIX{$OPT_terminal} ) {
-        $OPT_Pfile = $OPT_prefix . $SUFFIX{$OPT_terminal};
+
+    if ( defined($OPT_terminal) && !$INTERACTIVE{$OPT_terminal}) {
+        $OPT_Pfile = $OPT_prefix . ($SUFFIX{$OPT_terminal} || ("." . $OPT_terminal));
         $tigr->isWritableFile($OPT_Pfile) or $tigr->isCreatableFile($OPT_Pfile)
             or die "ERROR: Could not write $OPT_Pfile, $!\n";
     }

@@ -9,14 +9,14 @@
 #
 #-------------------------------------------------------------------------------
 
-use lib "@LIB_DIR@";
+use lib '@LIB_DIR@';
 use Foundation;
 use File::Spec::Functions;
 use warnings;
 use strict;
 
-my $BIN_DIR = "@BIN_DIR@";
-my $SCRIPT_DIR = "@LIB_DIR@";
+my $BIN_DIR = '@BIN_DIR@';
+my $SCRIPT_DIR = '@LIB_DIR@';
 
 my $VERSION_INFO = q~
 DNAdiff version 1.3
@@ -68,19 +68,19 @@ my $USAGE_INFO = q~
 
 my @DEPEND_INFO =
     (
-     "$BIN_DIR/delta-filter",
-     "$BIN_DIR/show-diff",
-     "$BIN_DIR/show-snps",
-     "$BIN_DIR/show-coords",
-     "$BIN_DIR/nucmer",
+     "$BIN_DIR/@DELTAFILTER@",
+     "$BIN_DIR/@SHOWDIFF@",
+     "$BIN_DIR/@SHOWSNPS@",
+     "$BIN_DIR/@SHOWCOORDS@",
+     "$BIN_DIR/@NUCMER@",
      "$SCRIPT_DIR/Foundation.pm"
      );
 
-my $DELTA_FILTER = "$BIN_DIR/delta-filter";
-my $SHOW_DIFF = "$BIN_DIR/show-diff";
-my $SHOW_SNPS = "$BIN_DIR/show-snps";
-my $SHOW_COORDS = "$BIN_DIR/show-coords";
-my $NUCMER = "$BIN_DIR/nucmer";
+my $DELTA_FILTER = "$BIN_DIR/@DELTAFILTER@";
+my $SHOW_DIFF = "$BIN_DIR/@SHOWDIFF@";
+my $SHOW_SNPS = "$BIN_DIR/@SHOWSNPS@";
+my $SHOW_COORDS = "$BIN_DIR/@SHOWCOORDS@";
+my $NUCMER = "$BIN_DIR/@NUCMER@";
 
 my $SNPBuff         = 20;            # required buffer around "good" snps
 my $OPT_Prefix      = "out";         # prefix for all output files

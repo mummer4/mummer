@@ -4,12 +4,13 @@
 ACLOCAL_AMFLAGS = -I m4
 
 AM_CPPFLAGS = -Wall -I$(srcdir)/include
-AM_CXXFLAGS = -std=c++11 $(EXTRA_CXXFLAGS)
+AM_CXXFLAGS = -std=c++17 $(EXTRA_CXXFLAGS)
 AM_LDFLAGS = -lpthread
 
 # Pre-declare all used variables.
 bin_PROGRAMS =
 bin_SCRIPTS =
+pkglibexec_SCRIPTS =
 pkglibexec_PROGRAMS =
 noinst_SCRIPTS =
 noinst_HEADERS =
@@ -51,7 +52,8 @@ AM_DISTCHECK_CONFIGURE_FLAGS=--enable-perl-binding --enable-ruby-binding --enabl
 lib_LTLIBRARIES = libumdmummer.la
 LDADD = libumdmummer.la
 libumdmummer_la_SOURCES  = src/essaMEM/sparseSA.cpp src/essaMEM/sssort_compact.cc
-libumdmummer_la_SOURCES += src/tigr/mgaps.cc src/tigr/postnuc.cc src/tigr/sw_align.cc src/tigr/tigrinc.cc
+libumdmummer_la_SOURCES += src/tigr/mgaps.cc src/tigr/postnuc.cc	\
+                           src/tigr/sw_align.cc src/tigr/tigrinc.cc
 libumdmummer_la_SOURCES += src/umd/nucmer.cc
 
 library_includedir = $(includedir)/mummer-@PACKAGE_VERSION@
@@ -109,8 +111,9 @@ mummer_SOURCES = src/essaMEM/fasta.cpp src/essaMEM/mummer.cpp
 bin_PROGRAMS += show-coords show-aligns show-snps show-tiling	\
                 show-diff repeat-match annotate combineMUMs	\
                 delta-filter
-pkglibexec_PROGRAMS += mgaps postnuc prepro postpro
+pkglibexec_PROGRAMS += mgaps prenuc postnuc prepro postpro
 mgaps_SOURCES = src/tigr/mgaps_main.cc
+prenuc_SOURCES = src/tigr/prenuc.cc
 postnuc_SOURCES = src/tigr/postnuc_main.cc
 show_coords_SOURCES = src/tigr/show-coords.cc src/tigr/delta.cc
 show_aligns_SOURCES = src/tigr/show-aligns.cc src/tigr/delta.cc src/tigr/translate.cc
@@ -135,32 +138,71 @@ EXTRA_DIST += src/tigr/gaps.cc
 # what LIBTOOLS does.
 
 # List of scripts to install
-perl_scripts = mummerplot dnadiff promer delta2vcf
+perl_scripts = mummerplot dnadiff promer delta2vcf nucmer_ori
 shell_scripts = exact-tandems
 all_scripts = $(perl_scripts) $(shell_scripts)
+bin_scripts = mummerplot dnadiff promer exact-tandems
+libexec_scripts = nucmer_ori
 
 # Obsolete stuff
 EXTRA_DIST += scripts/run-mummer1.sh scripts/run-mummer3.sh	\
               scripts/mapview.pl scripts/nucmer2xfig.pl
 
-libs_scripts = $(patsubst %,.libs/%,$(all_scripts))
-bin_SCRIPTS += $(libs_scripts)
-noinst_SCRIPTS += $(all_scripts)
-EXTRA_DIST += $(patsubst %,scripts/%.pl,$(perl_scripts))
-EXTRA_DIST += $(patsubst %,scripts/%.sh,$(shell_scripts))
-CLEANFILES += $(libs_scripts) $(all_scripts)
+libs_scripts        = $(patsubst %,.libs/%,$(all_scripts))
+bin_SCRIPTS        += $(patsubst %,.libs/%,$(bin_scripts))
+pkglibexec_SCRIPTS += $(patsubst %,.libs/%,$(libexec_scripts))
+noinst_SCRIPTS     += $(all_scripts)
+EXTRA_DIST         += $(patsubst %,scripts/%.pl,$(perl_scripts))
+EXTRA_DIST         += $(patsubst %,scripts/%.sh,$(shell_scripts))
+CLEANFILES         += $(libs_scripts) $(all_scripts)
 
 # Rules to generate the scripts, in .libs and in build directory.
+mummername      = $(shell echo mummer | sed '$(transform)')
+nucmername      = $(shell echo nucmer | sed '$(transform)')
+mgapsname       = $(shell echo mgaps | sed '$(transform)')
+prenucname      = $(shell echo prenuc | sed '$(transform)')
+postnucname     = $(shell echo postnuc | sed '$(transform)')
+preproname      = $(shell echo prepro | sed '$(transform)')
+postproname     = $(shell echo postpro | sed '$(transform)')
+showcoordsname  = $(shell echo show-coords | sed '$(transform)')
+showdiffname    = $(shell echo show-diff | sed '$(transform)')
+showsnpsname    = $(shell echo show-snps | sed '$(transform)')
+deltafiltername = $(shell echo delta-filter | sed '$(transform)')
+repeatmatchname = $(shell echo repeat-match | sed '$(transform)')
+
+
 script_inst_subst  = sed -e 's,[@]PERL[@],$(PERL),g' \
-                       -e 's,[@]BIN_DIR[@],$(bindir),g' \
-                       -e 's,[@]LIB_DIR[@],$(script_libdir),g' \
-	               -e 's,[@]LIBEXEC_DIR[@],$(pkglibexecdir),g' \
-		       -e 's,[@]GNUPLOT_EXE[@],$(GNUPLOT),g'
+                         -e 's,[@]BIN_DIR[@],$(bindir),g' \
+                         -e 's,[@]LIB_DIR[@],$(script_libdir),g' \
+                         -e 's,[@]LIBEXEC_DIR[@],$(pkglibexecdir),g' \
+                         -e 's,[@]MUMMER[@],$(mummername),g' \
+                         -e 's,[@]MGAPS[@],$(mgapsname),g' \
+                         -e 's,[@]PRENUC[@],$(prenucname),g' \
+                         -e 's,[@]POSTNUC[@],$(postnucname),g' \
+                         -e 's,[@]PREPRO[@],$(preproname),g' \
+                         -e 's,[@]POSTPRO[@],$(postproname),g' \
+                         -e 's,[@]SHOWCOORDS[@],$(showcoordsname),g' \
+                         -e 's,[@]SHOWDIFF[@],$(showdiffname),g' \
+                         -e 's,[@]SHOWSNPS[@],$(showsnpsname),g' \
+                         -e 's,[@]NUCMER[@],$(nucmername),g' \
+                         -e 's,[@]DELTAFILTER[@],$(deltafiltername),g' \
+                         -e 's,[@]REPEATMATCH[@],$(repeatmatchname),g'
 script_local_subst = sed -e 's,[@]PERL[@],$(PERL),g' \
-                       -e 's,[@]BIN_DIR[@],$(abs_builddir),g' \
-                       -e 's,[@]LIB_DIR[@],$(abs_srcdir)/scripts,g' \
-	               -e 's,[@]LIBEXEC_DIR[@],$(abs_builddir),g' \
-                       -e 's,[@]GNUPLOT_EXE[@],$(GNUPLOT),g'
+                         -e 's,[@]BIN_DIR[@],$(abs_builddir),g' \
+                         -e 's,[@]LIB_DIR[@],$(abs_srcdir)/scripts,g' \
+                         -e 's,[@]LIBEXEC_DIR[@],$(abs_builddir),g' \
+                         -e 's,[@]MUMMER[@],mummer,g' \
+                         -e 's,[@]MGAPS[@],mgaps,g' \
+                         -e 's,[@]PRENUC[@],prenuc,g' \
+                         -e 's,[@]POSTNUC[@],postnuc,g' \
+                         -e 's,[@]PREPRO[@],prepro,g' \
+                         -e 's,[@]POSTPRO[@],postpro,g' \
+                         -e 's,[@]SHOWCOORDS[@],show-coords,g' \
+                         -e 's,[@]SHOWDIFF[@],show-diff,g' \
+                         -e 's,[@]SHOWSNPS[@],show-snps,g' \
+                         -e 's,[@]NUCMER[@],nucmer,g' \
+                         -e 's,[@]DELTAFILTER[@],delta-filter,g' \
+                         -e 's,[@]REPEATMATCH[@],repeat-match,g'
 
 .libs/%: scripts/%.pl
 	@mkdir -p $(dir $@) && $(script_inst_subst) < $< > $@
@@ -172,8 +214,8 @@ script_local_subst = sed -e 's,[@]PERL[@],$(PERL),g' \
 	$(AM_V_GEN)$(script_local_subst) < $< > $@ && chmod a+x $@
 
 # Supporting modules
-script_lib_SCRIPTS = scripts/Foundation.pm scripts/tandem-repeat.awk
-EXTRA_DIST += $(script_lib_SCRIPTS)
+script_lib_DATA = scripts/Foundation.pm scripts/tandem-repeat.awk
+EXTRA_DIST += $(script_lib_DATA)
 
 #######
 # umd #

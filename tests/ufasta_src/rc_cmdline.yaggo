@@ -1,0 +1,8 @@
+description "Reverse complement all reads in file"
+
+option("C", "canonical") {
+  description "Output canonical sequences"
+  off }
+arg("file") {
+  description "Input fasta file"
+  c_string; multiple }

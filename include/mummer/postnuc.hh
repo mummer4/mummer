@@ -126,12 +126,18 @@ struct error_description_type {
   // is equal to the number of matching and mismatching bases since the start or the
   // previous indel.
 };
-class error_iterator_type : public std::iterator<std::input_iterator_tag, error_description_type> {
+class error_iterator_type {
   const Alignment&       m_al;
   error_description_type m_error;
   const char*            m_ref_end;
   size_t                 m_k;   // index in delta
 public:
+  typedef error_description_type  value_type;
+  typedef std::ptrdiff_t          difference_type;
+  typedef value_type*             pointer;
+  typedef value_type&             reference;
+  typedef std::input_iterator_tag iterator_category;
+
   // Create an iterator at beginning of error. ref and qry pointer
   // points char before the start of sequence (i.e. as in 1-base
   // indexing).
@@ -412,6 +418,18 @@ void printSyntenys(const std::vector<Synteny<FastaRecord> > & Syntenys, const Fa
   }
 }
 
+inline char revChar(const char c) {
+  char res;
+  switch (c) {
+    case 'A': case 'a': res = 't'; break;
+    case 'T': case 't':  res = 'a'; break;
+    case 'C': case 'c':  res = 'g'; break;
+    case 'G': case 'g':  res = 'c'; break;
+    default:  res = 'n'; break;
+  }
+  return res;
+};
+
 template<typename FR1, typename FR2>
 void printSAMAlignments(const std::vector<Alignment>& Alignments,
                         const FR1& A, const FR2& B,
@@ -419,8 +437,8 @@ void printSAMAlignments(const std::vector<Alignment>& Alignments,
                         const long minLen) {
   const char* mapq = Alignments.size() > 1 ? "\t10\t" : "\t30\t";
   bool hard_clip = false;
-  for(const auto& Al : Alignments) {
-    if(std::abs(Al.eA - Al.sA) < minLen && std::abs(Al.eB - Al.sB) < minLen)
+  for (const auto& Al : Alignments) {
+    if (std::abs(Al.eA - Al.sA) < minLen && std::abs(Al.eB - Al.sB) < minLen)
       continue;
     const bool fwd = Al.dirB == FORWARD_CHAR;
     SAMFile << B.Id() << '\t'
@@ -429,15 +447,25 @@ void printSAMAlignments(const std::vector<Alignment>& Alignments,
             << mapq
             << createCIGAR(Al.delta, Al.sB, Al.eB, B.len(), hard_clip)
             << "\t*\t0\t0\t";
-    if(long_format) {
-      const auto start = hard_clip ? Al.sB : 1;
-      const auto len   = hard_clip ? Al.eB - start + 1 : B.len();
-      SAMFile.write(B.seq() + start, len);
+    if (long_format) {
+      if (fwd) {
+        const auto start = hard_clip ? Al.sB : 1;
+        const auto len = hard_clip ? Al.eB - start + 1 : B.len();
+        SAMFile.write(B.seq() + start, len);
+      } else {
+        const auto start = hard_clip ? revC(Al.sB, B.len()) : B.len();
+        const auto end = hard_clip ? revC(Al.eB, B.len()) : 1;
+        const auto len = start - end + 1;
+
+        const char* c = B.seq() + start;
+        for (auto i = len; i > 0; --i, --c)
+          SAMFile << revChar(*c);
+      }
     } else {
       SAMFile << '*';
     }
     SAMFile << "\t*\tNM:i:" << Al.Errors;
-    if(long_format)
+    if (long_format)
       SAMFile << "\tMD:Z:" << createMD(Al, A.seq(), B.seq(), B.len());
     SAMFile << '\n';
     hard_clip = true;

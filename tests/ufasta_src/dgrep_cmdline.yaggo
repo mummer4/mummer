@@ -1,0 +1,17 @@
+description "Match the data and output the header and matching lines"
+
+option("m", "--max-count") {
+  description "Stop reading after NUM matching headers"
+  uint64; typestr "NUM" }
+option("n", "--line-number") {
+  description " Prefix each line of output with the 1-based line number within its input file"
+  off }
+option("v", "--invert-match") {
+  description "Invert the sense of matching, to select non-matching headers"
+  off }
+arg("regexp") {
+  description "Regular expression to match the header"
+  c_string }
+arg("file") {
+  description "Fasta files"
+  c_string; multiple }

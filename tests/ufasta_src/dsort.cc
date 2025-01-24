@@ -37,7 +37,7 @@ int dsort_main(int argc, char *argv[]) {
         for(int i = 0; i < data.size; ++i)
           std::cout << data.lines[i] << '\n';
       }
-    } catch(std::ios::failure) {
+    } catch(std::ios::failure&) {
       std::cerr << "Error with file '" << file << '\'' << std::endl;
       res = EXIT_FAILURE;
     }

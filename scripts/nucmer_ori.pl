@@ -1,4 +1,4 @@
-#!__PERL_PATH
+#!@PERL@
 
 #-------------------------------------------------------------------------------
 #   Programmer: Adam M Phillippy, The Institute for Genomic Research
@@ -15,15 +15,21 @@
 #
 #-------------------------------------------------------------------------------
 
-use lib "__SCRIPT_DIR";
+use lib '@LIB_DIR@';
 use Foundation;
 use File::Spec::Functions;
 use strict;
 
-my $AUX_BIN_DIR = "__AUX_BIN_DIR";
-my $BIN_DIR = "__BIN_DIR";
-my $SCRIPT_DIR = "__SCRIPT_DIR";
+my $AUX_BIN_DIR = '@LIBEXEC_DIR@';
+my $BIN_DIR = '@BIN_DIR';
+my $LIB_DIR = '@LIB_DIR';
 
+#-- Set up the program path names
+my $algo_path = "$BIN_DIR/@MUMMER@";
+my $mgaps_path = "$AUX_BIN_DIR/@MGAPS@";
+my $prenuc_path = "$AUX_BIN_DIR/@PRENUC@";
+my $postnuc_path = "$AUX_BIN_DIR/@POSTNUC@";
+my $showcoords_path = "$BIN_DIR/@SHOWCOORDS@";
 
 my $VERSION_INFO = q~
 NUCmer (NUCleotide MUMmer) version 3.1
@@ -84,6 +90,8 @@ my $HELP_INFO = q~
     --[no]simplify  Simplify alignments by removing shadowed clusters. Turn
                     this option off if aligning a sequence to itself to look
                     for repeats (default --simplify)
+    --keep          Do not erase intermediary data (.mgaps, .ntref)
+    --anchors       Also save the anchors, i.e., output of mummer (.mums)
     -V
     --version       Display the version information and exit
     ~;
@@ -96,12 +104,12 @@ my $USAGE_INFO = q~
 
 my @DEPEND_INFO =
     (
-     "$BIN_DIR/mummer",
-     "$BIN_DIR/mgaps",
-     "$BIN_DIR/show-coords",
-     "$AUX_BIN_DIR/postnuc",
-     "$AUX_BIN_DIR/prenuc",
-     "$SCRIPT_DIR/Foundation.pm"
+     $algo_path,
+     $mgaps_path,
+     $showcoords_path,
+     $postnuc_path,
+     $prenuc_path,
+     "$LIB_DIR/Foundation.pm"
      );
 
 
@@ -150,6 +158,8 @@ sub main ( )
     my $delta = 1;        # if true, create the delta file
     my $optimize = 1;     # if true, optimize alignment scores
     my $simplify = 1;     # if true, simplify shadowed alignments
+    my $keep = 0;         # if true, do not erase intermediary data
+    my $anchors = 0;      # if true, save the output of mummer
 
     my $generate_coords;
 
@@ -169,25 +179,27 @@ sub main ( )
     #-- Get command line parameters
     $err[0] = $tigr->TIGR_GetOptions
 	(
-         "maxmatch" => \$maxmatch,
-	 "mumcand" => \$mumreference,
-         "mumreference" => \$mumreference,
-         "mum" => \$mum,
-	 "b|breaklen=i" => \$blen,
-         "banded!" => \$banded,
+         "maxmatch"       => \$maxmatch,
+	 "mumcand"        => \$mumreference,
+         "mumreference"   => \$mumreference,
+         "mum"            => \$mum,
+	 "b|breaklen=i"   => \$blen,
+         "banded!"        => \$banded,
 	 "c|mincluster=i" => \$clus,
-	 "delta!" => \$delta,
-         "D|diagdiff=i" => \$ddiff,
+	 "delta!"         => \$delta,
+         "D|diagdiff=i"   => \$ddiff,
 	 "d|diagfactor=f" => \$dfrac,
-	 "extend!" => \$extend,
-	 "f|forward"   => \$fwd,
-	 "g|maxgap=i" => \$gap,
-	 "l|minmatch=i" => \$size,
-	 "o|coords"   => \$generate_coords,
-	 "optimize!" => \$optimize,
-	 "p|prefix=s" => \$pfx,
-	 "r|reverse"   => \$rev,
-	 "simplify!" => \$simplify
+	 "extend!"        => \$extend,
+	 "f|forward"      => \$fwd,
+	 "g|maxgap=i"     => \$gap,
+	 "l|minmatch=i"   => \$size,
+	 "o|coords"       => \$generate_coords,
+	 "optimize!"      => \$optimize,
+	 "p|prefix=s"     => \$pfx,
+	 "r|reverse"      => \$rev,
+	 "simplify!"      => \$simplify,
+         "keep"           => \$keep,
+         "anchors"        => \$anchors
 	 );
 
 
@@ -243,13 +255,6 @@ sub main ( )
 	exit (1);
     }
 
-    #-- Set up the program path names
-    my $algo_path = "$BIN_DIR/mummer";
-    my $mgaps_path = "$BIN_DIR/mgaps";
-    my $prenuc_path = "$AUX_BIN_DIR/prenuc";
-    my $postnuc_path = "$AUX_BIN_DIR/postnuc";
-    my $showcoords_path = "$BIN_DIR/show-coords";
-		     
     #-- Check that the files needed are all there and readable/writable
     {
 	undef (@err);
@@ -333,9 +338,11 @@ sub main ( )
 
     #-- Run mummer | mgaps and assert return value is zero
     print (STDERR "2,3: RUNNING mummer AND CREATING CLUSTERS\n");
-    print("$algo_path $algo $mdir -l $size -n $pfx.ntref $qry_file |\n",
-          "| $mgaps_path -l $clus -s $gap -d $ddiff -f $dfrac > $pfx.mgaps\n");
-    open(ALGO_PIPE, "$algo_path $algo $mdir -l $size -n $pfx.ntref $qry_file |")
+#    print("$algo_path $algo $mdir -l $size -n $pfx.ntref $qry_file |\n",
+    #          "| $mgaps_path -l $clus -s $gap -d $ddiff -f $dfrac > $pfx.mgaps\n");
+    my $algo_cmd = "$algo_path $algo $mdir -l $size -n $pfx.ntref $qry_file |";
+    $algo_cmd .= " tee $pfx.mums |" if($anchors);
+    open(ALGO_PIPE, $algo_cmd)
 	or $tigr->bail ("ERROR: could not open $algo_path output pipe $!");
     open(CLUS_PIPE, "| $mgaps_path -l $clus -s $gap -d $ddiff -f $dfrac > $pfx.mgaps")
 	or $tigr->bail ("ERROR: could not open $mgaps_path input pipe $!");
@@ -380,11 +387,13 @@ sub main ( )
     }
 
     #-- Remove the temporary output
-#    $err[0] = unlink ("$pfx.ntref", "$pfx.mgaps");
+    if(!$keep) {
+      $err[0] = unlink ("$pfx.ntref", "$pfx.mgaps", "$pfx.mums");
 
-    if ( $err[0] != 2 ) {
+      if ( $err[0] != 2 ) {
 	$tigr->logError ("WARNING: there was a problem deleting".
 			 " the temporary output files", 1);
+      }
     }
 
     #-- Return success

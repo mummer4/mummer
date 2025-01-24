@@ -15,6 +15,7 @@
 //------------------------------------------------------------------------------
 
 #include <sys/ioctl.h>
+#include <sys/stat.h>
 
 #include <mummer/delta.hh>
 #include <mummer/tigrinc.hh>
@@ -48,8 +49,9 @@ static const char* const ANSI_UNDERLINE = "\033[4m";
 
 //-- Note: if coord exceeds LINE_PREFIX_LEN - 1 digits,
 //         increase these accordingly
-#define LINE_PREFIX_LEN 11
-#define PREFIX_FORMAT "%-10ld "
+#define LINE_BUFFER_LEN 32 // Must be long enough to accomodate a full long int
+#define LINE_PREFIX_LEN 12 // Should be enough for genomes up to 99 billion bases
+#define PREFIX_FORMAT "%-11ld "
 
 #define DEFAULT_SCREEN_WIDTH 60
 int Screen_Width = 0;
@@ -178,7 +180,7 @@ bool isSortByReference = false;          // -r option
 int DATA_TYPE = NUCMER_DATA;
 int MATRIX_TYPE = mummer::sw_align::BLOSUM62;
 
-char InputFileName [MAX_LINE];
+std::string InputFileName;
 // Today, only 1 ref and qry file supported in delta format. It may change one day!
 std::vector<std::string> RefFileNames, QryFileNames;
 
@@ -233,59 +235,59 @@ int main
     while ( !errflg  &&  ((ch = getopt
                            (argc, argv, "hqrw:x:m:c")) != EOF) )
       switch (ch)
-        {
-        case 'h' :
-	  printHelp (argv[0]);
-	  exit (EXIT_SUCCESS);
-          break;
+			{
+			case 'h' :
+				printHelp (argv[0]);
+				exit (EXIT_SUCCESS);
+				break;
 
-	case 'q' :
-	  isSortByQuery = true;
-	  break;
+			case 'q' :
+				isSortByQuery = true;
+				break;
 
-	case 'r' :
-	  isSortByReference = true;
-	  break;
+			case 'r' :
+				isSortByReference = true;
+				break;
 
-	case 'w' :
-	  Screen_Width = atoi (optarg);
-	  if ( Screen_Width <= LINE_PREFIX_LEN )
-	    {
-	      fprintf(stderr,
-		      "WARNING: invalid screen width %d, using default\n",
-		      Screen_Width);
-	      Screen_Width = DEFAULT_SCREEN_WIDTH;
-	    }
-	  break;
+			case 'w' :
+				Screen_Width = atoi (optarg);
+				if ( Screen_Width <= LINE_PREFIX_LEN )
+				{
+					fprintf(stderr,
+									"WARNING: invalid screen width %d, using default\n",
+									Screen_Width);
+					Screen_Width = DEFAULT_SCREEN_WIDTH;
+				}
+				break;
 
-        case 'm':
-          Marker_Width = atoi(optarg);
-          break;
+			case 'm':
+				Marker_Width = atoi(optarg);
+				break;
 
-	case 'x' :
-	  MATRIX_TYPE = atoi (optarg);
-	  if ( MATRIX_TYPE < 1 || MATRIX_TYPE > 3 )
-	    {
-	      fprintf(stderr,
-		      "WARNING: invalid matrix type %d, using default\n",
-		      MATRIX_TYPE);
-	      MATRIX_TYPE = mummer::sw_align::BLOSUM62;
-	    }
-	  break;
+			case 'x' :
+				MATRIX_TYPE = atoi (optarg);
+				if ( MATRIX_TYPE < 1 || MATRIX_TYPE > 3 )
+				{
+					fprintf(stderr,
+									"WARNING: invalid matrix type %d, using default\n",
+									MATRIX_TYPE);
+					MATRIX_TYPE = mummer::sw_align::BLOSUM62;
+				}
+				break;
 
-        case 'c' :
-          Colorize = true;
-          break;
+			case 'c' :
+				Colorize = true;
+				break;
 
-        default :
-          errflg ++;
-        }
+			default :
+				errflg ++;
+			}
 
     if ( errflg > 0  ||  argc - optind != 3 )
-      {
-        printUsage (argv[0]);
-        exit (EXIT_FAILURE);
-      }
+		{
+			printUsage (argv[0]);
+			exit (EXIT_FAILURE);
+		}
 
     if ( isSortByQuery  &&  isSortByReference )
       fprintf (stderr,
@@ -294,7 +296,7 @@ int main
       Screen_Width = get_screen_width();
   }
 
-  strcpy (InputFileName, argv[optind ++]);
+  InputFileName = argv[optind ++];
   IdR = argv[optind++];
   IdQ = argv[optind++];
 
@@ -368,11 +370,21 @@ void parseDelta
   bool found = false;
 
   DeltaReader_t dr;
-  dr.open (InputFileName);
+  dr.open (InputFileName.c_str());
   DATA_TYPE = dr.getDataType( ) == NUCMER_STRING ?
     NUCMER_DATA : PROMER_DATA;
+
+	struct stat sb;
   RefFileNames.push_back(dr.getReferencePath());
+	if(stat(RefFileNames.back().c_str(), &sb) == -1 || !(sb.st_mode & S_IFREG)) {
+		fprintf(stderr, "WARNING: the reference file '%s' is not a regular file, process may hang for input\n",
+						RefFileNames.back().c_str());
+	}
   QryFileNames.push_back(dr.getQueryPath());
+	if(stat(QryFileNames.back().c_str(), &sb) == -1 || !(sb.st_mode & S_IFREG)) {
+		fprintf(stderr, "WARNING: the query file '%s' is not a regular file, process may hang for input\n",
+						QryFileNames.back().c_str());
+	}
 
   while ( dr.readNext( ) )
     {
@@ -428,7 +440,7 @@ void printAlignments
 
   int Sign;
   long int Delta;
-  long int Total, Remain;
+  long int Remain;
   // long int Errors;
   long int Pos;
   char c; // Character to add to Buff3
@@ -529,7 +541,6 @@ void printAlignments
       Bpos = sQ;
 
       //      Errors = 0;
-      Total = 0;
       Remain = eR - sR + 1;
 
       add_prefix(Buff1, Apos, SeqLenR, frameR);
@@ -597,7 +608,6 @@ void printAlignments
 	      else
 		c = PROMER_MISMATCH_CHAR;
               append(Buff1, Buff2, Buff3, '.', B[Bi][Bpos++], c);
-	      Total ++;
               ++Pos;
 	    }
 	}
@@ -685,7 +695,7 @@ void append(ColoredBuffer& Buff1, ColoredBuffer& Buff2, std::string &Buff3,
 }
 
 void add_prefix(ColoredBuffer& Buff, long int pos, long int seqlen, int frame) {
-  char b[LINE_PREFIX_LEN + 1];
+  char b[LINE_BUFFER_LEN + 1];
   sprintf(b, PREFIX_FORMAT, toFwd(pos, seqlen, frame));
   Buff.clear();
   Buff += b;
@@ -794,7 +804,7 @@ long int revC
 bool find_sequence(const std::vector<string>& paths, const std::string& Id, std::string& seq)
 {
   //-- Find, and read in sequences. Return if find one with name Id, and store it in seq.
-  stream_manager streams(paths.cbegin(), paths.cend());
+	stream_manager streams(paths.cbegin(), paths.cend());
   sequence_parser parser(16, 10, 1, streams);
   bool found = false;
   while(!found) {

@@ -1,0 +1,24 @@
+FROM almalinux:8.10 AS builder
+
+RUN dnf install -y autoconf automake libtool gcc gcc-c++ make rubygems && \
+    gem install yaggo
+
+WORKDIR /usr/src
+
+COPY . .
+
+RUN autoreconf -fi \
+  && ./configure \
+  && make -j`nproc` \
+  && make install DESTDIR=$(pwd)/inst
+
+# optionally run tests
+#RUN make check || cat ./test-suite.log && exit 1
+
+FROM almalinux:8.10
+
+RUN dnf install -y gnuplot libgomp perl && \
+    dnf clean all
+
+COPY --from=builder /usr/src/inst /
+RUN ldconfig

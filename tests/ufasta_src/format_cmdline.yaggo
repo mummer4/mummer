@@ -1,0 +1,21 @@
+description "Format fasta files"
+
+option("l", "line-length") {
+  description "Wrap length to L characters"
+  typestr "L"
+  uint32; default 70 }
+option("L", "lower-case") {
+  description "Change all bases to lower case"
+  off }
+option("U", "upper-case") {
+  description "Change all bases to upper case"
+  off; conflict "lower-case" }
+option("s", "spaces") {
+  description "Remove white spaces"
+  off }
+option("H", "header") {
+  description "Shorten header to first word after >"
+  off }
+arg("file") {
+  description "Input fasta file"
+  c_string; multiple }
