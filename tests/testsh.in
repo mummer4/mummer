@@ -11,6 +11,8 @@ export LC_ALL=C
 
 BUILD=@BUILDDIR@
 SRC=@SRCDIR@
+SAMTOOLS=@SAMTOOLS@
+
 SCRIPT=$1
 
 # Path to data

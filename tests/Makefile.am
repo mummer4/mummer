@@ -9,7 +9,8 @@ CLEANFILES += $(check_SCRIPTS)
 # proper environment
 %D%/testsh: %D%/testsh.in
 	$(AM_V_GEN)sed -e 's,[@]BUILDDIR[@],$(abs_builddir),g' \
-	               -e 's,[@]SRCDIR[@],$(abs_srcdir),g' $< > $@
+	               -e 's,[@]SRCDIR[@],$(abs_srcdir),g' \
+	               -e 's,[@]SAMTOOLS[@],$(SAMTOOLS),g' $< > $@
 	@chmod a+x $@
 EXTRA_DIST += %D%/testsh.in
 

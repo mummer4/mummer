@@ -210,6 +210,11 @@ struct sequence_info {
   sequence_info& operator=(const sequence_info& rhs) = delete;
   // Return the FastaRecordPtr corresponding to the sequence containing position pos
   FastaRecordPtr find(size_t pos) const;
+
+  size_t size() const { return records.size() - 1; }
+  const char* seq(size_t i) const { return sequence.data() + records[i].seq; }
+  size_t seq_size(size_t i) const { return records[i+1].seq - records[i].seq - 1; }
+  const char*  header(size_t i) const { return headers.data() + records[i].header; }
 };
 
 class FastaRecordPtr {
@@ -283,6 +288,7 @@ public:
   { }
 
   const mummer::sparseSA& sa() const { return m_sa; }
+  const sequence_info& reference_info() const { return m_reference_info; }
 
   // TODO: remove code duplication with thread_align_file
   // Align the sequence query against the references

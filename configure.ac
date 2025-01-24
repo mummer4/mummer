@@ -28,8 +28,12 @@ AS_IF([test "x$enable_openmp" != "xno"],
       [EXTRA_CXXFLAGS="$EXTRA_CXXFLAGS -Wno-unknown-pragmas"])
 
 # Check for yaggo
-AC_ARG_VAR([YAGGO], [Yaggo switch parser generator])
+AC_ARG_VAR([YAGGO], [Path to the yaggo switch parser generator])
 AS_IF([test "x$YAGGO" = "x"], [AC_PATH_PROG([YAGGO], [yaggo], [false])])
+
+# Check for samtools. Only used for testing if available
+AC_ARG_VAR([SAMTOOLS], [Path to sammtools (for testing only, optional)])
+AS_IF([test "x$SAMTOOLS" = "x"], [AC_PATH_PROG([SAMTOOLS], [samtools])])
 
 # Check that type __int128 is supported and if the
 AC_ARG_WITH([int128],
