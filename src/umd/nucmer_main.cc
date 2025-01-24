@@ -136,7 +136,7 @@ int main(int argc, char *argv[]) {
         for(size_t i = 0; i < info.size(); ++i)
           os << "@SQ\tSN:" << info.header(i) << "\tLN:" << info.seq_size(i) << '\n';
       }
-      os << "@PG\tID:nucmer\tPN:nucmer\tVN:4.0\tCL:\"" << cmdline << "\"\n";
+      os << "@PG\tID:nucmer\tPN:nucmer\tVN:" << PACKAGE_VERSION << "\tCL:\"" << cmdline << "\"\n";
       if(!os.good())
         nucmer_cmdline::error() << "Error while writing the SAM header";
     }

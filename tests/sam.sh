@@ -3,7 +3,7 @@ nucmer --maxmatch --sam-long sam_test_long1.sam --save sam_test_index \
 nucmer --maxmatch --sam-long sam_test_long2.sam --load sam_test_index \
     $D/seed_reads_1.fa $D/seed_reads_0.fa
 
-pgline="$(printf "@PG\tID:nucmer\tPN:nucmer\tVN:4.0\tCL:")"
+pgline="$(printf "@PG\tID:nucmer\tPN:nucmer\tVN:%s\tCL:" "$VERSION")"
 pglen=$(echo -n "$pgline" | wc -c)
 for i in 1 2; do
     f=sam_test_long${i}.sam
