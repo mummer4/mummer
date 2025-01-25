@@ -1,6 +1,6 @@
 Master | Develop
 -------|--------
-[![Build Status](https://travis-ci.org/mummer4/mummer.svg?branch=master)](https://travis-ci.org/mummer4/mummer) | [![Build Status](https://travis-ci.org/mummer4/mummer.svg?branch=develop)](https://travis-ci.org/mummer4/mummer)
+![Build Status](https://github.com/mummer4/mummer/actions/workflows/c-cpp.yml/badge.svg?branch=master) | ![Build Status](https://github.com/mummer4/mummer/actions/workflows/c-cpp.yml/badge.svg?branch=develop)
 
 # MUMmer4.x README
 

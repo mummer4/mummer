@@ -7,7 +7,7 @@ WORKDIR /usr/src
 
 COPY . .
 
-RUN autoreconf -fi \
+RUN pwd && ls && autoreconf -fi \
   && ./configure \
   && make -j`nproc` \
   && make install DESTDIR=$(pwd)/inst

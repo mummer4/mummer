@@ -81,7 +81,7 @@ make uninstall
 To build a Docker container image containing mummer and all dependencies, [install Docker](https://docs.docker.com/get-docker/) for Windows, Mac, or Linux; clone the mummer git repo; and issue the following command in the top-level directory of the mummer git working tree:
 
 ```Shell
-docker build -t mummer .
+docker build -t mummer -f Dockerfiles/Dockerfile-debian .
 ```
 
 To execute individual mummer commands (e.g., `nucmer`) within a container:
@@ -101,13 +101,13 @@ docker run -it --rm -v $PWD:/mnt -w /mnt mummer
 To build an Apptainer container, from the git tree run:
 
 ```Shell
-apptainer build mummer.sif mummer.def
+apptainer build mummer.sif Apptainerfiles/mummer-alpine.def # or Apptainerfiles/mummer-debian.def
 ```
 
 To build another branch than HEAD (for example `develop`), run:
 
 ```Shell
-apptainer build --build-arg treeish=develop mummer.sif mummer.def
+apptainer build --build-arg treeish=develop mummer.sif Apptainerfiles/mummer-alpine.def
 ```
 
 To execute individual MUMmer commands (e.g., `nucmer`):
