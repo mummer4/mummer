@@ -1,6 +1,6 @@
 Master | Develop
 -------|--------
-[![Build Status](https://github.com/mummer4/mummer/actions/workflows/c-cpp.yml/badge.svg?branch=master)] | [![Build Status](https://github.com/mummer4/mummer/actions/workflows/c-cpp.yml/badge.svg?branch=develop)]
+![Build Status](https://github.com/mummer4/mummer/actions/workflows/c-cpp.yml/badge.svg?branch=master) | ![Build Status](https://github.com/mummer4/mummer/actions/workflows/c-cpp.yml/badge.svg?branch=develop)
 
 # MUMmer4.x README
 
