@@ -1,0 +1,54 @@
+Bootstrap: docker
+From: alpine
+Stage: builder
+
+%arguments
+  # Branch to build
+  treeish=HEAD
+
+%setup
+    # Copy code
+    mkdir -p ${APPTAINER_ROOTFS}/usr/src
+    git archive {{ treeish  }} | tar -x -C ${APPTAINER_ROOTFS}/usr/src
+
+%post
+    # System package installation
+    apk update
+    apk add autoconf automake libtool g++ make ruby
+    gem install yaggo
+
+    # Buil and install
+    cd /usr/src
+    autoreconf -fi
+    ./configure
+    make -j`nproc`
+    make install DESTDIR=$(pwd)/inst
+
+Bootstrap: docker
+From: alpine
+Stage: final
+
+%help
+MUMmer package. The available commands are:
+nucmer          DNA aligner
+promer          Protein aligner
+mummer          Find MUMs
+show-coords     Display coordinates of alignments from a delta file
+show-diff       Display structural difference from a delta file
+show-tiling     Display locate of aligned query contig
+show-aligns     Display all the alignments from a delta file
+delta-filter    Filter a delta file
+dnadiff         Comparative analysis using nucmer
+
+%files from builder
+       /usr/src/inst/* /
+
+%environment
+    export LC_ALL=C
+
+%post
+    apk add --no-cache libstdc++ libgomp perl
+
+%test
+    set -e
+    echo -n "nucmer: "; nucmer --help > /dev/null && echo "Good"

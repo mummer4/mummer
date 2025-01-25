@@ -1,5 +1,5 @@
 Bootstrap: docker
-From: debian:12.5-slim
+From: debian:12-slim
 Stage: builder
 
 %arguments
@@ -25,19 +25,32 @@ Stage: builder
     make install DESTDIR=$(pwd)/inst
 
 Bootstrap: docker
-From: debian:12.5-slim
+From: debian:12-slim
 Stage: final
 
 %help
+MUMmer package. The available commands are:
+nucmer          DNA aligner
+promer          Protein aligner
+mummer          Find MUMs
+show-coords     Display coordinates of alignments from a delta file
+show-diff       Display structural difference from a delta file
+show-tiling     Display locate of aligned query contig
+show-aligns     Display all the alignments from a delta file
+delta-filter    Filter a delta file
+dnadiff         Comparative analysis using nucmer
 
 %files from builder
        /usr/src/inst/* /
+
+%environment
+    export LC_ALL=C
 
 %post
     ldconfig
     apt update
     apt install  -y --no-install-recommends \
-      gnuplot libgomp1 perl
+      libgomp1 perl
     apt-get clean
 
 %test
