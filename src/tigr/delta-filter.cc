@@ -33,7 +33,10 @@ bool           OPT_RLIS         = false;     // do reference based LIS
 bool           OPT_GLIS         = false;     // do global LIS
 bool           OPT_1to1         = false;     // do 1-to-1 alignment
 bool           OPT_MtoM         = false;     // do M-to-M alignment
+bool           OPT_PrintHeader  = true;      // print output header
+string         OPT_PrintIdentity = "identity.idy";           // path to print %identity
 long int       OPT_MinLength    = 0;         // minimum alignment length
+long int       OPT_MinSeqLength    = 0;         // minimum sequence length
 float          OPT_MinIdentity  = 0.0;       // minimum %identity
 float          OPT_MinUnique    = 0.0;       // minimum %unique
 float          OPT_MaxOverlap   = 100.0;     // maximum olap as % of align len
@@ -67,7 +70,7 @@ int main(int argc, char ** argv)
   // Optimization: if only filtering by identity or length, stream
   // through, do not create graph.
   const bool stream = !(OPT_MinUnique > 0) && !OPT_QLIS && !OPT_RLIS && !OPT_GLIS && !OPT_MtoM && !OPT_1to1;
-  const bool noop = stream && !(OPT_MinIdentity > 0) && !(OPT_MinLength);
+  const bool noop = stream && !(OPT_MinIdentity > 0) && !(OPT_MinLength) && !(OPT_MinSeqLength);
   if(stream) {
     std::ifstream is(OPT_AlignName);
     if(!is.good()) {
@@ -87,8 +90,8 @@ int main(int argc, char ** argv)
   graph.build(OPT_AlignName, true);
 
   //-- Identity requirements
-  if ( OPT_MinIdentity > 0  ||  OPT_MinLength > 0 )
-    graph.flagScore(OPT_MinLength, OPT_MinIdentity);
+  if ( OPT_MinIdentity > 0  ||  OPT_MinLength > 0  || OPT_MinSeqLength > 0)
+    graph.flagScore(OPT_MinLength, OPT_MinIdentity, OPT_MinSeqLength);
 
   //-- Uniqueness requirements
   if ( OPT_MinUnique > 0 )
@@ -115,7 +118,11 @@ int main(int argc, char ** argv)
     graph.flag1to1(OPT_Epsilon, OPT_MaxOverlap);
 
   //-- Output the filtered delta file
-  graph.outputDelta(cout);
+  graph.outputDelta(cout, OPT_PrintHeader);
+
+  std::ofstream outfile(OPT_PrintIdentity);
+  graph.outputIdy(outfile);
+  outfile.close();
 
   return EXIT_SUCCESS;
 }
@@ -130,7 +137,7 @@ void ParseArgs(int argc, char ** argv)
   optarg = NULL;
   
   while ( !errflg  &&
-         ((ch = getopt(argc, argv, "e:ghi:l:o:qru:m1")) != EOF) )
+         ((ch = getopt(argc, argv, "e:ghHi:I:L:l:o:qru:m1")) != EOF) )
     switch (ch)
       {
       case 'e':
@@ -146,17 +153,29 @@ void ParseArgs(int argc, char ** argv)
         exit(EXIT_SUCCESS);
         break;
 
+      case 'H':
+        OPT_PrintHeader = false;
+        break;
+
       case 'i':
         OPT_MinIdentity = atof(optarg);
+        break;
+
+      case 'I':
+        OPT_PrintIdentity = optarg;
         break;
 
       case 'l':
         OPT_MinLength = atol(optarg);
         break;
 
+      case 'L':
+        OPT_MinSeqLength = atol(optarg);
+        break;
+
       case 'o':
-	OPT_MaxOverlap = atof(optarg);
-	break;
+	      OPT_MaxOverlap = atof(optarg);
+	      break;
 
       case 'q':
         OPT_QLIS = true;
@@ -228,10 +247,15 @@ void PrintHelp(const char * s)
     << "              (intersection of -r and -q alignments)\n"
     << "-g            1-to-1 global alignment not allowing rearrangements\n"
     << "-h            Display help information\n"
+    << "-H            Do not print the output header\n"
     << "-i float      Set the minimum alignment identity [0, 100], default "
     << OPT_MinIdentity << endl
+    << "-I string     Print identity value, default "
+    << OPT_PrintIdentity << endl
     << "-l int        Set the minimum alignment length, default "
     << OPT_MinLength << endl
+    << "-L int        Set the minimum length, default "
+    << OPT_MinSeqLength << endl
     << "-m            Many-to-many alignment allowing for rearrangements\n"
     << "              (union of -r and -q alignments)\n"
     << "-q            Maps each position of each query to its best hit in\n"
@@ -282,14 +306,14 @@ int FilterDelta(std::istream& is, float min_len, float min_idy) {
   std::string line;
   // Print header unmodified
   std::getline(is, line);
-  std::cout << line << '\n';
+  if (OPT_PrintHeader) std::cout << line << '\n';
   std::getline(is, line);
   const bool promer = line == PROMER_STRING;
   if(!promer && line != NUCMER_STRING) {
     std::cerr << "Unsupported format '" << line << "'\n";
     return EXIT_FAILURE;
   }
-  std::cout << line << '\n';
+  if (OPT_PrintHeader) std::cout << line << '\n';
 
   int c = is.peek();
   if(c != '>') {
@@ -300,21 +324,26 @@ int FilterDelta(std::istream& is, float min_len, float min_idy) {
   DeltaRecord_t record;
   DeltaAlignment_t alignment;
 
+  std::ofstream outfile(OPT_PrintIdentity); // Open the output file
   while(c != EOF) {
     is >> record;
     bool first = true;
     for(c = is.peek(); c != '>' && c != EOF; c = is.peek()) {
       alignment.read(is, promer, true);
+      
+      if (record.lenQ < OPT_MinSeqLength) continue;
       if(alignment.idy < min_idy ||
          std::abs(alignment.eR - alignment.sR) + 1 < min_len ||
          std::abs(alignment.eQ - alignment.sQ) + 1 < min_len)
         continue;
       if(first) {
         std::cout << record << '\n';
+        outfile << record << " " << alignment.idy << '\n';
         first = false;
       }
       std::cout << alignment;
     }
   }
+  outfile.close();
   return EXIT_SUCCESS;
 }
