@@ -2,49 +2,64 @@ name: C/C++ CI
 
 on:
   push:
-    branches: [ master, develop, 'release/**' ]
+    branches: [master, develop, "release/**", "feature/**"]
   pull_request:
-    branches: [ master, develop  ]
+    branches: [master, develop]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - name: dependencies
-      run: |
-        sudo apt-get update
-        sudo DEBIAN_FRONTEND=noninteractive apt-get install -y yaggo gettext swig python3-dev ruby-dev libperl-dev
-    - name: autotools
-      run: autoreconf -fi
-    - name: configure
-      run: ./configure --enable-all-binding --enable-swig
+      - uses: actions/checkout@v3
+      - name: dependencies
+        run: |
+          sudo apt-get update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y yaggo gettext swig python3-dev ruby-dev libperl-dev
+      - name: autotools
+        run: autoreconf -fi
+      - name: configure
+        run: ./configure --enable-all-binding --enable-swig
 
-    - name: make
-      run: make -j$(nproc)
+      - name: make
+        run: make -j$(nproc)
 
-    - name: make check
-      run: make -j$(nproc) check
-    - name: Check logs
-      if: failure()
-      uses: actions/upload-artifact@v4
-      with:
-        name: checklog
-        path: "**/*tests/*.log"
+      - name: make check
+        run: make -j$(nproc) check
+      - name: Check logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: checklog
+          path: "**/*tests/*.log"
 
-    - name: make distcheck
-      run: make -j$(nproc) distcheck
-    - name: Distcheck logs
-      if: failure()
-      uses: actions/upload-artifact@v4
-      with:
-        name: distchecklog
-        path: |
-          **/*tests/*.log
-          **/*tests/**/tee.*
+      - name: make distcheck
+        run: make -j$(nproc) distcheck
+      - name: Distcheck logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: distchecklog
+          path: |
+            **/*tests/*.log
+            **/*tests/**/tee.*
 
-    - name: Distribution tar ball
-      uses: actions/upload-artifact@v4
-      with:
-        name: disttarball
-        path: "mummer-*.tar.gz"
+      - name: Distribution tar ball
+        uses: actions/upload-artifact@v4
+        with:
+          name: disttarball
+          path: "mummer-*.tar.gz"
+
+  testbsd:
+    runs-on: ubuntu-latest
+    name: Compile on FreeBSD
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test in FreeBSD
+        id: test
+        uses: vmactions/freebsd-vm@v1
+        with:
+          usesh: true
+          prepare: |
+            pkg install -y gmake yaggo autoconf automake libtool
+          run: |
+            autoreconf -fi && ./configure MAKE=gmake && gmake check
