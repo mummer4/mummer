@@ -6,13 +6,12 @@
 
 typedef std::map<std::string, std::string> name_seq_map;
 
-name_seq_map read_fasta(const char* path) {
+name_seq_map read_fasta(std::istream& is) {
   name_seq_map res;
-  std::ifstream is(path);
 
   int c = is.peek();
   if(c != '>')
-    check_cigar_cmdline::error() << "Invalid fasta file '" << path << '\'';
+    check_cigar_cmdline::error() << "Invalid fasta file";
   std::string line;
   while(c != EOF) {
     std::getline(is, line);
@@ -25,6 +24,48 @@ name_seq_map read_fasta(const char* path) {
 
   return res;
 }
+
+name_seq_map read_fasta(const char* path) {
+  std::ifstream is(path);
+  return read_fasta(is);
+}
+
+name_seq_map read_fastq(std::istream& is) {
+  name_seq_map res;
+
+  std::string line;
+  int c = is.peek();
+  while(c != EOF) {
+      std::getline(is, line);
+      if(c != '@')
+        check_cigar_cmdline::error() << "Invalid fastq file: " << line;
+      std::string& seq = res[line.substr(1, line.find_first_of(" \t", 1) - 1)];
+      for(c = is.peek(); c != EOF && c != '+'; c = is.peek()) {
+        std::getline(is, line);
+        seq += line;
+      }
+      if(c == '+') {
+          std::getline(is, line);
+          std::getline(is, line);
+          c = is.peek();
+      }
+  }
+
+  return res;
+}
+
+name_seq_map read_seq(const char* path) {
+  std::ifstream is(path);
+  switch(is.peek()) {
+    case '>': return read_fasta(is);
+    case '@': return read_fastq(is);
+    default:
+      check_cigar_cmdline::error() << "Invalid sequence file '" << path << '\'';
+  }
+  // should never get there
+  exit(1);
+}
+
 
 char comp(char c) {
   switch(c) {
@@ -97,7 +138,7 @@ long find_nm(const std::vector<std::string>& fields) {
 int main(int argc, char *argv[]) {
   check_cigar_cmdline args(argc, argv);
   auto ref_map = read_fasta(args.ref_arg);
-  auto qry_map = read_fasta(args.qry_arg);
+  auto qry_map = read_seq(args.qry_arg);
 
   std::ifstream is(args.sam_arg);
   if(!is.good())

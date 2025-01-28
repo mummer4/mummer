@@ -60,6 +60,6 @@ jobs:
         with:
           usesh: true
           prepare: |
-            pkg install -y gmake yaggo autoconf automake libtool
+            pkg install -y gmake yaggo autoconf automake libtool bash
           run: |
             autoreconf -fi && ./configure MAKE=gmake && gmake check
