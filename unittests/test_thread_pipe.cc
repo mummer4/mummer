@@ -29,7 +29,7 @@ namespace {
     }
 
     TEST(ThreadPipe, MultipleProducers) {
-        static const char* file = "unittests/multipleproducers";
+        static const char* file = "multipleproducers";
         static const int nb_threads = 4;
 
         { // Write content to file
