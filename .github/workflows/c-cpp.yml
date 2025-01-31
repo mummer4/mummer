@@ -63,3 +63,26 @@ jobs:
             pkg install -y gmake yaggo autoconf automake libtool bash
           run: |
             autoreconf -fi && ./configure MAKE=gmake && gmake check
+
+  testmacos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: dependencies
+        run: |
+          brew install autoconf automake libtool md5sha1sum
+          gem install yaggo
+      - name: autotools
+        run: autoreconf -fi
+      - name: configure
+        run: ./configure
+      - name: make
+        run: make -j$(sysctl -n hw.ncpu)
+      - name: make check
+        run: make -j$(sysctl -n hw.ncpu) check
+      - name: Check logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: checklog
+          path: "**/*tests/*.log"
