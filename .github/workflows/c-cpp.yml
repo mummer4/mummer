@@ -60,9 +60,11 @@ jobs:
         with:
           usesh: true
           prepare: |
-            pkg install -y gmake yaggo autoconf automake libtool bash
+            pkg install -y gmake yaggo autoconf automake libtool bash gcc14
           run: |
-            autoreconf -fi && ./configure MAKE=gmake && gmake check
+            autoreconf -fi && \
+            ./configure MAKE=gmake CC=gcc14 CXX=g++14 LDFLAGS=-Wl,-rpath=/usr/local/lib/gcc14 && \
+            gmake -j $(sysctl -n hw.ncpu) check
 
   testmacos:
     runs-on: macos-latest
@@ -75,7 +77,7 @@ jobs:
       - name: autotools
         run: autoreconf -fi
       - name: configure
-        run: ./configure
+        run: ./configure CC=gcc-14 CXX=g++-14
       - name: make
         run: make -j$(sysctl -n hw.ncpu)
       - name: make check

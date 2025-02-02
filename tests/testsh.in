@@ -18,7 +18,8 @@ SCRIPT=$1
 
 # Path to data
 D=$BUILD/tests/data
-PATH=$BUILD:$BUILD/tests:$SRC/tests:$PATH
+PATH=${BUILD}:${BUILD}/tests:${SRC}/tests:$PATH
+
 # Name
 N=$(basename $1 .sh)
 # Working directory

@@ -1,46 +1,89 @@
-# MUMmer4 INSTALLATION README
+# MUMmer4 Compilation README
 
 ## Dependencies
 
-If compiling from a [release source tarball](../../releases) you need a
-recent version of the GCC compiler (g++ version >= 4.7) and other
-essential tools for compilation (GNU make, ar, etc. Install
-`build-essentials` on Debian or Ubuntu derivatives).  Additional
-requirements are needed to compile the SWIG script bindings. See the
-[SWIG installation guide](swig/INSTALL.md).
+If compiling from a [release source tarball](../../releases) (recommended), you need a recent version of the GCC compiler (see below, only GCC is supported) and other essential tools for compilation (GNU make, ar, etc).
+Additional requirements are needed to compile the SWIG script bindings.
+See the [SWIG installation guide](swig/INSTALL.md).
 
-If compiling from the github development tree, additionally you need autotools (autoconf, automake and libtools),
-[yaggo](https://github.com/gmarcais/yaggo/releases).
-You should compile from a [release source tarball](../../releases), unless you plan on modifying the code of MUMmer.
+If compiling from the github development tree, additionally you need autotools (autoconf, automake and libtools), [yaggo](https://github.com/gmarcais/yaggo/releases).
 
-On Ubuntu:
+### On Ubuntu
 
+From the tarball:
 ```Shell
-sudo apt install git build-essential yaggo autoconf automake libtool gettext
+sudo apt install build-essential
 # For the bindings to scripting, additionally install
 sudo apt install swig python3-dev ruby-dev libperl-dev
 ```
 
-## Compilation & Installation
+From the git tree:
+```Shell
+sudo apt instaoo build-essential git yaggo autoconf automake libtool gettext
+# For the bindings to scripting, additionally install
+sudo apt install swig python3-dev ruby-dev libperl-dev
+```
 
-To compile and install from a [release source tarball](../../releases):
+### On Mac OS
+
+MUMmer must be compiled with GCC, not Clang (and not the Apple provided `gcc` which is really `clang`).
+Install with Brew:
 
 ```Shell
+brew install autoconf automake libtool md5sha1sum
+gem install yaggo
+```
+
+### On FreeBSD
+
+MUMmer must be compiled with GCC, not Clang.
+Install with Brew:
+
+```Shell
+brew install autoconf automake libtool md5sha1sum bash
+gem install yaggo
+```
+
+
+## Compilation & Installation
+
+If compiling from the release tarball (recommended), then the first command `autoreconf -fi` is not necessary.
+
+### On Ubuntu
+
+```Shell
+autoreconf -fi # Optional, on if compiling from git tree
 ./configure --prefix=/path/to/installation
 make
+make check # Optional
 make install
 ```
 
-If `--prefix` is omitted, the software is installed in
-`/usr/local`. One may need `sudo make install` if installing in a
-system location.
+If `--prefix` is omitted, the software is installed in `/usr/local`.
+One may need `sudo make install` if installing in a system location.
 
-To compile from the github tree, `autoreconf` must additionally be run:
+### On MacOS
+
+Compile with `gcc-14`.
+
 ```Shell
-autoreconf -fi
-./configure --prefix=/path/to/installation
+autoreconf -fi # Optional, on if compiling from git tree
+./configure --prefix=/path/to/installation CC=gcc-14 CXX=g++-14
 make
+make check # Optional
 make install
+```
+
+### On FreeBSD
+
+Compile with `gcc14`.
+
+```Shell
+autoreconf -fi # Optional, on if compiling from git tree
+./configure --prefix=/path/to/installation MAKE=gmake CC=gcc14 CXX=g++14 LDFLAGS=-Wl,-rpath=/usr/local/lib/gcc14
+gmake
+gmake check # Optional
+gmake install
 ```
 
 ## SOFTWARE REQUIREMENTS
