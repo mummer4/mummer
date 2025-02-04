@@ -28,7 +28,6 @@ TEST(SequenceParser, Fasta) {
   static const char* seq1 = "ATTACCTTGTACCTTCAGAGC";
   static const char* seq2 = "TTCGATCCCTTGATAATTAGTCACGTTAGCT";
   const char* file_name = "Fasta.fa";
-  file_unlink fu(file_name);
 
   {
     std::ofstream sequence(file_name);
@@ -73,7 +72,6 @@ TEST(SequenceParser, Fastq) {
   static const char* seq1 = "ATTACCTTGTACCTTCAGAGC";
   static const char* seq2 = "TTCGATCCCTTGATAATTAGTCACGTTAGCT";
   const char* file_name = "Fasta.fq";
-  file_unlink fu(file_name);
 
   {
     std::ofstream sequence(file_name);
@@ -126,7 +124,6 @@ TEST(SequenceParser, Fastq) {
 
 TEST(SequenceParser, FastaMany) {
   const char* file_name = "FastaMany.fa";
-  file_unlink fu(file_name);
   static const int nb_sequences = 1000;
 
   std::uniform_int_distribution<int> rand_byte(0, 255);

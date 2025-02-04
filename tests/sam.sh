@@ -16,7 +16,7 @@ for i in 1 2; do
     [ "$(grep '^@PG' $f | head -c $pglen)" = "$pgline" ]
 
     # Test sequence headers
-    diff -q <(grep '^@SQ' $f) <(ufasta sizes -H $D/seed_reads_1.fa | sed 's/\([0-9]\+\) \([0-9]\+\)/@SQ\tSN:\1\tLN:\2/')
+    diff -q <(grep '^@SQ' $f) <(ufasta sizes -H $D/seed_reads_1.fa | sed -E 's/([0-9]+) ([0-9]+)/@SQ\tSN:\1\tLN:\2/')
 
     # Test that samtools can parse our output
     if [ -n "$SAMTOOLS" ]; then

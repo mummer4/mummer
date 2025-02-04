@@ -36,6 +36,10 @@
 #ifndef _GCC10_UNIFORM_DIST_H
 #define _GCC10_UNIFORM_DIST_H
 
+#ifndef __glibcxx_assert
+#define __glibcxx_assert(x)
+#endif
+
 #include <type_traits>
 #include <limits>
 

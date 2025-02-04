@@ -48,6 +48,7 @@ class ostream_buffered : public consumer<ostream_buffered, stringstream_wrapper>
   std::ostream& os_;
 public:
   ostream_buffered(std::ostream& os) : os_(os) { }
+  ~ostream_buffered() { close(); }
   bool operator()(stringstream_wrapper& e) {
     bool res = false;
     auto rdbuf = e.p_->rdbuf();

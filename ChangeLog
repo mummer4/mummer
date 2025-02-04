@@ -1,5 +1,16 @@
 -- Version history --
 
+4.0.0  48bit suffix array. Go past previous sequence length limitations
+       nucmer is all C++ (not Perl script) and multi-threaded
+       nucmer can save the SA index for later reuse
+       Added SAM output format to nucmer
+       Moved to autoconf compilation system
+       Bindings to scripting language: Python, Perl, Ruby
+       Improved mummerplot
+       Better unittesting and conformance testing
+       Provide a library with pkg-conig configuration
+       Moved to artistic license 2.0
+       Moved to C++17 standard.
 3.23 - Added -D and --banded option to nucmer. These options can be used to
        specify the largest indel that will be included in an alignment
        segment without breaking it in two pieces.
