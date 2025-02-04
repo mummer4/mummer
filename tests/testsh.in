@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /usr/bin/env bash
 
 set -e
 set -x
@@ -18,15 +18,14 @@ SCRIPT=$1
 
 # Path to data
 D=$BUILD/tests/data
-PATH=$BUILD:$BUILD/tests:$SRC/tests:$PATH
+PATH=${BUILD}:${BUILD}/tests:${SRC}/tests:$PATH
+
 # Name
 N=$(basename $1 .sh)
 # Working directory
 WORKDIR=tests/$N
 mkdir -p $WORKDIR
 
-# Read script in fd 3 so that it is availabe after changing directory
-# (path to SCRIPT may not be absolute).
-exec 3<$SCRIPT
+SCRIPT=$(realpath $SCRIPT)
 cd $WORKDIR
-source /dev/fd/3
+source "$SCRIPT"

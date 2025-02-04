@@ -1,4 +1,9 @@
-#! /bin/bash
+#! /usr/bin/env bash
 
-md5sum -c <(echo "$1  -") 2>&1 || \
-    test $(md5) == "$1" 2>&1
+# The semantic of md5sum differs in some subtle way. Darwin doesn't support
+# /dev/stdin, FreeBSD doesn't support "-". Linux supports both.
+
+case "$(uname)" in
+  (Darwin) exec md5sum -c <(echo "$1  -") 2>&1 ;;
+  (*) exec md5sum -c <(echo "$1  /dev/stdin") 2>&1 ;;
+esac

@@ -696,7 +696,8 @@ void append(ColoredBuffer& Buff1, ColoredBuffer& Buff2, std::string &Buff3,
 
 void add_prefix(ColoredBuffer& Buff, long int pos, long int seqlen, int frame) {
   char b[LINE_BUFFER_LEN + 1];
-  sprintf(b, PREFIX_FORMAT, toFwd(pos, seqlen, frame));
+  snprintf(b, sizeof(b), PREFIX_FORMAT, toFwd(pos, seqlen, frame));
+  b[sizeof(b)-1] = '\0';
   Buff.clear();
   Buff += b;
 }

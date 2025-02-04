@@ -1,0 +1,9 @@
+#! /usr/bin/env bash
+
+set -e
+
+pwd
+p=$(realpath unittests/test_all)
+mkdir -p unittests/tmp
+cd unittests/tmp
+exec $p
