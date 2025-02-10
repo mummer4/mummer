@@ -1491,6 +1491,7 @@ ostream & DeltaGraph_t::outputIdy (ostream & out)
   vector<DeltaEdgelet_t *>::const_iterator eli;
 
   long idycTotal;
+  long refMatchedTotal;
   double idy = 0;
   bool pass;
 
@@ -1500,6 +1501,7 @@ ostream & DeltaGraph_t::outputIdy (ostream & out)
             ei != (mi->second).edges.end(); ++ ei )
         {
           idycTotal = 0;
+          refMatchedTotal = 0;
           pass = true;
           
           for ( eli  = (*ei)->edgelets.begin();
@@ -1508,15 +1510,16 @@ ostream & DeltaGraph_t::outputIdy (ostream & out)
               if ( (*eli)->isGOOD )
                 pass = false;
               idycTotal += (*eli)->idyc;
+              refMatchedTotal += (*eli)->hiR - (*eli)->loR + 1;
             }
           if (pass != true)
           {
 
-            if ((*ei)->refnode->len > (*ei)->qrynode->len)
+            if ((*ei)->refnode->len < (*ei)->qrynode->len)
             {
-              idy = (double)(((*ei)->qrynode->len - idycTotal)) / (double)((*ei)->qrynode->len);
+              idy = (double)(((*ei)->qrynode->len - idycTotal - ((*ei)->refnode->len - refMatchedTotal))) / (double)((*ei)->qrynode->len);
             }else{
-              idy = (double)(((*ei)->refnode->len - idycTotal)) / (double)((*ei)->refnode->len);
+              idy = (double)(((*ei)->refnode->len - idycTotal - ((*ei)->refnode->len - refMatchedTotal))) / (double)((*ei)->refnode->len);
             }
             out
               << '>'
