@@ -41,7 +41,7 @@ my $HELP_INFO = q~
   USAGE: promer  [options]  <Reference>  <Query>
 
   DESCRIPTION:
-    promer generates amino acid alignments between two mutli-FASTA DNA input
+    promer generates amino acid alignments between two multi-FASTA DNA input
     files. The out.delta output file lists the distance between insertions
     and deletions that produce maximal scoring alignments between each
     sequence. The show-* utilities know how to read this format. The DNA

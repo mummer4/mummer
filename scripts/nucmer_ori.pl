@@ -40,7 +40,7 @@ my $HELP_INFO = q~
   USAGE: nucmer  [options]  <Reference>  <Query>
 
   DESCRIPTION:
-    nucmer generates nucleotide alignments between two mutli-FASTA input
+    nucmer generates nucleotide alignments between two multi-FASTA input
     files. The out.delta output file lists the distance between insertions
     and deletions that produce maximal scoring alignments between each
     sequence. The show-* utilities know how to read this format.
