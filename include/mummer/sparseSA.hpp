@@ -653,7 +653,7 @@ void sparseSA::findMEM_k_each(const char* P, size_t Plen, long k, int min_len, b
         int i = 0;
         bool succes  = true;
         while(i < sparseMult && (succes = suffixlink(mli))){
-          suffixlink(xmi);
+          if( !suffixlink(xmi) ){ xmi = mli; }
           i++;
         }
         if(!succes){
