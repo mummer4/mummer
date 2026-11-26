@@ -302,15 +302,19 @@ MAIN:
     unless ( $OPT_gpstatus == -1 ) {
 
         my $child = 1;
+        my $forked = 0;
         if ( $OPT_gpstatus == 0 && $OPT_terminal eq $X11 ) {
             print STDERR "Forking mouse listener\n";
             $child = fork;
+            $forked = 1;
         }
 
         #-- parent runs gnuplot
         if ( $child ) {
             RunGP( );
-            kill 1, $child;
+            #-- only signal a listener we forked; $child is otherwise the
+            #-- sentinel 1, and kill 1, 1 sends SIGHUP to PID 1
+            kill 1, $child if $forked;
         }
         #-- child listens to clipboard
         elsif ( defined $child ) {
